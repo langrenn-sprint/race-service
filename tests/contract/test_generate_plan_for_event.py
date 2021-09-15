@@ -39,9 +39,9 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="session")
-async def event_id(http_service: Any, token: MockFixture) -> Optional[str]:
-    """Create an event object for testing."""
-    url = f"{http_service}/events"
+async def raceplan_id(http_service: Any, token: MockFixture) -> Optional[str]:
+    """Create an raceplan object for testing."""
+    url = f"{http_service}/raceplans"
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -58,41 +58,30 @@ async def event_id(http_service: Any, token: MockFixture) -> Optional[str]:
         status = response.status
     await session.close()
     if status == 201:
-        # return the event_id, which is the last item of the path
+        # return the raceplan_id, which is the last item of the path
         return response.headers[hdrs.LOCATION].split("/")[-1]
     else:
-        logging.error(f"Got unsuccesful status when creating event: {status}.")
+        logging.error(f"Got unsuccesful status when creating raceplan: {status}.")
         return None
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_generate_ageclasses(
-    http_service: Any, token: MockFixture, event_id: str
+async def test_generate_raceplan_for_event(
+    http_service: Any, token: MockFixture, raceplan_id: str
 ) -> None:
-    """Should return 201 created and a location header with url to ageclasses."""
+    """Should return 201 created and a location header with url to raceplan."""
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
+        hdrs.CONTENT_TYPE: "application/json",
     }
 
     async with ClientSession() as session:
-
-        # First we need to find assert that we have an event:
-        url = f"{http_service}/events/{event_id}"
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-
-        # Then we add contestants to event:
-        url = f"{http_service}/events/{event_id}/contestants"
-        files = {"file": open("tests/files/contestants_eventid_364892.csv", "rb")}
-        async with session.post(url, headers=headers, data=files) as response:
-            assert response.status == 200
-
         # Finally ageclasses are generated:
-        url = f"{http_service}/events/{event_id}/generate-ageclasses"
+        url = f"{http_service}/raceplans/{raceplan_id}/generate-plan-for-event"
         async with session.post(url, headers=headers) as response:
             assert response.status == 201
-            assert f"/events/{event_id}/ageclasses" in response.headers[hdrs.LOCATION]
+            assert f"/raceplans/{raceplan_id}" in response.headers[hdrs.LOCATION]
 
         # We check that ageclasses are actually created:
         url = response.headers[hdrs.LOCATION]

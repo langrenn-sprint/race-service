@@ -1,8 +1,8 @@
 version: '3'
 services:
-  event-service:
+  race-service:
     build: .
-    image: gcr.io/langrenn-sprint/event-service:test
+    image: gcr.io/langrenn-sprint/race-service:test
     ports:
       - 8080:8080
     environment:
