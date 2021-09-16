@@ -15,4 +15,4 @@ ADD src /app/src
 
 EXPOSE 8080
 
-CMD gunicorn  --chdir src "event_service:create_app"  --config=src/event_service/gunicorn_config.py --worker-class aiohttp.GunicornWebWorker
+CMD gunicorn  --chdir src "race_service:create_app"  --config=src/race_service/gunicorn_config.py --worker-class aiohttp.GunicornWebWorker

@@ -1,4 +1,4 @@
-"""Module for admin of sporting events."""
+"""Module for admin of races."""
 import logging
 import os
 from typing import Any
@@ -8,15 +8,10 @@ from aiohttp_middlewares import cors_middleware, error_middleware
 import motor.motor_asyncio
 
 from .views import (
-    AgeclassesView,
-    AgeclassView,
-    ContestantsAssignBibsView,
-    ContestantsView,
-    ContestantView,
-    EventGenerateAgeclassesView,
-    EventsView,
-    EventView,
+    GenerateRaceplanForEventView,
     Ping,
+    RaceplansView,
+    RaceplanView,
     Ready,
 )
 
@@ -52,18 +47,11 @@ async def create_app() -> web.Application:
         [
             web.view("/ping", Ping),
             web.view("/ready", Ready),
-            web.view("/events", EventsView),
-            web.view("/events/{eventId}", EventView),
+            web.view("/raceplans", RaceplansView),
             web.view(
-                "/events/{eventId}/generate-ageclasses", EventGenerateAgeclassesView
+                "/raceplans/generate-raceplan-for-event", GenerateRaceplanForEventView
             ),
-            web.view("/events/{eventId}/ageclasses", AgeclassesView),
-            web.view("/events/{eventId}/ageclasses/{ageclassId}", AgeclassView),
-            web.view("/events/{eventId}/contestants", ContestantsView),
-            web.view(
-                "/events/{eventId}/contestants/assign-bibs", ContestantsAssignBibsView
-            ),
-            web.view("/events/{eventId}/contestants/{contestantId}", ContestantView),
+            web.view("/raceplans/{raceplanId}", RaceplanView),
         ]
     )
 

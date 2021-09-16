@@ -49,7 +49,7 @@ jobs:
 
       - name: Tag and publish docker image to Google Cloud
         run: |-
-          docker tag gcr.io/$PROJECT_ID/event-service:test gcr.io/$PROJECT_ID/event-service:$GITHUB_SHA
-          docker tag gcr.io/$PROJECT_ID/event-service:test gcr.io/$PROJECT_ID/event-service:latest
-          docker rmi gcr.io/$PROJECT_ID/event-service:test
-          docker -- push gcr.io/$PROJECT_ID/event-service -a
+          docker tag gcr.io/$PROJECT_ID/race-service:test gcr.io/$PROJECT_ID/race-service:$GITHUB_SHA
+          docker tag gcr.io/$PROJECT_ID/race-service:test gcr.io/$PROJECT_ID/race-service:latest
+          docker rmi gcr.io/$PROJECT_ID/race-service:test
+          docker -- push gcr.io/$PROJECT_ID/race-service -a

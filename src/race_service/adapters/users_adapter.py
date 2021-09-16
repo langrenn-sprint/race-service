@@ -15,7 +15,7 @@ USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
 class UsersAdapter:
-    """Class representing an adapter for events."""
+    """Class representing an adapter for users."""
 
     @classmethod
     async def authorize(cls: Any, token: Optional[str], roles: list) -> None:

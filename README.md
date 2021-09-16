@@ -1,7 +1,24 @@
-# event-service
-Backend service to adminster events, will generate racelists etc
+# race-service
+The race service let you administrate the main domain objects race and race plan.
 
+Based on the type of event (competition format), list of race classes and a list of contestants, this service will support:
 
+- generating a race plan, and
+- generating races pr race classes with contestants and start times for each individual race.
+
+The race service will support the following competition formats:
+
+- Interval start competition,
+- Mass start competition,
+- Skiathlon competition,
+- Pursuit,
+- Individual sprint competition,
+- Team sprint competition, and
+- Relay competitions.
+
+cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_CrossCountry_2022_clean.pdf
+
+## Example of usage
 ```
 % curl -H "Content-Type: application/json" \
   -X POST \
@@ -12,30 +29,57 @@ Backend service to adminster events, will generate racelists etc
   -H "Authorization: Bearer $ACCESS" \
   -X POST \
   --data @tests/files/event.json \
-  http://localhost:8080/events
-% curl -H "Authorization: Bearer $ACCESS"  http://localhost:8080/events
+  http://localhost:8080/raceplans/generate-plan-for-event
+% curl -H "Authorization: Bearer $ACCESS"  http://localhost:8080/raceplans
 ```
 
-## Running the API locally
+## Develop and run locally
+### Requirements
+- [pyenv](https://github.com/pyenv/pyenv) (recommended)
+- [poetry](https://python-poetry.org/)
+- [nox](https://nox.thea.codes/en/stable/)
+
+```
+% pipx install nox
+% pipx install poetry
+% pipx inject nox nox-poetry
+```
+
+### Install software:
+```
+% git clone https://github.com/Informasjonsforvaltning/dataservice-publisher.git
+% cd dataservice-publisher
+% pyenv install 3.9.6
+% pyenv local 3.9.6
+% poetry install
+```
+### Environment variables
+To run the service locally, you need to supply a set of environment variables. A simple way to solve this is to supply a .env file in the root directory.
+
+A minimal .env:
+```
+```
+
+### Running the API locally
 Start the server locally:
 ```
-% poetry run adev runserver -p 8080 --aux-port 8089 src/event_service
+% poetry run adev runserver -p 8080 --aux-port 8089 src/race_service
 ```
-## Running the API in a wsgi-server (gunicorn)
+### Running the API in a wsgi-server (gunicorn)
 ```
-% cd src && poetry run gunicorn event_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% cd src && poetry run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
 ```
-## Running the wsgi-server in Docker
+### Running the wsgi-server in Docker
 To build and run the api in a Docker container:
 ```
-% docker build -t gcr.io/langrenn-sprint/event-service:latest .
-% docker run --env-file .env -p 8080:8080 -d gcr.io/langrenn-sprint/event-service:latest
+% docker build -t gcr.io/langrenn-sprint/race-service:latest .
+% docker run --env-file .env -p 8080:8080 -d gcr.io/langrenn-sprint/race-service:latest
 ```
 The easier way would be with docker-compose:
 ```
 docker-compose up --build
 ```
-## Running tests
+### Running tests
 We use [pytest](https://docs.pytest.org/en/latest/) for contract testing.
 
 To run linters, checkers and tests:
@@ -44,31 +88,9 @@ To run linters, checkers and tests:
 ```
 To run specific test:
 ```
-% nox -s integration_tests -- -k test_create_event_adapter_fails
+% nox -s integration_tests -- -k test_create_race_adapter_fails
 ```
 To run tests with logging, do:
 ```
 % nox -s integration_tests -- --log-cli-level=DEBUG
-```
-## Environment variables
-### `REDIS_HOST`
-Hostname where the remote redis is reachable on default port (6379).
-Default: localhost
-### `REDIS_PASSWORD`
-Password to the remote redis is reachable.
-Default: `6379`
-### `LOGGING_LEVEL`
-One of the supported levels found [here](https://docs.python.org/3/library/logging.html#levels).
-Default: `INFO`
-### `CONFIG`
-One of
-- `dev`: will not use cache backend
-- `test`: will not use cache backend
-- `production`: will require and use a redis backend, cf docker-compose.yml
-Default: `production`
-
-An example .env file for local development without use of redis cache:
-```
-LOGGING_LEVEL=DEBUG
-CONFIG=dev
 ```
