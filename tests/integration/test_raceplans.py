@@ -32,7 +32,7 @@ def token_unsufficient_role() -> str:
 
 @pytest.fixture
 async def new_raceplan() -> dict:
-    """Create a mock contestant object."""
+    """Create a raceplan object."""
     return {
         "event_id": "event_1",
         "races": [
@@ -66,7 +66,7 @@ async def new_raceplan() -> dict:
 
 @pytest.fixture
 async def raceplan() -> dict:
-    """Create a mock contestant object."""
+    """Create a mock raceplan object."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "event_id": "event_1",

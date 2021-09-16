@@ -2,7 +2,7 @@
 import asyncio
 import logging
 import os
-from typing import Any, Optional
+from typing import Any, AsyncGenerator
 
 from aiohttp import ClientSession, hdrs
 import pytest
@@ -39,36 +39,47 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="session")
-async def raceplan_id(http_service: Any, token: MockFixture) -> Optional[str]:
+async def request_body() -> dict:
     """Create an raceplan object for testing."""
+    return {
+        "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "competition_format": "Individual sprint competition",
+        "raceclasses": [{"name": "G16", "order": "1"}, {"name": "J16", "order": "2"}],
+        "contestants": [
+            {"bib": 1, "raceclass": "G16"},
+            {"bib": 2, "raceclass": "G16"},
+            {"bib": 3, "raceclass": "J16"},
+            {"bib": 4, "raceclass": "J16"},
+        ],
+    }
+
+
+@pytest.fixture
+@pytest.mark.asyncio
+async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
+    """Delete all raceplans."""
+    yield
     url = f"{http_service}/raceplans"
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-    request_body = {
-        "name": "Oslo Skagen sprint",
-        "date": "2021-08-31",
-        "organiser": "Lyn Ski",
-        "webpage": "https://example.com",
-        "information": "Testarr for å teste den nye løysinga.",
-    }
+
     session = ClientSession()
-    async with session.post(url, headers=headers, json=request_body) as response:
-        status = response.status
+    async with session.get(url, headers=headers) as response:
+        raceplans = await response.json()
+        for raceplan in raceplans:
+            raceplan_id = raceplan["id"]
+            async with session.delete(
+                f"{url}/{raceplan_id}", headers=headers
+            ) as response:
+                pass
     await session.close()
-    if status == 201:
-        # return the raceplan_id, which is the last item of the path
-        return response.headers[hdrs.LOCATION].split("/")[-1]
-    else:
-        logging.error(f"Got unsuccesful status when creating raceplan: {status}.")
-        return None
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_generate_raceplan_for_event(
-    http_service: Any, token: MockFixture, raceplan_id: str
+    http_service: Any, token: MockFixture, clear_db: None, request_body: dict
 ) -> None:
     """Should return 201 created and a location header with url to raceplan."""
     headers = {
@@ -77,17 +88,18 @@ async def test_generate_raceplan_for_event(
     }
 
     async with ClientSession() as session:
-        # Finally ageclasses are generated:
-        url = f"{http_service}/raceplans/{raceplan_id}/generate-plan-for-event"
-        async with session.post(url, headers=headers) as response:
+        # Raceplan is generated:
+        url = f"{http_service}/raceplans/generate-raceplan-for-event"
+        async with session.post(url, headers=headers, json=request_body) as response:
             assert response.status == 201
-            assert f"/raceplans/{raceplan_id}" in response.headers[hdrs.LOCATION]
+            assert "/raceplans/" in response.headers[hdrs.LOCATION]
 
-        # We check that ageclasses are actually created:
+        # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
         async with session.get(url, headers=headers) as response:
-            ageclasses = await response.json()
+            raceplan = await response.json()
             assert response.status == 200
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-            assert type(ageclasses) is list
-            assert len(ageclasses) > 0
+            assert type(raceplan) is dict
+            assert raceplan["id"]
+            assert raceplan["event_id"] == request_body["event_id"]
