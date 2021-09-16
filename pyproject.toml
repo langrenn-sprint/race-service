@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "event-service"
+name = "race-service"
 version = "0.1.0"
 description = "An API for admin of sporting events"
 authors = ["Stig B. Dørmænen <stigbd@gmail.com>", "Heming Harnæs <heming.harnaes@gmail.com"]
 license = "Apache-2.0"
 readme = "README.md"
-homepage = "https://github.com/langrenn-sprint/event-service"
-repository = "https://github.com/langrenn-sprint/event-service"
+homepage = "https://github.com/langrenn-sprint/race-service"
+repository = "https://github.com/langrenn-sprint/race-service"
 classifiers=[
   "Programming Language :: Python :: 3",
   "License :: OSI Approved :: Apache Software License",
@@ -59,7 +59,7 @@ source = ["src", "*/site-packages"]
 
 [tool.coverage.run]
 branch = false
-source = ["event_service"]
+source = ["race_service"]
 omit = ["*gunicorn_config.py"]
 
 [tool.coverage.report]
