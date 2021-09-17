@@ -58,6 +58,12 @@ To run the service locally, you need to supply a set of environment variables. A
 
 A minimal .env:
 ```
+JWT_SECRET=secret
+JWT_EXP_DELTA_SECONDS=3600
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=passw123
+DB_USER=admin
+DB_PASSWORD=admin
 ```
 
 ### Running the API locally
