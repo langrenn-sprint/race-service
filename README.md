@@ -23,7 +23,7 @@ cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cross
 % curl -H "Content-Type: application/json" \
   -X POST \
   --data '{"username":"admin","password":"passw123"}' \
-  http://localhost:8081/login
+  http://localhost:8082/login
 % export ACCESS="" #token from response
 % curl -H "Content-Type: application/json" \
   -H "Authorization: Bearer $ACCESS" \
@@ -58,6 +58,12 @@ To run the service locally, you need to supply a set of environment variables. A
 
 A minimal .env:
 ```
+JWT_SECRET=secret
+JWT_EXP_DELTA_SECONDS=3600
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=passw123
+DB_USER=admin
+DB_PASSWORD=admin
 ```
 
 ### Running the API locally
