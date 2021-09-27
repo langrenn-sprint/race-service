@@ -1,6 +1,7 @@
 """Integration test cases for the raceplans route."""
 from copy import deepcopy
-from datetime import time
+from datetime import datetime
+from json import dumps
 import os
 
 from aiohttp import hdrs
@@ -37,28 +38,24 @@ async def new_raceplan() -> dict:
         "event_id": "event_1",
         "races": [
             {
-                "name": "G16K01",
                 "raceclass": "G16",
                 "order": 1,
-                "start_time": time(12, 00, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
             },
             {
-                "name": "G16K02",
                 "raceclass": "G16",
                 "order": 2,
-                "start_time": time(12, 15, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
             },
             {
-                "name": "G16K03",
                 "raceclass": "G16",
                 "order": 3,
-                "start_time": time(12, 30, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
             },
             {
-                "name": "G16K04",
                 "raceclass": "G16",
                 "order": 4,
-                "start_time": time(12, 45, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
             },
         ],
     }
@@ -72,28 +69,24 @@ async def raceplan() -> dict:
         "event_id": "event_1",
         "races": [
             {
-                "name": "G16K01",
                 "raceclass": "G16",
                 "order": 1,
-                "start_time": time(12, 00, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
             },
             {
-                "name": "G16K02",
                 "raceclass": "G16",
                 "order": 2,
-                "start_time": time(12, 15, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
             },
             {
-                "name": "G16K03",
                 "raceclass": "G16",
                 "order": 3,
-                "start_time": time(12, 30, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
             },
             {
-                "name": "G16K04",
                 "raceclass": "G16",
                 "order": 4,
-                "start_time": time(12, 45, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
             },
         ],
     }
@@ -118,7 +111,7 @@ async def test_create_raceplan(
         return_value=RACEPLAN_ID,
     )
 
-    request_body = new_raceplan
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
 
     headers = MultiDict(
         {
@@ -128,8 +121,8 @@ async def test_create_raceplan(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
-        resp = await client.post("/raceplans", headers=headers, json=request_body)
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
         assert resp.status == 201
         assert f"/raceplans/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
 
@@ -152,7 +145,7 @@ async def test_get_raceplan_by_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.get(f"/raceplans/{RACEPLAN_ID}", headers=headers)
         assert resp.status == 200
@@ -163,7 +156,6 @@ async def test_get_raceplan_by_id(
         assert body["event_id"] == raceplan["event_id"]
         assert len(body["races"]) == 4
         for race in body["races"]:
-            assert race["name"]
             assert race["raceclass"]
             assert race["order"]
             assert race["start_time"]
@@ -190,13 +182,13 @@ async def test_update_raceplan_by_id(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         },
     )
-    request_body = raceplan
+    request_body = dumps(raceplan, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.put(
-            f"/raceplans/{RACEPLAN_ID}", headers=headers, json=request_body
+            f"/raceplans/{RACEPLAN_ID}", headers=headers, data=request_body
         )
         assert resp.status == 204
 
@@ -218,7 +210,7 @@ async def test_get_all_raceplans(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.get("/raceplans", headers=headers)
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -249,7 +241,7 @@ async def test_delete_raceplan_by_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.delete(f"/raceplans/{RACEPLAN_ID}", headers=headers)
         assert resp.status == 204
@@ -272,7 +264,8 @@ async def test_create_raceplan_with_input_id(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=RACEPLAN_ID,
     )
-    request_body = raceplan
+    request_body = dumps(raceplan, indent=4, sort_keys=True, default=str)
+
     headers = MultiDict(
         {
             hdrs.CONTENT_TYPE: "application/json",
@@ -281,8 +274,8 @@ async def test_create_raceplan_with_input_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
-        resp = await client.post("/raceplans", headers=headers, json=request_body)
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
         assert resp.status == 422
 
 
@@ -299,7 +292,8 @@ async def test_create_raceplan_adapter_fails(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=None,
     )
-    request_body = new_raceplan
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
+
     headers = MultiDict(
         {
             hdrs.CONTENT_TYPE: "application/json",
@@ -308,8 +302,8 @@ async def test_create_raceplan_adapter_fails(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
-        resp = await client.post("/raceplans", headers=headers, json=request_body)
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
         assert resp.status == 400
 
 
@@ -337,7 +331,7 @@ async def test_create_raceplan_mandatory_property(
     request_body = {"id": RACEPLAN_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.post("/raceplans", headers=headers, json=request_body)
         assert resp.status == 422
@@ -367,7 +361,7 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
     request_body = {"id": RACEPLAN_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.put(
             f"/raceplans/{RACEPLAN_ID}", headers=headers, json=request_body
@@ -396,14 +390,15 @@ async def test_update_raceplan_by_id_different_id_in_body(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         },
     )
-    request_body = deepcopy(raceplan)
-    request_body["id"] = "different_id"
+    update_body = deepcopy(raceplan)
+    update_body["id"] = "different_id"
+    request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.put(
-            f"/raceplans/{RACEPLAN_ID}", headers=headers, json=request_body
+            f"/raceplans/{RACEPLAN_ID}", headers=headers, data=request_body
         )
         assert resp.status == 422
 
@@ -426,13 +421,13 @@ async def test_create_raceplan_no_authorization(
         return_value=RACEPLAN_ID,
     )
 
-    request_body = new_raceplan
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
     headers = MultiDict({hdrs.CONTENT_TYPE: "application/json"})
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8081/authorize", status=401)
 
-        resp = await client.post("/raceplans", headers=headers, json=request_body)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
         assert resp.status == 401
 
 
@@ -448,7 +443,7 @@ async def test_get_raceplan_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8081/authorize", status=401)
 
         resp = await client.get(f"/raceplans/{RACEPLAN_ID}")
         assert resp.status == 401
@@ -474,13 +469,14 @@ async def test_update_raceplan_by_id_no_authorization(
             hdrs.CONTENT_TYPE: "application/json",
         },
     )
-    request_body = raceplan
+
+    request_body = dumps(raceplan, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8081/authorize", status=401)
 
         resp = await client.put(
-            f"/raceplans/{RACEPLAN_ID}", headers=headers, json=request_body
+            f"/raceplans/{RACEPLAN_ID}", headers=headers, data=request_body
         )
         assert resp.status == 401
 
@@ -495,7 +491,7 @@ async def test_list_raceplans_no_authorization(
         return_value=[raceplan],
     )
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8081/authorize", status=401)
         resp = await client.get("/raceplans")
         assert resp.status == 401
 
@@ -512,7 +508,7 @@ async def test_delete_raceplan_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8081/authorize", status=401)
 
         resp = await client.delete(f"/raceplans/{RACEPLAN_ID}")
         assert resp.status == 401
@@ -537,7 +533,7 @@ async def test_create_raceplan_insufficient_role(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=RACEPLAN_ID,
     )
-    request_body = new_raceplan
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
     headers = MultiDict(
         {
             hdrs.CONTENT_TYPE: "application/json",
@@ -546,8 +542,8 @@ async def test_create_raceplan_insufficient_role(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=403)
-        resp = await client.post("/raceplans", headers=headers, json=request_body)
+        m.post("http://users.example.com:8081/authorize", status=403)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
         assert resp.status == 403
 
 
@@ -571,7 +567,7 @@ async def test_get_raceplan_not_found(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.get(f"/raceplans/{RACEPLAN_ID}", headers=headers)
         assert resp.status == 404
@@ -598,12 +594,12 @@ async def test_update_raceplan_not_found(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         },
     )
-    request_body = raceplan
+    request_body = dumps(raceplan, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.put(
-            f"/raceplans/{RACEPLAN_ID}", headers=headers, json=request_body
+            f"/raceplans/{RACEPLAN_ID}", headers=headers, data=request_body
         )
         assert resp.status == 404
 
@@ -629,6 +625,6 @@ async def test_delete_raceplan_not_found(
         },
     )
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.delete(f"/raceplans/{RACEPLAN_ID}", headers=headers)
         assert resp.status == 404
