@@ -136,7 +136,9 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
 
 # Create an event to test on:
 @pytest.fixture(scope="module")
-async def event_id(http_service: Any, token: MockFixture) -> Optional[str]:
+async def event_id(
+    http_service: Any, token: MockFixture, competition_format_interval_start: Any
+) -> Optional[str]:
     """Create an event object for testing."""
     url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
     with open("tests/files/event.json", "r") as file:
@@ -165,11 +167,23 @@ async def event_id(http_service: Any, token: MockFixture) -> Optional[str]:
 
 
 @pytest.fixture(scope="module")
-async def competition_format_interval_start() -> dict:
+async def competition_format_interval_start(
+    http_service: Any, token: MockFixture
+) -> Any:
     """An competition_format object for testing."""
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
     with open("tests/files/competition_format.json", "r") as file:
         competition_format = load(file)
-    return competition_format
+        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
+        request_body = competition_format
+        session = ClientSession()
+        async with session.post(url, headers=headers, json=request_body) as response:
+            status = response.status
+        await session.close()
+        assert status == 201
 
 
 @pytest.fixture
@@ -189,7 +203,6 @@ async def test_generate_raceplan_for__interval_start_event(
     token: MockFixture,
     clear_db: None,
     event_id: str,
-    competition_format_interval_start: dict,
     expected_raceplan: dict,
 ) -> None:
     """Should return 201 created and a location header with url to raceplan."""
@@ -203,13 +216,6 @@ async def test_generate_raceplan_for__interval_start_event(
         logging.debug(f"Verifying event with id {event_id} at url {url}.")
         async with session.get(url, headers=headers) as response:
             assert response.status == 200
-
-        # Then we have to create a competition_format:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
-        request_body = competition_format_interval_start
-        async with session.post(url, headers=headers, json=request_body) as response:
-            status = response.status
-            assert status == 201
 
         # Add list of contestants to event:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
