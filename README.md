@@ -23,7 +23,7 @@ cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cross
 % curl -H "Content-Type: application/json" \
   -X POST \
   --data '{"username":"admin","password":"passw123"}' \
-  http://localhost:8081/login
+  http://localhost:8082/login
 % export ACCESS="" #token from response
 % curl -H "Content-Type: application/json" \
   -H "Authorization: Bearer $ACCESS" \

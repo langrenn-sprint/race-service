@@ -48,6 +48,7 @@ class RaceplansService:
         Raises:
             IllegalValueException: input object has illegal values
         """
+        logging.debug(f"trying to insert raceplan: {raceplan}")
         # Validation:
         if raceplan.id:
             raise IllegalValueException("Cannot create raceplan with input id.")
@@ -56,6 +57,7 @@ class RaceplansService:
         raceplan.id = id
         # insert new raceplan
         new_raceplan = raceplan.to_dict()
+        logging.debug(f"new_raceplan: {new_raceplan}")
         result = await RaceplansAdapter.create_raceplan(db, new_raceplan)
         logging.debug(f"inserted raceplan with id: {id}")
         if result:

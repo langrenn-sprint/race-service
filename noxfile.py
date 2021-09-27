@@ -12,6 +12,7 @@ nox.options.sessions = (
     "lint",
     "mypy",
     "pytype",
+    "unit_tests",
     "integration_tests",
     "contract_tests",
 )
@@ -21,20 +22,12 @@ nox.options.sessions = (
 def unit_tests(session: Session) -> None:
     """Run the unit test suite."""
     args = session.posargs
-    session.install(
-        ".",
-        "pytest",
-        "pytest-mock",
-        "pytest-aiohttp",
-        "requests",
-        "aioresponses",
-    )
+    session.install(".", "requests", "pytest", "pytest-mock", "pytest-asyncio")
     session.run(
         "pytest",
         "-m unit",
         "-rA",
         *args,
-        env={"CONFIG": "test", "JWT_SECRET": "secret"},
     )
 
 
@@ -62,7 +55,9 @@ def integration_tests(session: Session) -> None:
             "JWT_SECRET": "secret",
             "ADMIN_USERNAME": "admin",
             "ADMIN_PASSWORD": "password",
-            "USERS_HOST_SERVER": "example.com",
+            "EVENTS_HOST_SERVER": "events.example.com",
+            "EVENTS_HOST_PORT": "8081",
+            "USERS_HOST_SERVER": "users.example.com",
             "USERS_HOST_PORT": "8081",
         },
     )
@@ -90,8 +85,10 @@ def contract_tests(session: Session) -> None:
             "CONFIG": "test",
             "ADMIN_USERNAME": "admin",
             "ADMIN_PASSWORD": "password",
+            "EVENTS_HOST_SERVER": "localhost",
+            "EVENTS_HOST_PORT": "8081",
             "USERS_HOST_SERVER": "localhost",
-            "USERS_HOST_PORT": "8081",
+            "USERS_HOST_PORT": "8082",
             "JWT_EXP_DELTA_SECONDS": "60",
         },
     )

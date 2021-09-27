@@ -37,6 +37,24 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/RacePlanCollection'
+    /raceplans/generate-raceplan-for-event:
+      post:
+        tags:
+        - race_plan
+        security:
+        - bearerAuth: []
+        description: command to generate race plan based on event
+        requestBody:
+          description: input data from which to generate the plan
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uuid
+                description: id of event to which the plan belongs
+        responses:
+          201:
+            description: Created
     /raceplans/{racePlanId}:
       parameters:
       - name: racePlanId
@@ -71,59 +89,8 @@
         responses:
           204:
             description: No content
-    /raceplans/generate-raceplan-for-event:
-      post:
-        tags:
-        - race_plan
-        security:
-        - bearerAuth: []
-        description: command to generate race plan based on event
-        requestBody:
-          description: input data from which to generate the plan
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Input'
-        responses:
-          201:
-            description: Created
   components:
     schemas:
-      Input:
-        type: object
-        description: the composite input object with required information to generate a race plan|
-        properties:
-          event_id:
-            type: string
-            description: reference to the event
-          competitionFormat:
-            type: string
-            description: the format of the competition
-          startTime:
-            type: string
-            format: time
-            description: the time of day when the event starts
-          raceclasses:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                  description: name of race class
-                order:
-                  type: integer
-                  description: relative start position in plan
-          contestants:
-            type: array
-            items:
-              type: object
-              properties:
-                bib:
-                  type: integer
-                raceclass:
-                  type: string
-                  description: race class name
       RacePlanCollection:
         type: object
         properties:
@@ -141,7 +108,7 @@
           races:
             type: array
             items:
-              type: str
+              type: string
               description: ref to individual races
     securitySchemes:
       bearerAuth:

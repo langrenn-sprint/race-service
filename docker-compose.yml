@@ -8,6 +8,26 @@ services:
     environment:
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - EVENTS_HOST_SERVER=event-service
+      - EVENTS_HOST_PORT=8080
+      - USERS_HOST_SERVER=user-service
+      - USERS_HOST_PORT=8080
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - LOGGING_LEVEL=${LOGGING_LEVEL}
+    depends_on:
+      - event-service
+      - user-service
+      - mongodb
+  event-service:
+    image: gcr.io/langrenn-sprint/event-service:latest
+    ports:
+      - 8081:8080
+    environment:
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - USERS_HOST_SERVER=user-service
       - USERS_HOST_PORT=8080
       - DB_HOST=mongodb
@@ -20,7 +40,7 @@ services:
   user-service:
     image: gcr.io/langrenn-sprint/user-service:latest
     ports:
-      - 8081:8080
+      - 8082:8080
     environment:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXP_DELTA_SECONDS=${JWT_EXP_DELTA_SECONDS}

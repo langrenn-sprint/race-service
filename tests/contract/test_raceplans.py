@@ -1,4 +1,5 @@
 """Contract test cases for raceclasses."""
+import asyncio
 from copy import deepcopy
 from datetime import time
 import logging
@@ -13,7 +14,15 @@ USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
+def event_loop(request: Any) -> Any:
+    """Redefine the event_loop fixture to have the same scope."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="module")
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Delete all raceplans before we start."""
@@ -35,7 +44,7 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 @pytest.mark.asyncio
 async def token(http_service: Any) -> str:
     """Create a valid token."""

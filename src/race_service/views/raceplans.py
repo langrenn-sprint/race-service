@@ -39,7 +39,7 @@ class RaceplansView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         raceplans = await RaceplansService.get_all_raceplans(db)
         list = []
@@ -56,7 +56,7 @@ class RaceplansView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         body = await self.request.json()
         logging.debug(f"Got create request for raceplan {body} of type {type(body)}")
@@ -65,17 +65,17 @@ class RaceplansView(View):
         except KeyError as e:
             raise HTTPUnprocessableEntity(
                 reason=f"Mandatory property {e.args[0]} is missing."
-            )
+            ) from e
         try:
             raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
-        except IllegalValueException:
-            raise HTTPUnprocessableEntity()
+        except IllegalValueException as e:
+            raise HTTPUnprocessableEntity() from e
         if raceplan_id:
             logging.debug(f"inserted document with raceplan_id {raceplan_id}")
             headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})
 
             return Response(status=201, headers=headers)
-        raise HTTPBadRequest()
+        raise HTTPBadRequest() from None
 
 
 class RaceplanView(View):
@@ -88,15 +88,15 @@ class RaceplanView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         raceplan_id = self.request.match_info["raceplanId"]
         logging.debug(f"Got get request for raceplan {raceplan_id}")
 
         try:
             raceplan = await RaceplansService.get_raceplan_by_id(db, raceplan_id)
-        except RaceplanNotFoundException:
-            raise HTTPNotFound()
+        except RaceplanNotFoundException as e:
+            raise HTTPNotFound() from e
         logging.debug(f"Got raceplan: {raceplan}")
         body = raceplan.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -108,7 +108,7 @@ class RaceplanView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         body = await self.request.json()
         raceplan_id = self.request.match_info["raceplanId"]
@@ -120,14 +120,14 @@ class RaceplanView(View):
         except KeyError as e:
             raise HTTPUnprocessableEntity(
                 reason=f"Mandatory property {e.args[0]} is missing."
-            )
+            ) from e
 
         try:
             await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
-        except IllegalValueException:
-            raise HTTPUnprocessableEntity()
-        except RaceplanNotFoundException:
-            raise HTTPNotFound()
+        except IllegalValueException as e:
+            raise HTTPUnprocessableEntity() from e
+        except RaceplanNotFoundException as e:
+            raise HTTPNotFound() from e
         return Response(status=204)
 
     async def delete(self) -> Response:
@@ -137,13 +137,13 @@ class RaceplanView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         raceplan_id = self.request.match_info["raceplanId"]
         logging.debug(f"Got delete request for raceplan {raceplan_id}")
 
         try:
             await RaceplansService.delete_raceplan(db, raceplan_id)
-        except RaceplanNotFoundException:
-            raise HTTPNotFound()
+        except RaceplanNotFoundException as e:
+            raise HTTPNotFound() from e
         return Response(status=204)
