@@ -111,7 +111,7 @@ async def calculate_raceplan(
         race = Race(
             raceclass=raceclass["name"],
             order=raceclass["order"],
-            start_time=start_time.time().isoformat(),
+            start_time=start_time,
             no_of_contestants=raceclass["no_of_contestants"],
         )
         # Calculate start_time for next raceclass:

@@ -1,4 +1,5 @@
 """Unit test cases for the event-service module."""
+from datetime import datetime
 from functools import reduce
 from typing import Any, List
 
@@ -80,16 +81,36 @@ async def expected_raceplan(event: dict) -> Raceplan:
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 62
     raceplan.races.append(
-        Race(raceclass="J15", order=1, start_time="09:00:00", no_of_contestants=16)
+        Race(
+            raceclass="J15",
+            order=1,
+            start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
+            no_of_contestants=16,
+        )
     )
     raceplan.races.append(
-        Race(raceclass="G15", order=2, start_time="09:08:00", no_of_contestants=14)
+        Race(
+            raceclass="G15",
+            order=2,
+            start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
+            no_of_contestants=14,
+        )
     )
     raceplan.races.append(
-        Race(raceclass="J16", order=3, start_time="09:15:00", no_of_contestants=17)
+        Race(
+            raceclass="J16",
+            order=3,
+            start_time=datetime.fromisoformat("2021-08-31 09:15:00"),
+            no_of_contestants=17,
+        )
     )
     raceplan.races.append(
-        Race(raceclass="G16", order=4, start_time="09:23:30", no_of_contestants=15)
+        Race(
+            raceclass="G16",
+            order=4,
+            start_time=datetime.fromisoformat("2021-08-31 09:23:30"),
+            no_of_contestants=15,
+        )
     )
 
     return raceplan

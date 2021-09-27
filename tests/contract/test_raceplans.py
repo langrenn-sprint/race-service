@@ -1,7 +1,8 @@
 """Contract test cases for raceclasses."""
 import asyncio
 from copy import deepcopy
-from datetime import time
+from datetime import datetime
+from json import dumps
 import logging
 import os
 from typing import Any, AsyncGenerator
@@ -73,25 +74,25 @@ async def new_raceplan() -> dict:
                 "name": "G16K01",
                 "raceclass": "G16",
                 "order": 1,
-                "start_time": time(12, 00, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:00:00").isoformat(),
             },
             {
                 "name": "G16K02",
                 "raceclass": "G16",
                 "order": 2,
-                "start_time": time(12, 15, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:15:00").isoformat(),
             },
             {
                 "name": "G16K03",
                 "raceclass": "G16",
                 "order": 3,
-                "start_time": time(12, 30, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:30:00").isoformat(),
             },
             {
                 "name": "G16K04",
                 "raceclass": "G16",
                 "order": 4,
-                "start_time": time(12, 45, 00).isoformat(),
+                "start_time": datetime.fromisoformat("2021-08-31 12:45:00").isoformat(),
             },
         ],
     }
@@ -108,9 +109,10 @@ async def test_create_raceplan(
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-    request_body = new_raceplan
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
+
     session = ClientSession()
-    async with session.post(url, headers=headers, json=request_body) as response:
+    async with session.post(url, headers=headers, data=request_body) as response:
         status = response.status
     await session.close()
 
@@ -181,9 +183,10 @@ async def test_update_raceplan(http_service: Any, token: MockFixture) -> None:
             raceplans = await response.json()
         id = raceplans[0]["id"]
         url = f"{url}/{id}"
-        request_body = deepcopy(raceplans[0])
-        request_body["event_id"] = "new_event_id"
-        async with session.put(url, headers=headers, json=request_body) as response:
+        update_raceplan = deepcopy(raceplans[0])
+        update_raceplan["event_id"] = "new_event_id"
+        request_body = dumps(update_raceplan, indent=4, sort_keys=True, default=str)
+        async with session.put(url, headers=headers, data=request_body) as response:
             pass
 
     assert response.status == 204
