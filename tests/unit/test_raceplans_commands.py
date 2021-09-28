@@ -13,9 +13,9 @@ from race_service.models import Race, Raceplan
 async def competition_format_interval_start() -> dict:
     """An competition_format object for testing."""
     return {
-        "name": "Interval start",
+        "name": "Interval Start",
         "starting_order": "Draw",
-        "start_procedure": "Interval start",
+        "start_procedure": "Interval Start",
         "intervals": "00:00:30",
     }
 
@@ -26,7 +26,7 @@ async def event() -> dict:
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Oslo Skagen sprint",
-        "competition_format": "Interval start",
+        "competition_format": "Interval Start",
         "date_of_event": "2021-08-31",
         "time_of_event": "09:00:00",
         "organiser": "Lyn Ski",
