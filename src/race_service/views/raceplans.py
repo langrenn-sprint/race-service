@@ -69,7 +69,7 @@ class RaceplansView(View):
         try:
             raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity() from e
+            raise HTTPUnprocessableEntity(reason=e) from e
         if raceplan_id:
             logging.debug(f"inserted document with raceplan_id {raceplan_id}")
             headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})
@@ -96,7 +96,7 @@ class RaceplanView(View):
         try:
             raceplan = await RaceplansService.get_raceplan_by_id(db, raceplan_id)
         except RaceplanNotFoundException as e:
-            raise HTTPNotFound() from e
+            raise HTTPNotFound(reason=e) from e
         logging.debug(f"Got raceplan: {raceplan}")
         body = raceplan.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -125,9 +125,9 @@ class RaceplanView(View):
         try:
             await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity() from e
+            raise HTTPUnprocessableEntity(reason=e) from e
         except RaceplanNotFoundException as e:
-            raise HTTPNotFound() from e
+            raise HTTPNotFound(reason=e) from e
         return Response(status=204)
 
     async def delete(self) -> Response:
@@ -145,5 +145,5 @@ class RaceplanView(View):
         try:
             await RaceplansService.delete_raceplan(db, raceplan_id)
         except RaceplanNotFoundException as e:
-            raise HTTPNotFound() from e
+            raise HTTPNotFound(reason=e) from e
         return Response(status=204)
