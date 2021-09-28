@@ -18,6 +18,7 @@ from race_service.adapters import (
 )
 from race_service.commands import (
     CompetitionFormatNotSupportedException,
+    InconsistentValuesInRaceclassesException,
     InvalidDateFormatException,
     MissingPropertyException,
     NoRaceclassesInEventException,
@@ -61,6 +62,7 @@ class GenerateRaceplanForEventView(View):
             InvalidDateFormatException,
             NoRaceclassesInEventException,
             MissingPropertyException,
+            InconsistentValuesInRaceclassesException,
         ) as e:
             raise HTTPBadRequest(reason=e) from e
         headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})

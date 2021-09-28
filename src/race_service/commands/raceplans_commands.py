@@ -32,6 +32,15 @@ class NoRaceclassesInEventException(Exception):
         super().__init__(message)
 
 
+class InconsistentValuesInRaceclassesException(Exception):
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class MissingPropertyException(Exception):
     """Class representing custom exception for command."""
 
@@ -172,8 +181,6 @@ async def check_date(date_str: str) -> None:
             f'Date "{date_str}" has invalid format".'
         ) from e
 
-    # We check if event has valid time:
-
 
 async def check_time(time_str: str) -> None:
     """Validate time from string."""
@@ -206,8 +213,36 @@ async def get_format_configuration(token: str, competition_format_name: str) -> 
 async def get_raceclasses(token: str, event_id: str) -> List[dict]:
     """Get the raceclasses."""
     raceclasses = await EventsAdapter.get_raceclasses(token, event_id)
+    # Validate:
+    # Check if there in fact _are_ raceclasses in the list:
     if len(raceclasses) == 0:
         raise NoRaceclassesInEventException(
             f"No raceclass for event {event_id}. Cannot proceed."
         )
+
+    # Check if raceclasses have only integers order values:
+    if not all(
+        isinstance(o, (int)) for o in [r.get("order", None) for r in raceclasses]
+    ):
+        raise InconsistentValuesInRaceclassesException(
+            f"Raceclasses order values for event {event_id} contains non numeric values."
+        )
+
+    # Check if raceclasses have complete and unique values for `order`:
+    if len(raceclasses) != len(set([r["order"] for r in raceclasses])):
+        raise InconsistentValuesInRaceclassesException(
+            f"Raceclasses order values for event {event_id} are not unique."
+        )
+
+    # Check if the order values are consecutive:
+    if not sorted([r["order"] for r in raceclasses]) == list(
+        range(
+            min([r["order"] for r in raceclasses]),
+            max([r["order"] for r in raceclasses]) + 1,
+        )
+    ):
+        raise InconsistentValuesInRaceclassesException(
+            f"Raceclasses order values for event {event_id} are not consecutive."
+        )
+
     return raceclasses
