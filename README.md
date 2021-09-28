@@ -8,7 +8,7 @@ Based on the type of event (competition format), list of race classes and a list
 
 The race service will support the following competition formats:
 
-- Interval start competition,
+- Interval Start competition,
 - Mass start competition,
 - Skiathlon competition,
 - Pursuit,

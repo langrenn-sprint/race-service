@@ -38,7 +38,7 @@ async def event() -> dict[str, Any]:
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Oslo Skagen sprint",
-        "competition_format": "Interval start",
+        "competition_format": "Interval Start",
         "date_of_event": "2021-08-31",
         "time_of_event": "09:00:00",
         "organiser": "Lyn Ski",
@@ -81,8 +81,8 @@ async def format_configuration() -> dict[str, Any]:
     """An format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "name": "Interval start",
-        "start_procedure": "Interval start",
+        "name": "Interval Start",
+        "start_procedure": "Interval Start",
         "intervals": "00:00:30",
     }
 

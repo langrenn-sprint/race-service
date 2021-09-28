@@ -147,7 +147,7 @@ async def get_event(token: str, event_id: str) -> dict:
         ) from e
 
     # We check if we support the competition-format:
-    if competition_format.lower() == "Interval start".lower():
+    if competition_format.lower() == "Interval Start".lower():
         pass
     else:
         raise CompetitionFormatNotSupportedException(
