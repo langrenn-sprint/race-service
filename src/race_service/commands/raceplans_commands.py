@@ -58,15 +58,6 @@ class RaceplansCommands:
 
 
 # helpers
-async def get_raceplan(db: Any, token: str, event_id: str) -> None:
-    """Check if the event already has a raceplan."""
-    existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
-    if existing_rp:
-        raise RaceplanAllreadyExistException(
-            f'Event "{event_id}" already has a raceplan.'
-        )
-
-
 async def get_event(token: str, event_id: str) -> dict:
     """Get the event and validate."""
     try:
