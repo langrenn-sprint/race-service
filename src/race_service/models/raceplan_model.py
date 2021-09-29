@@ -11,6 +11,7 @@ from marshmallow import fields
 class Race(DataClassJsonMixin):
     """Data class with details about a race."""
 
+    id: str
     raceclass: str
     order: int
     start_time: datetime = field(
@@ -20,10 +21,15 @@ class Race(DataClassJsonMixin):
             mm_field=fields.DateTime(format="iso"),
         )
     )
-    no_of_contestants: int = 0
-    heat: Optional[str] = field(default=None)
-    name: Optional[str] = field(default=None)
-    id: Optional[str] = field(default=None)
+    no_of_contestants: int
+
+
+@dataclass
+class IndividualSprintRace(Race, DataClassJsonMixin):
+    """Data class with details about a race."""
+
+    round: str
+    heat: int
 
 
 @dataclass
