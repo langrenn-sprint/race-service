@@ -137,11 +137,11 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
 # Create an event to test on:
 @pytest.fixture(scope="module")
 async def event_id(
-    http_service: Any, token: MockFixture, competition_format_interval_start: Any
+    http_service: Any, token: MockFixture, competition_format_individual_sprint: Any
 ) -> Optional[str]:
     """Create an event object for testing."""
     url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-    with open("tests/files/event.json", "r") as file:
+    with open("tests/files/event_individual_sprint.json", "r") as file:
         event = load(file)
 
     headers = {
@@ -167,7 +167,7 @@ async def event_id(
 
 
 @pytest.fixture(scope="module")
-async def competition_format_interval_start(
+async def competition_format_individual_sprint(
     http_service: Any, token: MockFixture
 ) -> Any:
     """An competition_format object for testing."""
@@ -196,16 +196,17 @@ async def expected_raceplan() -> dict:
 
 
 # Finally we test the test_generate_raceplan_for_event function:
+@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_generate_raceplan_for__interval_start_event(
+async def test_generate_raceplan_for_individual_sprint_event(
     http_service: Any,
     token: MockFixture,
     clear_db: None,
     event_id: str,
     expected_raceplan: dict,
 ) -> None:
-    """Should return 201 created and a location header with url to raceplan."""
+    """Should return 400 Bad request."""
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
@@ -268,7 +269,11 @@ async def test_generate_raceplan_for__interval_start_event(
                 logging.error(
                     f"Got unexpected status {response.status}, reason {body}."
                 )
-            assert response.status == 201
+            assert response.status == 400
+            assert (
+                body["detail"]
+                == 'Competition-format "Individual Sprint" not supported.'
+            )
             assert "/raceplans/" in response.headers[hdrs.LOCATION]
 
         # We check that raceplan are actually created:

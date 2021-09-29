@@ -5,29 +5,32 @@ from typing import Any, List
 
 import pytest
 
-from race_service.commands import calculate_raceplan
+from race_service.commands.raceplans_individual_sprint import (
+    calculate_raceplan_individual_sprint,
+)
 from race_service.models import Race, Raceplan
+
+# --- Individual Sprint ---
 
 
 @pytest.fixture
-async def competition_format_interval_start() -> dict:
+async def competition_format_individual_sprint() -> dict:
     """An competition_format object for testing."""
     return {
-        "name": "Interval Start",
+        "name": "Individual Sprint",
         "starting_order": "Draw",
-        "start_procedure": "Interval Start",
-        "intervals": "00:00:30",
+        "start_procedure": "Heat Start",
     }
 
 
 @pytest.fixture
-async def event() -> dict:
+async def event_individual_sprint() -> dict:
     """An competition_format object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Oslo Skagen sprint",
-        "competition_format": "Interval Start",
-        "date_of_event": "2021-08-31",
+        "competition_format": "Individual Sprint",
+        "date_of_event": "2021-09-29",
         "time_of_event": "09:00:00",
         "organiser": "Lyn Ski",
         "webpage": "https://example.com",
@@ -36,7 +39,7 @@ async def event() -> dict:
 
 
 @pytest.fixture
-async def raceclasses() -> List[dict[str, Any]]:
+async def raceclasses_individual_sprint() -> List[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -75,9 +78,11 @@ async def raceclasses() -> List[dict[str, Any]]:
 
 
 @pytest.fixture
-async def expected_raceplan(event: dict) -> Raceplan:
+async def expected_raceplan_individual_sprint(
+    event_individual_sprint: dict,
+) -> Raceplan:
     """Create a mock raceplan object."""
-    raceplan = Raceplan(event_id=event["id"], races=list())
+    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 62
     raceplan.races.append(
@@ -116,35 +121,45 @@ async def expected_raceplan(event: dict) -> Raceplan:
     return raceplan
 
 
+@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_calculate_raceplan_interval_start(
-    competition_format_interval_start: dict,
-    event: dict,
-    raceclasses: List[dict],
-    expected_raceplan: Raceplan,
+async def test_calculate_raceplan_individual_sprint(
+    competition_format_individual_sprint: dict,
+    event_individual_sprint: dict,
+    raceclasses_individual_sprint: List[dict],
+    expected_raceplan_individual_sprint: Raceplan,
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
-    raceplan = await calculate_raceplan(
-        event, competition_format_interval_start, raceclasses
+    raceplan = await calculate_raceplan_individual_sprint(
+        event_individual_sprint,
+        competition_format_individual_sprint,
+        raceclasses_individual_sprint,
     )
 
     assert type(raceplan) is Raceplan
     assert raceplan.id is None
-    assert raceplan.event_id == expected_raceplan.event_id
-    assert raceplan.no_of_contestants == expected_raceplan.no_of_contestants
-    assert len(raceplan.races) == len(expected_raceplan.races)
+    assert raceplan.event_id == expected_raceplan_individual_sprint.event_id
+    assert (
+        raceplan.no_of_contestants
+        == expected_raceplan_individual_sprint.no_of_contestants
+    )
+    assert len(raceplan.races) == len(expected_raceplan_individual_sprint.races)
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
-        map(lambda p, q: p == q, raceplan.races, expected_raceplan.races),
+        map(
+            lambda p, q: p == q,
+            raceplan.races,
+            expected_raceplan_individual_sprint.races,
+        ),
         True,
     ):
         print("Calculated raceplan:")
         print(*raceplan.races, sep="\n")
         print("----")
         print("Expected raceplan:")
-        print(*expected_raceplan.races, sep="\n")
+        print(*expected_raceplan_individual_sprint.races, sep="\n")
         raise AssertionError("Raceplan does not match expected.")
     else:
         assert 1 == 1
