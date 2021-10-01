@@ -24,6 +24,7 @@ from race_service.commands import (
     NoRaceclassesInEventException,
     RaceplansCommands,
 )
+from race_service.services import RaceplanAllreadyExistException
 from .utils import extract_token_from_request
 
 load_dotenv()
@@ -63,6 +64,7 @@ class GenerateRaceplanForEventView(View):
             NoRaceclassesInEventException,
             MissingPropertyException,
             InconsistentValuesInRaceclassesException,
+            RaceplanAllreadyExistException,
         ) as e:
             raise HTTPBadRequest(reason=e) from e
         headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})

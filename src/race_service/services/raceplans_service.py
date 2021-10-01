@@ -22,6 +22,15 @@ class RaceplanNotFoundException(Exception):
         super().__init__(message)
 
 
+class RaceplanAllreadyExistException(Exception):
+    """Class representing custom exception for fetch method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class RaceplansService:
     """Class representing a service for raceplans."""
 
@@ -47,9 +56,19 @@ class RaceplansService:
 
         Raises:
             IllegalValueException: input object has illegal values
+            RaceplanAllreadyExistException: event can have zero or one plan
         """
         logging.debug(f"trying to insert raceplan: {raceplan}")
+        # Event can have one, and only, one raceplan:
+        existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(
+            db, raceplan.event_id
+        )
+        if existing_rp:
+            raise RaceplanAllreadyExistException(
+                f'Event "{raceplan.event_id}" already has a raceplan.'
+            )
         # Validation:
+        await validate_raceplan(db, raceplan)
         if raceplan.id:
             raise IllegalValueException("Cannot create raceplan with input id.")
         # create id
@@ -100,4 +119,12 @@ class RaceplansService:
             return result
         raise RaceplanNotFoundException(f"Raceplan with id {id} not found")
 
-    #   Commands:
+
+#   Validation:
+async def validate_raceplan(db: Any, raceplan: Raceplan) -> None:
+    """Validate the raceplan."""
+    # Validate races:
+    # TODO: validate race-properties.
+    if raceplan.races:
+        for _race in raceplan.races:
+            pass

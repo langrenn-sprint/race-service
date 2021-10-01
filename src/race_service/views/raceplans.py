@@ -18,6 +18,7 @@ from race_service.adapters import UsersAdapter
 from race_service.models import Raceplan
 from race_service.services import (
     IllegalValueException,
+    RaceplanAllreadyExistException,
     RaceplanNotFoundException,
     RaceplansService,
 )
@@ -70,6 +71,8 @@ class RaceplansView(View):
             raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
         except IllegalValueException as e:
             raise HTTPUnprocessableEntity(reason=e) from e
+        except RaceplanAllreadyExistException as e:
+            raise HTTPBadRequest(reason=e) from e
         if raceplan_id:
             logging.debug(f"inserted document with raceplan_id {raceplan_id}")
             headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})

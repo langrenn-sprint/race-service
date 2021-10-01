@@ -122,6 +122,30 @@ async def test_create_raceplan(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_create_raceplan_when_event_already_has_one(
+    http_service: Any, token: MockFixture, clear_db: None, new_raceplan: dict
+) -> None:
+    """Should return 400 Bad request and error message in body."""
+    url = f"{http_service}/raceplans"
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
+
+    session = ClientSession()
+    async with session.post(url, headers=headers, data=request_body) as response:
+        status = response.status
+        body = await response.json()
+    await session.close()
+
+    assert status == 400
+    assert body
+    assert f'"{new_raceplan["event_id"]}" already has a raceplan' in body["detail"]
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_get_all_raceplans(http_service: Any, token: MockFixture) -> None:
     """Should return OK and a list of raceplans as json."""
     url = f"{http_service}/raceplans"
