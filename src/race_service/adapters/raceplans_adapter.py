@@ -33,11 +33,11 @@ class RaceplansAdapter:
         return result
 
     @classmethod
-    async def get_raceplan_by_name(
-        cls: Any, db: Any, raceplanname: str
+    async def get_raceplan_by_event_id(
+        cls: Any, db: Any, event_id: str
     ) -> dict:  # pragma: no cover
-        """Get raceplan function."""
-        result = await db.raceplans_collection.find_one({"raceplanname": raceplanname})
+        """Get raceplan by event_id function."""
+        result = await db.raceplans_collection.find_one({"event_id": event_id})
         return result
 
     @classmethod

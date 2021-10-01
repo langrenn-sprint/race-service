@@ -1,10 +1,12 @@
 """Package for all commands."""
-from .raceplans_commands import (
-    calculate_raceplan,
+from .exceptions import (
     CompetitionFormatNotSupportedException,
     InconsistentValuesInRaceclassesException,
     InvalidDateFormatException,
     MissingPropertyException,
     NoRaceclassesInEventException,
+)
+from .raceplans_commands import (
+    calculate_raceplan,
     RaceplansCommands,
 )

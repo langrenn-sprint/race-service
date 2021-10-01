@@ -110,6 +110,10 @@ async def test_create_raceplan(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=RACEPLAN_ID,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
 
     request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
 
@@ -136,6 +140,10 @@ async def test_get_raceplan_by_id(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     headers = MultiDict(
@@ -172,6 +180,10 @@ async def test_update_raceplan_by_id(
         return_value=raceplan,
     )
     mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=RACEPLAN_ID,
     )
@@ -203,6 +215,11 @@ async def test_get_all_raceplans(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
         return_value=[raceplan],
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+
     headers = MultiDict(
         {
             hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -234,6 +251,11 @@ async def test_delete_raceplan_by_id(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=RACEPLAN_ID,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+
     headers = MultiDict(
         {
             hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -251,6 +273,44 @@ async def test_delete_raceplan_by_id(
 
 
 @pytest.mark.integration
+async def test_create_raceplan_when_event_already_has_one(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    new_raceplan: dict,
+    raceplan: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    RACEPLAN_ID = raceplan["id"]
+    mocker.patch(
+        "race_service.services.raceplans_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value={"id": "blabladibla"},
+    )
+
+    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
+
+    headers = MultiDict(
+        {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
+        assert resp.status == 400
+
+
+@pytest.mark.integration
 async def test_create_raceplan_with_input_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, raceplan: dict
 ) -> None:
@@ -264,6 +324,11 @@ async def test_create_raceplan_with_input_id(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=RACEPLAN_ID,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+
     request_body = dumps(raceplan, indent=4, sort_keys=True, default=str)
 
     headers = MultiDict(
@@ -292,6 +357,11 @@ async def test_create_raceplan_adapter_fails(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=None,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+
     request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
 
     headers = MultiDict(
@@ -320,6 +390,10 @@ async def test_create_raceplan_mandatory_property(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     headers = MultiDict(
@@ -350,6 +424,10 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     headers = MultiDict(
@@ -382,6 +460,10 @@ async def test_update_raceplan_by_id_different_id_in_body(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     headers = MultiDict(
@@ -420,6 +502,10 @@ async def test_create_raceplan_no_authorization(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=RACEPLAN_ID,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
 
     request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
     headers = MultiDict({hdrs.CONTENT_TYPE: "application/json"})
@@ -440,6 +526,10 @@ async def test_get_raceplan_by_id_no_authorization(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -462,6 +552,10 @@ async def test_update_raceplan_by_id_no_authorization(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     headers = MultiDict(
@@ -490,6 +584,10 @@ async def test_list_raceplans_no_authorization(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
         return_value=[raceplan],
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=401)
         resp = await client.get("/raceplans")
@@ -505,6 +603,10 @@ async def test_delete_raceplan_by_id_no_authorization(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -533,6 +635,11 @@ async def test_create_raceplan_insufficient_role(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=RACEPLAN_ID,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+
     request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
     headers = MultiDict(
         {
@@ -560,6 +667,11 @@ async def test_get_raceplan_not_found(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=None,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+
     headers = MultiDict(
         {
             hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -585,6 +697,10 @@ async def test_update_raceplan_not_found(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=None,
     )
 
@@ -616,6 +732,10 @@ async def test_delete_raceplan_not_found(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=None,
     )
 

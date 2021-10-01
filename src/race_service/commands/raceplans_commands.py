@@ -7,56 +7,17 @@ from race_service.adapters import (
     EventNotFoundException,
     EventsAdapter,
     FormatConfigurationNotFoundException,
+    RaceplansAdapter,
 )
 from race_service.models import Race, Raceplan
-from race_service.services import (
-    RaceplansService,
+from race_service.services import RaceplanAllreadyExistException, RaceplansService
+from .exceptions import (
+    CompetitionFormatNotSupportedException,
+    InconsistentValuesInRaceclassesException,
+    InvalidDateFormatException,
+    MissingPropertyException,
+    NoRaceclassesInEventException,
 )
-
-
-class CompetitionFormatNotSupportedException(Exception):
-    """Class representing custom exception for command."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
-class NoRaceclassesInEventException(Exception):
-    """Class representing custom exception for command."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
-class InconsistentValuesInRaceclassesException(Exception):
-    """Class representing custom exception for command."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
-class MissingPropertyException(Exception):
-    """Class representing custom exception for command."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
-class InvalidDateFormatException(Exception):
-    """Class representing custom exception for command."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
 
 
 class RaceplansCommands:
@@ -67,6 +28,8 @@ class RaceplansCommands:
         cls: Any, db: Any, token: str, event_id: str
     ) -> str:
         """Generate raceplan for event function."""
+        # First we check if event already has a plan:
+        await get_raceplan(db, token, event_id)
         # First we get the event from the event-service:
         event = await get_event(token, event_id)
         # We fetch the configuration of the competition-format:
@@ -132,6 +95,15 @@ async def calculate_raceplan(
 
 
 # helpers
+async def get_raceplan(db: Any, token: str, event_id: str) -> None:
+    """Check if the event already has a raceplan."""
+    existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
+    if existing_rp:
+        raise RaceplanAllreadyExistException(
+            f'Event "{event_id}" already has a raceplan.'
+        )
+
+
 async def get_event(token: str, event_id: str) -> dict:
     """Get the event and validate."""
     try:
