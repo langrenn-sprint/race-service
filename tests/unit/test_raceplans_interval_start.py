@@ -4,6 +4,7 @@ from functools import reduce
 from typing import Any, List
 
 import pytest
+from pytest_mock import MockFixture
 
 from race_service.commands.raceplans_interval_start import (
     calculate_raceplan_interval_start,
@@ -86,6 +87,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
     raceplan.no_of_contestants = 62
     raceplan.races.append(
         Race(
+            id="1",
             raceclass="J15",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
@@ -94,6 +96,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
     )
     raceplan.races.append(
         Race(
+            id="2",
             raceclass="G15",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
@@ -102,6 +105,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
     )
     raceplan.races.append(
         Race(
+            id="3",
             raceclass="J16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:15:00"),
@@ -110,6 +114,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
     )
     raceplan.races.append(
         Race(
+            id="4",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:23:30"),
@@ -122,12 +127,18 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_interval_start(
+    mocker: MockFixture,
     competition_format_interval_start: dict,
     event_interval_start: dict,
     raceclasses_interval_start: List[dict],
     expected_raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
+    mocker.patch(
+        "race_service.commands.raceplans_interval_start.create_id",
+        side_effect=["1", "2", "3", "4"],
+    )
+
     raceplan = await calculate_raceplan_interval_start(
         event_interval_start,
         competition_format_interval_start,

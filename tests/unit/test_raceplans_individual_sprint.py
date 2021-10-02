@@ -4,11 +4,12 @@ from functools import reduce
 from typing import Any, List
 
 import pytest
+from pytest_mock import MockFixture
 
 from race_service.commands.raceplans_individual_sprint import (
     calculate_raceplan_individual_sprint,
 )
-from race_service.models import Race, Raceplan
+from race_service.models import IndividualSprintRace, Raceplan
 
 # --- Individual Sprint ---
 
@@ -43,36 +44,12 @@ async def raceclasses_individual_sprint() -> List[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
-            "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "name": "G15",
-            "ageclass_name": "G 15 år",
-            "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 14,
-            "order": 2,
-        },
-        {
-            "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "name": "G16",
-            "ageclass_name": "G 16 år",
-            "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 15,
-            "order": 4,
-        },
-        {
             "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "J15",
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 16,
+            "no_of_contestants": 32,
             "order": 1,
-        },
-        {
-            "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "name": "J16",
-            "ageclass_name": "J 16 år",
-            "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 17,
-            "order": 3,
         },
     ]
 
@@ -84,53 +61,102 @@ async def expected_raceplan_individual_sprint(
     """Create a mock raceplan object."""
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    raceplan.no_of_contestants = 62
+    raceplan.no_of_contestants = 32
     raceplan.races.append(
-        Race(
-            raceclass="J15",
+        IndividualSprintRace(
+            id="1",
             order=1,
-            start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
-            no_of_contestants=16,
+            raceclass="J15",
+            round="Quarterfinals",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
+            no_of_contestants=8,
         )
     )
     raceplan.races.append(
-        Race(
-            raceclass="G15",
+        IndividualSprintRace(
+            id="2",
             order=2,
-            start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
-            no_of_contestants=14,
+            raceclass="J15",
+            round="Quarterfinals",
+            heat=2,
+            start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
+            no_of_contestants=8,
         )
     )
     raceplan.races.append(
-        Race(
-            raceclass="J16",
+        IndividualSprintRace(
+            id="3",
             order=3,
-            start_time=datetime.fromisoformat("2021-08-31 09:15:00"),
-            no_of_contestants=17,
+            raceclass="J15",
+            round="Quarterfinals",
+            heat=3,
+            start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
+            no_of_contestants=8,
         )
     )
     raceplan.races.append(
-        Race(
-            raceclass="G16",
+        IndividualSprintRace(
+            id="4",
             order=4,
-            start_time=datetime.fromisoformat("2021-08-31 09:23:30"),
-            no_of_contestants=15,
+            raceclass="J15",
+            round="Quarterfinals",
+            heat=4,
+            start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
+            no_of_contestants=8,
+        )
+    )
+    raceplan.races.append(
+        IndividualSprintRace(
+            id="5",
+            order=5,
+            raceclass="J15",
+            round="Semi-finals",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:10:00"),
+            no_of_contestants=8,
+        )
+    )
+    raceplan.races.append(
+        IndividualSprintRace(
+            id="6",
+            order=6,
+            raceclass="J15",
+            round="Semi-finals",
+            heat=2,
+            start_time=datetime.fromisoformat("2021-09-29 09:12:30"),
+            no_of_contestants=8,
+        )
+    )
+    raceplan.races.append(
+        IndividualSprintRace(
+            id="7",
+            order=7,
+            raceclass="J15",
+            round="Finals",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
+            no_of_contestants=8,
         )
     )
 
     return raceplan
 
 
-@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint(
+    mocker: MockFixture,
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
     raceclasses_individual_sprint: List[dict],
     expected_raceplan_individual_sprint: Raceplan,
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
+    mocker.patch(
+        "race_service.commands.raceplans_individual_sprint.create_id",
+        side_effect=list(range(1, 1000)),
+    )
     raceplan = await calculate_raceplan_individual_sprint(
         event_individual_sprint,
         competition_format_individual_sprint,
@@ -162,4 +188,5 @@ async def test_calculate_raceplan_individual_sprint(
         print(*expected_raceplan_individual_sprint.races, sep="\n")
         raise AssertionError("Raceplan does not match expected.")
     else:
+        print(*raceplan.races, sep="\n")
         assert 1 == 1
