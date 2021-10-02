@@ -20,10 +20,16 @@ class Race(DataClassJsonMixin):
             mm_field=fields.DateTime(format="iso"),
         )
     )
-    no_of_contestants: int = 0
-    heat: Optional[str] = field(default=None)
-    name: Optional[str] = field(default=None)
+    no_of_contestants: int
     id: Optional[str] = field(default=None)
+
+
+@dataclass
+class IndividualSprintRace(Race, DataClassJsonMixin):
+    """Data class with details about a race."""
+
+    round: str = ""
+    heat: int = 0
 
 
 @dataclass

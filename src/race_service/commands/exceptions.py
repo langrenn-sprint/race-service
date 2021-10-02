@@ -1,4 +1,4 @@
-"""Module for raceplan commands."""
+"""Module for raceplan exceptions."""
 
 
 class CompetitionFormatNotSupportedException(Exception):

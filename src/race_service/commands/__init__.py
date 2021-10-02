@@ -6,7 +6,4 @@ from .exceptions import (
     MissingPropertyException,
     NoRaceclassesInEventException,
 )
-from .raceplans_commands import (
-    calculate_raceplan,
-    RaceplansCommands,
-)
+from .raceplans_commands import RaceplansCommands

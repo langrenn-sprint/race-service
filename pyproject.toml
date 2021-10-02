@@ -61,8 +61,10 @@ source = ["src", "*/site-packages"]
 [tool.coverage.run]
 branch = false
 source = ["race_service"]
-omit = ["*gunicorn_config.py"]
-
+omit = [
+    "*gunicorn_config.py",
+    "*raceplans_individual_sprint.py"
+    ]
 [tool.coverage.report]
 show_missing = true
 fail_under = 100

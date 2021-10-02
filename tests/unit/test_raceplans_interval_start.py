@@ -5,8 +5,12 @@ from typing import Any, List
 
 import pytest
 
-from race_service.commands import calculate_raceplan
+from race_service.commands.raceplans_interval_start import (
+    calculate_raceplan_interval_start,
+)
 from race_service.models import Race, Raceplan
+
+# --- Interval Start ---
 
 
 @pytest.fixture
@@ -21,7 +25,7 @@ async def competition_format_interval_start() -> dict:
 
 
 @pytest.fixture
-async def event() -> dict:
+async def event_interval_start() -> dict:
     """An competition_format object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -36,7 +40,7 @@ async def event() -> dict:
 
 
 @pytest.fixture
-async def raceclasses() -> List[dict[str, Any]]:
+async def raceclasses_interval_start() -> List[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -75,9 +79,9 @@ async def raceclasses() -> List[dict[str, Any]]:
 
 
 @pytest.fixture
-async def expected_raceplan(event: dict) -> Raceplan:
+async def expected_raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     """Create a mock raceplan object."""
-    raceplan = Raceplan(event_id=event["id"], races=list())
+    raceplan = Raceplan(event_id=event_interval_start["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 62
     raceplan.races.append(
@@ -112,7 +116,6 @@ async def expected_raceplan(event: dict) -> Raceplan:
             no_of_contestants=15,
         )
     )
-
     return raceplan
 
 
@@ -120,31 +123,39 @@ async def expected_raceplan(event: dict) -> Raceplan:
 @pytest.mark.asyncio
 async def test_calculate_raceplan_interval_start(
     competition_format_interval_start: dict,
-    event: dict,
-    raceclasses: List[dict],
-    expected_raceplan: Raceplan,
+    event_interval_start: dict,
+    raceclasses_interval_start: List[dict],
+    expected_raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
-    raceplan = await calculate_raceplan(
-        event, competition_format_interval_start, raceclasses
+    raceplan = await calculate_raceplan_interval_start(
+        event_interval_start,
+        competition_format_interval_start,
+        raceclasses_interval_start,
     )
 
     assert type(raceplan) is Raceplan
     assert raceplan.id is None
-    assert raceplan.event_id == expected_raceplan.event_id
-    assert raceplan.no_of_contestants == expected_raceplan.no_of_contestants
-    assert len(raceplan.races) == len(expected_raceplan.races)
+    assert raceplan.event_id == expected_raceplan_interval_start.event_id
+    assert (
+        raceplan.no_of_contestants == expected_raceplan_interval_start.no_of_contestants
+    )
+    assert len(raceplan.races) == len(expected_raceplan_interval_start.races)
+    for race in raceplan.races:
+        assert type(race) is Race
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
-        map(lambda p, q: p == q, raceplan.races, expected_raceplan.races),
+        map(
+            lambda p, q: p == q, raceplan.races, expected_raceplan_interval_start.races
+        ),
         True,
     ):
         print("Calculated raceplan:")
         print(*raceplan.races, sep="\n")
         print("----")
         print("Expected raceplan:")
-        print(*expected_raceplan.races, sep="\n")
+        print(*expected_raceplan_interval_start.races, sep="\n")
         raise AssertionError("Raceplan does not match expected.")
     else:
         assert 1 == 1
