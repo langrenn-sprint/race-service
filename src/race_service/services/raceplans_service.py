@@ -44,6 +44,17 @@ class RaceplansService:
         return raceplans
 
     @classmethod
+    async def get_raceplan_by_event_id(
+        cls: Any, db: Any, event_id: str
+    ) -> List[Raceplan]:
+        """Get all raceplans by event_id function."""
+        raceplans: List[Raceplan] = []
+        _raceplan = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
+        if _raceplan:
+            raceplans.append(Raceplan.from_dict(_raceplan))
+        return raceplans
+
+    @classmethod
     async def create_raceplan(cls: Any, db: Any, raceplan: Raceplan) -> Optional[str]:
         """Create raceplan function.
 

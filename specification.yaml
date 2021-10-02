@@ -29,7 +29,12 @@
       get:
         tags:
         - race_plan
-        description: Get a list of race plans
+        description: Get a list of raceplans
+        parameters:
+        - name: event-id
+          in: query
+          description: the event the raceplan belongs to
+          required: false
         responses:
           200:
             description: Ok

@@ -170,6 +170,46 @@ async def test_get_raceplan_by_id(
 
 
 @pytest.mark.integration
+async def test_get_raceplan_by_event_id(
+    client: _TestClient, mocker: MockFixture, token: MockFixture, raceplan: dict
+) -> None:
+    """Should return OK, and a body containing one raceplan."""
+    EVENT_ID = raceplan["event_id"]
+    RACEPLAN_ID = raceplan["id"]
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=raceplan,
+    )
+
+    headers = MultiDict(
+        {
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.get(f"/raceplans?event-id={EVENT_ID}", headers=headers)
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["id"] == RACEPLAN_ID
+        assert body[0]["event_id"] == raceplan["event_id"]
+        assert len(body[0]["races"]) == 4
+        for race in body[0]["races"]:
+            assert race["raceclass"]
+            assert race["order"]
+            assert race["start_time"]
+
+
+@pytest.mark.integration
 async def test_update_raceplan_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, raceplan: dict
 ) -> None:
