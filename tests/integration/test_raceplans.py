@@ -36,26 +36,31 @@ async def new_raceplan() -> dict:
     """Create a raceplan object."""
     return {
         "event_id": "event_1",
+        "no_of_contestants": 32,
         "races": [
             {
                 "raceclass": "G16",
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+                "no_of_contestants": 8,
             },
             {
                 "raceclass": "G16",
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
+                "no_of_contestants": 8,
             },
             {
                 "raceclass": "G16",
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
+                "no_of_contestants": 8,
             },
             {
                 "raceclass": "G16",
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
+                "no_of_contestants": 8,
             },
         ],
     }
@@ -67,26 +72,31 @@ async def raceplan() -> dict:
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "event_id": "event_1",
+        "no_of_contestants": 32,
         "races": [
             {
                 "raceclass": "G16",
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+                "no_of_contestants": 8,
             },
             {
                 "raceclass": "G16",
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
+                "no_of_contestants": 8,
             },
             {
                 "raceclass": "G16",
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
+                "no_of_contestants": 8,
             },
             {
                 "raceclass": "G16",
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
+                "no_of_contestants": 8,
             },
         ],
     }

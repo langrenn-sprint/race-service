@@ -28,7 +28,7 @@ cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cross
 % curl -H "Content-Type: application/json" \
   -H "Authorization: Bearer $ACCESS" \
   -X POST \
-  --data @tests/files/event.json \
+  --data @tests/files/event_interval_start.json \
   http://localhost:8080/raceplans/generate-plan-for-event
 % curl -H "Authorization: Bearer $ACCESS"  http://localhost:8080/raceplans
 ```

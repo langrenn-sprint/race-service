@@ -82,9 +82,11 @@ class RaceplansService:
         await validate_raceplan(db, raceplan)
         if raceplan.id:
             raise IllegalValueException("Cannot create raceplan with input id.")
-        # create id
+        # create ids:
         id = create_id()
         raceplan.id = id
+        for race in raceplan.races:
+            race.id = create_id()
         # insert new raceplan
         new_raceplan = raceplan.to_dict()
         logging.debug(f"new_raceplan: {new_raceplan}")

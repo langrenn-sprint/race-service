@@ -1,6 +1,5 @@
 """Module for raceplan commands."""
-from datetime import date, datetime, time, timedelta
-import logging
+from datetime import date, time
 from typing import Any, List
 
 from race_service.adapters import (
@@ -9,8 +8,10 @@ from race_service.adapters import (
     FormatConfigurationNotFoundException,
     RaceplansAdapter,
 )
-from race_service.models import Race, Raceplan
-from race_service.services import RaceplanAllreadyExistException, RaceplansService
+from race_service.services import (
+    RaceplanAllreadyExistException,
+    RaceplansService,
+)
 from .exceptions import (
     CompetitionFormatNotSupportedException,
     InconsistentValuesInRaceclassesException,
@@ -18,6 +19,8 @@ from .exceptions import (
     MissingPropertyException,
     NoRaceclassesInEventException,
 )
+from .raceplans_individual_sprint import calculate_raceplan_individual_sprint
+from .raceplans_interval_start import calculate_raceplan_interval_start
 
 
 class RaceplansCommands:
@@ -40,58 +43,18 @@ class RaceplansCommands:
         raceclasses = await get_raceclasses(token, event_id)
 
         # Calculate the raceplan:
-        raceplan = await calculate_raceplan(event, format_configuration, raceclasses)
-
+        if event["competition_format"] == "Individual Sprint":
+            raceplan = await calculate_raceplan_individual_sprint(
+                event, format_configuration, raceclasses
+            )  # pragma: no cover
+        elif event["competition_format"] == "Interval Start":
+            raceplan = await calculate_raceplan_interval_start(
+                event, format_configuration, raceclasses
+            )
         # Finally we store the new raceplan and return the id:
         raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
         assert raceplan_id
         return raceplan_id
-
-
-# calculations
-async def calculate_raceplan(
-    event: dict,
-    format_configuration: dict,
-    raceclasses: List[dict],
-) -> Raceplan:
-    """Calculate raceplan based on input."""
-    logging.debug(f"Calculate raceplan for event: {event}")
-    logging.debug(f"Calculate raceplan for competition_format: {format_configuration}")
-    logging.debug(f"Calculate raceplan for raceclasses: {raceclasses}")
-    raceplan = Raceplan(event_id=event["id"], races=list())
-    # sort the raceclasses on order:
-    raceclasses_sorted = sorted(raceclasses, key=lambda k: k["order"])
-    # get the interval as timedelta:
-    logging.debug(
-        f'Format_configuration.intervals: {format_configuration["intervals"]}'
-    )
-    intervals = timedelta(
-        hours=time.fromisoformat(format_configuration["intervals"]).hour,
-        minutes=time.fromisoformat(format_configuration["intervals"]).minute,
-        seconds=time.fromisoformat(format_configuration["intervals"]).second,
-    )
-    # get the first start_time from the event:
-    logging.debug(
-        f'Event.date/Event.time: {event["date_of_event"]}/{event["time_of_event"]}.'
-    )
-    start_time = datetime.combine(
-        date.fromisoformat(event["date_of_event"]),
-        time.fromisoformat(event["time_of_event"]),
-    )
-
-    for raceclass in raceclasses_sorted:
-        race = Race(
-            raceclass=raceclass["name"],
-            order=raceclass["order"],
-            start_time=start_time,
-            no_of_contestants=raceclass["no_of_contestants"],
-        )
-        # Calculate start_time for next raceclass:
-        start_time = start_time + intervals * raceclass["no_of_contestants"]
-        # Add the race to the raceplan:
-        raceplan.races.append(race)
-        raceplan.no_of_contestants += race.no_of_contestants
-    return raceplan
 
 
 # helpers
