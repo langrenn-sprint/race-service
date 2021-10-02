@@ -166,6 +166,30 @@ async def test_get_all_raceplans(http_service: Any, token: MockFixture) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_get_all_raceplan_by_event_id(
+    http_service: Any, token: MockFixture, new_raceplan: dict
+) -> None:
+    """Should return OK and a list with one raceplan as json."""
+    event_id = new_raceplan["event_id"]
+    url = f"{http_service}/raceplans?event-id={event_id}"
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    session = ClientSession()
+    async with session.get(url, headers=headers) as response:
+        raceplans = await response.json()
+    await session.close()
+
+    assert response.status == 200
+    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert type(raceplans) is list
+    assert len(raceplans) == 1
+    assert raceplans[0]["event_id"] == event_id
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_get_raceplan(
     http_service: Any, token: MockFixture, new_raceplan: dict
 ) -> None:
@@ -234,3 +258,26 @@ async def test_delete_raceplan(http_service: Any, token: MockFixture) -> None:
             pass
 
     assert response.status == 204
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_get_all_raceplan_by_event_id_when_event_does_not_exist(
+    http_service: Any, token: MockFixture, new_raceplan: dict
+) -> None:
+    """Should return OK and an empty list."""
+    event_id = "does_not_exist"
+    url = f"{http_service}/raceplans?event-id={event_id}"
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    session = ClientSession()
+    async with session.get(url, headers=headers) as response:
+        raceplans = await response.json()
+    await session.close()
+
+    assert response.status == 200
+    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert type(raceplans) is list
+    assert len(raceplans) == 0

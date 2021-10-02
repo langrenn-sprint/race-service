@@ -42,7 +42,11 @@ class RaceplansView(View):
         except Exception as e:
             raise e from e
 
-        raceplans = await RaceplansService.get_all_raceplans(db)
+        if "event-id" in self.request.rel_url.query:
+            event_id = self.request.rel_url.query["event-id"]
+            raceplans = await RaceplansService.get_raceplan_by_event_id(db, event_id)
+        else:
+            raceplans = await RaceplansService.get_all_raceplans(db)
         list = []
         for _e in raceplans:
             list.append(_e.to_dict())
