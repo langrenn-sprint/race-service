@@ -3,7 +3,6 @@ from datetime import date, datetime, time, timedelta
 from typing import List
 
 from race_service.models import IndividualSprintRace, Raceplan
-from race_service.services import create_id
 
 MAX_OF_CONTESTANTS = 80
 TIME_BETWEEN_HEATS = timedelta(
@@ -37,7 +36,6 @@ async def calculate_raceplan_individual_sprint(
         for raceclass in raceclasses_sorted:
             for heat in range(0, no_of_heats(raceclass, round)):
                 race = IndividualSprintRace(
-                    id=create_id(),
                     raceclass=raceclass["name"],
                     order=order,
                     start_time=start_time,
@@ -137,7 +135,7 @@ def no_of_heats(raceclass: dict, round: str) -> int:  # noqa: C901
         )
 
 
-def no_of_contestants_in_heat(raceclass: dict, round: str) -> int:
+def no_of_contestants_in_heat(raceclass: dict, round: str) -> int:  # pragma: no cover
     """Look up and calculate no_of_contestants in heat for raceclass."""
     # TODO: need to look up based on round and
     # rules for how may contestants that qualify for next round.
