@@ -47,7 +47,7 @@ async def raceclasses_individual_sprint() -> List[dict[str, Any]]:
             "name": "J15",
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 32,
+            "no_of_contestants": 27,
             "order": 1,
         },
     ]
@@ -60,82 +60,89 @@ async def expected_raceplan_individual_sprint(
     """Create a mock raceplan object."""
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    raceplan.no_of_contestants = 32
+    raceplan.no_of_contestants = 27
     raceplan.races.append(
         IndividualSprintRace(
             order=1,
             raceclass="J15",
-            round="Quarterfinals",
+            round="Q",
+            index="",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
-            no_of_contestants=8,
+            no_of_contestants=7,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
             order=2,
             raceclass="J15",
-            round="Quarterfinals",
+            round="Q",
+            index="",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
-            no_of_contestants=8,
+            no_of_contestants=7,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
             order=3,
             raceclass="J15",
-            round="Quarterfinals",
+            round="Q",
+            index="",
             heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
-            no_of_contestants=8,
+            no_of_contestants=7,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
             order=4,
             raceclass="J15",
-            round="Quarterfinals",
+            round="Q",
+            index="",
             heat=4,
             start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
-            no_of_contestants=8,
+            no_of_contestants=6,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
             order=5,
             raceclass="J15",
-            round="Semi-finals",
+            round="S",
+            index="A",
             heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:10:00"),
-            no_of_contestants=8,
+            start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+            no_of_contestants=7,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
             order=6,
             raceclass="J15",
-            round="Semi-finals",
+            round="S",
+            index="A",
             heat=2,
-            start_time=datetime.fromisoformat("2021-09-29 09:12:30"),
-            no_of_contestants=8,
+            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+            no_of_contestants=6,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
             order=7,
             raceclass="J15",
-            round="Finals",
+            round="F",
+            index="A",
             heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
-            no_of_contestants=8,
+            start_time=datetime.fromisoformat("2021-09-29 09:30:00"),
+            no_of_contestants=6,
         )
     )
 
     return raceplan
 
 
-@pytest.mark.skip(reason="no way of currently testing this")
+# @pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint(
@@ -154,13 +161,24 @@ async def test_calculate_raceplan_individual_sprint(
     assert type(raceplan) is Raceplan
     assert raceplan.id is None
     assert raceplan.event_id == expected_raceplan_individual_sprint.event_id
+    # Check that no_of_contestants corresponds to the number given in raceclasses:
+    assert raceplan.no_of_contestants == sum(
+        rc["no_of_contestants"] for rc in raceclasses_individual_sprint
+    )
     assert (
         raceplan.no_of_contestants
         == expected_raceplan_individual_sprint.no_of_contestants
     )
+    # Check that there are correct number of races:
     assert len(raceplan.races) == len(expected_raceplan_individual_sprint.races)
+    # Check that all the contestants have been given a Quarterfinal:
+    total_no_of_contestants_in_quarterfinals = 0
     for race in raceplan.races:
         assert type(race) is IndividualSprintRace
+        if race.round == "Q":
+            total_no_of_contestants_in_quarterfinals += race.no_of_contestants
+    assert total_no_of_contestants_in_quarterfinals == raceplan.no_of_contestants
+
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
