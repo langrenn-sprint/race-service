@@ -140,9 +140,16 @@ async def test_calculate_raceplan_interval_start(
     assert (
         raceplan.no_of_contestants == expected_raceplan_interval_start.no_of_contestants
     )
+    assert raceplan.no_of_contestants == sum(
+        rc["no_of_contestants"] for rc in raceclasses_interval_start
+    )
     assert len(raceplan.races) == len(expected_raceplan_interval_start.races)
+    total_no_of_contestants = 0
     for race in raceplan.races:
         assert type(race) is Race
+        total_no_of_contestants += race.no_of_contestants
+    assert total_no_of_contestants == raceplan.no_of_contestants
+
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,

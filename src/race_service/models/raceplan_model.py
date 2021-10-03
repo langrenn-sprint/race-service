@@ -29,6 +29,7 @@ class IndividualSprintRace(Race, DataClassJsonMixin):
     """Data class with details about a race."""
 
     round: str = ""
+    index: str = ""
     heat: int = 0
 
 
