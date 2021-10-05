@@ -100,3 +100,15 @@ To run tests with logging, do:
 ```
 % nox -s integration_tests -- --log-cli-level=DEBUG
 ```
+
+# ConfigMatrix for individual sprint
+| Max no of contestants	|no of heats Q|	To S pr heat |	no of SA | to F pr heat	| no of SC | to FC pr heat | no of F (A-C) |
+| --------------------- | ------------|	---- |	-------- | ---	| ---------| ---- | ---- |
+| 7  | 0 | Alle til SA | 1 | Alle til FA    | 0 |  n/a | 1 |
+| 16 | 0 | Alle til SA | 2 | 4 FA, resten til FB | 0 | n/a  | 2 |
+| 24 | 3 | 5 til SA, resten til FC | 2 | 4 FA, resten FB | 0 | n/a |	3 |
+| 32 | 4 | 4 til SA, rest to SC |	2 | 4 FA, resten FB | 2 |	4 FC, rest out | 3 |
+| 40 | 5 | 5 to SA, rest to SC |	3 |	3 FA, 3 FB, rest out |	2	|4 FC, rest out	| 3 |
+| 48 | 6 | 4 to SA, rest to SC	| 3	| 3 FA, 3 FB, rest out |	3	|3 FC, rest out	| 3 |
+| 56 | 7 | 5 to SA, rest to SC	| 4	| 2 FA, 2 FB, rest out |	3	|3 FC, rest out	| 3 |
+| 80 | 8 | 4 to SA, rest to SC	| 4	| 2 FA, 2 FB, rest out |	4	|2 FC, rest out	| 3 |
