@@ -32,17 +32,29 @@ class RaceplansCommands:
     ) -> str:
         """Generate raceplan for event function."""
         # First we check if event already has a plan:
-        await get_raceplan(db, token, event_id)
+        try:
+            await get_raceplan(db, token, event_id)
+        except RaceplanAllreadyExistException as e:
+            raise e from e
         # First we get the event from the event-service:
-        event = await get_event(token, event_id)
+        try:
+            event = await get_event(token, event_id)
+        except EventNotFoundException as e:
+            raise e from e
         # We fetch the configuration of the competition-format:
-        format_configuration = await get_format_configuration(
-            token, event["competition_format"]
-        )
+        try:
+            format_configuration = await get_format_configuration(
+                token, event["competition_format"]
+            )
+        except FormatConfigurationNotFoundException as e:
+            raise CompetitionFormatNotSupportedException(
+                f'Competition-format {event["competition_format"]} is not supported.'
+            ) from e
         # Then we fetch the raceclasses:
         raceclasses = await get_raceclasses(token, event_id)
 
         # Calculate the raceplan:
+        raceplan = None
         if event["competition_format"] == "Individual Sprint":
             raceplan = await calculate_raceplan_individual_sprint(
                 event, format_configuration, raceclasses
@@ -52,6 +64,7 @@ class RaceplansCommands:
                 event, format_configuration, raceclasses
             )
         # Finally we store the new raceplan and return the id:
+        assert raceplan
         raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
         assert raceplan_id
         return raceplan_id
@@ -73,21 +86,11 @@ async def get_event(token: str, event_id: str) -> dict:
         event = await EventsAdapter.get_event_by_id(token, event_id)
     except EventNotFoundException as e:
         raise e from e
-    # Check if we support the competition format:
-    try:
-        competition_format = event["competition_format"]
-    except KeyError as e:
+    # Check if the event has a competition format:
+    if "competition_format" not in event:
         raise CompetitionFormatNotSupportedException(
             f"Event {event_id} has no value for competition_format."
-        ) from e
-
-    # We check if we support the competition-format:
-    if competition_format.lower() == "Interval Start".lower():
-        pass
-    else:
-        raise CompetitionFormatNotSupportedException(
-            f'Competition-format "{competition_format}" not supported.'
-        )
+        ) from None
 
     # We check if event has valid date:
     if "date_of_event" in event:
@@ -134,13 +137,14 @@ async def get_format_configuration(token: str, competition_format_name: str) -> 
     except FormatConfigurationNotFoundException as e:
         raise e from e
     # Validate:
-    if "intervals" not in format_configuration:
-        raise MissingPropertyException(
-            f'Format configuration "{competition_format_name}" '
-            'is missing the "intervals" property.'
-        )
-    # We do have intervals, check if valid format:
-    await check_time(format_configuration["intervals"])
+    if format_configuration["name"] == "Interval Start":
+        if "intervals" not in format_configuration:
+            raise MissingPropertyException(
+                f'Format configuration "{competition_format_name}" '
+                'is missing the "intervals" property.'
+            )
+        # We do have intervals, check if valid format:
+        await check_time(format_configuration["intervals"])
 
     return format_configuration
 

@@ -77,6 +77,7 @@ async def new_raceplan() -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00").isoformat(),
                 "no_of_contestants": 8,
+                "datatype": "interval_start",
             },
             {
                 "name": "G16K02",
@@ -84,6 +85,7 @@ async def new_raceplan() -> dict:
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 12:15:00").isoformat(),
                 "no_of_contestants": 8,
+                "datatype": "interval_start",
             },
             {
                 "name": "G16K03",
@@ -91,6 +93,7 @@ async def new_raceplan() -> dict:
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 12:30:00").isoformat(),
                 "no_of_contestants": 8,
+                "datatype": "interval_start",
             },
             {
                 "name": "G16K04",
@@ -98,6 +101,7 @@ async def new_raceplan() -> dict:
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 12:45:00").isoformat(),
                 "no_of_contestants": 8,
+                "datatype": "interval_start",
             },
         ],
     }

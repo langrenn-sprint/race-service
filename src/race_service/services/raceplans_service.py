@@ -86,7 +86,10 @@ class RaceplansService:
         id = create_id()
         raceplan.id = id
         for race in raceplan.races:
-            race.id = create_id()
+            if type(race) is dict:
+                race["id"] = create_id()
+            else:
+                race.id = create_id()
         # insert new raceplan
         new_raceplan = raceplan.to_dict()
         logging.debug(f"new_raceplan: {new_raceplan}")
