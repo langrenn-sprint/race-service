@@ -63,6 +63,7 @@ async def expected_raceplan_individual_sprint(
     raceplan.no_of_contestants = 27
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=1,
             raceclass="J15",
             round="Q",
@@ -74,6 +75,7 @@ async def expected_raceplan_individual_sprint(
     )
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=2,
             raceclass="J15",
             round="Q",
@@ -85,6 +87,7 @@ async def expected_raceplan_individual_sprint(
     )
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=3,
             raceclass="J15",
             round="Q",
@@ -96,6 +99,7 @@ async def expected_raceplan_individual_sprint(
     )
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=4,
             raceclass="J15",
             round="Q",
@@ -107,42 +111,44 @@ async def expected_raceplan_individual_sprint(
     )
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=5,
             raceclass="J15",
             round="S",
             index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
-            no_of_contestants=7,
+            no_of_contestants=8,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=6,
             raceclass="J15",
             round="S",
             index="A",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
-            no_of_contestants=6,
+            no_of_contestants=8,
         )
     )
     raceplan.races.append(
         IndividualSprintRace(
+            id="",
             order=7,
             raceclass="J15",
             round="F",
             index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:30:00"),
-            no_of_contestants=6,
+            no_of_contestants=8,
         )
     )
 
     return raceplan
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint(

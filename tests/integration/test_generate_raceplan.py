@@ -295,7 +295,7 @@ async def test_generate_raceplan_for_event_format_configuration_not_found(
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
-    """Should return 404 Not found."""
+    """Should return 400 Not found."""
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
@@ -336,7 +336,7 @@ async def test_generate_raceplan_for_event_format_configuration_not_found(
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 404
+        assert resp.status == 400
 
 
 @pytest.mark.integration
@@ -970,7 +970,9 @@ async def test_generate_raceplan_for_event_format_configuration_not_supported(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        side_effect=FormatConfigurationNotFoundException(
+            "FormatConfiguration not found."
+        ),
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",

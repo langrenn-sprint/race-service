@@ -2,7 +2,7 @@
 from datetime import date, datetime, time, timedelta
 from typing import List
 
-from race_service.models import Race, Raceplan
+from race_service.models import IntervalStartRace, Raceplan
 
 
 async def calculate_raceplan_interval_start(
@@ -27,7 +27,8 @@ async def calculate_raceplan_interval_start(
     )
 
     for raceclass in raceclasses_sorted:
-        race = Race(
+        race = IntervalStartRace(
+            id="",
             raceclass=raceclass["name"],
             order=raceclass["order"],
             start_time=start_time,

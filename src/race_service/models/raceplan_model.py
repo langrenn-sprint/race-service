@@ -1,10 +1,10 @@
 """Raceplan data class module."""
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from dataclasses_json import config, DataClassJsonMixin
-from marshmallow import fields
+from marshmallow.fields import Constant, DateTime
 
 
 @dataclass
@@ -17,11 +17,21 @@ class Race(DataClassJsonMixin):
         metadata=config(
             encoder=datetime.isoformat,
             decoder=datetime.fromisoformat,
-            mm_field=fields.DateTime(format="iso"),
+            mm_field=DateTime(format="iso"),
         )
     )
     no_of_contestants: int
-    id: Optional[str] = field(default=None)
+    id: str
+
+
+@dataclass
+class IntervalStartRace(Race, DataClassJsonMixin):
+    """Data class with details about a race."""
+
+    datatype: str = field(
+        metadata=dict(marshmallow_field=Constant("interval_start")),
+        default="interval_start",
+    )
 
 
 @dataclass
@@ -31,6 +41,10 @@ class IndividualSprintRace(Race, DataClassJsonMixin):
     round: str = ""
     index: str = ""
     heat: int = 0
+    datatype: str = field(
+        metadata=dict(marshmallow_field=Constant("individual_sprint")),
+        default="individual_sprint",
+    )
 
 
 @dataclass
@@ -38,6 +52,6 @@ class Raceplan(DataClassJsonMixin):
     """Data class with details about a raceplan."""
 
     event_id: str
-    races: List[Race]
+    races: List[Union[IntervalStartRace, IndividualSprintRace, Race]]
     no_of_contestants: int = 0
     id: Optional[str] = field(default=None)
