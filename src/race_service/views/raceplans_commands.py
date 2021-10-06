@@ -13,7 +13,6 @@ from multidict import MultiDict
 
 from race_service.adapters import (
     EventNotFoundException,
-    FormatConfigurationNotFoundException,
     UsersAdapter,
 )
 from race_service.commands import (
@@ -55,8 +54,6 @@ class GenerateRaceplanForEventView(View):
                 db, token, event_id
             )
         except EventNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
-        except FormatConfigurationNotFoundException as e:
             raise HTTPNotFound(reason=e) from e
         except (
             CompetitionFormatNotSupportedException,

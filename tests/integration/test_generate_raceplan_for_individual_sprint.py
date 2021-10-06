@@ -91,7 +91,6 @@ async def raceclasses() -> List[dict[str, Any]]:
     ]
 
 
-@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.integration
 async def test_generate_raceplan_for_event(
     client: _TestClient,

@@ -8,7 +8,7 @@ import pytest
 from race_service.commands.raceplans_interval_start import (
     calculate_raceplan_interval_start,
 )
-from race_service.models import Race, Raceplan
+from race_service.models import IntervalStartRace, Raceplan
 
 # --- Interval Start ---
 
@@ -85,7 +85,8 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 62
     raceplan.races.append(
-        Race(
+        IntervalStartRace(
+            id="",
             raceclass="J15",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
@@ -93,7 +94,8 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
         )
     )
     raceplan.races.append(
-        Race(
+        IntervalStartRace(
+            id="",
             raceclass="G15",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
@@ -101,7 +103,8 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
         )
     )
     raceplan.races.append(
-        Race(
+        IntervalStartRace(
+            id="",
             raceclass="J16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:15:00"),
@@ -109,7 +112,8 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
         )
     )
     raceplan.races.append(
-        Race(
+        IntervalStartRace(
+            id="",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:23:30"),
@@ -146,7 +150,7 @@ async def test_calculate_raceplan_interval_start(
     assert len(raceplan.races) == len(expected_raceplan_interval_start.races)
     total_no_of_contestants = 0
     for race in raceplan.races:
-        assert type(race) is Race
+        assert type(race) is IntervalStartRace
         total_no_of_contestants += race.no_of_contestants
     assert total_no_of_contestants == raceplan.no_of_contestants
 
