@@ -44,7 +44,7 @@ class RaceplansCommands:
         # We fetch the configuration of the competition-format:
         try:
             format_configuration = await get_format_configuration(
-                token, event["competition_format"]
+                token, event_id, event["competition_format"]
             )
         except FormatConfigurationNotFoundException as e:
             raise CompetitionFormatNotSupportedException(
@@ -128,11 +128,13 @@ async def check_time(time_str: str) -> None:
         raise InvalidDateFormatException('Time "{time_str}" has invalid format.') from e
 
 
-async def get_format_configuration(token: str, competition_format_name: str) -> dict:
+async def get_format_configuration(
+    token: str, event_id: str, competition_format_name: str
+) -> dict:
     """Get the format configuration."""
     try:
         format_configuration = await EventsAdapter.get_format_configuration(
-            token, competition_format_name
+            token, event_id, competition_format_name
         )
     except FormatConfigurationNotFoundException as e:
         raise e from e

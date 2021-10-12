@@ -49,6 +49,10 @@ async def format_configuration() -> dict[str, Any]:
         "name": "Individual Sprint",
         "starting_order": "Draw",
         "start_procedure": "Heat Start",
+        "time_between_rounds": "00:10:00",
+        "time_between_heats": "00:02:30",
+        "max_no_of_contestants": 80,
+        "datatype": "individual_sprint",
     }
 
 

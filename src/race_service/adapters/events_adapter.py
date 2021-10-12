@@ -61,20 +61,39 @@ class EventsAdapter:
 
     @classmethod
     async def get_format_configuration(
-        cls: Any, token: str, competition_format_name: str
+        cls: Any, token: str, event_id: str, competition_format_name: str
     ) -> dict:  # pragma: no cover
         """Get format_configuration from event-service."""
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/competition-formats?name={competition_format_name}"
-        )
-
         headers = {
             hdrs.AUTHORIZATION: f"Bearer {token}",
             hdrs.ACCEPT: "application/json",
         }
 
         async with ClientSession() as session:
+            # First we try to get the configuration from the event:
+            url = (
+                f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
+                f"/events/{event_id}/format"
+            )
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    format_configuration = await response.json()
+                    return format_configuration
+                elif response.status == 404:
+                    pass  # We will try to get the global config
+                else:
+                    raise HTTPInternalServerError(
+                        reason=(
+                            "Got unknown status from events service"
+                            f"when getting competition_format from event {event_id}/"
+                            f"{competition_format_name}: {response.status}."
+                        )
+                    ) from None
+
+            url = (
+                f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
+                f"/competition-formats?name={competition_format_name}"
+            )
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     format_configurations = await response.json()
