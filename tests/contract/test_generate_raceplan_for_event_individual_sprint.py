@@ -154,7 +154,6 @@ async def expected_raceplan() -> dict:
 
 
 # Finally we test the test_generate_raceplan_for_event function:
-@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.contract
 @pytest.mark.asyncio
 async def test_generate_raceplan_for_individual_sprint_event(
@@ -259,7 +258,6 @@ async def test_generate_raceplan_for_individual_sprint_event(
         async with session.get(url, headers=headers) as response:
             assert response.status == 200
             raceplan = await response.json()
-            print(*raceplan["races"], sep="\n")
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
             assert type(raceplan) is dict
             assert raceplan["id"]
@@ -269,6 +267,7 @@ async def test_generate_raceplan_for_individual_sprint_event(
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
             )
+            assert type(raceplan["races"]) is list
             assert len(raceplan["races"]) == len(expected_raceplan["races"])
 
             i = 0
