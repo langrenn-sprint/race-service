@@ -4,18 +4,9 @@ from typing import Any, List
 
 from race_service.models import IndividualSprintRace, Raceplan
 
-MAX_OF_CONTESTANTS = 80
-TIME_BETWEEN_HEATS = timedelta(
-    hours=00,
-    minutes=2,
-    seconds=30,
-)
-TIME_BETWEEN_ROUNDS = timedelta(
-    hours=00,
-    minutes=10,
-    seconds=00,
-)
+
 ROUNDS = ["Q", "S", "F"]
+max_no_of_contestants = 0
 
 
 async def calculate_raceplan_individual_sprint(
@@ -25,6 +16,18 @@ async def calculate_raceplan_individual_sprint(
 ) -> Raceplan:
     """Calculate raceplan for Individual Sprint event."""
     raceplan = Raceplan(event_id=event["id"], races=list())
+    # First we prepare the parameters:
+    time.fromisoformat(format_configuration["time_between_heats"]).hour,
+    TIME_BETWEEN_HEATS = timedelta(
+        hours=time.fromisoformat(format_configuration["time_between_heats"]).hour,
+        minutes=time.fromisoformat(format_configuration["time_between_heats"]).minute,
+        seconds=time.fromisoformat(format_configuration["time_between_heats"]).second,
+    )
+    TIME_BETWEEN_ROUNDS = timedelta(
+        hours=time.fromisoformat(format_configuration["time_between_rounds"]).hour,
+        minutes=time.fromisoformat(format_configuration["time_between_rounds"]).minute,
+        seconds=time.fromisoformat(format_configuration["time_between_rounds"]).second,
+    )
     # sort the raceclasses on order:
     raceclasses_sorted = sorted(raceclasses, key=lambda k: k["order"])
     # get the first start_time from the event:
@@ -65,6 +68,8 @@ async def calculate_raceplan_individual_sprint(
 
 class ConfigMatrix:
     """Class to represent the config matrix."""
+
+    MAX_NO_OF_CONTESTANTS = 80
 
     m: dict[int, dict[str, Any]] = {}
     m[1] = {
@@ -152,13 +157,19 @@ class ConfigMatrix:
         "no_of_contestants_qualified_to_F": 2,
     }
     m[8] = {
-        "lim_no_contestants": MAX_OF_CONTESTANTS,
+        "lim_no_contestants": MAX_NO_OF_CONTESTANTS,
         "no_of_heats_Q": 8,
-        "no_of_heats_S": 4,
-        "no_of_heats_F": 1,
+        "from_Q_to_SA": 4,
+        "from_Q_to_SC": float("inf"),  # all
+        "no_of_heats_S": {"A": 4, "C": 4},
+        "from_SA_to_FA": 2,
+        "from_SA_to_FB": 2,
+        "from_SC_to_FC": 2,
+        "no_of_heats_F": {"A": 1, "B": 1, "C": 1},
         "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
+        "race_index_S": ["A", "C"],
+        "race_index_F": ["A", "B", "C"],
+        # The following is redundant, can be calculated from above:
         "no_of_contestants_qualified_to_Q": float("inf"),  # all
         "no_of_contestants_qualified_to_S": 4,
         "no_of_contestants_qualified_to_F": 2,
@@ -261,7 +272,7 @@ class ConfigMatrix:
             return 6
         elif 48 < no_of_contestants <= 56:
             return 7
-        elif 56 < no_of_contestants <= MAX_OF_CONTESTANTS:
+        elif 56 < no_of_contestants <= ConfigMatrix.MAX_NO_OF_CONTESTANTS:
             return 8
         else:
             raise ValueError(
