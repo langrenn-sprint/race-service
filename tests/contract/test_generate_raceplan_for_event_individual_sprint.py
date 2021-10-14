@@ -241,6 +241,8 @@ async def test_generate_raceplan_for_individual_sprint_event(
                 ) as response:
                     assert response.status == 204
 
+        await _print_raceclasses(raceclasses)
+
         # Finally, we are ready to generate the raceplan:
         request_body = {"event_id": event_id}
         url = f"{http_service}/raceplans/generate-raceplan-for-event"
@@ -263,9 +265,19 @@ async def test_generate_raceplan_for_individual_sprint_event(
             assert raceplan["id"]
             assert raceplan["event_id"] == request_body["event_id"]
 
+            await _print_raceplan(raceplan)
             # And we compare the response to the expected raceplan:
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
+            )
+            # Check that all the contestants have been assigned to a Quarterfinal:
+            assert (
+                sum(
+                    race["no_of_contestants"]
+                    for race in raceplan["races"]
+                    if race["round"] == "Q"
+                )
+                == raceplan["no_of_contestants"]
             )
             assert type(raceplan["races"]) is list
             assert len(raceplan["races"]) == len(expected_raceplan["races"])
@@ -288,3 +300,46 @@ async def test_generate_raceplan_for_individual_sprint_event(
                     == expected_raceplan["races"][i]["no_of_contestants"]
                 ), f'"no_of_contestants" in index {i}:{race}\n ne:\n{expected_race}'
                 i += 1
+
+
+# ---
+async def _print_raceclasses(raceclasses: dict) -> None:
+    print("order;name;ageclass_name;no_of_contestants;distance;event_id")
+    for raceclass in raceclasses:
+        print(
+            str(raceclass["order"])
+            + ";"
+            + raceclass["name"]
+            + ";"
+            + raceclass["ageclass_name"]
+            + ";"
+            + str(raceclass["no_of_contestants"])
+            + ";"
+            + str(raceclass["distance"])
+            + ";"
+            + raceclass["event_id"]
+        )
+
+
+async def _print_raceplan(raceplan: dict) -> None:
+    print(f'event_id: {raceplan["event_id"]}')
+    print(f'no_of_contestants: {raceplan["no_of_contestants"]}')
+    print("order;start_time;raceclass;round;index;heat;no_of_contestants;rule")
+    for race in raceplan["races"]:
+        print(
+            str(race["order"])
+            + ";"
+            + str(race["start_time"])
+            + ";"
+            + str(race["raceclass"])
+            + ";"
+            + str(race["round"])
+            + ";"
+            + str(race["index"])
+            + ";"
+            + str(race["heat"])
+            + ";"
+            + str(race["no_of_contestants"])
+            + ";"
+            + str(race["rule"])
+        )
