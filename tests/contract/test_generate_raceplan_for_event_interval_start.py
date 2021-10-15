@@ -203,7 +203,7 @@ async def test_generate_raceplan_for_interval_start_event(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        files = {"file": open("tests/files/allcontestants_eventid_364892.csv", "rb")}
+        files = {"file": open("tests/files/all_contestants_eventid_364892.csv", "rb")}
         logging.debug(f"Adding contestants from file at url {url}.")
         async with session.post(url, headers=headers, data=files) as response:
             status = response.status
