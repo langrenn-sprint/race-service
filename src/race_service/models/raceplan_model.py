@@ -1,7 +1,7 @@
 """Raceplan data class module."""
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from dataclasses_json import config, DataClassJsonMixin
 from marshmallow.fields import Constant, DateTime
@@ -41,6 +41,7 @@ class IndividualSprintRace(Race, DataClassJsonMixin):
     round: str = ""
     index: str = ""
     heat: int = 0
+    rule: Dict[str, Dict[str, Union[int, float]]] = field(default_factory=dict)
     datatype: str = field(
         metadata=dict(marshmallow_field=Constant("individual_sprint")),
         default="individual_sprint",

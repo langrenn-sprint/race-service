@@ -1,12 +1,8 @@
 """Module for raceplan commands."""
 from datetime import date, datetime, time, timedelta
-from typing import Any, List
+from typing import Any, List, Union
 
 from race_service.models import IndividualSprintRace, Raceplan
-
-
-ROUNDS = ["Q", "S", "F"]
-max_no_of_contestants = 0
 
 
 async def calculate_raceplan_individual_sprint(
@@ -16,6 +12,10 @@ async def calculate_raceplan_individual_sprint(
 ) -> Raceplan:
     """Calculate raceplan for Individual Sprint event."""
     raceplan = Raceplan(event_id=event["id"], races=list())
+    # We get the number of contestants in plan from the raceclasses:
+    raceplan.no_of_contestants = sum(
+        raceclass["no_of_contestants"] for raceclass in raceclasses
+    )
     # First we prepare the parameters:
     time.fromisoformat(format_configuration["time_between_heats"]).hour,
     TIME_BETWEEN_HEATS = timedelta(
@@ -39,221 +39,390 @@ async def calculate_raceplan_individual_sprint(
     # Generate the races based on configuration and number of contestants
     # for round in ROUNDS:
     order = 1
-    for round in ROUNDS:
-        for raceclass in raceclasses_sorted:
-            for heat in range(1, ConfigMatrix.no_of_heats(raceclass, round) + 1):
-                race = IndividualSprintRace(
-                    id="",
-                    raceclass=raceclass["name"],
-                    order=order,
-                    start_time=start_time,
-                    no_of_contestants=ConfigMatrix.no_of_contestants_in_heat(
-                        raceclass, round, heat
-                    ),
-                    round=round,
-                    index=ConfigMatrix.race_index(raceclass, round, heat),
-                    heat=heat,
-                )
-                order += 1
-                # Calculate start_time for next heat:
-                start_time = start_time + TIME_BETWEEN_HEATS
-                # Add the race to the raceplan:
-                raceplan.races.append(race)
+    for raceclass in raceclasses_sorted:
+        for round in ConfigMatrix.get_rounds():
+            for index in ConfigMatrix.get_race_indexes(raceclass, round):
+                for heat in range(
+                    1, ConfigMatrix.get_no_of_heats(raceclass, round, index) + 1
+                ):
+                    race = IndividualSprintRace(
+                        id="",
+                        order=order,
+                        raceclass=raceclass["name"],
+                        round=round,
+                        index="" if round == "Q" else index,
+                        heat=heat,
+                        start_time=start_time,
+                        no_of_contestants=0,
+                        rule={}
+                        if round == "F"
+                        else ConfigMatrix.get_rule_from_to(raceclass, round, index),
+                    )
+                    order += 1
+                    # Calculate start_time for next heat:
+                    start_time = start_time + TIME_BETWEEN_HEATS
+                    # Add the race to the raceplan:
+                    raceplan.races.append(race)
             # Calculate start_time for next round:
             start_time = start_time - TIME_BETWEEN_HEATS + TIME_BETWEEN_ROUNDS
-            raceplan.no_of_contestants += raceclass["no_of_contestants"]
-    raceplan.no_of_contestants = raceplan.no_of_contestants // len(ROUNDS)
+
+    # We need to calculate the number of contestants pr heat:
+    await _calculate_number_of_contestants_pr_race(raceclasses, raceplan)
+
     return raceplan
+
+
+async def _calculate_number_of_contestants_pr_race(
+    raceclasses: List[dict],
+    raceplan: Raceplan,
+) -> None:
+    """Calculate number of contestants pr race based on plan."""
+    for raceclass in raceclasses:
+        await _calculate_number_of_contestants_pr_race_in_raceclass(raceclass, raceplan)
+
+
+async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
+    raceclass: dict,
+    raceplan: Raceplan,
+) -> None:
+    """Calculate number of contestants pr race pr raceclass based on plan."""
+    no_of_Qs = len(
+        [
+            race
+            for race in raceplan.races
+            if race.raceclass == raceclass["name"] and race.round == "Q"
+        ]
+    )
+    no_of_SAs = len(
+        [
+            race
+            for race in raceplan.races
+            if race.raceclass == raceclass["name"]
+            and race.round == "S"
+            and race.index == "A"
+        ]
+    )
+    no_of_SCs = len(
+        [
+            race
+            for race in raceplan.races
+            if race.raceclass == raceclass["name"]
+            and race.round == "S"
+            and race.index == "C"
+        ]
+    )
+    no_of_FAs = len(
+        [
+            race
+            for race in raceplan.races
+            if race.raceclass == raceclass["name"]
+            and race.round == "F"
+            and race.index == "A"
+        ]
+    )
+    no_of_FBs = len(
+        [
+            race
+            for race in raceplan.races
+            if race.raceclass == raceclass["name"]
+            and race.round == "F"
+            and race.index == "B"
+        ]
+    )
+    no_of_FCs = len(
+        [
+            race
+            for race in raceplan.races
+            if race.raceclass == raceclass["name"]
+            and race.round == "F"
+            and race.index == "C"
+        ]
+    )
+
+    no_of_contestants_to_Qs = raceclass["no_of_contestants"]
+    no_of_contestants_to_SAs = 0
+    no_of_contestants_to_SCs = 0
+    no_of_contestants_to_FAs = 0
+    no_of_contestants_to_FBs = 0
+    no_of_contestants_to_FCs = 0
+
+    # Calculate number of contestants pr heat in Q:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"] and race.round == "Q"
+    ]:
+        # First we calculate no of cs in each Q race:
+        # We need to "smooth" the contestants across the heats:
+        quotient, remainder = divmod(
+            no_of_contestants_to_Qs,
+            no_of_Qs,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+    # Calculate number of contestants in SA, SC and FC:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"] and race.round == "Q"
+    ]:
+        # Then, for each race in round Q, some goes to SA:
+        no_of_contestants_to_SAs += race.rule["S"]["A"]
+        # rest to SC:
+        if race.rule["S"]["C"] != 0:
+            no_of_contestants_to_SCs += race.no_of_contestants - race.rule["S"]["A"]
+        # or the rest may in some cases go directly to FC:
+        if "F" in race.rule:
+            if "C" in race.rule["F"]:
+                no_of_contestants_to_FCs += race.no_of_contestants - race.rule["S"]["A"]
+
+    # Calculate number of contestants pr heat in SA:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "S"
+        and race.index == "A"
+    ]:
+        quotient, remainder = divmod(
+            no_of_contestants_to_SAs,
+            no_of_SAs,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+    # Calculate number of contestants pr heat in SC:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "S"
+        and race.index == "C"
+    ]:
+        quotient, remainder = divmod(
+            no_of_contestants_to_SCs,
+            no_of_SCs,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+    # Calculate number of contestants in FA and FB:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "S"
+        and race.index == "A"
+    ]:
+        no_of_contestants_to_FAs += race.rule["F"]["A"]
+        # rest to FB:
+        if race.rule["F"]["B"] < float("inf"):
+            no_of_contestants_to_FBs += race.rule["F"]["B"]
+        else:
+            no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]
+
+    # Calculate number of contestants in FC:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "S"
+        and race.index == "C"
+    ]:
+        no_of_contestants_to_FCs += race.rule["F"]["C"]
+
+    # Calculate number of contestants pr heat in FA:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "F"
+        and race.index == "A"
+    ]:
+        quotient, remainder = divmod(
+            no_of_contestants_to_FAs,
+            no_of_FAs,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+    # Calculate number of contestants pr heat in FB:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "F"
+        and race.index == "B"
+    ]:
+        quotient, remainder = divmod(
+            no_of_contestants_to_FBs,
+            no_of_FBs,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+    # Calculate number of contestants pr heat in FC:
+    for race in [
+        race
+        for race in raceplan.races
+        if race.raceclass == raceclass["name"]
+        and race.round == "F"
+        and race.index == "C"
+    ]:
+        quotient, remainder = divmod(
+            no_of_contestants_to_FCs,
+            no_of_FCs,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
 
 
 class ConfigMatrix:
     """Class to represent the config matrix."""
 
-    MAX_NO_OF_CONTESTANTS = 80
+    ROUNDS = ["Q", "S", "F"]
 
+    MAX_NO_OF_CONTESTANTS = 80  # TODO: Get this from competition-format
+    ALL = 10
+    REST = float("inf")
     m: dict[int, dict[str, Any]] = {}
     m[1] = {
         "lim_no_contestants": 7,
-        "no_of_heats_Q": 0,
-        "no_of_heats_S": 1,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": float("inf"),
-        "no_of_contestants_qualified_to_F": float("inf"),
+        "no_of_heats": {
+            "Q": {"A": 0},
+            "S": {"A": 1, "C": 0},
+            "F": {"A": 1, "B": 0, "C": 0},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": ALL, "C": 0}}},
+            "S": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
+        },
     }
     m[2] = {
         "lim_no_contestants": 16,
-        "no_of_heats_Q": 0,
-        "no_of_heats_S": 2,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": float("inf"),
-        "no_of_contestants_qualified_to_F": 4,
+        "no_of_heats": {
+            "Q": {"A": 0},
+            "S": {"A": 2, "C": 0},
+            "F": {"A": 1, "B": 1, "C": 0},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": ALL, "C": 0}}},
+            "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+        },
     }
     m[3] = {
         "lim_no_contestants": 24,
-        "no_of_heats_Q": 3,
-        "no_of_heats_S": 2,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": 5,
-        "no_of_contestants_qualified_to_F": 4,
+        "no_of_heats": {
+            "Q": {"A": 3},
+            "S": {"A": 2, "C": 0},
+            "F": {"A": 1, "B": 1, "C": 1},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
+            "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+        },
     }
     m[4] = {
         "lim_no_contestants": 32,
-        "no_of_heats_Q": 4,
-        "no_of_heats_S": 2,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": 4,
-        "no_of_contestants_qualified_to_F": 4,
+        "no_of_heats": {
+            "Q": {"A": 4},
+            "S": {"A": 2, "C": 2},
+            "F": {"A": 1, "B": 1, "C": 1},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": 4, "C": REST}}},
+            "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
+        },
     }
     m[5] = {
         "lim_no_contestants": 40,
-        "no_of_heats_Q": 5,
-        "no_of_heats_S": 3,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": 5,
-        "no_of_contestants_qualified_to_F": 3,
+        "no_of_heats": {
+            "Q": {"A": 5},
+            "S": {"A": 3, "C": 2},
+            "F": {"A": 1, "B": 1, "C": 1},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": 5, "C": REST}}},
+            "S": {"A": {"F": {"A": 3, "B": 3}}, "C": {"F": {"C": 4}}},
+        },
     }
     m[6] = {
         "lim_no_contestants": 48,
-        "no_of_heats_Q": 6,
-        "no_of_heats_S": 3,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": 4,
-        "no_of_contestants_qualified_to_F": 3,
+        "no_of_heats": {
+            "Q": {"A": 6},
+            "S": {"A": 3, "C": 3},
+            "F": {"A": 1, "B": 1, "C": 1},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": 4, "C": REST}}},
+            "S": {"A": {"F": {"A": 3, "B": 3}}, "C": {"F": {"C": 3}}},
+        },
     }
     m[7] = {
         "lim_no_contestants": 56,
-        "no_of_heats_Q": 7,
-        "no_of_heats_S": 4,
-        "no_of_heats_F": 1,
-        "race_index_Q": "",
-        "race_index_S": "A",
-        "race_index_F": "A",
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": 5,
-        "no_of_contestants_qualified_to_F": 2,
+        "no_of_heats": {
+            "Q": {"A": 7},
+            "S": {"A": 4, "C": 3},
+            "F": {"A": 1, "B": 1, "C": 1},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": 5, "C": REST}}},
+            "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 3}}},
+        },
     }
     m[8] = {
         "lim_no_contestants": MAX_NO_OF_CONTESTANTS,
-        "no_of_heats_Q": 8,
-        "from_Q_to_SA": 4,
-        "from_Q_to_SC": float("inf"),  # all
-        "no_of_heats_S": {"A": 4, "C": 4},
-        "from_SA_to_FA": 2,
-        "from_SA_to_FB": 2,
-        "from_SC_to_FC": 2,
-        "no_of_heats_F": {"A": 1, "B": 1, "C": 1},
-        "race_index_Q": "",
-        "race_index_S": ["A", "C"],
-        "race_index_F": ["A", "B", "C"],
-        # The following is redundant, can be calculated from above:
-        "no_of_contestants_qualified_to_Q": float("inf"),  # all
-        "no_of_contestants_qualified_to_S": 4,
-        "no_of_contestants_qualified_to_F": 2,
+        "no_of_heats": {
+            "Q": {"A": 8},
+            "S": {"A": 4, "C": 4},
+            "F": {"A": 1, "B": 1, "C": 1},
+        },
+        "from_to": {
+            "Q": {"A": {"S": {"A": 4, "C": REST}}},
+            "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+        },
     }
 
     @classmethod
-    def no_of_heats(cls: Any, raceclass: dict, round: str) -> int:
-        """Get no of heats."""
-        no_of_contestants = raceclass["no_of_contestants"]
-        _key = ConfigMatrix._get_key(no_of_contestants)
-        if round == "Q":
-            return ConfigMatrix.m[_key]["no_of_heats_Q"]
-        elif round == "S":
-            return ConfigMatrix.m[_key]["no_of_heats_S"]
-        elif round == "F":
-            return ConfigMatrix.m[_key]["no_of_heats_F"]
-        else:
-            raise ValueError(f"Unsupported value for round: {round}")
+    def get_rounds(cls: Any) -> list:
+        """Get no of heats pr round and index."""
+        return ConfigMatrix.ROUNDS
 
     @classmethod
-    def race_index(cls: Any, raceclass: dict, round: str, heat: int) -> str:
-        """Get race_index."""
-        no_of_contestants = raceclass["no_of_contestants"]
-        _key = ConfigMatrix._get_key(no_of_contestants)
-        if round == "Q":
-            return ConfigMatrix.m[_key]["race_index_Q"]
-        elif round == "S":
-            return ConfigMatrix.m[_key]["race_index_S"]
-        elif round == "F":
-            return ConfigMatrix.m[_key]["race_index_F"]
-        else:
-            raise ValueError(f"Unsupported value for round: {round}")
+    def get_no_of_heats(cls: Any, raceclass: dict, round: str, index: str) -> int:
+        """Get no of heats pr round and index."""
+        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        return ConfigMatrix.m[_key]["no_of_heats"][round][index]
 
     @classmethod
-    def no_of_contestants_in_heat(
-        cls: Any, raceclass: dict, round: str, heat: int
-    ) -> int:
-        """Look up and calculate no_of_contestants in heat for raceclass."""
-        no_of_contestants = raceclass["no_of_contestants"]
-        _key = ConfigMatrix._get_key(no_of_contestants)
-        if round == "Q":
-            if (
-                ConfigMatrix.m[_key]["no_of_contestants_qualified_to_Q"]
-                > no_of_contestants
-            ):
-                _no = no_of_contestants
-            else:
-                _no = ConfigMatrix.m[_key]["no_of_contestants_qualified_to_Q"]
+    def get_race_indexes(cls: Any, raceclass: dict, round: str) -> str:
+        """Get race indexes pr round."""
+        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        return ConfigMatrix.m[_key]["no_of_heats"][round].keys()
 
-            quotient, remainder = divmod(
-                _no, ConfigMatrix.no_of_heats(raceclass, round)
-            )
-            if heat <= remainder:
-                return quotient + 1
-            else:
-                return quotient
-        elif round == "S":
-            _no = (
-                ConfigMatrix.m[_key]["no_of_contestants_qualified_to_S"]
-                * ConfigMatrix.m[_key]["no_of_heats_Q"]
-            )
-
-            quotient, remainder = divmod(
-                _no, ConfigMatrix.no_of_heats(raceclass, round)
-            )
-            if heat <= remainder:
-                return quotient + 1
-            else:
-                return quotient
-        elif round == "F":
-            _no = (
-                ConfigMatrix.m[_key]["no_of_contestants_qualified_to_F"]
-                * ConfigMatrix.m[_key]["no_of_heats_S"]
-            )
-
-            quotient, remainder = divmod(
-                _no, ConfigMatrix.no_of_heats(raceclass, round)
-            )
-            if heat <= remainder:
-                return quotient + 1
-            else:
-                return quotient
-        else:
-            raise ValueError(f"Unsupported value for round: {round}")
+    @classmethod
+    def get_rule_from_to(
+        cls: Any,
+        raceclass: dict,
+        from_round: str,
+        from_index: str,
+    ) -> dict[str, dict[str, Union[int, float]]]:
+        """Get race rule pr round and index."""
+        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        return ConfigMatrix.m[_key]["from_to"][from_round][from_index]
 
     @classmethod
     def _get_key(cls: Any, no_of_contestants: int) -> int:
