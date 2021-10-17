@@ -17,7 +17,12 @@ async def calculate_raceplan_individual_sprint(
         raceclass["no_of_contestants"] for raceclass in raceclasses
     )
     # First we prepare the parameters:
-    time.fromisoformat(format_configuration["time_between_heats"]).hour,
+    # get the time_between_groups as timedelta:
+    TIME_BETWEEN_GROUPS = timedelta(
+        hours=time.fromisoformat(format_configuration["time_between_groups"]).hour,
+        minutes=time.fromisoformat(format_configuration["time_between_groups"]).minute,
+        seconds=time.fromisoformat(format_configuration["time_between_groups"]).second,
+    )
     TIME_BETWEEN_HEATS = timedelta(
         hours=time.fromisoformat(format_configuration["time_between_heats"]).hour,
         minutes=time.fromisoformat(format_configuration["time_between_heats"]).minute,
@@ -28,46 +33,55 @@ async def calculate_raceplan_individual_sprint(
         minutes=time.fromisoformat(format_configuration["time_between_rounds"]).minute,
         seconds=time.fromisoformat(format_configuration["time_between_rounds"]).second,
     )
-    # sort the raceclasses on order:
-    raceclasses_sorted = sorted(raceclasses, key=lambda k: k["order"])
     # get the first start_time from the event:
     start_time = datetime.combine(
         date.fromisoformat(event["date_of_event"]),
         time.fromisoformat(event["time_of_event"]),
     )
 
-    # Generate the races based on configuration and number of contestants
-    # for round in ROUNDS:
-    order = 1
+    # sort the raceclasses on order:
+    raceclasses_sorted = sorted(raceclasses, key=lambda k: (k["group"], k["order"]))
+    # We need to group the raceclasses by group:
+    d: dict[int, list] = {}
     for raceclass in raceclasses_sorted:
+        d.setdefault(raceclass["group"], []).append(raceclass)
+    raceclasses_grouped = list(d.values())
+
+    # Generate the races based on configuration and number of contestants
+    order = 1
+    for raceclasses in raceclasses_grouped:
         for round in ConfigMatrix.get_rounds():
-            for index in ConfigMatrix.get_race_indexes(raceclass, round):
-                for heat in range(
-                    1, ConfigMatrix.get_no_of_heats(raceclass, round, index) + 1
-                ):
-                    race = IndividualSprintRace(
-                        id="",
-                        order=order,
-                        raceclass=raceclass["name"],
-                        round=round,
-                        index="" if round == "Q" else index,
-                        heat=heat,
-                        start_time=start_time,
-                        no_of_contestants=0,
-                        rule={}
-                        if round == "F"
-                        else ConfigMatrix.get_rule_from_to(raceclass, round, index),
-                    )
-                    order += 1
-                    # Calculate start_time for next heat:
-                    start_time = start_time + TIME_BETWEEN_HEATS
-                    # Add the race to the raceplan:
-                    raceplan.races.append(race)
-            # Calculate start_time for next round:
-            start_time = start_time - TIME_BETWEEN_HEATS + TIME_BETWEEN_ROUNDS
+            for raceclass in raceclasses:
+                for index in ConfigMatrix.get_race_indexes(raceclass, round):
+                    for heat in range(
+                        1, ConfigMatrix.get_no_of_heats(raceclass, round, index) + 1
+                    ):
+                        race = IndividualSprintRace(
+                            id="",
+                            order=order,
+                            raceclass=raceclass["name"],
+                            round=round,
+                            index="" if round == "Q" else index,
+                            heat=heat,
+                            start_time=start_time,
+                            no_of_contestants=0,
+                            rule={}
+                            if round == "F"
+                            else ConfigMatrix.get_rule_from_to(raceclass, round, index),
+                        )
+                        order += 1
+                        # Calculate start_time for next heat:
+                        start_time = start_time + TIME_BETWEEN_HEATS
+                        # Add the race to the raceplan:
+                        raceplan.races.append(race)
+                # Calculate start_time for next round:
+                start_time = start_time - TIME_BETWEEN_HEATS + TIME_BETWEEN_ROUNDS
+        # Calculate start_time for next group:
+        start_time = start_time + TIME_BETWEEN_GROUPS
 
     # We need to calculate the number of contestants pr heat:
-    await _calculate_number_of_contestants_pr_race(raceclasses, raceplan)
+    for raceclasses in raceclasses_grouped:
+        await _calculate_number_of_contestants_pr_race(raceclasses, raceplan)
 
     return raceplan
 

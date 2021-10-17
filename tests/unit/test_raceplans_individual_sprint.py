@@ -20,6 +20,7 @@ async def competition_format_individual_sprint() -> dict:
         "name": "Individual Sprint",
         "starting_order": "Draw",
         "start_procedure": "Heat Start",
+        "time_between_groups": "00:10:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
         "max_no_of_contestants": 80,
@@ -52,6 +53,7 @@ async def raceclasses_individual_sprint() -> List[dict[str, Any]]:
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 27,
+            "group": 1,
             "order": 1,
         },
     ]

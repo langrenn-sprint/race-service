@@ -20,6 +20,7 @@ async def competition_format_interval_start() -> dict:
         "name": "Interval Start",
         "starting_order": "Draw",
         "start_procedure": "Interval Start",
+        "time_between_groups": "00:10:00",
         "intervals": "00:00:30",
     }
 
@@ -49,6 +50,7 @@ async def raceclasses_interval_start() -> List[dict[str, Any]]:
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 14,
+            "group": 1,
             "order": 2,
         },
         {
@@ -57,7 +59,8 @@ async def raceclasses_interval_start() -> List[dict[str, Any]]:
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 15,
-            "order": 4,
+            "group": 2,
+            "order": 2,
         },
         {
             "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -65,6 +68,7 @@ async def raceclasses_interval_start() -> List[dict[str, Any]]:
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 16,
+            "group": 1,
             "order": 1,
         },
         {
@@ -73,7 +77,8 @@ async def raceclasses_interval_start() -> List[dict[str, Any]]:
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 17,
-            "order": 3,
+            "group": 2,
+            "order": 1,
         },
     ]
 
@@ -107,7 +112,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
             id="",
             raceclass="J16",
             order=3,
-            start_time=datetime.fromisoformat("2021-08-31 09:15:00"),
+            start_time=datetime.fromisoformat("2021-08-31 09:25:00"),
             no_of_contestants=17,
         )
     )
@@ -116,7 +121,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
             id="",
             raceclass="G16",
             order=4,
-            start_time=datetime.fromisoformat("2021-08-31 09:23:30"),
+            start_time=datetime.fromisoformat("2021-08-31 09:33:30"),
             no_of_contestants=15,
         )
     )

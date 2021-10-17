@@ -97,6 +97,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 15,
+            "group": 1,
             "order": 2,
         },
         {
@@ -105,6 +106,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 16,
+            "group": 1,
             "order": 4,
         },
         {
@@ -113,6 +115,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 17,
+            "group": 1,
             "order": 1,
         },
         {
@@ -121,6 +124,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 18,
+            "group": 1,
             "order": 3,
         },
     ]
@@ -713,6 +717,118 @@ async def test_generate_raceplan_for_event_invalid_time(
 
 
 @pytest.mark.integration
+async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceclasses_inconsistent_group_values = deepcopy(raceclasses)
+    raceclasses_inconsistent_group_values[0].pop("group", None)
+    mocker.patch(
+        "race_service.services.raceplans_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses_inconsistent_group_values,
+    )
+
+    headers = MultiDict(
+        {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert "contains non numeric values." in body["detail"]
+
+
+@pytest.mark.integration
+async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceclasses_inconsistent_group_values = deepcopy(raceclasses)
+    raceclasses_inconsistent_group_values[0]["group"] = 999
+    mocker.patch(
+        "race_service.services.raceplans_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses_inconsistent_group_values,
+    )
+
+    headers = MultiDict(
+        {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert "are not consecutive." in body["detail"]
+
+
+@pytest.mark.integration
 async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -878,7 +994,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
         )
         assert resp.status == 400
         body = await resp.json()
-        assert "are not unique." in body["detail"]
+        assert "are not unique inside group." in body["detail"]
 
 
 @pytest.mark.integration

@@ -48,6 +48,7 @@ async def format_configuration() -> dict[str, Any]:
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Interval Start",
         "start_procedure": "Interval Start",
+        "time_between_groups": "00:10:00",
         "intervals": "00:00:30",
     }
 
@@ -62,7 +63,8 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 15,
-            "order": 2,
+            "group": 2,
+            "order": 1,
         },
         {
             "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -70,7 +72,8 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 16,
-            "order": 4,
+            "group": 1,
+            "order": 1,
         },
         {
             "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -78,7 +81,8 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 17,
-            "order": 1,
+            "group": 2,
+            "order": 2,
         },
         {
             "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -86,7 +90,8 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 18,
-            "order": 3,
+            "group": 1,
+            "order": 2,
         },
     ]
 
