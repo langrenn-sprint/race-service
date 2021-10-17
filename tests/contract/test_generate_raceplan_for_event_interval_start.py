@@ -224,7 +224,7 @@ async def test_generate_raceplan_for_interval_start_event(
             assert response.status == 201
             assert f"/events/{event_id}/raceclasses" in response.headers[hdrs.LOCATION]
 
-        # Set order on all raceclasses:
+        # Set group and order on all raceclasses:
         url = (
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
@@ -233,15 +233,16 @@ async def test_generate_raceplan_for_interval_start_event(
             assert response.status == 200
             raceclasses = await response.json()
             # TODO: do some kind of sorting so that we can compare results
-            order = 0
             for raceclass in raceclasses:
                 id = raceclass["id"]
-                order = order + 1
-                raceclass["order"] = order
+                raceclass["group"], raceclass["order"] = await _decide_group_and_order(
+                    raceclass
+                )
                 async with session.put(
                     f"{url}/{id}", headers=headers, json=raceclass
                 ) as response:
                     assert response.status == 204
+        await _print_raceclasses(raceclasses)
 
         # Finally, we are ready to generate the raceplan:
         request_body = {"event_id": event_id}
@@ -264,6 +265,8 @@ async def test_generate_raceplan_for_interval_start_event(
             assert type(raceplan) is dict
             assert raceplan["id"]
             assert raceplan["event_id"] == request_body["event_id"]
+
+            await _print_raceplan(raceplan)
 
             # And we compare the response to the expected raceplan:
             assert (
@@ -289,3 +292,78 @@ async def test_generate_raceplan_for_interval_start_event(
                     == expected_raceplan["races"][i]["no_of_contestants"]
                 ), f'"no_of_contestants" in index {i}:{race}\n ne:\n{expected_race}'
                 i += 1
+
+
+# ---
+async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: C901
+    if raceclass["name"] == "G16":  # race-order: 1
+        return (1, 1)
+    elif raceclass["name"] == "J16":  # race-order: 2
+        return (1, 2)
+    elif raceclass["name"] == "G15":  # race-order: 3
+        return (1, 3)
+    elif raceclass["name"] == "J15":  # race-order: 4
+        return (1, 4)
+    elif raceclass["name"] == "G14":  # race-order: 5
+        return (2, 1)
+    elif raceclass["name"] == "J14":  # race-order: 6
+        return (2, 2)
+    elif raceclass["name"] == "G13":  # race-order: 7
+        return (2, 3)
+    elif raceclass["name"] == "J13":  # race-order: 8
+        return (2, 4)
+    elif raceclass["name"] == "G12":  # race-order: 9
+        return (3, 1)
+    elif raceclass["name"] == "J12":  # race-order: 10
+        return (3, 2)
+    elif raceclass["name"] == "G11":  # race-order: 11
+        return (3, 3)
+    elif raceclass["name"] == "J11":  # race-order: 12
+        return (3, 4)
+    return (0, 0)  # should not reach this point
+
+
+async def _print_raceclasses(raceclasses: list[dict]) -> None:
+    # print("--- RACECLASSES ---")
+    # print("group;order;name;ageclass_name;no_of_contestants;distance;event_id")
+    # for raceclass in raceclasses:
+    #     print(
+    #         str(raceclass["group"])
+    #         + ";"
+    #         + str(raceclass["order"])
+    #         + ";"
+    #         + raceclass["name"]
+    #         + ";"
+    #         + raceclass["ageclass_name"]
+    #         + ";"
+    #         + str(raceclass["no_of_contestants"])
+    #         + ";"
+    #         + str(raceclass["distance"])
+    #         + ";"
+    #         + raceclass["event_id"]
+    #     )
+    pass
+
+
+async def _print_raceplan(raceplan: dict) -> None:
+    # print("--- RACEPLAN ---")
+    # print(f'event_id: {raceplan["event_id"]}')
+    # print(f'no_of_contestants: {raceplan["no_of_contestants"]}')
+    # print("order;start_time;raceclass;no_of_contestants")
+    # for race in raceplan["races"]:
+    #     print(
+    #         str(race["order"])
+    #         + ";"
+    #         + str(race["start_time"])
+    #         + ";"
+    #         + str(race["raceclass"])
+    #         + ";"
+    #         + str(race["no_of_contestants"])
+    #     )
+    pass
+
+
+async def _dump_raceplan_to_json(raceclass: str, raceplan: dict) -> None:
+    # with open(f"tests/files/tmp_{raceclass}_raceplan.json", "w") as file:
+    #     json.dump(raceplan, file)
+    pass

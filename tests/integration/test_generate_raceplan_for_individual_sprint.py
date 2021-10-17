@@ -49,6 +49,7 @@ async def format_configuration() -> dict[str, Any]:
         "name": "Individual Sprint",
         "starting_order": "Draw",
         "start_procedure": "Heat Start",
+        "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
         "max_no_of_contestants": 80,
@@ -66,6 +67,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 15,
+            "group": 1,
             "order": 2,
         },
         {
@@ -74,6 +76,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 16,
+            "group": 1,
             "order": 4,
         },
         {
@@ -82,6 +85,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 17,
+            "group": 1,
             "order": 1,
         },
         {
@@ -90,6 +94,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 18,
+            "group": 1,
             "order": 3,
         },
     ]
