@@ -151,7 +151,7 @@ async def get_format_configuration(
     return format_configuration
 
 
-async def get_raceclasses(token: str, event_id: str) -> List[dict]:
+async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C901
     """Get the raceclasses."""
     raceclasses = await EventsAdapter.get_raceclasses(token, event_id)
     # Validate:
@@ -161,6 +161,27 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:
             f"No raceclass for event {event_id}. Cannot proceed."
         )
 
+    # Validate `group` property:
+    # Check if raceclasses have only integers group values:
+    if not all(
+        isinstance(o, (int)) for o in [r.get("group", None) for r in raceclasses]
+    ):
+        raise InconsistentValuesInRaceclassesException(
+            f"Raceclasses group values for event {event_id} contains non numeric values."
+        )
+
+    # Check if the group values are consecutive:
+    if not sorted(set([r["group"] for r in raceclasses])) == list(
+        range(
+            min(set([r["group"] for r in raceclasses])),
+            max(set([r["group"] for r in raceclasses])) + 1,
+        )
+    ):
+        raise InconsistentValuesInRaceclassesException(
+            f"Raceclasses group values for event {event_id} are not consecutive."
+        )
+
+    # Validate `order` property:
     # Check if raceclasses have only integers order values:
     if not all(
         isinstance(o, (int)) for o in [r.get("order", None) for r in raceclasses]
@@ -168,22 +189,30 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:
         raise InconsistentValuesInRaceclassesException(
             f"Raceclasses order values for event {event_id} contains non numeric values."
         )
-
-    # Check if raceclasses have complete and unique values for `order`:
-    if len(raceclasses) != len(set([r["order"] for r in raceclasses])):
-        raise InconsistentValuesInRaceclassesException(
-            f"Raceclasses order values for event {event_id} are not unique."
-        )
+    # Check if raceclasses have complete and unique values for `order` pr group:
+    # sort the raceclasses on group and order:
+    raceclasses_sorted = sorted(raceclasses, key=lambda k: (k["group"], k["order"]))
+    # We need to group the raceclasses by group:
+    d: dict[int, list] = {}
+    for raceclass in raceclasses_sorted:
+        d.setdefault(raceclass["group"], []).append(raceclass)
+    raceclasses_grouped = list(d.values())
+    for _raceclasses in raceclasses_grouped:
+        if len(_raceclasses) != len(set([r["order"] for r in _raceclasses])):
+            raise InconsistentValuesInRaceclassesException(
+                f"Raceclasses order values for event {event_id} are not unique inside group."
+            )
 
     # Check if the order values are consecutive:
-    if not sorted([r["order"] for r in raceclasses]) == list(
-        range(
-            min([r["order"] for r in raceclasses]),
-            max([r["order"] for r in raceclasses]) + 1,
-        )
-    ):
-        raise InconsistentValuesInRaceclassesException(
-            f"Raceclasses order values for event {event_id} are not consecutive."
-        )
+    for _raceclasses in raceclasses_grouped:
+        if not sorted([r["order"] for r in _raceclasses]) == list(
+            range(
+                min([r["order"] for r in _raceclasses]),
+                max([r["order"] for r in _raceclasses]) + 1,
+            )
+        ):
+            raise InconsistentValuesInRaceclassesException(
+                f"Raceclasses order values for event {event_id} are not consecutive."
+            )
 
     return raceclasses

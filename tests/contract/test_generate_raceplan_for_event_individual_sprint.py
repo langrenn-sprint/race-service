@@ -251,6 +251,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
             for raceclass in raceclasses:
                 id = raceclass["id"]
                 order = order + 1
+                raceclass["group"] = 1
                 raceclass["order"] = order
                 async with session.put(
                     f"{url}/{id}", headers=headers, json=raceclass
@@ -401,7 +402,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             assert response.status == 201
             assert f"/events/{event_id}/raceclasses" in response.headers[hdrs.LOCATION]
 
-        # Set order on all raceclasses:
+        # Set group and order on all raceclasses:
         url = (
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
@@ -410,11 +411,11 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             assert response.status == 200
             raceclasses = await response.json()
             # TODO: do some kind of sorting so that we can compare results
-            order = 0
             for raceclass in raceclasses:
                 id = raceclass["id"]
-                order = order + 1
-                raceclass["order"] = order
+                raceclass["group"], raceclass["order"] = await _decide_group_and_order(
+                    raceclass
+                )
                 async with session.put(
                     f"{url}/{id}", headers=headers, json=raceclass
                 ) as response:
@@ -491,11 +492,41 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
 
 
 # ---
-async def _print_raceclasses(raceclasses: dict) -> None:
-    # print("order;name;ageclass_name;no_of_contestants;distance;event_id")
+async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: C901
+    if raceclass["name"] == "G16":  # race-order: 1
+        return (1, 1)
+    elif raceclass["name"] == "J16":  # race-order: 2
+        return (1, 2)
+    elif raceclass["name"] == "G15":  # race-order: 3
+        return (1, 3)
+    elif raceclass["name"] == "J15":  # race-order: 4
+        return (1, 4)
+    elif raceclass["name"] == "G14":  # race-order: 5
+        return (2, 1)
+    elif raceclass["name"] == "J14":  # race-order: 6
+        return (2, 2)
+    elif raceclass["name"] == "G13":  # race-order: 7
+        return (2, 3)
+    elif raceclass["name"] == "J13":  # race-order: 8
+        return (2, 4)
+    elif raceclass["name"] == "G12":  # race-order: 9
+        return (3, 1)
+    elif raceclass["name"] == "J12":  # race-order: 10
+        return (3, 2)
+    elif raceclass["name"] == "G11":  # race-order: 11
+        return (3, 3)
+    elif raceclass["name"] == "J11":  # race-order: 12
+        return (3, 4)
+    return (0, 0)  # should not reach this point
+
+
+async def _print_raceclasses(raceclasses: list[dict]) -> None:
+    # print("group;order;name;ageclass_name;no_of_contestants;distance;event_id")
     # for raceclass in raceclasses:
     #     print(
-    #         str(raceclass["order"])
+    #         str(raceclass["group"])
+    #         + ";"
+    #         + str(raceclass["order"])
     #         + ";"
     #         + raceclass["name"]
     #         + ";"
