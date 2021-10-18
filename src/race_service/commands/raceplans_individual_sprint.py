@@ -52,7 +52,7 @@ async def calculate_raceplan_individual_sprint(
     for raceclasses in raceclasses_grouped:
         for round in ConfigMatrix.get_rounds():
             for raceclass in raceclasses:
-                for index in ConfigMatrix.get_race_indexes(raceclass, round):
+                for index in reversed(ConfigMatrix.get_race_indexes(raceclass, round)):
                     for heat in range(
                         1, ConfigMatrix.get_no_of_heats(raceclass, round, index) + 1
                     ):
@@ -422,10 +422,10 @@ class ConfigMatrix:
         return ConfigMatrix.m[_key]["no_of_heats"][round][index]
 
     @classmethod
-    def get_race_indexes(cls: Any, raceclass: dict, round: str) -> str:
+    def get_race_indexes(cls: Any, raceclass: dict, round: str) -> list:
         """Get race indexes pr round."""
         _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
-        return ConfigMatrix.m[_key]["no_of_heats"][round].keys()
+        return [key for key in ConfigMatrix.m[_key]["no_of_heats"][round]]
 
     @classmethod
     def get_rule_from_to(

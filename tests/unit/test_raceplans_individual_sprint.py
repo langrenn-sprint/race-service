@@ -125,11 +125,11 @@ async def expected_raceplan_individual_sprint(
             order=5,
             raceclass="J15",
             round="S",
-            index="A",
+            index="C",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
-            no_of_contestants=8,
-            rule={"F": {"A": 4, "B": float("inf")}},
+            no_of_contestants=6,
+            rule={"F": {"C": 4}},
         )
     )
     raceplan.races.append(
@@ -138,11 +138,11 @@ async def expected_raceplan_individual_sprint(
             order=6,
             raceclass="J15",
             round="S",
-            index="A",
+            index="C",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
-            no_of_contestants=8,
-            rule={"F": {"A": 4, "B": float("inf")}},
+            no_of_contestants=5,
+            rule={"F": {"C": 4}},
         )
     )
     raceplan.races.append(
@@ -151,11 +151,11 @@ async def expected_raceplan_individual_sprint(
             order=7,
             raceclass="J15",
             round="S",
-            index="C",
+            index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
-            no_of_contestants=6,
-            rule={"F": {"C": 4}},
+            no_of_contestants=8,
+            rule={"F": {"A": 4, "B": float("inf")}},
         )
     )
     raceplan.races.append(
@@ -164,11 +164,11 @@ async def expected_raceplan_individual_sprint(
             order=8,
             raceclass="J15",
             round="S",
-            index="C",
+            index="A",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
-            no_of_contestants=5,
-            rule={"F": {"C": 4}},
+            no_of_contestants=8,
+            rule={"F": {"A": 4, "B": float("inf")}},
         )
     )
     raceplan.races.append(
@@ -177,7 +177,7 @@ async def expected_raceplan_individual_sprint(
             order=9,
             raceclass="J15",
             round="F",
-            index="A",
+            index="C",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:35:00"),
             no_of_contestants=8,
@@ -203,7 +203,7 @@ async def expected_raceplan_individual_sprint(
             order=11,
             raceclass="J15",
             round="F",
-            index="C",
+            index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:40:00"),
             no_of_contestants=8,
