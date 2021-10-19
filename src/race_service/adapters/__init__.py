@@ -5,4 +5,5 @@ from .events_adapter import (
     FormatConfigurationNotFoundException,
 )
 from .raceplans_adapter import RaceplansAdapter
+from .timeevents_adapter import TimeeventsAdapter
 from .users_adapter import UsersAdapter

@@ -13,6 +13,8 @@ from .views import (
     RaceplansView,
     RaceplanView,
     Ready,
+    TimeeventsView,
+    TimeeventView,
 )
 
 
@@ -46,6 +48,8 @@ async def create_app() -> web.Application:
                 "/raceplans/generate-raceplan-for-event", GenerateRaceplanForEventView
             ),
             web.view("/raceplans/{raceplanId}", RaceplanView),
+            web.view("/timeevents", TimeeventsView),
+            web.view("/timeevents/{timeeventId}", TimeeventView),
         ]
     )
 
