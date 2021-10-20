@@ -18,7 +18,6 @@ from race_service.adapters import UsersAdapter
 from race_service.models import Timeevent
 from race_service.services import (
     IllegalValueException,
-    TimeeventAllreadyExistException,
     TimeeventNotFoundException,
     TimeeventsService,
 )
@@ -44,7 +43,9 @@ class TimeeventsView(View):
 
         if "event-id" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["event-id"]
-            timeevents = await TimeeventsService.get_timeevent_by_event_id(db, event_id)
+            timeevents = await TimeeventsService.get_timeevents_by_event_id(
+                db, event_id
+            )
         else:
             timeevents = await TimeeventsService.get_all_timeevents(db)
         list = []
@@ -75,8 +76,6 @@ class TimeeventsView(View):
             timeevent_id = await TimeeventsService.create_timeevent(db, timeevent)
         except IllegalValueException as e:
             raise HTTPUnprocessableEntity(reason=e) from e
-        except TimeeventAllreadyExistException as e:
-            raise HTTPBadRequest(reason=e) from e
         if timeevent_id:
             logging.debug(f"inserted document with timeevent_id {timeevent_id}")
             headers = MultiDict(

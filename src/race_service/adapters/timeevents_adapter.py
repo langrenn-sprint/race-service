@@ -33,12 +33,15 @@ class TimeeventsAdapter:
         return result
 
     @classmethod
-    async def get_timeevent_by_event_id(
+    async def get_timeevents_by_event_id(
         cls: Any, db: Any, event_id: str
-    ) -> dict:  # pragma: no cover
-        """Get timeevent by event_id function."""
-        result = await db.timeevents_collection.find_one({"event_id": event_id})
-        return result
+    ) -> List:  # pragma: no cover
+        """Get timeevents by event_id function."""
+        timeevents: List = []
+        cursor = db.timeevents_collection.find({"event_id": event_id})
+        for timeevent in await cursor.to_list(length=100):
+            timeevents.append(timeevent)
+        return timeevents
 
     @classmethod
     async def update_timeevent(

@@ -94,6 +94,72 @@
         responses:
           204:
             description: No content
+    /timeevents:
+      post:
+        tags:
+        - race_plan
+        security:
+        - bearerAuth: []
+        description: Add a new timeevent
+        requestBody:
+          description: The new timeevent to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeEvent'
+        responses:
+          201:
+            description: Created
+      get:
+        tags:
+        - race_plan
+        description: Get a list of timeevents
+        parameters:
+        - name: event-id
+          in: query
+          description: the event the timeevent belongs to
+          required: false
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TimeEventCollection'
+    /timeevents/{eventId}:
+      parameters:
+      - name: eventId
+        in: path
+        description: Get timeevents for one event
+        required: true
+        schema:
+          type: string
+          format: uuid
+      get:
+        tags:
+        - timeevent
+        description: Get timeevents for one event
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TimeEvents'
+      put:
+        tags:
+        - timeevent
+        description: Update a timeevent
+        responses:
+          204:
+            description: No content
+      delete:
+        tags:
+        - race_plan
+        description: Delete a timeevent
+        responses:
+          204:
+            description: No content
   components:
     schemas:
       RacePlanCollection:
@@ -104,6 +170,25 @@
             items:
               $ref: '#/components/schemas/RacePlan'
       RacePlan:
+        properties:
+          id:
+            type: string
+          eventId:
+            type: string
+            description: reference to the event the plan is for
+          races:
+            type: array
+            items:
+              type: string
+              description: ref to individual races
+      TimeEventCollection:
+        type: object
+        properties:
+          events:
+            type: array
+            items:
+              $ref: '#/components/schemas/TimeEvent'
+      TimeEvent:
         properties:
           id:
             type: string

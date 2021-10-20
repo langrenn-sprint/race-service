@@ -1,7 +1,6 @@
 """Contract test cases for raceclasses."""
 import asyncio
 from copy import deepcopy
-from datetime import datetime
 from json import dumps
 import logging
 import os
@@ -73,21 +72,10 @@ async def new_timeevent() -> dict:
         "race_id": "race_1",
         "point": "Finish",
         "rank": 0,
-        "registration_time": datetime.fromisoformat("2021-08-31 12:01:02").isoformat(),
+        "registration_time": "12:01:02",
         "next_race_id": "semi_1",
         "status": "OK",
-        "changelog": [
-            {
-                "timestamp": "2021-08-31 12:00:02",
-                "userId": "raceplan-admin",
-                "comment": "First status change to",
-            },
-            {
-                "timestamp": "2021-08-31 12:01:02",
-                "userId": "raceplan-admin",
-                "comment": "Second status change to",
-            },
-        ],
+        "changelog": "",
     }
 
 
@@ -134,7 +122,7 @@ async def test_get_all_timeevents(http_service: Any, token: MockFixture) -> None
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_timeevent_by_event_id(
+async def test_get_all_timeevents_by_event_id(
     http_service: Any, token: MockFixture, new_timeevent: dict
 ) -> None:
     """Should return OK and a list with one timeevent as json."""
@@ -143,7 +131,6 @@ async def test_get_all_timeevent_by_event_id(
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
         timeevents = await response.json()
@@ -181,7 +168,6 @@ async def test_get_timeevent(
     assert type(timeevent) is dict
     assert timeevent["id"]
     assert timeevent["event_id"] == new_timeevent["event_id"]
-    assert timeevent["races"]
 
 
 @pytest.mark.contract

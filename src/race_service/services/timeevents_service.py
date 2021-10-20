@@ -22,15 +22,6 @@ class TimeeventNotFoundException(Exception):
         super().__init__(message)
 
 
-class TimeeventAllreadyExistException(Exception):
-    """Class representing custom exception for fetch method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
 class TimeeventsService:
     """Class representing a service for timeevents."""
 
@@ -44,14 +35,14 @@ class TimeeventsService:
         return timeevents
 
     @classmethod
-    async def get_timeevent_by_event_id(
+    async def get_timeevents_by_event_id(
         cls: Any, db: Any, event_id: str
     ) -> List[Timeevent]:
         """Get all timeevents by event_id function."""
         timeevents: List[Timeevent] = []
-        _timeevent = await TimeeventsAdapter.get_timeevent_by_event_id(db, event_id)
-        if _timeevent:
-            timeevents.append(Timeevent.from_dict(_timeevent))
+        _timeevents = await TimeeventsAdapter.get_timeevents_by_event_id(db, event_id)
+        for e in _timeevents:
+            timeevents.append(Timeevent.from_dict(e))
         return timeevents
 
     @classmethod
@@ -69,17 +60,8 @@ class TimeeventsService:
 
         Raises:
             IllegalValueException: input object has illegal values
-            TimeeventAllreadyExistException: event can have zero or one plan
         """
         logging.debug(f"trying to insert timeevent: {timeevent}")
-        # Event can have one, and only, one timeevent:
-        existing_rp = await TimeeventsAdapter.get_timeevent_by_event_id(
-            db, timeevent.event_id
-        )
-        if existing_rp:
-            raise TimeeventAllreadyExistException(
-                f'Event "{timeevent.event_id}" already has a timeevent.'
-            )
         # Validation:
         await validate_timeevent(db, timeevent)
         if timeevent.id:
@@ -87,11 +69,6 @@ class TimeeventsService:
         # create ids:
         id = create_id()
         timeevent.id = id
-        for race in timeevent.races:
-            if type(race) is dict:
-                race["id"] = create_id()
-            else:
-                race.id = create_id()
         # insert new timeevent
         new_timeevent = timeevent.to_dict()
         logging.debug(f"new_timeevent: {new_timeevent}")
@@ -141,8 +118,5 @@ class TimeeventsService:
 #   Validation:
 async def validate_timeevent(db: Any, timeevent: Timeevent) -> None:
     """Validate the timeevent."""
-    # Validate races:
-    # TODO: validate race-properties.
-    if timeevent.races:
-        for _race in timeevent.races:
-            pass
+    # TODO: validate timeevent-properties.
+    pass
