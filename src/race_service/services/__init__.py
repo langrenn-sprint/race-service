@@ -5,7 +5,7 @@ from .raceplans_service import (
     RaceplanNotFoundException,
     RaceplansService,
 )
-from .timeevents_service import (
-    TimeeventNotFoundException,
-    TimeeventsService,
+from .time_events_service import (
+    TimeEventNotFoundException,
+    TimeEventsService,
 )

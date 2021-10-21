@@ -1,4 +1,4 @@
-"""Timeevent data class module."""
+"""TimeEvent data class module."""
 from dataclasses import dataclass, field
 from datetime import time
 from typing import Optional
@@ -7,8 +7,8 @@ from dataclasses_json import DataClassJsonMixin
 
 
 @dataclass
-class Timeevent(DataClassJsonMixin):
-    """Data class with details about a timeevent."""
+class TimeEvent(DataClassJsonMixin):
+    """Data class with details about a time_event."""
 
     bib: int
     event_id: Optional[str] = field(default=None)

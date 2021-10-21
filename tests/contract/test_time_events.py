@@ -25,19 +25,19 @@ def event_loop(request: Any) -> Any:
 @pytest.fixture(scope="module")
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
-    """Delete all timeevents before we start."""
-    url = f"{http_service}/timeevents"
+    """Delete all time_events before we start."""
+    url = f"{http_service}/time-events"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        timeevents = await response.json()
-        for timeevent in timeevents:
-            timeevent_id = timeevent["id"]
+        time_events = await response.json()
+        for time_event in time_events:
+            time_event_id = time_event["id"]
             async with session.delete(
-                f"{url}/{timeevent_id}", headers=headers
+                f"{url}/{time_event_id}", headers=headers
             ) as response:
                 pass
     await session.close()
@@ -64,8 +64,8 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture
-async def new_timeevent() -> dict:
-    """Create a timeevent object."""
+async def new_time_event() -> dict:
+    """Create a time_event object."""
     return {
         "bib": 14,
         "event_id": "event_1",
@@ -81,75 +81,75 @@ async def new_timeevent() -> dict:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_create_timeevent(
-    http_service: Any, token: MockFixture, clear_db: None, new_timeevent: dict
+async def test_create_time_event(
+    http_service: Any, token: MockFixture, clear_db: None, new_time_event: dict
 ) -> None:
     """Should return Created, location header and no body."""
-    url = f"{http_service}/timeevents"
+    url = f"{http_service}/time-events"
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-    request_body = dumps(new_timeevent, indent=4, sort_keys=True, default=str)
+    request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
 
     session = ClientSession()
     async with session.post(url, headers=headers, data=request_body) as response:
         status = response.status
     await session.close()
     assert status == 201
-    assert "/timeevents/" in response.headers[hdrs.LOCATION]
+    assert "/time-events/" in response.headers[hdrs.LOCATION]
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_timeevents(http_service: Any, token: MockFixture) -> None:
-    """Should return OK and a list of timeevents as json."""
-    url = f"{http_service}/timeevents"
+async def test_get_all_time_events(http_service: Any, token: MockFixture) -> None:
+    """Should return OK and a list of time_events as json."""
+    url = f"{http_service}/time-events"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        timeevents = await response.json()
+        time_events = await response.json()
     await session.close()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(timeevents) is list
-    assert len(timeevents) > 0
+    assert type(time_events) is list
+    assert len(time_events) > 0
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_timeevents_by_event_id(
-    http_service: Any, token: MockFixture, new_timeevent: dict
+async def test_get_all_time_events_by_event_id(
+    http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
-    """Should return OK and a list with one timeevent as json."""
-    event_id = new_timeevent["event_id"]
-    url = f"{http_service}/timeevents?event-id={event_id}"
+    """Should return OK and a list with one time_event as json."""
+    event_id = new_time_event["event_id"]
+    url = f"{http_service}/time_events?event-id={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        timeevents = await response.json()
+        time_events = await response.json()
     await session.close()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(timeevents) is list
-    assert len(timeevents) == 1
-    assert timeevents[0]["event_id"] == event_id
+    assert type(time_events) is list
+    assert len(time_events) == 1
+    assert time_events[0]["event_id"] == event_id
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_timeevent(
-    http_service: Any, token: MockFixture, new_timeevent: dict
+async def test_get_time_event(
+    http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
-    """Should return OK and an timeevent as json."""
-    url = f"{http_service}/timeevents"
+    """Should return OK and an time_event as json."""
+    url = f"{http_service}/time-events"
 
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -157,24 +157,24 @@ async def test_get_timeevent(
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            timeevents = await response.json()
-        id = timeevents[0]["id"]
+            time_events = await response.json()
+        id = time_events[0]["id"]
         url = f"{url}/{id}"
         async with session.get(url, headers=headers) as response:
-            timeevent = await response.json()
+            time_event = await response.json()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(timeevent) is dict
-    assert timeevent["id"]
-    assert timeevent["event_id"] == new_timeevent["event_id"]
+    assert type(time_event) is dict
+    assert time_event["id"]
+    assert time_event["event_id"] == new_time_event["event_id"]
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_update_timeevent(http_service: Any, token: MockFixture) -> None:
+async def test_update_time_event(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
-    url = f"{http_service}/timeevents"
+    url = f"{http_service}/time-events"
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -182,12 +182,12 @@ async def test_update_timeevent(http_service: Any, token: MockFixture) -> None:
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            timeevents = await response.json()
-        id = timeevents[0]["id"]
+            time_events = await response.json()
+        id = time_events[0]["id"]
         url = f"{url}/{id}"
-        update_timeevent = deepcopy(timeevents[0])
-        update_timeevent["event_id"] = "new_event_id"
-        request_body = dumps(update_timeevent, indent=4, sort_keys=True, default=str)
+        update_time_event = deepcopy(time_events[0])
+        update_time_event["event_id"] = "new_event_id"
+        request_body = dumps(update_time_event, indent=4, sort_keys=True, default=str)
         async with session.put(url, headers=headers, data=request_body) as response:
             pass
 
@@ -196,17 +196,17 @@ async def test_update_timeevent(http_service: Any, token: MockFixture) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_delete_timeevent(http_service: Any, token: MockFixture) -> None:
+async def test_delete_time_event(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
-    url = f"{http_service}/timeevents"
+    url = f"{http_service}/time-events"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            timeevents = await response.json()
-        id = timeevents[0]["id"]
+            time_events = await response.json()
+        id = time_events[0]["id"]
         url = f"{url}/{id}"
         async with session.delete(url, headers=headers) as response:
             pass
@@ -216,22 +216,22 @@ async def test_delete_timeevent(http_service: Any, token: MockFixture) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_timeevent_by_event_id_when_event_does_not_exist(
-    http_service: Any, token: MockFixture, new_timeevent: dict
+async def test_get_all_time_event_by_event_id_when_event_does_not_exist(
+    http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
     """Should return OK and an empty list."""
     event_id = "does_not_exist"
-    url = f"{http_service}/timeevents?event-id={event_id}"
+    url = f"{http_service}/time_events?event-id={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        timeevents = await response.json()
+        time_events = await response.json()
     await session.close()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(timeevents) is list
-    assert len(timeevents) == 0
+    assert type(time_events) is list
+    assert len(time_events) == 0

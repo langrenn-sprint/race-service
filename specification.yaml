@@ -94,15 +94,15 @@
         responses:
           204:
             description: No content
-    /timeevents:
+    /time-events:
       post:
         tags:
         - race_plan
         security:
         - bearerAuth: []
-        description: Add a new timeevent
+        description: Add a new time-event
         requestBody:
-          description: The new timeevent to be created
+          description: The new time-event to be created
           content:
             application/json:
               schema:
@@ -113,11 +113,11 @@
       get:
         tags:
         - race_plan
-        description: Get a list of timeevents
+        description: Get a list of time-events
         parameters:
         - name: event-id
           in: query
-          description: the event the timeevent belongs to
+          description: the event the time-event belongs to
           required: false
         responses:
           200:
@@ -126,19 +126,19 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/TimeEventCollection'
-    /timeevents/{eventId}:
+    /time-events/{eventId}:
       parameters:
       - name: eventId
         in: path
-        description: Get timeevents for one event
+        description: Get time-events for one event
         required: true
         schema:
           type: string
           format: uuid
       get:
         tags:
-        - timeevent
-        description: Get timeevents for one event
+        - time-event
+        description: Get time-events for one event
         responses:
           200:
             description: Ok
@@ -148,15 +148,15 @@
                   $ref: '#/components/schemas/TimeEvents'
       put:
         tags:
-        - timeevent
-        description: Update a timeevent
+        - time-event
+        description: Update a time-event
         responses:
           204:
             description: No content
       delete:
         tags:
         - race_plan
-        description: Delete a timeevent
+        description: Delete a time-event
         responses:
           204:
             description: No content
