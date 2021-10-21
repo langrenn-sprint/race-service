@@ -127,7 +127,7 @@ async def test_get_all_time_events_by_event_id(
 ) -> None:
     """Should return OK and a list with one time_event as json."""
     event_id = new_time_event["event_id"]
-    url = f"{http_service}/time_events?event-id={event_id}"
+    url = f"{http_service}/time-events?event-id={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
@@ -221,7 +221,7 @@ async def test_get_all_time_event_by_event_id_when_event_does_not_exist(
 ) -> None:
     """Should return OK and an empty list."""
     event_id = "does_not_exist"
-    url = f"{http_service}/time_events?event-id={event_id}"
+    url = f"{http_service}/time-events?event-id={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
