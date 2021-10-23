@@ -71,7 +71,7 @@ async def new_time_event() -> dict:
         "event_id": "event_1",
         "race_id": "race_1",
         "point": "Finish",
-        "rank": 0,
+        "rank": "0",
         "registration_time": "12:01:02",
         "next_race_id": "semi_1",
         "status": "OK",
