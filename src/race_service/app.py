@@ -9,10 +9,13 @@ import motor.motor_asyncio
 
 from .views import (
     GenerateRaceplanForEventView,
+    GenerateStartlistForEventView,
     Ping,
     RaceplansView,
     RaceplanView,
     Ready,
+    StartlistsView,
+    StartlistView,
     TimeEventsView,
     TimeEventView,
 )
@@ -48,6 +51,12 @@ async def create_app() -> web.Application:
                 "/raceplans/generate-raceplan-for-event", GenerateRaceplanForEventView
             ),
             web.view("/raceplans/{raceplanId}", RaceplanView),
+            web.view("/startlists", StartlistsView),
+            web.view(
+                "/startlists/generate-startlist-for-event",
+                GenerateStartlistForEventView,
+            ),
+            web.view("/startlists/{startlistId}", StartlistView),
             web.view("/time-events", TimeEventsView),
             web.view("/time-events/{time_eventId}", TimeEventView),
         ]

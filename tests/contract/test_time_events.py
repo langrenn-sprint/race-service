@@ -25,23 +25,35 @@ def event_loop(request: Any) -> Any:
 @pytest.fixture(scope="module")
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
+    """Delete all startlists before we start."""
+    """Clear db before and after tests."""
+    logging.info(" --- Cleaning db at startup. ---")
+    await delete_time_events(http_service, token)
+    logging.info(" --- Testing starts. ---")
+    yield
+    logging.info(" --- Testing finished. ---")
+    logging.info(" --- Cleaning db after testing. ---")
+    await delete_time_events(http_service, token)
+    logging.info(" --- Cleaning db done. ---")
+
+
+async def delete_time_events(http_service: Any, token: MockFixture) -> None:
     """Delete all time_events before we start."""
     url = f"{http_service}/time-events"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    session = ClientSession()
-    async with session.get(url, headers=headers) as response:
-        time_events = await response.json()
-        for time_event in time_events:
-            time_event_id = time_event["id"]
-            async with session.delete(
-                f"{url}/{time_event_id}", headers=headers
-            ) as response:
-                pass
-    await session.close()
-    yield
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            time_events = await response.json()
+            for time_event in time_events:
+                time_event_id = time_event["id"]
+                async with session.delete(
+                    f"{url}/{time_event_id}", headers=headers
+                ) as response:
+                    pass
+    logging.info("Clear_db: Deleted all raceplans.")
 
 
 @pytest.fixture(scope="module")

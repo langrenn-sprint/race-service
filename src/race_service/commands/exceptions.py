@@ -19,6 +19,15 @@ class NoRaceclassesInEventException(Exception):
         super().__init__(message)
 
 
+class InconsistentValuesInContestantsException(Exception):
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class InconsistentValuesInRaceclassesException(Exception):
     """Class representing custom exception for command."""
 
@@ -38,6 +47,24 @@ class MissingPropertyException(Exception):
 
 
 class InvalidDateFormatException(Exception):
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
+class NoRaceplanInEventException(Exception):
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
+class DuplicateRaceplansInEventException(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:

@@ -1,4 +1,4 @@
-"""Resource module for raceplan command resources."""
+"""Resource module for startlist command resources."""
 import os
 
 from aiohttp import hdrs
@@ -12,18 +12,21 @@ from dotenv import load_dotenv
 from multidict import MultiDict
 
 from race_service.adapters import (
+    ContestantsNotFoundException,
     EventNotFoundException,
+    RaceclassesNotFoundException,
     UsersAdapter,
 )
 from race_service.commands import (
     CompetitionFormatNotSupportedException,
-    InconsistentValuesInRaceclassesException,
+    DuplicateRaceplansInEventException,
+    InconsistentValuesInContestantsException,
     InvalidDateFormatException,
     MissingPropertyException,
-    NoRaceclassesInEventException,
-    RaceplansCommands,
+    NoRaceplanInEventException,
+    StartlistsCommands,
 )
-from race_service.services import RaceplanAllreadyExistException
+from race_service.services import StartlistAllreadyExistException
 from .utils import extract_token_from_request
 
 load_dotenv()
@@ -32,8 +35,8 @@ HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
 
 
-class GenerateRaceplanForEventView(View):
-    """Class representing the generate raceplan for event commands resources."""
+class GenerateStartlistForEventView(View):
+    """Class representing the generate startlist for event commands resources."""
 
     async def post(self) -> Response:
         """Post route function."""
@@ -50,19 +53,22 @@ class GenerateRaceplanForEventView(View):
         request_body = await self.request.json()
         event_id = request_body["event_id"]
         try:
-            raceplan_id = await RaceplansCommands.generate_raceplan_for_event(
+            startlist_id = await StartlistsCommands.generate_startlist_for_event(
                 db, token, event_id
             )
         except EventNotFoundException as e:
             raise HTTPNotFound(reason=e) from e
         except (
             CompetitionFormatNotSupportedException,
+            ContestantsNotFoundException,
+            DuplicateRaceplansInEventException,
+            InconsistentValuesInContestantsException,
             InvalidDateFormatException,
-            NoRaceclassesInEventException,
+            NoRaceplanInEventException,
             MissingPropertyException,
-            InconsistentValuesInRaceclassesException,
-            RaceplanAllreadyExistException,
+            RaceclassesNotFoundException,
+            StartlistAllreadyExistException,
         ) as e:
             raise HTTPBadRequest(reason=e) from e
-        headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})
+        headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"})
         return Response(status=201, headers=headers)
