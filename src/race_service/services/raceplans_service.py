@@ -1,10 +1,10 @@
 """Module for raceplans service."""
 import logging
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 import uuid
 
 from race_service.adapters import RaceplansAdapter
-from race_service.models import Raceplan
+from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
 from .exceptions import IllegalValueException
 
 
@@ -39,8 +39,18 @@ class RaceplansService:
         """Get all raceplans function."""
         raceplans: List[Raceplan] = []
         _raceplans = await RaceplansAdapter.get_all_raceplans(db)
-        for e in _raceplans:
-            raceplans.append(Raceplan.from_dict(e))
+
+        if _raceplans:
+            for _raceplan in _raceplans:
+                raceplan = Raceplan.from_dict(_raceplan)
+                _races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
+                for _race in raceplan.races:
+                    if _race["datatype"] == "interval_start":
+                        _races.append(IntervalStartRace.from_dict(_race))
+                    elif _race["datatype"] == "individual_sprint":
+                        _races.append(IndividualSprintRace.from_dict(_race))
+                raceplan.races = _races
+                raceplans.append(raceplan)
         return raceplans
 
     @classmethod
@@ -49,9 +59,19 @@ class RaceplansService:
     ) -> List[Raceplan]:
         """Get all raceplans by event_id function."""
         raceplans: List[Raceplan] = []
-        _raceplan = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
-        if _raceplan:
-            raceplans.append(Raceplan.from_dict(_raceplan))
+        _raceplans = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
+
+        if _raceplans:
+            for _raceplan in _raceplans:
+                raceplan = Raceplan.from_dict(_raceplan)
+                _races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
+                for _race in raceplan.races:
+                    if _race["datatype"] == "interval_start":
+                        _races.append(IntervalStartRace.from_dict(_race))
+                    elif _race["datatype"] == "individual_sprint":
+                        _races.append(IndividualSprintRace.from_dict(_race))
+                raceplan.races = _races
+                raceplans.append(raceplan)
         return raceplans
 
     @classmethod
@@ -74,7 +94,8 @@ class RaceplansService:
         existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(
             db, raceplan.event_id
         )
-        if existing_rp:
+        logging.debug(f"existing_rp: {existing_rp}")
+        if existing_rp and len(existing_rp) > 0:
             raise RaceplanAllreadyExistException(
                 f'Event "{raceplan.event_id}" already has a raceplan.'
             )

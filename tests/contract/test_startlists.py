@@ -1,4 +1,4 @@
-"""Contract test cases for raceclasses."""
+"""Contract test cases for startlists."""
 import asyncio
 from copy import deepcopy
 from datetime import datetime
@@ -26,35 +26,37 @@ def event_loop(request: Any) -> Any:
 @pytest.fixture(scope="module")
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
-    """Delete all raceplans before we start."""
+    """Delete all startlists before we start."""
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_raceplans(http_service, token)
+    await delete_startlists(http_service, token)
     logging.info(" --- Testing starts. ---")
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_raceplans(http_service, token)
+    await delete_startlists(http_service, token)
     logging.info(" --- Cleaning db done. ---")
 
 
-async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
-    """Delete all raceplans before we start."""
-    url = f"{http_service}/raceplans"
+async def delete_startlists(http_service: Any, token: MockFixture) -> None:
+    """Delete all startlists before we start."""
+    url = f"{http_service}/startlists"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            raceplans = await response.json()
-            for raceplan in raceplans:
-                raceplan_id = raceplan["id"]
+            assert response.status == 200
+            startlists = await response.json()
+            for startlist in startlists:
+                startlist_id = startlist["id"]
                 async with session.delete(
-                    f"{url}/{raceplan_id}", headers=headers
+                    f"{url}/{startlist_id}", headers=headers
                 ) as response:
+                    assert response.status == 204
                     pass
-    logging.info("Clear_db: Deleted all raceplans.")
+    logging.info("Clear_db: Deleted all startlists.")
 
 
 @pytest.fixture(scope="module")
@@ -77,43 +79,43 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture
-async def new_raceplan() -> dict:
-    """Create a raceplan object."""
+async def new_startlist() -> dict:
+    """Create a startlist object."""
     return {
         "event_id": "event_1",
-        "no_of_contestants": 32,
-        "races": [
+        "no_of_contestants": 4,
+        "start_entries": [
             {
-                "name": "G16K01",
-                "raceclass": "G16",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 12:00:00").isoformat(),
-                "no_of_contestants": 8,
-                "datatype": "interval_start",
+                "race_id": "race_1",
+                "bib": 1,
+                "starting_position": 1,
+                "scheduled_start_time": datetime.fromisoformat(
+                    "2021-08-31 12:00:00"
+                ).isoformat(),
             },
             {
-                "name": "G16K02",
-                "raceclass": "G16",
-                "order": 2,
-                "start_time": datetime.fromisoformat("2021-08-31 12:15:00").isoformat(),
-                "no_of_contestants": 8,
-                "datatype": "interval_start",
+                "race_id": "race_1",
+                "bib": 2,
+                "starting_position": 2,
+                "scheduled_start_time": datetime.fromisoformat(
+                    "2021-08-31 12:00:30"
+                ).isoformat(),
             },
             {
-                "name": "G16K03",
-                "raceclass": "G16",
-                "order": 3,
-                "start_time": datetime.fromisoformat("2021-08-31 12:30:00").isoformat(),
-                "no_of_contestants": 8,
-                "datatype": "interval_start",
+                "race_id": "race_1",
+                "bib": 3,
+                "starting_position": 3,
+                "scheduled_start_time": datetime.fromisoformat(
+                    "2021-08-31 12:01:00"
+                ).isoformat(),
             },
             {
-                "name": "G16K04",
-                "raceclass": "G16",
-                "order": 4,
-                "start_time": datetime.fromisoformat("2021-08-31 12:45:00").isoformat(),
-                "no_of_contestants": 8,
-                "datatype": "interval_start",
+                "race_id": "race_1",
+                "bib": 4,
+                "starting_position": 4,
+                "scheduled_start_time": datetime.fromisoformat(
+                    "2021-08-31 12:01:30"
+                ).isoformat(),
             },
         ],
     }
@@ -121,16 +123,16 @@ async def new_raceplan() -> dict:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_create_raceplan(
-    http_service: Any, token: MockFixture, clear_db: None, new_raceplan: dict
+async def test_create_startlist(
+    http_service: Any, token: MockFixture, clear_db: None, new_startlist: dict
 ) -> None:
     """Should return Created, location header and no body."""
-    url = f"{http_service}/raceplans"
+    url = f"{http_service}/startlists"
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
+    request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
 
     session = ClientSession()
     async with session.post(url, headers=headers, data=request_body) as response:
@@ -138,21 +140,21 @@ async def test_create_raceplan(
     await session.close()
 
     assert status == 201
-    assert "/raceplans/" in response.headers[hdrs.LOCATION]
+    assert "/startlists/" in response.headers[hdrs.LOCATION]
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_create_raceplan_when_event_already_has_one(
-    http_service: Any, token: MockFixture, clear_db: None, new_raceplan: dict
+async def test_create_startlist_when_event_already_has_one(
+    http_service: Any, token: MockFixture, clear_db: None, new_startlist: dict
 ) -> None:
     """Should return 400 Bad request and error message in body."""
-    url = f"{http_service}/raceplans"
+    url = f"{http_service}/startlists"
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-    request_body = dumps(new_raceplan, indent=4, sort_keys=True, default=str)
+    request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
 
     session = ClientSession()
     async with session.post(url, headers=headers, data=request_body) as response:
@@ -162,60 +164,60 @@ async def test_create_raceplan_when_event_already_has_one(
 
     assert status == 400
     assert body
-    assert f'"{new_raceplan["event_id"]}" already has a raceplan' in body["detail"]
+    assert f'"{new_startlist["event_id"]}" already has a startlist' in body["detail"]
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_raceplans(http_service: Any, token: MockFixture) -> None:
-    """Should return OK and a list of raceplans as json."""
-    url = f"{http_service}/raceplans"
+async def test_get_all_startlists(http_service: Any, token: MockFixture) -> None:
+    """Should return OK and a list of startlists as json."""
+    url = f"{http_service}/startlists"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        raceplans = await response.json()
+        startlists = await response.json()
     await session.close()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(raceplans) is list
-    assert len(raceplans) > 0
+    assert type(startlists) is list
+    assert len(startlists) > 0
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_raceplan_by_event_id(
-    http_service: Any, token: MockFixture, new_raceplan: dict
+async def test_get_all_startlist_by_event_id(
+    http_service: Any, token: MockFixture, new_startlist: dict
 ) -> None:
-    """Should return OK and a list with one raceplan as json."""
-    event_id = new_raceplan["event_id"]
-    url = f"{http_service}/raceplans?event-id={event_id}"
+    """Should return OK and a list with one startlist as json."""
+    event_id = new_startlist["event_id"]
+    url = f"{http_service}/startlists?event-id={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        raceplans = await response.json()
+        startlists = await response.json()
     await session.close()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(raceplans) is list
-    assert len(raceplans) == 1
-    assert raceplans[0]["event_id"] == event_id
+    assert type(startlists) is list
+    assert len(startlists) == 1
+    assert startlists[0]["event_id"] == event_id
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_raceplan(
-    http_service: Any, token: MockFixture, new_raceplan: dict
+async def test_get_startlist(
+    http_service: Any, token: MockFixture, new_startlist: dict
 ) -> None:
-    """Should return OK and an raceplan as json."""
-    url = f"{http_service}/raceplans"
+    """Should return OK and an startlist as json."""
+    url = f"{http_service}/startlists"
 
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -223,25 +225,39 @@ async def test_get_raceplan(
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            raceplans = await response.json()
-        id = raceplans[0]["id"]
+            startlists = await response.json()
+        id = startlists[0]["id"]
         url = f"{url}/{id}"
         async with session.get(url, headers=headers) as response:
-            raceplan = await response.json()
+            body = await response.json()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(raceplan) is dict
-    assert raceplan["id"]
-    assert raceplan["event_id"] == new_raceplan["event_id"]
-    assert raceplan["races"]
+    assert type(body) is dict
+    assert body["id"]
+    assert body["event_id"] == new_startlist["event_id"]
+    assert body["start_entries"]
+    assert len(body["start_entries"]) == len(new_startlist["start_entries"])
+    i = 0
+    for start_entry in body["start_entries"]:
+        assert start_entry["race_id"] == new_startlist["start_entries"][i]["race_id"]
+        assert start_entry["bib"] == new_startlist["start_entries"][i]["bib"]
+        assert (
+            start_entry["starting_position"]
+            == new_startlist["start_entries"][i]["starting_position"]
+        )
+        assert (
+            start_entry["scheduled_start_time"]
+            == new_startlist["start_entries"][i]["scheduled_start_time"]
+        )
+        i += 1
 
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_update_raceplan(http_service: Any, token: MockFixture) -> None:
+async def test_update_startlist(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
-    url = f"{http_service}/raceplans"
+    url = f"{http_service}/startlists"
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -249,12 +265,12 @@ async def test_update_raceplan(http_service: Any, token: MockFixture) -> None:
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            raceplans = await response.json()
-        id = raceplans[0]["id"]
+            startlists = await response.json()
+        id = startlists[0]["id"]
         url = f"{url}/{id}"
-        update_raceplan = deepcopy(raceplans[0])
-        update_raceplan["event_id"] = "new_event_id"
-        request_body = dumps(update_raceplan, indent=4, sort_keys=True, default=str)
+        update_startlist = deepcopy(startlists[0])
+        update_startlist["event_id"] = "new_event_id"
+        request_body = dumps(update_startlist, indent=4, sort_keys=True, default=str)
         async with session.put(url, headers=headers, data=request_body) as response:
             pass
 
@@ -263,17 +279,17 @@ async def test_update_raceplan(http_service: Any, token: MockFixture) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_delete_raceplan(http_service: Any, token: MockFixture) -> None:
+async def test_delete_startlist(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
-    url = f"{http_service}/raceplans"
+    url = f"{http_service}/startlists"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
-            raceplans = await response.json()
-        id = raceplans[0]["id"]
+            startlists = await response.json()
+        id = startlists[0]["id"]
         url = f"{url}/{id}"
         async with session.delete(url, headers=headers) as response:
             pass
@@ -283,22 +299,22 @@ async def test_delete_raceplan(http_service: Any, token: MockFixture) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_get_all_raceplan_by_event_id_when_event_does_not_exist(
-    http_service: Any, token: MockFixture, new_raceplan: dict
+async def test_get_all_startlists_by_event_id_when_event_does_not_exist(
+    http_service: Any, token: MockFixture, new_startlist: dict
 ) -> None:
     """Should return OK and an empty list."""
     event_id = "does_not_exist"
-    url = f"{http_service}/raceplans?event-id={event_id}"
+    url = f"{http_service}/startlists?event-id={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
     session = ClientSession()
     async with session.get(url, headers=headers) as response:
-        raceplans = await response.json()
+        startlists = await response.json()
     await session.close()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-    assert type(raceplans) is list
-    assert len(raceplans) == 0
+    assert type(startlists) is list
+    assert len(startlists) == 0

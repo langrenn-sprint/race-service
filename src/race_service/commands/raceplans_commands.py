@@ -58,7 +58,7 @@ class RaceplansCommands:
         if event["competition_format"] == "Individual Sprint":
             raceplan = await calculate_raceplan_individual_sprint(
                 event, format_configuration, raceclasses
-            )  # pragma: no cover
+            )
         elif event["competition_format"] == "Interval Start":
             raceplan = await calculate_raceplan_interval_start(
                 event, format_configuration, raceclasses

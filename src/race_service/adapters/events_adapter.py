@@ -30,6 +30,24 @@ class FormatConfigurationNotFoundException(Exception):
         super().__init__(message)
 
 
+class RaceclassesNotFoundException(Exception):
+    """Class representing custom exception for get method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
+class ContestantsNotFoundException(Exception):
+    """Class representing custom exception for get method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class EventsAdapter:
     """Class representing an adapter for events."""
 
@@ -89,7 +107,7 @@ class EventsAdapter:
                             f"{competition_format_name}: {response.status}."
                         )
                     ) from None
-
+            # We have not found event specific format, get the global config:
             url = (
                 f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
                 f"/competition-formats?name={competition_format_name}"
@@ -127,12 +145,46 @@ class EventsAdapter:
             async with session.get(url, headers=headers) as response:
                 if response.status == 200:
                     raceclasses = await response.json()
+                    if len(raceclasses) == 0:
+                        raise RaceclassesNotFoundException(
+                            f"No raceclasses found for event {event_id}."
+                        )
                     return raceclasses
                 else:
                     raise HTTPInternalServerError(
                         reason=(
                             "Got unknown status from events service"
                             f"when getting raceclasses for event {event_id}:"
+                            f"{response.status}."
+                        )
+                    ) from None
+
+    @classmethod
+    async def get_contestants(
+        cls: Any, token: str, event_id: str
+    ) -> List[dict]:  # pragma: no cover
+        """Get contestants from event-service."""
+        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
+
+        headers = {
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+            hdrs.ACCEPT: "application/json",
+        }
+
+        async with ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status == 200:
+                    contestants = await response.json()
+                    if len(contestants) == 0:
+                        raise ContestantsNotFoundException(
+                            f"No contestants found for event {event_id}."
+                        )
+                    return contestants
+                else:
+                    raise HTTPInternalServerError(
+                        reason=(
+                            "Got unknown status from events service"
+                            f"when getting contestants for event {event_id}:"
                             f"{response.status}."
                         )
                     ) from None
