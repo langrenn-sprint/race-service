@@ -7,7 +7,7 @@ class RaceplansAdapter:
     """Class representing an adapter for raceplans."""
 
     @classmethod
-    async def get_all_raceplans(cls: Any, db: Any) -> List:  # pragma: no cover
+    async def get_all_raceplans(cls: Any, db: Any) -> List[dict]:  # pragma: no cover
         """Get all raceplans function."""
         raceplans: List = []
         cursor = db.raceplans_collection.find()
@@ -35,10 +35,13 @@ class RaceplansAdapter:
     @classmethod
     async def get_raceplan_by_event_id(
         cls: Any, db: Any, event_id: str
-    ) -> dict:  # pragma: no cover
+    ) -> List[dict]:  # pragma: no cover
         """Get raceplan by event_id function."""
+        raceplans: List = []
         result = await db.raceplans_collection.find_one({"event_id": event_id})
-        return result
+        if result:
+            raceplans.append(result)
+        return raceplans
 
     @classmethod
     async def update_raceplan(

@@ -7,13 +7,17 @@
         name: Apache 2.0
         url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   tags:
-    - name: race_plan
-      description: Race plan operations
+    - name: raceplan
+      description: Raceplan operations
+    - name: time-event
+      description: Time-event operations
+    - name: startlist
+      description: Startlist operations
   paths:
     /raceplans:
       post:
         tags:
-        - race_plan
+        - raceplan
         security:
         - bearerAuth: []
         description: Add a new race plan
@@ -28,13 +32,16 @@
             description: Created
       get:
         tags:
-        - race_plan
+        - raceplan
         description: Get a list of raceplans
         parameters:
         - name: event-id
           in: query
           description: the event the raceplan belongs to
           required: false
+          schema:
+            type: string
+            format: uuid
         responses:
           200:
             description: Ok
@@ -45,7 +52,7 @@
     /raceplans/generate-raceplan-for-event:
       post:
         tags:
-        - race_plan
+        - raceplan
         security:
         - bearerAuth: []
         description: command to generate race plan based on event
@@ -71,7 +78,7 @@
           format: uuid
       get:
         tags:
-        - race_plan
+        - raceplan
         description: Get a unique race plan
         responses:
           200:
@@ -82,22 +89,109 @@
                   $ref: '#/components/schemas/RacePlan'
       put:
         tags:
-        - race_plan
+        - raceplan
         description: Update an race plan
         responses:
           204:
             description: No content
       delete:
         tags:
-        - race_plan
+        - raceplan
         description: Delete a race plan
+        responses:
+          204:
+            description: No content
+    /startlists:
+      post:
+        tags:
+        - startlist
+        security:
+        - bearerAuth: []
+        description: Add a new startlist
+        requestBody:
+          description: The new startlist to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Startlist'
+        responses:
+          201:
+            description: Created
+      get:
+        tags:
+        - startlist
+        description: Get a list of startlists
+        parameters:
+        - name: event-id
+          in: query
+          description: the event the startlist belongs to
+          required: false
+          schema:
+            type: string
+            format: uuid
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/StartlistCollection'
+    /startlists/generate-startlist-for-event:
+      post:
+        tags:
+        - startlist
+        security:
+        - bearerAuth: []
+        description: command to generate startlist for all races in an event
+        requestBody:
+          description: input data from which to generate the plan
+          content:
+            application/json:
+              schema:
+                type: string
+                format: uuid
+                description: id of event to which the plan belongs
+        responses:
+          201:
+            description: Created
+    /startlists/{startlistId}:
+      parameters:
+      - name: startlistId
+        in: path
+        description: startlist id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      get:
+        tags:
+        - startlist
+        description: Get a unique startlist
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Startlist'
+      put:
+        tags:
+        - startlist
+        description: Update a startlist
+        responses:
+          204:
+            description: No content
+      delete:
+        tags:
+        - startlist
+        description: Delete a startlist
         responses:
           204:
             description: No content
     /time-events:
       post:
         tags:
-        - race_plan
+        - time-event
         security:
         - bearerAuth: []
         description: Add a new time-event
@@ -112,13 +206,16 @@
             description: Created
       get:
         tags:
-        - race_plan
+        - time-event
         description: Get a list of time-events
         parameters:
         - name: event-id
           in: query
           description: the event the time-event belongs to
           required: false
+          schema:
+            type: string
+            format: uuid
         responses:
           200:
             description: Ok
@@ -145,7 +242,7 @@
             content:
               application/json:
                 schema:
-                  $ref: '#/components/schemas/TimeEvents'
+                  $ref: '#/components/schemas/TimeEvent'
       put:
         tags:
         - time-event
@@ -155,7 +252,7 @@
             description: No content
       delete:
         tags:
-        - race_plan
+        - raceplan
         description: Delete a time-event
         responses:
           204:
@@ -181,6 +278,61 @@
             items:
               type: string
               description: ref to individual races
+      StartlistCollection:
+        type: object
+        properties:
+          startlists:
+            type: array
+            items:
+              $ref: '#/components/schemas/Startlist'
+      Startlist:
+        properties:
+          id:
+            type: string
+            format: uuid
+          eventId:
+            type: string
+            description: reference to the event the plan is for
+          noOfContestants:
+            type: integer
+            description: the total number of contestants in startlist
+          startEntries:
+            type: array
+            items:
+              $ref: '#/components/schemas/StartEntry'
+      StartEntry:
+        properties:
+          id:
+            type: string
+            format: uuid
+          eventId:
+            type: string
+            format: uuid
+          raceId:
+            type: string
+            format: uuid
+          bib:
+            type: integer
+            description: the bib uniquely identifying the contestant
+          startingPosition:
+            type: integer
+            description: the starting position in e.g. heat starts
+          scheduledStartTime:
+            type: string
+            format: time
+            description: the scheduled time when the contestant should start
+          actualStartTime:
+            type: string
+            format: time
+            description: the time when the contestant actually started
+          status:
+            type: string
+            description: controlled vocacubulary for the status. {"OK", "DNS"}
+          changelog:
+            type: array
+            description: list of changelog entries sorted by timestamp in ascending order.
+            items:
+              $ref: '#/components/schemas/Changelog'
       TimeEventCollection:
         type: object
         properties:
@@ -200,6 +352,17 @@
             items:
               type: string
               description: ref to individual races
+      Changelog:
+        type: object
+        properties:
+          timestamp:
+            type: string
+            format: date-time
+          userId:
+            type: string
+          comment:
+            type: string
+            description: a short description of the reason for the change
     securitySchemes:
       bearerAuth:
         type: http
