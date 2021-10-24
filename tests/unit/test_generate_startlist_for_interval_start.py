@@ -8,7 +8,7 @@ import pytest
 from race_service.commands.startlists_commands import (
     generate_startlist_for_interval_start,
 )
-from race_service.models import IntervalStartRace, Raceplan, StartEvent, Startlist
+from race_service.models import IntervalStartRace, Raceplan, StartEntry, Startlist
 
 # --- Interval Start ---
 
@@ -259,10 +259,10 @@ async def expected_startlist_interval_start(
     startlist = Startlist(
         event_id=event_interval_start["id"],
         no_of_contestants=raceplan_interval_start.no_of_contestants,
-        start_events=list(),
+        start_entries=list(),
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="1",
             bib=1,
@@ -270,8 +270,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="1",
             bib=2,
@@ -279,8 +279,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:00:30"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="2",
             bib=3,
@@ -288,8 +288,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="2",
             bib=4,
@@ -297,8 +297,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:01:30"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="3",
             bib=5,
@@ -306,8 +306,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:11:30"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="3",
             bib=6,
@@ -315,8 +315,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:12:00"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="4",
             bib=7,
@@ -324,8 +324,8 @@ async def expected_startlist_interval_start(
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:12:30"),
         )
     )
-    startlist.start_events.append(
-        StartEvent(
+    startlist.start_entries.append(
+        StartEntry(
             id="",
             race_id="4",
             bib=8,
@@ -365,30 +365,30 @@ async def test_generate_startlist_for_interval_start(
     assert startlist.no_of_contestants == sum(
         rc["no_of_contestants"] for rc in raceclasses
     )
-    assert len(startlist.start_events) == len(
-        expected_startlist_interval_start.start_events
+    assert len(startlist.start_entries) == len(
+        expected_startlist_interval_start.start_entries
     )
-    no_of_start_events = 0
-    for start_event in startlist.start_events:
-        assert type(start_event) is StartEvent
-        no_of_start_events += 1
-    assert no_of_start_events == startlist.no_of_contestants
+    no_of_start_entries = 0
+    for start_entry in startlist.start_entries:
+        assert type(start_entry) is StartEntry
+        no_of_start_entries += 1
+    assert no_of_start_entries == startlist.no_of_contestants
 
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
         map(
             lambda p, q: p == q,
-            startlist.start_events,
-            expected_startlist_interval_start.start_events,
+            startlist.start_entries,
+            expected_startlist_interval_start.start_entries,
         ),
         True,
     ):
         print("Calculated startlist:")
-        print(*startlist.start_events, sep="\n")
+        print(*startlist.start_entries, sep="\n")
         print("----")
         print("Expected startlist:")
-        print(*expected_startlist_interval_start.start_events, sep="\n")
+        print(*expected_startlist_interval_start.start_entries, sep="\n")
         raise AssertionError("Startlist does not match expected.")
     else:
         assert 1 == 1

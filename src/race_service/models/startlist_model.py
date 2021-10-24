@@ -10,7 +10,7 @@ from .changelog import Changelog
 
 
 @dataclass
-class StartEvent(DataClassJsonMixin):
+class StartEntry(DataClassJsonMixin):
     """Data class with details about a starlist."""
 
     race_id: str
@@ -34,5 +34,5 @@ class Startlist(DataClassJsonMixin):
 
     event_id: str
     no_of_contestants: int
-    start_events: List[StartEvent]
+    start_entries: List[StartEntry]
     id: Optional[str] = field(default=None)

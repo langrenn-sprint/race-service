@@ -89,8 +89,8 @@ class StartlistsService:
         # create ids:
         id = create_id()
         startlist.id = id
-        for start_event in startlist.start_events:
-            start_event.id = create_id()
+        for start_entry in startlist.start_entries:
+            start_entry.id = create_id()
         # insert new startlist
         new_startlist = startlist.to_dict()
         logging.debug(f"new_startlist: {new_startlist}")
@@ -140,8 +140,8 @@ class StartlistsService:
 #   Validation:
 async def validate_startlist(db: Any, startlist: Startlist) -> None:
     """Validate the startlist."""
-    # Validate start_events:
+    # Validate start_entries:
     # TODO: validate race-properties.
-    if startlist.start_events:
-        for _start_event in startlist.start_events:
+    if startlist.start_entries:
+        for _start_entry in startlist.start_entries:
             pass

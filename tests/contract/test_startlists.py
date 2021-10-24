@@ -84,7 +84,7 @@ async def new_startlist() -> dict:
     return {
         "event_id": "event_1",
         "no_of_contestants": 4,
-        "start_events": [
+        "start_entries": [
             {
                 "race_id": "race_1",
                 "bib": 1,
@@ -236,19 +236,19 @@ async def test_get_startlist(
     assert type(body) is dict
     assert body["id"]
     assert body["event_id"] == new_startlist["event_id"]
-    assert body["start_events"]
-    assert len(body["start_events"]) == len(new_startlist["start_events"])
+    assert body["start_entries"]
+    assert len(body["start_entries"]) == len(new_startlist["start_entries"])
     i = 0
-    for start_event in body["start_events"]:
-        assert start_event["race_id"] == new_startlist["start_events"][i]["race_id"]
-        assert start_event["bib"] == new_startlist["start_events"][i]["bib"]
+    for start_entry in body["start_entries"]:
+        assert start_entry["race_id"] == new_startlist["start_entries"][i]["race_id"]
+        assert start_entry["bib"] == new_startlist["start_entries"][i]["bib"]
         assert (
-            start_event["starting_position"]
-            == new_startlist["start_events"][i]["starting_position"]
+            start_entry["starting_position"]
+            == new_startlist["start_entries"][i]["starting_position"]
         )
         assert (
-            start_event["scheduled_start_time"]
-            == new_startlist["start_events"][i]["scheduled_start_time"]
+            start_entry["scheduled_start_time"]
+            == new_startlist["start_entries"][i]["scheduled_start_time"]
         )
         i += 1
 

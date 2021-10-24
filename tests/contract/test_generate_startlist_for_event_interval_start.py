@@ -204,7 +204,7 @@ async def expected_startlist() -> dict:
 # Finally we test the test_generate_startlist_for_event function:
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_generate_startlist_for_interval_start_event(
+async def test_generate_startlist_for_interval_start_entry(
     http_service: Any,
     token: MockFixture,
     clear_db: None,
@@ -359,24 +359,24 @@ async def test_generate_startlist_for_interval_start_event(
                 startlist["no_of_contestants"]
                 == expected_startlist["no_of_contestants"]
             )
-            assert len(startlist["start_events"]) == len(
-                expected_startlist["start_events"]
+            assert len(startlist["start_entries"]) == len(
+                expected_startlist["start_entries"]
             )
 
             i = 0
-            for start_event in startlist["start_events"]:
-                expected_start_event = expected_startlist["start_events"][i]
+            for start_entry in startlist["start_entries"]:
+                expected_start_entry = expected_startlist["start_entries"][i]
                 assert (
-                    start_event["bib"] == expected_start_event["bib"]
-                ), f'"bib" in index {i}:{start_event}\n ne:\n{expected_start_event}'
+                    start_entry["bib"] == expected_start_entry["bib"]
+                ), f'"bib" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
                 assert (
-                    start_event["starting_position"]
-                    == expected_start_event["starting_position"]
-                ), f'"starting_position" in index {i}:{start_event}\n ne:\n{expected_start_event}'
+                    start_entry["starting_position"]
+                    == expected_start_entry["starting_position"]
+                ), f'"starting_position" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
                 assert (
-                    start_event["scheduled_start_time"]
-                    == expected_start_event["scheduled_start_time"]
-                ), f'"scheduled_start_time" in index {i}:{start_event}\n ne:\n{expected_start_event}'
+                    start_entry["scheduled_start_time"]
+                    == expected_start_entry["scheduled_start_time"]
+                ), f'"scheduled_start_time" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
                 i += 1
 
 
@@ -463,15 +463,15 @@ async def _print_startlist(startlist: dict) -> None:
     # print(f'event_id: {startlist["event_id"]}')
     # print(f'no_of_contestants: {startlist["no_of_contestants"]}')
     # print("race_id;bib;starting_position;scheduled_start_time")
-    # for start_event in startlist["start_events"]:
+    # for start_entry in startlist["start_entries"]:
     #     print(
-    #         str(start_event["race_id"])
+    #         str(start_entry["race_id"])
     #         + ";"
-    #         + str(start_event["bib"])
+    #         + str(start_entry["bib"])
     #         + ";"
-    #         + str(start_event["starting_position"])
+    #         + str(start_entry["starting_position"])
     #         + ";"
-    #         + str(start_event["scheduled_start_time"])
+    #         + str(start_entry["scheduled_start_time"])
     #     )
     pass
 

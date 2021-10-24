@@ -425,15 +425,15 @@ async def _print_startlist(startlist: dict) -> None:
     # print(f'event_id: {startlist["event_id"]}')
     # print(f'no_of_contestants: {startlist["no_of_contestants"]}')
     # print("race_id;bib;starting_position;scheduled_start_time")
-    # for start_event in startlist["start_events"]:
+    # for start_entry in startlist["start_entries"]:
     #     print(
-    #         str(start_event["race_id"])
+    #         str(start_entry["race_id"])
     #         + ";"
-    #         + str(start_event["bib"])
+    #         + str(start_entry["bib"])
     #         + ";"
-    #         + str(start_event["starting_position"])
+    #         + str(start_entry["starting_position"])
     #         + ";"
-    #         + str(start_event["scheduled_start_time"])
+    #         + str(start_entry["scheduled_start_time"])
     #     )
     pass
 

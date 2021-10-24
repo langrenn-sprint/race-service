@@ -10,7 +10,7 @@ from race_service.adapters import (
     RaceclassesNotFoundException,
     StartlistsAdapter,
 )
-from race_service.models import Raceplan, StartEvent, Startlist
+from race_service.models import Raceplan, StartEntry, Startlist
 from race_service.services import (
     RaceplansService,
     StartlistAllreadyExistException,
@@ -107,11 +107,11 @@ async def generate_startlist_for_interval_start(
 ) -> Startlist:
     """Generate a startlist for an interval start event."""
     no_of_contestants = len(contestants)
-    start_events: List[StartEvent] = []
+    start_entries: List[StartEntry] = []
     startlist = Startlist(
         event_id=event["id"],
         no_of_contestants=no_of_contestants,
-        start_events=start_events,
+        start_entries=start_entries,
     )
     interval = timedelta(
         hours=time.fromisoformat(format_configuration["intervals"]).hour,
@@ -121,7 +121,7 @@ async def generate_startlist_for_interval_start(
     # For every race in raceplan grouped by raceclass,
     # get the corresponding ageclasses from raceclass,
     # pick all contestants in ageclasses,
-    # and for every such contestant, generate a start_event:
+    # and for every such contestant, generate a start_entry:
 
     # First we need to group the races by raceclass:
     d: dict[str, list] = {}
@@ -138,7 +138,7 @@ async def generate_startlist_for_interval_start(
                 for raceclass in raceclasses
                 if raceclass["name"] == race.raceclass
             ]
-            # For every contestant in ageclass, create a start_event:
+            # For every contestant in ageclass, create a start_entry:
             scheduled_start_time = race.start_time
             for contestant in [
                 contestant
@@ -148,7 +148,7 @@ async def generate_startlist_for_interval_start(
                 bib = contestant["bib"]
                 starting_position += 1
 
-                start_event = StartEvent(
+                start_entry = StartEntry(
                     id="",
                     race_id=race.id,
                     bib=bib,
@@ -156,7 +156,7 @@ async def generate_startlist_for_interval_start(
                     scheduled_start_time=scheduled_start_time,
                 )
                 scheduled_start_time = scheduled_start_time + interval
-                startlist.start_events.append(start_event)
+                startlist.start_entries.append(start_entry)
 
     return startlist
 

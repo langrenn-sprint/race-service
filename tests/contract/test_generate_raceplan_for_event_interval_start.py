@@ -180,7 +180,7 @@ async def expected_raceplan() -> dict:
 # Finally we test the test_generate_raceplan_for_event function:
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_generate_raceplan_for_interval_start_event(
+async def test_generate_raceplan_for_interval_start_entry(
     http_service: Any,
     token: MockFixture,
     clear_db: None,

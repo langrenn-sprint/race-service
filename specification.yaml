@@ -296,11 +296,11 @@
           noOfContestants:
             type: integer
             description: the total number of contestants in startlist
-          startEvents:
+          startEntries:
             type: array
             items:
-              $ref: '#/components/schemas/StartEvent'
-      StartEvent:
+              $ref: '#/components/schemas/StartEntry'
+      StartEntry:
         properties:
           id:
             type: string

@@ -37,7 +37,7 @@ async def new_startlist() -> dict:
     return {
         "event_id": "event_1",
         "no_of_contestants": 32,
-        "start_events": [
+        "start_entries": [
             {
                 "race_id": "J15",
                 "bib": 1,
@@ -105,7 +105,7 @@ async def startlist() -> dict:
         "id": "1",
         "event_id": "event_1",
         "no_of_contestants": 32,
-        "start_events": [
+        "start_entries": [
             {
                 "race_id": "J15",
                 "bib": 1,
@@ -236,12 +236,12 @@ async def test_get_startlist_by_id(
         assert type(body) is dict
         assert body["id"] == STARTLIST_ID
         assert body["event_id"] == startlist["event_id"]
-        assert len(body["start_events"]) == len(startlist["start_events"])
-        for start_event in body["start_events"]:
-            assert start_event["race_id"]
-            assert start_event["bib"]
-            assert start_event["starting_position"]
-            assert start_event["scheduled_start_time"]
+        assert len(body["start_entries"]) == len(startlist["start_entries"])
+        for start_entry in body["start_entries"]:
+            assert start_entry["race_id"]
+            assert start_entry["bib"]
+            assert start_entry["starting_position"]
+            assert start_entry["scheduled_start_time"]
 
 
 @pytest.mark.integration
@@ -277,12 +277,12 @@ async def test_get_startlist_by_event_id(
         assert len(body) == 1
         assert body[0]["id"] == STARTLIST_ID
         assert body[0]["event_id"] == startlist["event_id"]
-        assert len(body[0]["start_events"]) == len(startlist["start_events"])
-        for start_event in body[0]["start_events"]:
-            assert start_event["race_id"]
-            assert start_event["bib"]
-            assert start_event["starting_position"]
-            assert start_event["scheduled_start_time"]
+        assert len(body[0]["start_entries"]) == len(startlist["start_entries"])
+        for start_entry in body[0]["start_entries"]:
+            assert start_entry["race_id"]
+            assert start_entry["bib"]
+            assert start_entry["starting_position"]
+            assert start_entry["scheduled_start_time"]
 
 
 @pytest.mark.integration
