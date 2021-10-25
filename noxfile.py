@@ -22,7 +22,9 @@ nox.options.sessions = (
 def unit_tests(session: Session) -> None:
     """Run the unit test suite."""
     args = session.posargs
-    session.install(".", "requests", "pytest", "pytest-mock", "pytest-asyncio")
+    session.install(
+        ".", "aioresponses", "requests", "pytest", "pytest-mock", "pytest-asyncio"
+    )
     session.run(
         "pytest",
         "-m unit",
