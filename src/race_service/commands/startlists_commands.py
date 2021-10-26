@@ -19,6 +19,7 @@ from race_service.services import (
 from .exceptions import (
     CompetitionFormatNotSupportedException,
     DuplicateRaceplansInEventException,
+    InconsistentInputDataException,
     InconsistentValuesInContestantsException,
     InvalidDateFormatException,
     MissingPropertyException,
@@ -69,7 +70,7 @@ class StartlistsCommands:
                 raceclasses,
                 raceplan,
                 contestants,
-            )  # pragma: no cover
+            )
         elif event["competition_format"] == "Interval Start":
             startlist = await generate_startlist_for_interval_start(
                 event,
@@ -93,9 +94,93 @@ async def generate_startlist_for_individual_sprint(
     contestants: List[dict],
 ) -> Startlist:  # pragma: no cover
     """Generate a startlist for an individual sprint event."""
-    raise CompetitionFormatNotSupportedException(
-        "Generating startlist for individual sprint event is not supported at this time."
+    no_of_contestants = len(contestants)
+    start_entries: List[StartEntry] = []
+    startlist = Startlist(
+        event_id=event["id"],
+        no_of_contestants=no_of_contestants,
+        start_entries=start_entries,
     )
+
+    # Sanity check:
+    no_of_contestants_in_raceclasses = sum(
+        raceclass["no_of_contestants"] for raceclass in raceclasses
+    )
+    if len(contestants) != no_of_contestants_in_raceclasses:
+        raise InconsistentInputDataException(
+            "len(contestants) does not match number of contestants in raceclasses:"
+            f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
+        )
+    #
+    if len(contestants) != raceplan.no_of_contestants:
+        raise InconsistentInputDataException(
+            "len(contestants) does not match number of contestants in raceplan:"
+            f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
+        )
+    #
+    no_of_contestants_in_races = sum(
+        race.no_of_contestants for race in raceplan.races if race.round == "Q"
+    )
+    if len(contestants) != no_of_contestants_in_races:
+        raise InconsistentInputDataException(
+            "len(contestants) does not match sum of contestants in raceplan.races quarterfinals:"
+            f"{len(contestants)} != {no_of_contestants_in_races}."
+        )
+    #
+    # For every race in round=Q in raceplan grouped by raceclass,
+    # get the corresponding ageclasses from raceclass,
+    # pick all contestants in ageclasses,
+    # and for every such contestant, generate a start_entry.
+    # until race is full.
+
+    # First we need to group the races by raceclass:
+    d: dict[str, list] = {}
+    for race in raceplan.races:
+        d.setdefault(race.raceclass, []).append(race)
+    races_grouped_by_raceclass = list(d.values())
+
+    for races in races_grouped_by_raceclass:
+        # We find the actual ageclasses in this raceclass:
+        ageclasses = [
+            raceclass["ageclass_name"]
+            for raceclass in raceclasses
+            if raceclass["name"] == races[0].raceclass
+        ]
+        # For every contestant in ageclass, create a start_entry in
+        # a quarter-final until it is full, continue with next quarter-final:
+
+        # Get the actual quarter-finals and set up control variables:
+        quarter_finals = [race for race in races if race.round == "Q"]
+        qf_index = 0
+        starting_position = 1
+        no_of_contestants_in_qf = 0
+
+        for contestant in [
+            contestant
+            for contestant in contestants
+            if contestant["ageclass"] in ageclasses
+        ]:
+
+            # Create the start-entry:
+            start_entry = StartEntry(
+                id="",
+                race_id=quarter_finals[qf_index].id,
+                bib=contestant["bib"],
+                starting_position=starting_position,
+                scheduled_start_time=quarter_finals[qf_index].start_time,
+            )
+            startlist.start_entries.append(start_entry)
+
+            no_of_contestants_in_qf += 1
+            # Check if qf is full:
+            if no_of_contestants_in_qf < quarter_finals[qf_index].no_of_contestants:
+                starting_position += 1
+            else:
+                qf_index += 1
+                starting_position = 1
+                no_of_contestants_in_qf = 0
+
+    return startlist
 
 
 async def generate_startlist_for_interval_start(
@@ -130,8 +215,8 @@ async def generate_startlist_for_interval_start(
     races_grouped = list(d.values())
 
     for races in races_grouped:
-        starting_position = 0
         for race in races:
+            starting_position = 0
             # Get the correponding ageclasses:
             ageclasses = [
                 raceclass["ageclass_name"]

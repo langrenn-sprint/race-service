@@ -2,6 +2,7 @@
 from .exceptions import (
     CompetitionFormatNotSupportedException,
     DuplicateRaceplansInEventException,
+    InconsistentInputDataException,
     InconsistentValuesInContestantsException,
     InconsistentValuesInRaceclassesException,
     InvalidDateFormatException,
