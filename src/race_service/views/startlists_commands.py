@@ -20,6 +20,7 @@ from race_service.adapters import (
 from race_service.commands import (
     CompetitionFormatNotSupportedException,
     DuplicateRaceplansInEventException,
+    InconsistentInputDataException,
     InconsistentValuesInContestantsException,
     InvalidDateFormatException,
     MissingPropertyException,
@@ -62,6 +63,7 @@ class GenerateStartlistForEventView(View):
             CompetitionFormatNotSupportedException,
             ContestantsNotFoundException,
             DuplicateRaceplansInEventException,
+            InconsistentInputDataException,
             InconsistentValuesInContestantsException,
             InvalidDateFormatException,
             NoRaceplanInEventException,
