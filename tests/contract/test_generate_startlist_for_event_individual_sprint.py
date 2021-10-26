@@ -339,7 +339,45 @@ async def test_generate_startlist_for_individual_sprint_event(
                 logging.error(
                     f"Got unexpected status {response.status}, reason {body}."
                 )
-            assert response.status == 400
+            assert response.status == 201
+            assert "/startlists/" in response.headers[hdrs.LOCATION]
+        # We check that startlist are actually created:
+        url = response.headers[hdrs.LOCATION]
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            startlist = await response.json()
+            assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+            assert type(startlist) is dict
+            assert startlist["id"]
+            assert startlist["event_id"] == request_body["event_id"]
+
+            await _print_startlist(startlist)
+            await _dump_startlist_to_json(startlist)
+
+            # And we compare the response to the expected startlist:
+            assert (
+                startlist["no_of_contestants"]
+                == expected_startlist["no_of_contestants"]
+            )
+            assert len(startlist["start_entries"]) == len(
+                expected_startlist["start_entries"]
+            )
+
+            i = 0
+            for start_entry in startlist["start_entries"]:
+                expected_start_entry = expected_startlist["start_entries"][i]
+                assert (
+                    start_entry["bib"] == expected_start_entry["bib"]
+                ), f'"bib" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
+                assert (
+                    start_entry["starting_position"]
+                    == expected_start_entry["starting_position"]
+                ), f'"starting_position" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
+                assert (
+                    start_entry["scheduled_start_time"]
+                    == expected_start_entry["scheduled_start_time"]
+                ), f'"scheduled_start_time" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
+                i += 1
 
 
 # ---
@@ -406,6 +444,12 @@ async def _print_raceplan(raceplan: dict) -> None:
     #         + ";"
     #         + str(race["raceclass"])
     #         + ";"
+    #         + str(race["round"])
+    #         + ";"
+    #         + str(race["index"])
+    #         + ";"
+    #         + str(race["heat"])
+    #         + ";"
     #         + str(race["no_of_contestants"])
     #     )
     pass
@@ -439,6 +483,6 @@ async def _print_startlist(startlist: dict) -> None:
 
 
 async def _dump_startlist_to_json(startlist: dict) -> None:
-    # with open("tests/files/tmp_startlist.json", "w") as file:
+    # with open("tests/files/tmp_startlist_individual_sprint.json", "w") as file:
     #     json.dump(startlist, file)
     pass

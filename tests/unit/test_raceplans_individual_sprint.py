@@ -266,5 +266,4 @@ async def test_calculate_raceplan_individual_sprint(
         print(*expected_raceplan_individual_sprint.races, sep="\n")
         raise AssertionError("Raceplan does not match expected.")
     else:
-        print(*raceplan.races, sep="\n")
         assert 1 == 1
