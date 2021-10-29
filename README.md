@@ -47,8 +47,8 @@ cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cross
 
 ### Install software:
 ```
-% git clone https://github.com/Informasjonsforvaltning/dataservice-publisher.git
-% cd dataservice-publisher
+% git clone https://github.com/langrenn-sprint/race-service.git
+% cd race-service
 % pyenv install 3.9.6
 % pyenv local 3.9.6
 % poetry install
