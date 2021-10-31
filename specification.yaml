@@ -9,6 +9,8 @@
   tags:
     - name: raceplan
       description: Raceplan operations
+    - name: race
+      description: Race operations
     - name: time-event
       description: Time-event operations
     - name: startlist
@@ -35,7 +37,7 @@
         - raceplan
         description: Get a list of raceplans
         parameters:
-        - name: event-id
+        - name: eventId
           in: query
           description: the event the raceplan belongs to
           required: false
@@ -67,9 +69,9 @@
         responses:
           201:
             description: Created
-    /raceplans/{racePlanId}:
+    /raceplans/{raceplanId}:
       parameters:
-      - name: racePlanId
+      - name: raceplanId
         in: path
         description: race plan id
         required: true
@@ -101,6 +103,75 @@
         responses:
           204:
             description: No content
+    /races:
+      post:
+        tags:
+        - race
+        security:
+        - bearerAuth: []
+        description: Add a new race
+        requestBody:
+          description: The new race to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Race'
+        responses:
+          201:
+            description: Created
+      get:
+        tags:
+        - race
+        description: Get a list of races
+        parameters:
+        - name: eventId
+          in: query
+          description: the event the race belongs to
+          required: false
+          schema:
+            type: string
+            format: uuid
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/RaceCollection'
+    /races/{raceId}:
+      parameters:
+      - name: raceId
+        in: path
+        description: race id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      get:
+        tags:
+        - race
+        description: Get a unique race
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Race'
+      put:
+        tags:
+        - race
+        description: Update a race
+        responses:
+          204:
+            description: No content
+      delete:
+        tags:
+        - race
+        description: Delete a race
+        responses:
+          204:
+            description: No content
     /startlists:
       post:
         tags:
@@ -122,7 +193,7 @@
         - startlist
         description: Get a list of startlists
         parameters:
-        - name: event-id
+        - name: eventId
           in: query
           description: the event the startlist belongs to
           required: false
@@ -278,6 +349,39 @@
             items:
               type: string
               description: ref to individual races
+      RaceCollection:
+        type: object
+        properties:
+          events:
+            type: array
+            items:
+              $ref: '#/components/schemas/Race'
+      Race:
+        properties:
+          id:
+            type: string
+            format: uuid
+          raceclass:
+            type: string
+            description: reference to the raceclass
+          order:
+            type: integer
+            description: the starting order of the race
+          start_time:
+            type: string
+            format: date-time
+            description: the starting order of the race
+          no_of_contestants:
+            type: integer
+            description: the number of contestants in the race
+          event_id:
+            type: string
+            format: uuid
+            description: reference to the event the race is part of
+          raceplan_id:
+            type: string
+            format: uuid
+            description: reference to the raceplan the race is part of
       StartlistCollection:
         type: object
         properties:

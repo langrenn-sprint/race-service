@@ -99,43 +99,67 @@ async def raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     raceplan = Raceplan(event_id=event_interval_start["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 8
-    raceplan.races.append(
+    # Add list of race_ids:
+    for id in range(1, 6):
+        raceplan.races.append(str(id))
+    return raceplan
+
+
+@pytest.fixture
+async def races_interval_start(
+    raceplan_interval_start: Raceplan,
+) -> List[IntervalStartRace]:
+    """Create a mock raceplan object."""
+    races: List[IntervalStartRace] = []
+    races.append(
         IntervalStartRace(
             id="1",
             raceclass="J15",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
             no_of_contestants=2,
+            event_id=raceplan_interval_start.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IntervalStartRace(
             id="2",
             raceclass="G15",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
             no_of_contestants=2,
+            event_id=raceplan_interval_start.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IntervalStartRace(
             id="3",
             raceclass="J16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:11:30"),
             no_of_contestants=2,
+            event_id=raceplan_interval_start.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IntervalStartRace(
             id="4",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:12:30"),
             no_of_contestants=2,
+            event_id=raceplan_interval_start.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    return raceplan
+    return races
 
 
 @pytest.fixture
@@ -343,6 +367,7 @@ async def test_generate_startlist_for_interval_start(
     competition_format_interval_start: dict,
     raceclasses: List[dict],
     raceplan_interval_start: Raceplan,
+    races_interval_start: List[IntervalStartRace],
     contestants: List[dict],
     expected_startlist_interval_start: Startlist,
 ) -> None:
@@ -352,6 +377,7 @@ async def test_generate_startlist_for_interval_start(
         competition_format_interval_start,
         raceclasses,
         raceplan_interval_start,
+        races_interval_start,
         contestants,
     )
 

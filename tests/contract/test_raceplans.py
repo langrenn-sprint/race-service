@@ -192,7 +192,7 @@ async def test_get_all_raceplan_by_event_id(
 ) -> None:
     """Should return OK and a list with one raceplan as json."""
     event_id = new_raceplan["event_id"]
-    url = f"{http_service}/raceplans?event-id={event_id}"
+    url = f"{http_service}/raceplans?eventId={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
@@ -288,7 +288,7 @@ async def test_get_all_raceplan_by_event_id_when_event_does_not_exist(
 ) -> None:
     """Should return OK and an empty list."""
     event_id = "does_not_exist"
-    url = f"{http_service}/raceplans?event-id={event_id}"
+    url = f"{http_service}/raceplans?eventId={event_id}"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }

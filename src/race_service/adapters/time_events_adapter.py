@@ -11,7 +11,7 @@ class TimeEventsAdapter:
         """Get all time_events function."""
         time_events: List = []
         cursor = db.time_events_collection.find()
-        for time_event in await cursor.to_list(length=100):
+        for time_event in await cursor.to_list(None):
             time_events.append(time_event)
             logging.debug(time_event)
         return time_events
@@ -39,7 +39,7 @@ class TimeEventsAdapter:
         """Get time_events by event_id function."""
         time_events: List = []
         cursor = db.time_events_collection.find({"event_id": event_id})
-        for time_event in await cursor.to_list(length=100):
+        for time_event in await cursor.to_list(None):
             time_events.append(time_event)
         return time_events
 

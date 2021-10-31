@@ -11,7 +11,7 @@ class RaceplansAdapter:
         """Get all raceplans function."""
         raceplans: List = []
         cursor = db.raceplans_collection.find()
-        for raceplan in await cursor.to_list(length=100):
+        for raceplan in await cursor.to_list(None):
             raceplans.append(raceplan)
             logging.debug(raceplan)
         return raceplans

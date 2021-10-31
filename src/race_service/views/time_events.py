@@ -41,8 +41,8 @@ class TimeEventsView(View):
         except Exception as e:
             raise e from e
 
-        if "event-id" in self.request.rel_url.query:
-            event_id = self.request.rel_url.query["event-id"]
+        if "eventId" in self.request.rel_url.query:
+            event_id = self.request.rel_url.query["eventId"]
             time_events = await TimeEventsService.get_time_events_by_event_id(
                 db, event_id
             )

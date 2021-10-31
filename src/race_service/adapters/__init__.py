@@ -7,6 +7,7 @@ from .events_adapter import (
     RaceclassesNotFoundException,
 )
 from .raceplans_adapter import RaceplansAdapter
+from .races_adapter import RacesAdapter
 from .startlists_adapter import StartlistsAdapter
 from .time_events_adapter import TimeEventsAdapter
 from .users_adapter import UsersAdapter
