@@ -111,6 +111,9 @@ async def raceplan_interval_start(event_interval_start: dict) -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
                 "no_of_contestants": 2,
+                "event_id": event_interval_start["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
             {
@@ -119,6 +122,9 @@ async def raceplan_interval_start(event_interval_start: dict) -> dict:
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
                 "no_of_contestants": 2,
+                "event_id": event_interval_start["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
             {
@@ -127,6 +133,9 @@ async def raceplan_interval_start(event_interval_start: dict) -> dict:
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
                 "no_of_contestants": 2,
+                "event_id": event_interval_start["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
             {
@@ -135,6 +144,9 @@ async def raceplan_interval_start(event_interval_start: dict) -> dict:
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
                 "no_of_contestants": 2,
+                "event_id": event_interval_start["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
         ],
@@ -297,8 +309,20 @@ async def test_generate_startlist_for_event(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=raceplan_interval_start["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
     )
 
     headers = MultiDict(

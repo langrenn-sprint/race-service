@@ -11,9 +11,11 @@ from race_service.adapters import (
 from race_service.services import (
     RaceplanAllreadyExistException,
     RaceplansService,
+    RacesService,
 )
 from .exceptions import (
     CompetitionFormatNotSupportedException,
+    CouldNotCreateRaceplanException,
     InconsistentValuesInRaceclassesException,
     InvalidDateFormatException,
     MissingPropertyException,
@@ -27,7 +29,7 @@ class RaceplansCommands:
     """Class representing a commands on events."""
 
     @classmethod
-    async def generate_raceplan_for_event(
+    async def generate_raceplan_for_event(  # noqa: C901
         cls: Any, db: Any, token: str, event_id: str
     ) -> str:
         """Generate raceplan for event function."""
@@ -54,20 +56,31 @@ class RaceplansCommands:
         raceclasses = await get_raceclasses(token, event_id)
 
         # Calculate the raceplan:
-        raceplan = None
         if event["competition_format"] == "Individual Sprint":
-            raceplan = await calculate_raceplan_individual_sprint(
+            raceplan, races = await calculate_raceplan_individual_sprint(
                 event, format_configuration, raceclasses
             )
         elif event["competition_format"] == "Interval Start":
-            raceplan = await calculate_raceplan_interval_start(
+            raceplan, races = await calculate_raceplan_interval_start(
                 event, format_configuration, raceclasses
             )
-        # Finally we store the new raceplan and return the id:
-        assert raceplan
+        # Finally we store the races and the raceplan and return the id to the plan:
         raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
-        assert raceplan_id
-        return raceplan_id
+        if raceplan_id:
+            for race in races:
+                race.raceplan_id = raceplan_id
+                race_id = await RacesService.create_race(db, race)
+                if race_id:
+                    raceplan.races.append(race_id)
+                else:
+                    raise CouldNotCreateRaceplanException(
+                        "Something went wrong when creating race."
+                    ) from None
+            await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
+            return raceplan_id
+        raise CouldNotCreateRaceplanException(
+            "Something went wrong when creating raceplan."
+        ) from None
 
 
 # helpers

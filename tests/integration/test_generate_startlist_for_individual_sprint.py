@@ -118,6 +118,9 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> dict:
                 "heat": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
                 "no_of_contestants": 2,
+                "event_id": event_individual_sprint["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "individual_sprint",
             },
             {
@@ -129,6 +132,9 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> dict:
                 "heat": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:02:30"),
                 "no_of_contestants": 2,
+                "event_id": event_individual_sprint["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "individual_sprint",
             },
             {
@@ -140,6 +146,9 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> dict:
                 "heat": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:05:00"),
                 "no_of_contestants": 2,
+                "event_id": event_individual_sprint["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "individual_sprint",
             },
             {
@@ -151,6 +160,9 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> dict:
                 "heat": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:07:30"),
                 "no_of_contestants": 2,
+                "event_id": event_individual_sprint["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "individual_sprint",
             },
         ],
@@ -313,8 +325,20 @@ async def test_generate_startlist_for_event(
         return_value=[raceplan_individual_sprint],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_individual_sprint["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=raceplan_individual_sprint["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
     )
 
     headers = MultiDict(

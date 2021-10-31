@@ -13,6 +13,8 @@ from .views import (
     Ping,
     RaceplansView,
     RaceplanView,
+    RacesView,
+    RaceView,
     Ready,
     StartlistsView,
     StartlistView,
@@ -51,6 +53,8 @@ async def create_app() -> web.Application:
                 "/raceplans/generate-raceplan-for-event", GenerateRaceplanForEventView
             ),
             web.view("/raceplans/{raceplanId}", RaceplanView),
+            web.view("/races", RacesView),
+            web.view("/races/{raceId}", RaceView),
             web.view("/startlists", StartlistsView),
             web.view(
                 "/startlists/generate-startlist-for-event",

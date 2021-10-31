@@ -299,6 +299,7 @@ async def test_generate_raceplan_for_interval_start_entry(
             i = 0
             for race in raceplan["races"]:
                 expected_race = expected_raceplan["races"][i]
+                assert race["raceplan_id"] == raceplan["id"]
                 assert race["order"] == i + 1
                 assert (
                     race["order"] == expected_race["order"]

@@ -318,7 +318,7 @@ async def test_generate_startlist_for_interval_start_entry(
                 )
             assert response.status == 201
         # Get the raceplan for debugging purposes:
-        url = f"{http_service}/raceplans?event-id={event_id}"
+        url = f"{http_service}/raceplans?eventId={event_id}"
         async with session.get(url, headers=headers) as response:
             if response.status != 200:
                 body = await response.json()

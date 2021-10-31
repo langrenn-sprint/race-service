@@ -25,6 +25,7 @@ from race_service.commands import (
     InvalidDateFormatException,
     MissingPropertyException,
     NoRaceplanInEventException,
+    NoRacesInRaceplanException,
     StartlistsCommands,
 )
 from race_service.services import StartlistAllreadyExistException
@@ -67,6 +68,7 @@ class GenerateStartlistForEventView(View):
             InconsistentValuesInContestantsException,
             InvalidDateFormatException,
             NoRaceplanInEventException,
+            NoRacesInRaceplanException,
             MissingPropertyException,
             RaceclassesNotFoundException,
             StartlistAllreadyExistException,

@@ -170,7 +170,7 @@ async def test_get_time_events_by_event_id(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/time-events?event-id={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/time-events?eventId={EVENT_ID}", headers=headers)
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()

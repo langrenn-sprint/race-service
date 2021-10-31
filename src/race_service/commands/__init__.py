@@ -1,6 +1,7 @@
 """Package for all commands."""
 from .exceptions import (
     CompetitionFormatNotSupportedException,
+    CouldNotCreateRaceplanException,
     DuplicateRaceplansInEventException,
     InconsistentInputDataException,
     InconsistentValuesInContestantsException,
@@ -9,6 +10,7 @@ from .exceptions import (
     MissingPropertyException,
     NoRaceclassesInEventException,
     NoRaceplanInEventException,
+    NoRacesInRaceplanException,
 )
 from .raceplans_commands import RaceplansCommands
 from .startlists_commands import StartlistsCommands

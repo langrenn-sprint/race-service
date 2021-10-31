@@ -1,10 +1,10 @@
 """Module for raceplans service."""
 import logging
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional
 import uuid
 
 from race_service.adapters import RaceplansAdapter
-from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
+from race_service.models import Raceplan
 from .exceptions import IllegalValueException
 
 
@@ -43,13 +43,6 @@ class RaceplansService:
         if _raceplans:
             for _raceplan in _raceplans:
                 raceplan = Raceplan.from_dict(_raceplan)
-                _races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
-                for _race in raceplan.races:
-                    if _race["datatype"] == "interval_start":
-                        _races.append(IntervalStartRace.from_dict(_race))
-                    elif _race["datatype"] == "individual_sprint":
-                        _races.append(IndividualSprintRace.from_dict(_race))
-                raceplan.races = _races
                 raceplans.append(raceplan)
         return raceplans
 
@@ -64,13 +57,6 @@ class RaceplansService:
         if _raceplans:
             for _raceplan in _raceplans:
                 raceplan = Raceplan.from_dict(_raceplan)
-                _races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
-                for _race in raceplan.races:
-                    if _race["datatype"] == "interval_start":
-                        _races.append(IntervalStartRace.from_dict(_race))
-                    elif _race["datatype"] == "individual_sprint":
-                        _races.append(IndividualSprintRace.from_dict(_race))
-                raceplan.races = _races
                 raceplans.append(raceplan)
         return raceplans
 
@@ -106,11 +92,6 @@ class RaceplansService:
         # create ids:
         id = create_id()
         raceplan.id = id
-        for race in raceplan.races:
-            if type(race) is dict:
-                race["id"] = create_id()
-            else:
-                race.id = create_id()
         # insert new raceplan
         new_raceplan = raceplan.to_dict()
         logging.debug(f"new_raceplan: {new_raceplan}")
@@ -133,7 +114,7 @@ class RaceplansService:
     async def update_raceplan(
         cls: Any, db: Any, id: str, raceplan: Raceplan
     ) -> Optional[str]:
-        """Get raceplan function."""
+        """Update raceplan function."""
         # get old document
         old_raceplan = await RaceplansAdapter.get_raceplan_by_id(db, id)
         # update the raceplan if found:
@@ -147,21 +128,20 @@ class RaceplansService:
 
     @classmethod
     async def delete_raceplan(cls: Any, db: Any, id: str) -> Optional[str]:
-        """Get raceplan function."""
+        """Delete raceplan function."""
         # get old document
         raceplan = await RaceplansAdapter.get_raceplan_by_id(db, id)
         # delete the document if found:
         if raceplan:
             result = await RaceplansAdapter.delete_raceplan(db, id)
             return result
-        raise RaceplanNotFoundException(f"Raceplan with id {id} not found")
+        raise RaceplanNotFoundException(
+            f"Raceplan with id {id} not found"
+        )  # pragma: no cover
 
 
 #   Validation:
 async def validate_raceplan(db: Any, raceplan: Raceplan) -> None:
     """Validate the raceplan."""
-    # Validate races:
-    # TODO: validate race-properties.
-    if raceplan.races:
-        for _race in raceplan.races:
-            pass
+    # TODO: validate raceplan-properties.
+    pass
