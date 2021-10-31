@@ -20,6 +20,7 @@ async def test_generate_startlist_for_individual_sprint(
     competition_format_individual_sprint: dict,
     raceclasses: List[dict],
     raceplan_individual_sprint: Raceplan,
+    races_individual_sprint: List[IndividualSprintRace],
     contestants: List[dict],
     expected_startlist_individual_sprint: Startlist,
 ) -> None:
@@ -29,6 +30,7 @@ async def test_generate_startlist_for_individual_sprint(
         competition_format_individual_sprint,
         raceclasses,
         raceplan_individual_sprint,
+        races_individual_sprint,
         contestants,
     )
 
@@ -125,9 +127,22 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 27
-    raceplan.races.append(
+    # Add list of race_ids:
+    for id in range(1, 12):
+        raceplan.races.append(str(id))
+
+    return raceplan
+
+
+@pytest.fixture
+async def races_individual_sprint(
+    raceplan_individual_sprint: Raceplan,
+) -> List[IndividualSprintRace]:
+    """Create a mock raceplan object."""
+    races: List[IndividualSprintRace] = []
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="1",
             order=1,
             raceclass="J15",
             round="Q",
@@ -136,11 +151,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
             no_of_contestants=7,
             rule={"S": {"A": 4, "C": float("inf")}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="2",
             order=2,
             raceclass="J15",
             round="Q",
@@ -149,11 +167,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
             no_of_contestants=7,
             rule={"S": {"A": 4, "C": float("inf")}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="3",
             order=3,
             raceclass="J15",
             round="Q",
@@ -162,11 +183,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
             no_of_contestants=7,
             rule={"S": {"A": 4, "C": float("inf")}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="4",
             order=4,
             raceclass="J15",
             round="Q",
@@ -175,11 +199,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
             no_of_contestants=6,
             rule={"S": {"A": 4, "C": float("inf")}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="5",
             order=5,
             raceclass="J15",
             round="S",
@@ -188,11 +215,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
             no_of_contestants=6,
             rule={"F": {"C": 4}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="6",
             order=6,
             raceclass="J15",
             round="S",
@@ -201,11 +231,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
             no_of_contestants=5,
             rule={"F": {"C": 4}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="7",
             order=7,
             raceclass="J15",
             round="S",
@@ -214,11 +247,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
             no_of_contestants=8,
             rule={"F": {"A": 4, "B": float("inf")}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="8",
             order=8,
             raceclass="J15",
             round="S",
@@ -227,11 +263,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
             no_of_contestants=8,
             rule={"F": {"A": 4, "B": float("inf")}},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="9",
             order=9,
             raceclass="J15",
             round="F",
@@ -240,11 +279,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:35:00"),
             no_of_contestants=8,
             rule={},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="10",
             order=10,
             raceclass="J15",
             round="F",
@@ -253,11 +295,14 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:37:30"),
             no_of_contestants=8,
             rule={},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IndividualSprintRace(
-            id="",
+            id="11",
             order=11,
             raceclass="J15",
             round="F",
@@ -266,14 +311,17 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
             start_time=datetime.fromisoformat("2021-09-29 09:40:00"),
             no_of_contestants=8,
             rule={},
+            event_id=raceplan_individual_sprint.event_id,
+            raceplan_id="",
+            startlist_id="",
         )
     )
     assert (
-        sum(race.no_of_contestants for race in raceplan.races if race.round == "Q")
-        == raceplan.no_of_contestants
+        sum(race.no_of_contestants for race in races if race.round == "Q")
+        == raceplan_individual_sprint.no_of_contestants
     )
 
-    return raceplan
+    return races
 
 
 @pytest.fixture
@@ -433,7 +481,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=1,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -442,7 +490,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=2,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -451,7 +499,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=3,
             starting_position=3,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -460,7 +508,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=4,
             starting_position=4,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -469,7 +517,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=5,
             starting_position=5,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -478,7 +526,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=6,
             starting_position=6,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -487,7 +535,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="1",
             bib=7,
             starting_position=7,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -496,7 +544,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=8,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -505,7 +553,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=9,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -514,7 +562,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=10,
             starting_position=3,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -523,7 +571,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=11,
             starting_position=4,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -532,7 +580,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=12,
             starting_position=5,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -541,7 +589,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=13,
             starting_position=6,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -550,7 +598,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="2",
             bib=14,
             starting_position=7,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -559,7 +607,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=15,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -568,7 +616,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=16,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -577,7 +625,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=17,
             starting_position=3,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -586,7 +634,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=18,
             starting_position=4,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -595,7 +643,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=19,
             starting_position=5,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -604,7 +652,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=20,
             starting_position=6,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -613,7 +661,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="3",
             bib=21,
             starting_position=7,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -622,7 +670,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="4",
             bib=22,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
@@ -631,7 +679,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="4",
             bib=23,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
@@ -640,7 +688,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="4",
             bib=24,
             starting_position=3,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
@@ -649,7 +697,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="4",
             bib=25,
             starting_position=4,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
@@ -658,7 +706,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="4",
             bib=26,
             starting_position=5,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
@@ -667,7 +715,7 @@ async def expected_startlist_individual_sprint(
     startlist.start_entries.append(
         StartEntry(
             id="",
-            race_id="",
+            race_id="4",
             bib=27,
             starting_position=6,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),

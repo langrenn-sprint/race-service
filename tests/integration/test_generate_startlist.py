@@ -147,6 +147,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
                 "no_of_contestants": 2,
+                "event_id": event["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
             {
@@ -155,6 +158,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
                 "no_of_contestants": 2,
+                "event_id": event["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
             {
@@ -163,6 +169,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
                 "no_of_contestants": 2,
+                "event_id": event["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
             {
@@ -171,6 +180,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
                 "no_of_contestants": 2,
+                "event_id": event["id"],
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
                 "datatype": "interval_start",
             },
         ],
@@ -289,6 +301,72 @@ async def contestants(event: dict, raceplan_interval_start: dict) -> List[dict]:
 
 
 # bad cases
+@pytest.mark.integration
+async def test_generate_startlist_for_event_no_races_in_plan(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    raceplan_interval_start: dict,
+    contestants: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    mocker.patch(
+        "race_service.services.startlists_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=[],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        return_value=contestants,
+    )
+
+    headers = MultiDict(
+        {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/startlists/generate-startlist-for-event",
+            headers=headers,
+            json=request_body,
+        )
+        assert resp.status == 400
 
 
 @pytest.mark.integration
@@ -334,6 +412,10 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -402,6 +484,10 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants_bib_not_unique,
     )
@@ -464,6 +550,10 @@ async def test_generate_startlist_for_event_no_contestants(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -530,6 +620,10 @@ async def test_generate_startlist_for_event_no_contestants_exception(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         side_effect=ContestantsNotFoundException("Contestants not found for event."),
     )
@@ -591,6 +685,10 @@ async def test_generate_startlist_for_event_no_raceplan(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
         return_value=None,
     )
     mocker.patch(
@@ -660,6 +758,10 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
         return_value=raceplan_interval_start,
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -724,6 +826,10 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start, raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -793,6 +899,10 @@ async def test_generate_startlist_for_event_unauthorized(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -858,6 +968,10 @@ async def test_generate_startlist_for_event_already_has_startlist(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -921,6 +1035,10 @@ async def test_generate_startlist_for_event_event_not_found(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -989,6 +1107,10 @@ async def test_generate_startlist_for_event_format_configuration_not_found(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -1053,6 +1175,10 @@ async def test_generate_startlist_for_event_no_raceclasses(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -1115,6 +1241,10 @@ async def test_generate_startlist_for_event_no_competition_format(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -1183,6 +1313,10 @@ async def test_generate_startlist_for_event_missing_intervals(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -1216,7 +1350,7 @@ async def test_generate_startlist_for_event_time_missing(
     contestants: List[dict],
     request_body: dict,
 ) -> None:
-    """Should return 201 Created, location header."""
+    """Should return 400 Bad request."""
     event_missing_time = deepcopy(event)
     event_missing_time.pop("time_of_event", None)
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
@@ -1247,6 +1381,10 @@ async def test_generate_startlist_for_event_time_missing(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -1315,6 +1453,10 @@ async def test_generate_startlist_for_event_date_missing(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -1381,6 +1523,10 @@ async def test_generate_startlist_for_event_invalid_date(
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
@@ -1445,6 +1591,10 @@ async def test_generate_startlist_for_event_invalid_time(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
@@ -1514,6 +1664,10 @@ async def test_generate_startlist_for_event_format_configuration_not_supported(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",

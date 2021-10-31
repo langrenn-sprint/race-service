@@ -1,6 +1,7 @@
 """Integration test cases for the raceplans route."""
 import os
 from typing import Any, List
+import uuid
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -122,6 +123,22 @@ async def test_generate_raceplan_for_event(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value={"id": RACEPLAN_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        side_effect=str(uuid.uuid4()),
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id",
         return_value=None,
     )
     mocker.patch(

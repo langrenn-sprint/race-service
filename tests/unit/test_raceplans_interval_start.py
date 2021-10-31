@@ -89,43 +89,64 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
     raceplan = Raceplan(event_id=event_interval_start["id"], races=list())
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 62
-    raceplan.races.append(
+    return raceplan
+
+
+@pytest.fixture
+async def expected_races_interval_start(
+    event_interval_start: dict,
+) -> List[IntervalStartRace]:
+    """Create a mock raceplan object."""
+    races: List[IntervalStartRace] = []
+    races.append(
         IntervalStartRace(
             id="",
             raceclass="J15",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
             no_of_contestants=16,
+            event_id=event_interval_start["id"],
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IntervalStartRace(
             id="",
             raceclass="G15",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
             no_of_contestants=14,
+            event_id=event_interval_start["id"],
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IntervalStartRace(
             id="",
             raceclass="J16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:25:00"),
             no_of_contestants=17,
+            event_id=event_interval_start["id"],
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    raceplan.races.append(
+    races.append(
         IntervalStartRace(
             id="",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:33:30"),
             no_of_contestants=15,
+            event_id=event_interval_start["id"],
+            raceplan_id="",
+            startlist_id="",
         )
     )
-    return raceplan
+    return races
 
 
 @pytest.mark.unit
@@ -135,9 +156,10 @@ async def test_calculate_raceplan_interval_start(
     event_interval_start: dict,
     raceclasses_interval_start: List[dict],
     expected_raceplan_interval_start: Raceplan,
+    expected_races_interval_start: List[IntervalStartRace],
 ) -> None:
-    """Should return an instance of Raceplan equal to the expected raceplan."""
-    raceplan = await calculate_raceplan_interval_start(
+    """Should return a tuple of Raceplan and races equal to the expected raceplan."""
+    raceplan, races = await calculate_raceplan_interval_start(
         event_interval_start,
         competition_format_interval_start,
         raceclasses_interval_start,
@@ -152,9 +174,10 @@ async def test_calculate_raceplan_interval_start(
     assert raceplan.no_of_contestants == sum(
         rc["no_of_contestants"] for rc in raceclasses_interval_start
     )
-    assert len(raceplan.races) == len(expected_raceplan_interval_start.races)
+    assert len(raceplan.races) == 0
+    assert len(races) == len(expected_races_interval_start)
     total_no_of_contestants = 0
-    for race in raceplan.races:
+    for race in races:
         assert type(race) is IntervalStartRace
         total_no_of_contestants += race.no_of_contestants
     assert total_no_of_contestants == raceplan.no_of_contestants
@@ -162,16 +185,14 @@ async def test_calculate_raceplan_interval_start(
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
-        map(
-            lambda p, q: p == q, raceplan.races, expected_raceplan_interval_start.races
-        ),
+        map(lambda p, q: p == q, races, expected_races_interval_start),
         True,
     ):
         print("Calculated raceplan:")
-        print(*raceplan.races, sep="\n")
+        print(*races, sep="\n")
         print("----")
         print("Expected raceplan:")
-        print(*expected_raceplan_interval_start.races, sep="\n")
+        print(*expected_races_interval_start, sep="\n")
         raise AssertionError("Raceplan does not match expected.")
     else:
         assert 1 == 1

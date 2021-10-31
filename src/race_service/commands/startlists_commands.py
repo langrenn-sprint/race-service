@@ -1,6 +1,6 @@
 """Module for startlist commands."""
 from datetime import date, time, timedelta
-from typing import Any, List
+from typing import Any, List, Union
 
 from race_service.adapters import (
     ContestantsNotFoundException,
@@ -10,9 +10,16 @@ from race_service.adapters import (
     RaceclassesNotFoundException,
     StartlistsAdapter,
 )
-from race_service.models import Raceplan, StartEntry, Startlist
+from race_service.models import (
+    IndividualSprintRace,
+    IntervalStartRace,
+    Raceplan,
+    StartEntry,
+    Startlist,
+)
 from race_service.services import (
     RaceplansService,
+    RacesService,
     StartlistAllreadyExistException,
     StartlistsService,
 )
@@ -24,6 +31,7 @@ from .exceptions import (
     InvalidDateFormatException,
     MissingPropertyException,
     NoRaceplanInEventException,
+    NoRacesInRaceplanException,
 )
 
 
@@ -31,7 +39,7 @@ class StartlistsCommands:
     """Class representing a commands on events."""
 
     @classmethod
-    async def generate_startlist_for_event(
+    async def generate_startlist_for_event(  # noqa: C901
         cls: Any, db: Any, token: str, event_id: str
     ) -> str:
         """Generate startlist for event function."""
@@ -58,6 +66,9 @@ class StartlistsCommands:
         raceclasses = await get_raceclasses(token, event_id)
         # Then we fetch the raceplan:
         raceplan = await get_raceplan(db, token, event_id)
+        # and the races:
+        if raceplan.id:
+            races = await get_races(db, token, raceplan.id)
         # And finally we get the list of contestants:
         contestants = await get_contestants(token, event_id)
 
@@ -69,6 +80,7 @@ class StartlistsCommands:
                 format_configuration,
                 raceclasses,
                 raceplan,
+                races,
                 contestants,
             )
         elif event["competition_format"] == "Interval Start":
@@ -77,6 +89,7 @@ class StartlistsCommands:
                 format_configuration,
                 raceclasses,
                 raceplan,
+                races,
                 contestants,
             )
         # Finally we store the new raceplan and return the id:
@@ -91,6 +104,7 @@ async def generate_startlist_for_individual_sprint(
     format_configuration: dict,
     raceclasses: List[dict],
     raceplan: Raceplan,
+    races: List[IndividualSprintRace],
     contestants: List[dict],
 ) -> Startlist:  # pragma: no cover
     """Generate a startlist for an individual sprint event."""
@@ -119,11 +133,11 @@ async def generate_startlist_for_individual_sprint(
         )
     #
     no_of_contestants_in_races = sum(
-        race.no_of_contestants for race in raceplan.races if race.round == "Q"
+        race.no_of_contestants for race in races if race.round == "Q"
     )
     if len(contestants) != no_of_contestants_in_races:
         raise InconsistentInputDataException(
-            "len(contestants) does not match sum of contestants in raceplan.races quarterfinals:"
+            "len(contestants) does not match sum of contestants in races quarterfinals:"
             f"{len(contestants)} != {no_of_contestants_in_races}."
         )
     #
@@ -135,7 +149,7 @@ async def generate_startlist_for_individual_sprint(
 
     # First we need to group the races by raceclass:
     d: dict[str, list] = {}
-    for race in raceplan.races:
+    for race in races:
         d.setdefault(race.raceclass, []).append(race)
     races_grouped_by_raceclass = list(d.values())
 
@@ -188,6 +202,7 @@ async def generate_startlist_for_interval_start(
     format_configuration: dict,
     raceclasses: List[dict],
     raceplan: Raceplan,
+    races: List[IntervalStartRace],
     contestants: List[dict],
 ) -> Startlist:
     """Generate a startlist for an interval start event."""
@@ -210,7 +225,7 @@ async def generate_startlist_for_interval_start(
 
     # First we need to group the races by raceclass:
     d: dict[str, list] = {}
-    for race in raceplan.races:
+    for race in races:
         d.setdefault(race.raceclass, []).append(race)
     races_grouped = list(d.values())
 
@@ -268,6 +283,18 @@ async def get_raceplan(db: Any, token: str, event_id: str) -> Raceplan:
             f"Multiple raceplans for event {event_id}. Cannot proceed."
         )
     return raceplans[0]
+
+
+async def get_races(
+    db: Any, token: str, raceplan_id: str
+) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
+    """Check if the event already has a raceplan."""
+    races = await RacesService.get_races_by_raceplan_id(db, raceplan_id)
+    if len(races) == 0:
+        raise NoRacesInRaceplanException(
+            f"No races in raceplan {raceplan_id}. Cannot proceed."
+        )
+    return races
 
 
 async def get_event(token: str, event_id: str) -> dict:

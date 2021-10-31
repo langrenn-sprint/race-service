@@ -11,7 +11,7 @@ class StartlistsAdapter:
         """Get all startlists function."""
         startlists: List = []
         cursor = db.startlists_collection.find()
-        for startlist in await cursor.to_list(length=100):
+        for startlist in await cursor.to_list(None):
             startlists.append(startlist)
             logging.debug(startlist)
         return startlists

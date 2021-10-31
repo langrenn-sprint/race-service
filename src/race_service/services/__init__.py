@@ -5,6 +5,10 @@ from .raceplans_service import (
     RaceplanNotFoundException,
     RaceplansService,
 )
+from .races_service import (
+    RaceNotFoundException,
+    RacesService,
+)
 from .startlists_service import (
     StartlistAllreadyExistException,
     StartlistNotFoundException,

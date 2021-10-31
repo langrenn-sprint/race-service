@@ -311,6 +311,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
             i = 0
             for race in raceplan["races"]:
                 expected_race = expected_raceplan["races"][i]
+                assert race["raceplan_id"] == raceplan["id"]
                 assert race["order"] == i + 1
                 assert (
                     race["order"] == expected_race["order"]

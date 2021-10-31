@@ -44,7 +44,6 @@ async def new_raceplan_interval_start() -> dict:
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "no_of_contestants": 8,
                 "datatype": "interval_start",
-                "id": None,
             },
             {
                 "raceclass": "G16",
@@ -52,7 +51,6 @@ async def new_raceplan_interval_start() -> dict:
                 "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
                 "no_of_contestants": 8,
                 "datatype": "interval_start",
-                "id": None,
             },
             {
                 "raceclass": "G16",
@@ -60,7 +58,6 @@ async def new_raceplan_interval_start() -> dict:
                 "start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
                 "no_of_contestants": 8,
                 "datatype": "interval_start",
-                "id": None,
             },
             {
                 "raceclass": "G16",
@@ -68,7 +65,6 @@ async def new_raceplan_interval_start() -> dict:
                 "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
                 "no_of_contestants": 8,
                 "datatype": "interval_start",
-                "id": None,
             },
         ],
     }
@@ -87,32 +83,95 @@ async def raceplan_interval_start() -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "no_of_contestants": 8,
-                "datatype": "interval_start",
                 "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
+                "datatype": "interval_start",
             },
             {
                 "raceclass": "G16",
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
                 "no_of_contestants": 8,
-                "datatype": "interval_start",
                 "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
+                "datatype": "interval_start",
             },
             {
                 "raceclass": "G16",
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
                 "no_of_contestants": 8,
-                "datatype": "interval_start",
                 "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
+                "datatype": "interval_start",
             },
             {
                 "raceclass": "G16",
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
                 "no_of_contestants": 8,
-                "datatype": "interval_start",
                 "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
+                "datatype": "interval_start",
+            },
+        ],
+    }
+
+
+@pytest.fixture
+async def new_raceplan_individual_sprint() -> dict:
+    """Create a mock raceplan object."""
+    return {
+        "event_id": "event_1",
+        "no_of_contestants": 32,
+        "races": [
+            {
+                "raceclass": "G16",
+                "order": 1,
+                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+                "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "startlist_id": "",
+                "datatype": "individual_sprint",
+            },
+            {
+                "raceclass": "G16",
+                "order": 2,
+                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
+                "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "startlist_id": "",
+                "datatype": "individual_sprint",
+            },
+            {
+                "raceclass": "G16",
+                "order": 3,
+                "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
+                "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "startlist_id": "",
+                "datatype": "individual_sprint",
+            },
+            {
+                "raceclass": "G16",
+                "order": 4,
+                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
+                "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "startlist_id": "",
+                "datatype": "individual_sprint",
             },
         ],
     }
@@ -133,6 +192,9 @@ async def raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "datatype": "individual_sprint",
                 "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
             },
             {
                 "raceclass": "G16",
@@ -141,6 +203,9 @@ async def raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "datatype": "individual_sprint",
                 "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
             },
             {
                 "raceclass": "G16",
@@ -149,6 +214,9 @@ async def raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "datatype": "individual_sprint",
                 "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
             },
             {
                 "raceclass": "G16",
@@ -157,13 +225,34 @@ async def raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "datatype": "individual_sprint",
                 "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "event_id": "event_1",
+                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+                "startlist_id": "",
+            },
+        ],
+    }
+
+
+@pytest.fixture
+async def new_raceplan_unsupported_datatype() -> dict:
+    """Create a raceplan object."""
+    return {
+        "event_id": "event_1",
+        "no_of_contestants": 8,
+        "races": [
+            {
+                "raceclass": "G16",
+                "order": 1,
+                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+                "no_of_contestants": 8,
+                "datatype": "unsupported",
             },
         ],
     }
 
 
 @pytest.mark.integration
-async def test_create_raceplan(
+async def test_create_raceplan_interval_start(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -184,9 +273,74 @@ async def test_create_raceplan(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=None,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value=raceplan_interval_start,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        return_value=raceplan_interval_start,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        side_effect=raceplan_interval_start["races"],
+    )
 
     request_body = dumps(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
+    )
+
+    headers = MultiDict(
+        {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
+        assert resp.status == 201
+        assert f"/raceplans/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_create_raceplan_individual_sprint(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    new_raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: dict,
+) -> None:
+    """Should return Created, location header."""
+    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    mocker.patch(
+        "race_service.services.raceplans_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value=raceplan_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        return_value=raceplan_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        side_effect=raceplan_individual_sprint["races"],
+    )
+
+    request_body = dumps(
+        new_raceplan_individual_sprint, indent=4, sort_keys=True, default=str
     )
 
     headers = MultiDict(
@@ -219,6 +373,10 @@ async def test_get_raceplan_by_id(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=raceplan_interval_start["races"],
     )
 
     headers = MultiDict(
@@ -272,7 +430,7 @@ async def test_get_raceplan_by_event_id(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/raceplans?event-id={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/raceplans?eventId={EVENT_ID}", headers=headers)
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -315,7 +473,7 @@ async def test_get_raceplan_by_event_id_individual_sprint(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/raceplans?event-id={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/raceplans?eventId={EVENT_ID}", headers=headers)
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -460,6 +618,14 @@ async def test_delete_raceplan_by_id(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
         return_value=None,
     )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=raceplan_interval_start["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.delete_race",
+        return_value=None,
+    )
 
     headers = MultiDict(
         {
@@ -502,6 +668,58 @@ async def test_create_raceplan_when_event_already_has_one(
 
     request_body = dumps(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
+    )
+
+    headers = MultiDict(
+        {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/raceplans", headers=headers, data=request_body)
+        assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_create_raceplan_unsupported_datatype(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    new_raceplan_unsupported_datatype: dict,
+    raceplan_interval_start: dict,
+) -> None:
+    """Should return Created, location header."""
+    RACEPLAN_ID = raceplan_interval_start["id"]
+    mocker.patch(
+        "race_service.services.raceplans_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value=raceplan_interval_start,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        return_value=raceplan_interval_start,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        side_effect=raceplan_interval_start["races"],
+    )
+
+    request_body = dumps(
+        new_raceplan_unsupported_datatype, indent=4, sort_keys=True, default=str
     )
 
     headers = MultiDict(

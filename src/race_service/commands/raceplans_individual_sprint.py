@@ -1,6 +1,6 @@
 """Module for raceplan commands."""
 from datetime import date, datetime, time, timedelta
-from typing import Any, List, Union
+from typing import Any, List, Tuple, Union
 
 from race_service.models import IndividualSprintRace, Raceplan
 
@@ -9,9 +9,10 @@ async def calculate_raceplan_individual_sprint(
     event: dict,
     format_configuration: dict,
     raceclasses: List[dict],
-) -> Raceplan:
+) -> Tuple[Raceplan, List[IndividualSprintRace]]:
     """Calculate raceplan for Individual Sprint event."""
     raceplan = Raceplan(event_id=event["id"], races=list())
+    races: List[IndividualSprintRace] = []
     # We get the number of contestants in plan from the raceclasses:
     raceplan.no_of_contestants = sum(
         raceclass["no_of_contestants"] for raceclass in raceclasses
@@ -68,12 +69,15 @@ async def calculate_raceplan_individual_sprint(
                             rule={}
                             if round == "F"
                             else ConfigMatrix.get_rule_from_to(raceclass, round, index),
+                            event_id=event["id"],
+                            raceplan_id="",
+                            startlist_id="",
                         )
                         order += 1
                         # Calculate start_time for next heat:
                         start_time = start_time + TIME_BETWEEN_HEATS
                         # Add the race to the raceplan:
-                        raceplan.races.append(race)
+                        races.append(race)
                 # Calculate start_time for next round:
                 start_time = start_time - TIME_BETWEEN_HEATS + TIME_BETWEEN_ROUNDS
         # Calculate start_time for next group:
@@ -81,36 +85,36 @@ async def calculate_raceplan_individual_sprint(
 
     # We need to calculate the number of contestants pr heat:
     for raceclasses in raceclasses_grouped:
-        await _calculate_number_of_contestants_pr_race(raceclasses, raceplan)
+        await _calculate_number_of_contestants_pr_race(raceclasses, raceplan, races)
 
-    return raceplan
+    return raceplan, races
 
 
 async def _calculate_number_of_contestants_pr_race(
-    raceclasses: List[dict],
-    raceplan: Raceplan,
+    raceclasses: List[dict], raceplan: Raceplan, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race based on plan."""
     for raceclass in raceclasses:
-        await _calculate_number_of_contestants_pr_race_in_raceclass(raceclass, raceplan)
+        await _calculate_number_of_contestants_pr_race_in_raceclass(
+            raceclass, raceplan, races
+        )
 
 
 async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
-    raceclass: dict,
-    raceplan: Raceplan,
+    raceclass: dict, raceplan: Raceplan, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race pr raceclass based on plan."""
     no_of_Qs = len(
         [
             race
-            for race in raceplan.races
+            for race in races
             if race.raceclass == raceclass["name"] and race.round == "Q"
         ]
     )
     no_of_SAs = len(
         [
             race
-            for race in raceplan.races
+            for race in races
             if race.raceclass == raceclass["name"]
             and race.round == "S"
             and race.index == "A"
@@ -119,7 +123,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     no_of_SCs = len(
         [
             race
-            for race in raceplan.races
+            for race in races
             if race.raceclass == raceclass["name"]
             and race.round == "S"
             and race.index == "C"
@@ -128,7 +132,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     no_of_FAs = len(
         [
             race
-            for race in raceplan.races
+            for race in races
             if race.raceclass == raceclass["name"]
             and race.round == "F"
             and race.index == "A"
@@ -137,7 +141,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     no_of_FBs = len(
         [
             race
-            for race in raceplan.races
+            for race in races
             if race.raceclass == raceclass["name"]
             and race.round == "F"
             and race.index == "B"
@@ -146,7 +150,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     no_of_FCs = len(
         [
             race
-            for race in raceplan.races
+            for race in races
             if race.raceclass == raceclass["name"]
             and race.round == "F"
             and race.index == "C"
@@ -163,7 +167,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     # Calculate number of contestants pr heat in Q:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"] and race.round == "Q"
     ]:
         # First we calculate no of cs in each Q race:
@@ -180,23 +184,23 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     # Calculate number of contestants in SA, SC and FC:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"] and race.round == "Q"
     ]:
         # Then, for each race in round Q, some goes to SA:
-        no_of_contestants_to_SAs += race.rule["S"]["A"]
+        no_of_contestants_to_SAs += race.rule["S"]["A"]  # type: ignore
         # rest to SC:
         if race.rule["S"]["C"] != 0:
-            no_of_contestants_to_SCs += race.no_of_contestants - race.rule["S"]["A"]
+            no_of_contestants_to_SCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
         # or the rest may in some cases go directly to FC:
         if "F" in race.rule:
             if "C" in race.rule["F"]:
-                no_of_contestants_to_FCs += race.no_of_contestants - race.rule["S"]["A"]
+                no_of_contestants_to_FCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
 
     # Calculate number of contestants pr heat in SA:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "S"
         and race.index == "A"
@@ -213,7 +217,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     # Calculate number of contestants pr heat in SC:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "S"
         and race.index == "C"
@@ -230,32 +234,32 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     # Calculate number of contestants in FA and FB:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "S"
         and race.index == "A"
     ]:
-        no_of_contestants_to_FAs += race.rule["F"]["A"]
+        no_of_contestants_to_FAs += race.rule["F"]["A"]  # type: ignore
         # rest to FB:
         if race.rule["F"]["B"] < float("inf"):
-            no_of_contestants_to_FBs += race.rule["F"]["B"]
+            no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
         else:
-            no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]
+            no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
 
     # Calculate number of contestants in FC:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "S"
         and race.index == "C"
     ]:
-        no_of_contestants_to_FCs += race.rule["F"]["C"]
+        no_of_contestants_to_FCs += race.rule["F"]["C"]  # type: ignore
 
     # Calculate number of contestants pr heat in FA:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "F"
         and race.index == "A"
@@ -272,7 +276,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     # Calculate number of contestants pr heat in FB:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "F"
         and race.index == "B"
@@ -289,7 +293,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     # Calculate number of contestants pr heat in FC:
     for race in [
         race
-        for race in raceplan.races
+        for race in races
         if race.raceclass == raceclass["name"]
         and race.round == "F"
         and race.index == "C"
