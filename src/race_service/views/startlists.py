@@ -12,7 +12,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import Startlist
@@ -79,9 +78,7 @@ class StartlistsView(View):
             raise HTTPBadRequest(reason=e) from e
         if startlist_id:
             logging.debug(f"inserted document with startlist_id {startlist_id}")
-            headers = MultiDict(
-                {hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"}
-            )
+            headers = {hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"}
 
             return Response(status=201, headers=headers)
         raise HTTPBadRequest() from None

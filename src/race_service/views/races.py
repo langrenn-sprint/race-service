@@ -12,7 +12,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import IndividualSprintRace, IntervalStartRace, Race
@@ -86,7 +85,7 @@ class RacesView(View):
             raise HTTPUnprocessableEntity(reason=e) from e
         if race_id:
             logging.debug(f"inserted document with race_id {race_id}")
-            headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/races/{race_id}"})
+            headers = {hdrs.LOCATION: f"{BASE_URL}/races/{race_id}"}
 
             return Response(status=201, headers=headers)
         raise HTTPBadRequest() from None

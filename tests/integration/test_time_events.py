@@ -8,7 +8,6 @@ from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
 import jwt
-from multidict import MultiDict
 import pytest
 from pytest_mock import MockFixture
 
@@ -108,12 +107,11 @@ async def test_create_time_event(
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     # todo - fix header location
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -133,11 +131,7 @@ async def test_get_time_event_by_id(
         return_value=time_event,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -161,11 +155,7 @@ async def test_get_time_events_by_event_id(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=time_events,
     )
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -198,12 +188,11 @@ async def test_update_time_event_by_id(
         return_value=TIME_EVENT_ID,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -230,11 +219,7 @@ async def test_get_all_time_events(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -266,11 +251,7 @@ async def test_delete_time_event_by_id(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -303,12 +284,10 @@ async def test_create_time_event_with_input_id(
 
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -336,12 +315,10 @@ async def test_create_time_event_adapter_fails(
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -368,12 +345,11 @@ async def test_create_time_event_mandatory_property(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = {"id": TIME_EVENT_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -402,12 +378,11 @@ async def test_update_time_event_by_id_missing_mandatory_property(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = {"id": TIME_EVENT_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -438,12 +413,11 @@ async def test_update_time_event_by_id_different_id_in_body(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     update_body = deepcopy(time_event)
     update_body["id"] = "different_id"
     request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
@@ -480,7 +454,7 @@ async def test_create_time_event_no_authorization(
     )
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
-    headers = MultiDict({hdrs.CONTENT_TYPE: "application/json"})
+    headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=401)
@@ -530,11 +504,7 @@ async def test_update_time_event_by_id_no_authorization(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-        },
-    )
+    headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
@@ -613,12 +583,10 @@ async def test_create_time_event_insufficient_role(
     )
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token_unsufficient_role}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token_unsufficient_role}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=403)
@@ -644,11 +612,7 @@ async def test_get_time_event_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -676,12 +640,11 @@ async def test_update_time_event_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -711,11 +674,8 @@ async def test_delete_time_event_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)

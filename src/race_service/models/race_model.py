@@ -1,7 +1,7 @@
 """Raceplan data class module."""
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from dataclasses_json import config, DataClassJsonMixin
 from marshmallow.fields import Constant, DateTime
@@ -24,7 +24,7 @@ class Race(DataClassJsonMixin):
     no_of_contestants: int
     event_id: str
     raceplan_id: str
-    startlist_id: str
+    start_entries: List[str]
 
 
 @dataclass

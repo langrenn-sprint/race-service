@@ -9,7 +9,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import (
     EventNotFoundException,
@@ -64,5 +63,5 @@ class GenerateRaceplanForEventView(View):
             RaceplanAllreadyExistException,
         ) as e:
             raise HTTPBadRequest(reason=e) from e
-        headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})
+        headers = {hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"}
         return Response(status=201, headers=headers)

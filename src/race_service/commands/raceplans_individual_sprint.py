@@ -71,7 +71,7 @@ async def calculate_raceplan_individual_sprint(
                             else ConfigMatrix.get_rule_from_to(raceclass, round, index),
                             event_id=event["id"],
                             raceplan_id="",
-                            startlist_id="",
+                            start_entries=[],
                         )
                         order += 1
                         # Calculate start_time for next heat:

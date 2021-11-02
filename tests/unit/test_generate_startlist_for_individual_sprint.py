@@ -153,7 +153,7 @@ async def races_individual_sprint(
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -169,7 +169,7 @@ async def races_individual_sprint(
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -185,7 +185,7 @@ async def races_individual_sprint(
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -201,7 +201,7 @@ async def races_individual_sprint(
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -217,7 +217,7 @@ async def races_individual_sprint(
             rule={"F": {"C": 4}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -233,7 +233,7 @@ async def races_individual_sprint(
             rule={"F": {"C": 4}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -249,7 +249,7 @@ async def races_individual_sprint(
             rule={"F": {"A": 4, "B": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -265,7 +265,7 @@ async def races_individual_sprint(
             rule={"F": {"A": 4, "B": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -281,7 +281,7 @@ async def races_individual_sprint(
             rule={},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -297,7 +297,7 @@ async def races_individual_sprint(
             rule={},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -313,7 +313,7 @@ async def races_individual_sprint(
             rule={},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     assert (
