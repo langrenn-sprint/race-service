@@ -95,6 +95,12 @@ class StartlistsCommands:
         # Finally we store the new raceplan and return the id:
         assert startlist
         startlist_id = await StartlistsService.create_startlist(db, startlist)
+        # We add the start_entries to the respective races:
+        for start_entry in startlist.start_entries:
+            race = await RacesService.get_race_by_id(db, start_entry.race_id)
+            assert start_entry.id
+            race.start_entries.append(start_entry.id)
+            await RacesService.update_race(db, start_entry.race_id, race)
         assert startlist_id
         return startlist_id
 

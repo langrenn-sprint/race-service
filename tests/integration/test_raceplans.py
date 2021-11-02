@@ -8,7 +8,6 @@ from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
 import jwt
-from multidict import MultiDict
 import pytest
 from pytest_mock import MockFixture
 
@@ -43,6 +42,9 @@ async def new_raceplan_interval_start() -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -50,6 +52,9 @@ async def new_raceplan_interval_start() -> dict:
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
                 "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -57,6 +62,9 @@ async def new_raceplan_interval_start() -> dict:
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
                 "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -64,6 +72,9 @@ async def new_raceplan_interval_start() -> dict:
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
                 "no_of_contestants": 8,
+                "event_id": "event_1",
+                "raceplan_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
         ],
@@ -86,7 +97,7 @@ async def raceplan_interval_start() -> dict:
                 "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -97,7 +108,7 @@ async def raceplan_interval_start() -> dict:
                 "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -108,7 +119,7 @@ async def raceplan_interval_start() -> dict:
                 "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -119,7 +130,7 @@ async def raceplan_interval_start() -> dict:
                 "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
         ],
@@ -140,7 +151,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "event_id": "event_1",
                 "raceplan_id": "",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "individual_sprint",
             },
             {
@@ -150,7 +161,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "event_id": "event_1",
                 "raceplan_id": "",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "individual_sprint",
             },
             {
@@ -160,7 +171,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "event_id": "event_1",
                 "raceplan_id": "",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "individual_sprint",
             },
             {
@@ -170,7 +181,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "no_of_contestants": 8,
                 "event_id": "event_1",
                 "raceplan_id": "",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "individual_sprint",
             },
         ],
@@ -194,7 +205,7 @@ async def raceplan_individual_sprint() -> dict:
                 "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
             },
             {
                 "raceclass": "G16",
@@ -205,7 +216,7 @@ async def raceplan_individual_sprint() -> dict:
                 "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
             },
             {
                 "raceclass": "G16",
@@ -216,7 +227,7 @@ async def raceplan_individual_sprint() -> dict:
                 "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
             },
             {
                 "raceclass": "G16",
@@ -227,7 +238,7 @@ async def raceplan_individual_sprint() -> dict:
                 "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
             },
         ],
     }
@@ -290,12 +301,10 @@ async def test_create_raceplan_interval_start(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -343,12 +352,10 @@ async def test_create_raceplan_individual_sprint(
         new_raceplan_individual_sprint, indent=4, sort_keys=True, default=str
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -379,11 +386,7 @@ async def test_get_raceplan_by_id(
         side_effect=raceplan_interval_start["races"],
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -421,11 +424,7 @@ async def test_get_raceplan_by_event_id(
         return_value=[raceplan_interval_start],
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -464,11 +463,7 @@ async def test_get_raceplan_by_event_id_individual_sprint(
         return_value=[raceplan_individual_sprint],
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -510,12 +505,11 @@ async def test_update_raceplan_by_id(
         return_value=RACEPLAN_ID,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -545,11 +539,7 @@ async def test_get_all_raceplans(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -580,11 +570,7 @@ async def test_get_all_raceplans_individual_sprint(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -627,11 +613,7 @@ async def test_delete_raceplan_by_id(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -670,12 +652,10 @@ async def test_create_raceplan_when_event_already_has_one(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -722,12 +702,10 @@ async def test_create_raceplan_unsupported_datatype(
         new_raceplan_unsupported_datatype, indent=4, sort_keys=True, default=str
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -759,12 +737,10 @@ async def test_create_raceplan_with_input_id(
 
     request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -797,12 +773,10 @@ async def test_create_raceplan_adapter_fails(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -832,12 +806,11 @@ async def test_create_raceplan_mandatory_property(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = {"id": RACEPLAN_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -869,12 +842,11 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = {"id": RACEPLAN_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -908,12 +880,11 @@ async def test_update_raceplan_by_id_different_id_in_body(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     update_body = deepcopy(raceplan_interval_start)
     update_body["id"] = "different_id"
     request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
@@ -952,7 +923,7 @@ async def test_create_raceplan_no_authorization(
     request_body = dumps(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
     )
-    headers = MultiDict({hdrs.CONTENT_TYPE: "application/json"})
+    headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=401)
@@ -1002,11 +973,10 @@ async def test_update_raceplan_by_id_no_authorization(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
 
@@ -1087,12 +1057,11 @@ async def test_create_raceplan_insufficient_role(
     request_body = dumps(
         new_raceplan_interval_start, indent=4, sort_keys=True, default=str
     )
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token_unsufficient_role}",
-        },
-    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=403)
@@ -1118,11 +1087,10 @@ async def test_get_raceplan_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -1153,12 +1121,11 @@ async def test_update_raceplan_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -1188,11 +1155,8 @@ async def test_delete_raceplan_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.delete(f"/raceplans/{RACEPLAN_ID}", headers=headers)

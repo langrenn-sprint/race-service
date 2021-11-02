@@ -379,6 +379,33 @@ async def test_generate_startlist_for_individual_sprint_event(
                 ), f'"scheduled_start_time" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
                 i += 1
 
+        # We also need to check that all the relevant races has got a list of start_entries:
+        url = f'{http_service}/races?eventId={request_body["event_id"]}'
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            races = await response.json()
+            no_of_contestants = 0
+            for race in [race for race in races if race["round"] == "Q"]:
+                assert (
+                    len(race["start_entries"]) > 0
+                ), f'race with round/order {race["order"]}/{race["round"]} does not have start_entries'
+                no_of_contestants += len(race["start_entries"])
+            assert no_of_contestants == startlist["no_of_contestants"]
+
+            # We inspect of the start_entries:
+            start_entry = races[0]["start_entries"][0]
+            assert type(start_entry) is str
+
+        # We inspect the details of the race:
+        url = f'{http_service}/races/{races[0]["id"]}'
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            race = await response.json()
+            assert race["no_of_contestants"] == len(race["start_entries"])
+            # TODO: We inspect of the first of the start_entries:
+            # TODO: Need to split StartEntry out to support this usecase
+            # in a simple way.
+
 
 # ---
 async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: C901

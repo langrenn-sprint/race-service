@@ -491,6 +491,14 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
                 ), f'"no_of_contestants" in index {i}:{race}\n ne:\n{expected_race}'
                 i += 1
 
+        # We also need to check that all the races has raceplan-reference:
+        url = f'{http_service}/races?eventId={request_body["event_id"]}'
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            races = await response.json()
+            for race in races:
+                assert race["raceplan_id"] == raceplan["id"]
+
 
 # ---
 async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: C901
