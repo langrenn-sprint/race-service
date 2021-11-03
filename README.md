@@ -51,7 +51,7 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 
 ### Install software
 
-``````shell
+```shell
 % git clone https://github.com/langrenn-sprint/race-service.git
 % cd race-service
 % pyenv install 3.9.6
@@ -76,42 +76,57 @@ LOGGING_LEVEL=DEBUG
 ```
 
 ### Running the API locally
+
 Start the server locally:
-```
+
+```shell
 % poetry run adev runserver -p 8080 --aux-port 8089 src/race_service
 ```
+
 ### Running the API in a wsgi-server (gunicorn)
-```
+
+```shell
 % cd src && poetry run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
 ```
+
 ### Running the wsgi-server in Docker
+
 To build and run the api in a Docker container:
-```
+
+```shell
 % docker build -t gcr.io/langrenn-sprint/race-service:latest .
 % docker run --env-file .env -p 8080:8080 -d gcr.io/langrenn-sprint/race-service:latest
 ```
+
 The easier way would be with docker-compose:
-```
+
+```shell
 docker-compose up --build
 ```
+
 ### Running tests
+
 We use [pytest](https://docs.pytest.org/en/latest/) for contract testing.
 
 To run linters, checkers and tests:
-```
+
+```shell
 % nox
 ```
+
 To run specific test:
-```
+
+```shell
 % nox -s integration_tests -- -k test_create_race_adapter_fails
 ```
+
 To run tests with logging, do:
-```
+
+```shell
 % nox -s integration_tests -- --log-cli-level=DEBUG
 ```
 
-
-# ConfigMatrix for individual sprint
+## ConfigMatrix for individual sprint
 
 | Max no of contestants | no of heats Q | To S pr heat  | no of SA | to F pr heat         | no of SC | to FC pr heat  | no of F (A-C) |
 | :-------------------: | :-----------: | :-----------  | :------: | :--------------      | :------: | :------------  | :-----------: |
