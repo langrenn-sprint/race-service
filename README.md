@@ -1,4 +1,5 @@
 # race-service
+
 The race service let you administrate the main domain objects race and race plan.
 
 Based on the type of event (competition format), list of race classes and a list of contestants, this service will support:
@@ -16,10 +17,11 @@ The race service will support the following competition formats:
 - Team sprint competition, and
 - Relay competitions.
 
-cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_CrossCountry_2022_clean.pdf
+cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_CrossCountry_2022_clean.pdf>
 
 ## Example of usage
-```
+
+```shell
 % curl -H "Content-Type: application/json" \
   -X POST \
   --data '{"username":"admin","password":"passw123"}' \
@@ -34,36 +36,43 @@ cf https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cross
 ```
 
 ## Develop and run locally
+
 ### Requirements
+
 - [pyenv](https://github.com/pyenv/pyenv) (recommended)
 - [poetry](https://python-poetry.org/)
 - [nox](https://nox.thea.codes/en/stable/)
 
-```
+```shell
 % pipx install nox
 % pipx install poetry
 % pipx inject nox nox-poetry
 ```
 
-### Install software:
-```
+### Install software
+
+``````shell
 % git clone https://github.com/langrenn-sprint/race-service.git
 % cd race-service
 % pyenv install 3.9.6
 % pyenv local 3.9.6
 % poetry install
 ```
+
 ### Environment variables
+
 To run the service locally, you need to supply a set of environment variables. A simple way to solve this is to supply a .env file in the root directory.
 
 A minimal .env:
-```
+
+```shell
 JWT_SECRET=secret
 JWT_EXP_DELTA_SECONDS=3600
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=passw123
 DB_USER=admin
 DB_PASSWORD=admin
+LOGGING_LEVEL=DEBUG
 ```
 
 ### Running the API locally
@@ -101,14 +110,16 @@ To run tests with logging, do:
 % nox -s integration_tests -- --log-cli-level=DEBUG
 ```
 
+
 # ConfigMatrix for individual sprint
-| Max no of contestants	|no of heats Q|	To S pr heat |	no of SA | to F pr heat	| no of SC | to FC pr heat | no of F (A-C) |
-| --------------------- | ------------|	---- |	-------- | ---	| ---------| ---- | ---- |
-| 7  | 0 | All to SA | 1 | All to FA    | 0 |  n/a | 1 |
-| 16 | 0 | All to SA | 2 | 4 FA, rest to FB | 0 | n/a  | 2 |
-| 24 | 3 | 5 til SA, rest to FC | 2 | 4 FA, rest to FB | 0 | n/a |	3 |
-| 32 | 4 | 4 til SA, rest to SC |	2 | 4 FA, rest to FB | 2 |	4 FC, rest out | 3 |
-| 40 | 5 | 5 to SA, rest to SC |	3 |	3 FA, 3 FB, rest out |	2	|4 FC, rest out	| 3 |
-| 48 | 6 | 4 to SA, rest to SC	| 3	| 3 FA, 3 FB, rest out |	3	|3 FC, rest out	| 3 |
-| 56 | 7 | 5 to SA, rest to SC	| 4	| 2 FA, 2 FB, rest out |	3	|3 FC, rest out	| 3 |
-| 80 | 8 | 4 to SA, rest to SC	| 4	| 2 FA, 2 FB, rest out |	4	|2 FC, rest out	| 3 |
+
+| Max no of contestants | no of heats Q | To S pr heat  | no of SA | to F pr heat         | no of SC | to FC pr heat  | no of F (A-C) |
+| :-------------------: | :-----------: | :-----------  | :------: | :--------------      | :------: | :------------  | :-----------: |
+|           7           |       0       | ALL SA        |    1     | All to FA            |     0    | n/a            |       1       |
+|          16           |       0       | ALL SA        |    2     | 4 FA, REST FB        |     0    | n/a            |       2       |
+|          24           |       3       | 5 SA, REST FC |    2     | 4 FA, REST FB        |     0    | n/a            |       3       |
+|          32           |       4       | 4 SA, REST SC |    2     | 4 FA, REST FB        |     2    | 4 FC, REST OUT |       3       |
+|          40           |       5       | 5 SA, REST SC |    3     | 3 FA, 3 FB, REST OUT |     2    | 4 FC, REST OUT |       3       |
+|          48           |       6       | 4 SA, REST SC |    3     | 3 FA, 3 FB, REST OUT |     3    | 3 FC, REST OUT |       3       |
+|          56           |       7       | 5 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     3    | 3 FC, REST OUT |       3       |
+|          80           |       8       | 4 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     4    | 2 FC, REST OUT |       3       |
