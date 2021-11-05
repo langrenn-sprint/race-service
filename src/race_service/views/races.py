@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+from typing import List
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -14,11 +15,17 @@ from aiohttp.web import (
 from dotenv import load_dotenv
 
 from race_service.adapters import UsersAdapter
-from race_service.models import IndividualSprintRace, IntervalStartRace, Race
+from race_service.models import (
+    IndividualSprintRace,
+    IntervalStartRace,
+    Race,
+    StartEntry,
+)
 from race_service.services import (
     IllegalValueException,
     RaceNotFoundException,
     RacesService,
+    StartEntriesService,
 )
 from .utils import extract_token_from_request
 
@@ -52,6 +59,7 @@ class RacesView(View):
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
+    # TODO: users should not be able to post race, should post to /generate-raceplan-for-event
     async def post(self) -> Response:  # noqa: C901
         """Create the race and all the races in it."""
         db = self.request.app["db"]
@@ -108,6 +116,13 @@ class RaceView(View):
 
         try:
             race = await RacesService.get_race_by_id(db, race_id)
+            start_entries: List[StartEntry] = []
+            for start_entry_id in race.start_entries:
+                start_entry: StartEntry = (
+                    await StartEntriesService.get_start_entry_by_id(db, start_entry_id)
+                )
+                start_entries.append(start_entry)
+            race.start_entries = start_entries  # type: ignore
         except RaceNotFoundException as e:
             raise HTTPNotFound(reason=e) from e
         logging.debug(f"Got race: {race}")

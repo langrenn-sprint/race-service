@@ -341,7 +341,9 @@ async def test_generate_startlist_for_interval_start_entry(
                 )
             assert response.status == 201
             assert "/startlists/" in response.headers[hdrs.LOCATION]
-        # We check that startlist are actually created:
+
+        # We check that startlist is actually created:
+        startlist_id = response.headers[hdrs.LOCATION].split("/")[-1]
         url = response.headers[hdrs.LOCATION]
         async with session.get(url, headers=headers) as response:
             assert response.status == 200
@@ -391,6 +393,27 @@ async def test_generate_startlist_for_interval_start_entry(
                 ), f'race with order {race["order"]} does not have start_entries'
                 no_of_contestants += len(race["start_entries"])
             assert no_of_contestants == startlist["no_of_contestants"]
+
+        # We inspect one of the start_entries in the list of races:
+        start_entry = races[0]["start_entries"][0]
+        assert type(start_entry) is str
+
+        # We inspect the details of the first race, which should include the whole start_entry object:
+        url = f'{http_service}/races/{races[0]["id"]}'
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            race = await response.json()
+            assert race["no_of_contestants"] == len(race["start_entries"])
+            for start_entry in race["start_entries"]:
+                assert type(start_entry) is dict
+                assert start_entry["id"]
+                assert start_entry["startlist_id"] == startlist_id
+                assert start_entry["race_id"] == race["id"]
+                assert start_entry["bib"]
+                assert start_entry["name"]
+                assert start_entry["club"]
+                assert start_entry["starting_position"]
+                assert start_entry["scheduled_start_time"]
 
 
 # ---
