@@ -56,6 +56,7 @@ class StartlistsView(View):
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
+    # TODO: users should not be able to post startlist, should post to /generate-startlist-for-event
     async def post(self) -> Response:
         """Post route function."""
         db = self.request.app["db"]

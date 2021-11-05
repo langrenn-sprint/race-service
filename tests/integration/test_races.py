@@ -1,8 +1,8 @@
 """Integration test cases for the races route."""
 from copy import deepcopy
-from datetime import datetime
 from json import dumps
 import os
+from typing import Any, List
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -40,7 +40,7 @@ async def new_race_interval_start() -> dict:
         "no_of_contestants": 8,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
+        "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
         "datatype": "interval_start",
     }
 
@@ -56,7 +56,7 @@ async def race_interval_start() -> dict:
         "no_of_contestants": 8,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
+        "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
         "datatype": "interval_start",
     }
 
@@ -71,7 +71,7 @@ async def new_race_individual_sprint() -> dict:
         "no_of_contestants": 8,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
+        "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
         "round": "Q",
         "index": "",
         "heat": 1,
@@ -91,7 +91,7 @@ async def race_individual_sprint() -> dict:
         "no_of_contestants": 8,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
+        "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
         "round": "Q",
         "index": "",
         "heat": 1,
@@ -100,13 +100,124 @@ async def race_individual_sprint() -> dict:
     }
 
 
+START_ENTRIES: List[dict] = [
+    {
+        "id": "11",
+        "race_id": "J15",
+        "bib": 1,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:00:00",
+        "starting_position": 1,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "22",
+        "race_id": "J15",
+        "bib": 2,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:00:30",
+        "starting_position": 2,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "33",
+        "race_id": "G15",
+        "bib": 3,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:01:00",
+        "starting_position": 1,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "44",
+        "race_id": "G15",
+        "bib": 4,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:01:30",
+        "starting_position": 2,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "55",
+        "race_id": "J16",
+        "bib": 5,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:02:00",
+        "starting_position": 1,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "66",
+        "race_id": "J16",
+        "bib": 6,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:02:30",
+        "starting_position": 2,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "77",
+        "race_id": "G16",
+        "bib": 7,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:03:00",
+        "starting_position": 1,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+    {
+        "id": "88",
+        "race_id": "G16",
+        "bib": 8,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": "2021-08-31T12:03:30",
+        "starting_position": 2,
+        "startlist_id": 1,
+        "status": None,
+        "changelog": None,
+    },
+]
+
+
+@pytest.fixture
+async def start_entries_() -> List[dict]:
+    """Create a mock start-entry object."""
+    return START_ENTRIES
+
+
+def get_start_entry_by_id(db: Any, id: str) -> dict:
+    """Mock function to look up correct race from list."""
+    return next(start_entry for start_entry in START_ENTRIES if start_entry["id"] == id)
+
+
 @pytest.fixture
 async def new_race_unsupported_datatype() -> dict:
     """Create a race object."""
     return {
         "raceclass": "G16",
         "order": 1,
-        "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+        "start_time": "2021-08-31T12:00:00",
         "no_of_contestants": 8,
         "datatype": "unsupported",
     }
@@ -193,6 +304,10 @@ async def test_get_race_by_id_interval_start(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
         return_value=race_interval_start,
     )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
 
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
@@ -214,8 +329,10 @@ async def test_get_race_by_id_interval_start(
         assert body["start_time"] == race_interval_start["start_time"]
         assert body["no_of_contestants"] == race_interval_start["no_of_contestants"]
         assert body["event_id"] == race_interval_start["event_id"]
-        assert body["start_entries"] == race_interval_start["start_entries"]
         assert body["datatype"] == race_interval_start["datatype"]
+        for start_entry in body["start_entries"]:
+            assert type(start_entry) is dict
+            assert start_entry == get_start_entry_by_id(db=None, id=start_entry["id"])
 
 
 @pytest.mark.integration
@@ -230,6 +347,10 @@ async def test_get_race_by_id_individual_sprint(
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
         return_value=race_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -249,12 +370,14 @@ async def test_get_race_by_id_individual_sprint(
         assert body["start_time"] == race_individual_sprint["start_time"]
         assert body["no_of_contestants"] == race_individual_sprint["no_of_contestants"]
         assert body["event_id"] == race_individual_sprint["event_id"]
-        assert body["start_entries"] == race_individual_sprint["start_entries"]
         assert body["round"] == race_individual_sprint["round"]
         assert body["index"] == race_individual_sprint["index"]
         assert body["heat"] == race_individual_sprint["heat"]
         assert body["rule"] == race_individual_sprint["rule"]
         assert body["datatype"] == race_individual_sprint["datatype"]
+        for start_entry in body["start_entries"]:
+            assert type(start_entry) is dict
+            assert start_entry == get_start_entry_by_id(db=None, id=start_entry["id"])
 
 
 @pytest.mark.integration

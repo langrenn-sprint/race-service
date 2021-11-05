@@ -56,6 +56,7 @@ class RaceplansView(View):
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
+    # TODO: users should not be able to post raceplan, should post to /generate-raceplan-for-event
     async def post(self) -> Response:  # noqa: C901
         """Create the raceplan and all the races in it."""
         db = self.request.app["db"]
