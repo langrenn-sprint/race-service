@@ -61,8 +61,12 @@ class RaceplansCommands:
                 event, format_configuration, raceclasses
             )
         elif event["competition_format"] == "Interval Start":
-            raceplan, races = await calculate_raceplan_interval_start(
+            raceplan, races = await calculate_raceplan_interval_start(  # type: ignore
                 event, format_configuration, raceclasses
+            )
+        else:
+            raise CompetitionFormatNotSupportedException(
+                f'Competition-format "{event["competition_format"]}" not supported.'
             )
         # Finally we store the races and the raceplan and return the id to the plan:
         raceplan_id = await RaceplansService.create_raceplan(db, raceplan)

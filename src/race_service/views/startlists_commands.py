@@ -44,7 +44,7 @@ class GenerateStartlistForEventView(View):
         # Authorize:
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
-        assert token
+        assert token  # noqa: S101
         try:
             await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
         except Exception as e:

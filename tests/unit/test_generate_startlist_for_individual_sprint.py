@@ -23,9 +23,10 @@ async def test_generate_startlist_for_individual_sprint(
     races_individual_sprint: List[IndividualSprintRace],
     contestants: List[dict],
     expected_startlist_individual_sprint: Startlist,
+    expected_start_entries_individual_sprint: Startlist,
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
-    startlist = await generate_startlist_for_individual_sprint(
+    startlist, start_entries = await generate_startlist_for_individual_sprint(
         event_individual_sprint,
         competition_format_individual_sprint,
         raceclasses,
@@ -44,11 +45,9 @@ async def test_generate_startlist_for_individual_sprint(
     assert startlist.no_of_contestants == sum(
         rc["no_of_contestants"] for rc in raceclasses
     )
-    assert len(startlist.start_entries) == len(
-        expected_startlist_individual_sprint.start_entries
-    )
+    assert len(start_entries) == len(expected_start_entries_individual_sprint)
     no_of_start_entries = 0
-    for start_entry in startlist.start_entries:
+    for start_entry in start_entries:
         assert type(start_entry) is StartEntry
         no_of_start_entries += 1
     assert no_of_start_entries == startlist.no_of_contestants
@@ -332,136 +331,217 @@ async def contestants(
     return [
         {
             "bib": 1,
+            "first_name": "First",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 2,
+            "first_name": "Second",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 3,
+            "first_name": "Third",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 4,
+            "first_name": "Fourth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 5,
+            "first_name": "Fifth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 6,
+            "first_name": "Sixth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 7,
+            "first_name": "Seventh",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 8,
+            "first_name": "Eight",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 9,
+            "first_name": "Ninth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 10,
+            "first_name": "Tenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 11,
+            "first_name": "Eleventh",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 12,
+            "first_name": "Twelfth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 13,
+            "first_name": "Thirteenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 14,
+            "first_name": "Fourteenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 15,
+            "first_name": "Fifteenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 16,
+            "first_name": "Sixteenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 17,
+            "first_name": "Seventeenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 18,
+            "first_name": "Eighteenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 19,
+            "first_name": "Nineteenth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 20,
+            "first_name": "Twentieth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 21,
+            "first_name": "Twenty First",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 22,
+            "first_name": "Twenty Second",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 23,
+            "first_name": "Twenty Third",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 24,
+            "first_name": "Twenty Fourth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 25,
+            "first_name": "Twenty Fifth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 26,
+            "first_name": "Twenty Sixth",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
         {
             "bib": 27,
+            "first_name": "Twenty Seventh",
+            "last_name": "Contender",
+            "club": "Lyn Ski",
             "ageclass": "J 15 år",
             "event_id": event_individual_sprint["id"],
         },
@@ -472,253 +552,343 @@ async def contestants(
 async def expected_startlist_individual_sprint(
     event_individual_sprint: dict, raceplan_individual_sprint: Raceplan
 ) -> Startlist:
-    """Create a mock raceplan object."""
+    """Create a mock startlist object."""
     startlist = Startlist(
         event_id=event_individual_sprint["id"],
         no_of_contestants=raceplan_individual_sprint.no_of_contestants,
         start_entries=list(),
     )
-    startlist.start_entries.append(
+    return startlist
+
+
+@pytest.fixture
+async def expected_start_entries_individual_sprint(
+    event_individual_sprint: dict, raceplan_individual_sprint: Raceplan
+) -> List[StartEntry]:
+    """Create a mock list of start_entries object."""
+    start_entries: List[StartEntry] = []
+    start_entries.append(
         StartEntry(
             id="",
             race_id="1",
+            startlist_id="",
             bib=1,
             starting_position=1,
+            name="First Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
             race_id="1",
+            startlist_id="",
             bib=2,
             starting_position=2,
+            name="Second Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
             race_id="1",
+            startlist_id="",
             bib=3,
             starting_position=3,
+            name="Third Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="1",
             bib=4,
             starting_position=4,
+            name="Fourth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="1",
             bib=5,
             starting_position=5,
+            name="Fifth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="1",
             bib=6,
             starting_position=6,
+            name="Sixth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="1",
             bib=7,
             starting_position=7,
+            name="Seventh Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=8,
             starting_position=1,
+            name="Eigth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=9,
             starting_position=2,
+            name="Nineth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=10,
             starting_position=3,
+            name="Tenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=11,
             starting_position=4,
+            name="Eleventh Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=12,
             starting_position=5,
+            name="Twelvth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=13,
             starting_position=6,
+            name="Thirteenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=14,
             starting_position=7,
+            name="Fourtheenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=15,
             starting_position=1,
+            name="Fifteenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=16,
             starting_position=2,
+            name="Sixteenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=17,
             starting_position=3,
+            name="Seventeenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=18,
             starting_position=4,
+            name="Eighteenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=19,
             starting_position=5,
+            name="Nineteenth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=20,
             starting_position=6,
+            name="Twentieth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=21,
             starting_position=7,
+            name="Twenty First Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=22,
             starting_position=1,
+            name="Twenty Second Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=23,
             starting_position=2,
+            name="Twenty Third Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=24,
             starting_position=3,
+            name="Twenty Fourth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=25,
             starting_position=4,
+            name="Twenty Fifth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=26,
             starting_position=5,
+            name="Twenty Sixth Contender",
+            club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=27,
+            name="Twenty Seventh Contender",
+            club="Lyn Ski",
             starting_position=6,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
         )
     )
-    return startlist
+    return start_entries

@@ -392,20 +392,6 @@ async def test_generate_startlist_for_individual_sprint_event(
                 no_of_contestants += len(race["start_entries"])
             assert no_of_contestants == startlist["no_of_contestants"]
 
-            # We inspect of the start_entries:
-            start_entry = races[0]["start_entries"][0]
-            assert type(start_entry) is str
-
-        # We inspect the details of the race:
-        url = f'{http_service}/races/{races[0]["id"]}'
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            race = await response.json()
-            assert race["no_of_contestants"] == len(race["start_entries"])
-            # TODO: We inspect of the first of the start_entries:
-            # TODO: Need to split StartEntry out to support this usecase
-            # in a simple way.
-
 
 # ---
 async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: C901

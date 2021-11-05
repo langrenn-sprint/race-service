@@ -1,7 +1,9 @@
 """Integration test cases for the startlists route."""
+from copy import deepcopy
 from datetime import datetime
 import os
 from typing import Any, List
+import uuid
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -309,19 +311,31 @@ async def test_generate_startlist_for_event(
     contestants: List[dict],
     request_body: dict,
 ) -> None:
-    """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    """Should return 201 Created and location header."""
+    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        side_effect=str(uuid.uuid4()),
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value={"id": STARTLIST_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -370,4 +384,101 @@ async def test_generate_startlist_for_event(
             json=request_body,
         )
         assert resp.status == 201
-        assert f"/startlists/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+        assert f"/startlists/{STARTLIST_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event_individual_sprint: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    raceplan_individual_sprint: dict,
+    contestants: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_races_with_wrong_no_of_contestants = deepcopy(raceplan_individual_sprint)
+    raceplan_races_with_wrong_no_of_contestants["races"][0][
+        "no_of_contestants"
+    ] = 100000
+
+    mocker.patch(
+        "race_service.services.startlists_service.create_id",
+        return_value=STARTLIST_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=STARTLIST_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        side_effect=str(uuid.uuid4()),
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value={"id": STARTLIST_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=[raceplan_races_with_wrong_no_of_contestants],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_races_with_wrong_no_of_contestants["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        return_value=contestants,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=get_race_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/startlists/generate-startlist-for-event",
+            headers=headers,
+            json=request_body,
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert (
+            "len(contestants) does not match sum of contestants in races quarterfinals"
+            in body["detail"]
+        )

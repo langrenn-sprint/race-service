@@ -13,6 +13,15 @@ def create_id() -> str:  # pragma: no cover
     return str(uuid.uuid4())
 
 
+class CouldNotCreateStartlistException(Exception):
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class StartlistNotFoundException(Exception):
     """Class representing custom exception for fetch method."""
 
@@ -57,9 +66,7 @@ class StartlistsService:
         return startlists
 
     @classmethod
-    async def create_startlist(
-        cls: Any, db: Any, startlist: Startlist
-    ) -> Optional[str]:
+    async def create_startlist(cls: Any, db: Any, startlist: Startlist) -> str:
         """Create startlist function.
 
         Args:
@@ -67,11 +74,12 @@ class StartlistsService:
             startlist (Startlist): a startlist instanse to be created
 
         Returns:
-            Optional[str]: The id of the created startlist. None otherwise.
+            str: The id of the created startlist
 
         Raises:
             IllegalValueException: input object has illegal values
             StartlistAllreadyExistException: event can have zero or one plan
+            CouldNotCreateStartlistException: creation failed
         """
         logging.debug(f"trying to insert startlist: {startlist}")
         # Event can have one, and only, one startlist:
@@ -89,8 +97,6 @@ class StartlistsService:
         # create ids:
         id = create_id()
         startlist.id = id
-        for start_entry in startlist.start_entries:
-            start_entry.id = create_id()
         # insert new startlist
         new_startlist = startlist.to_dict()
         logging.debug(f"new_startlist: {new_startlist}")
@@ -98,7 +104,9 @@ class StartlistsService:
         logging.debug(f"inserted startlist with id: {id}")
         if result:
             return id
-        return None
+        raise CouldNotCreateStartlistException(
+            "Creation of startlist failed."
+        ) from None
 
     @classmethod
     async def get_startlist_by_id(cls: Any, db: Any, id: str) -> Startlist:
