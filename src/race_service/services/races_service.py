@@ -1,6 +1,6 @@
 """Module for races service."""
 import logging
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 import uuid
 
 from race_service.adapters import RacesAdapter
@@ -55,9 +55,9 @@ class RacesService:
     @classmethod
     async def get_races_by_raceplan_id(
         cls: Any, db: Any, raceplan_id: str
-    ) -> List[Race]:
+    ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
         """Get all races by event_id function."""
-        races: List[Race] = []
+        races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
         _races = await RacesAdapter.get_races_by_raceplan_id(db, raceplan_id)
 
         if _races:
@@ -100,7 +100,9 @@ class RacesService:
         return None
 
     @classmethod
-    async def get_race_by_id(cls: Any, db: Any, id: str) -> Race:
+    async def get_race_by_id(
+        cls: Any, db: Any, id: str
+    ) -> Union[IndividualSprintRace, IntervalStartRace]:
         """Get race by id function."""
         race = await RacesAdapter.get_race_by_id(db, id)
         # return the document if found:

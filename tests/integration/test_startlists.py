@@ -40,6 +40,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J15",
                 "bib": 1,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "starting_position": 1,
                 "id": None,
@@ -47,6 +49,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J15",
                 "bib": 2,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
                 "starting_position": 2,
                 "id": None,
@@ -54,6 +58,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G15",
                 "bib": 3,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
                 "starting_position": 1,
                 "id": None,
@@ -61,6 +67,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G15",
                 "bib": 4,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
                 "starting_position": 2,
                 "id": None,
@@ -68,6 +76,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J16",
                 "bib": 5,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
                 "starting_position": 1,
                 "id": None,
@@ -75,6 +85,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J16",
                 "bib": 6,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
                 "starting_position": 2,
                 "id": None,
@@ -82,6 +94,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G16",
                 "bib": 7,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
                 "starting_position": 1,
                 "id": None,
@@ -89,6 +103,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G16",
                 "bib": 8,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
                 "starting_position": 2,
                 "id": None,
@@ -108,58 +124,82 @@ async def startlist() -> dict:
             {
                 "race_id": "J15",
                 "bib": 1,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "starting_position": 1,
                 "id": "11",
+                "startlist_id": 1,
             },
             {
                 "race_id": "J15",
                 "bib": 2,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
                 "starting_position": 2,
                 "id": "22",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G15",
                 "bib": 3,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
                 "starting_position": 1,
                 "id": "33",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G15",
                 "bib": 4,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
                 "starting_position": 2,
                 "id": "44",
+                "startlist_id": 1,
             },
             {
                 "race_id": "J16",
                 "bib": 5,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
                 "starting_position": 1,
                 "id": "55",
+                "startlist_id": 1,
             },
             {
                 "race_id": "J16",
                 "bib": 6,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
                 "starting_position": 2,
                 "id": "66",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G16",
                 "bib": 7,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
                 "starting_position": 1,
                 "id": "77",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G16",
                 "bib": 8,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
                 "starting_position": 2,
                 "id": "88",
+                "startlist_id": 1,
             },
         ],
     }
@@ -215,6 +255,10 @@ async def test_get_startlist_by_id(
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=startlist["start_entries"],
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}

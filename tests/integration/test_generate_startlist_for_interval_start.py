@@ -2,6 +2,7 @@
 from datetime import datetime
 import os
 from typing import Any, List
+import uuid
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -65,7 +66,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "G15",
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 15,
+            "no_of_contestants": 2,
             "group": 2,
             "order": 1,
         },
@@ -74,7 +75,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "G16",
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 16,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 1,
         },
@@ -83,7 +84,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "J15",
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 17,
+            "no_of_contestants": 2,
             "group": 2,
             "order": 2,
         },
@@ -92,7 +93,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "J16",
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 18,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 2,
         },
@@ -294,18 +295,30 @@ async def test_generate_startlist_for_event(
     request_body: dict,
 ) -> None:
     """Should return 201 Created, location header."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        side_effect=str(uuid.uuid4()),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value={"id": STARTLIST_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -354,4 +367,4 @@ async def test_generate_startlist_for_event(
             json=request_body,
         )
         assert resp.status == 201
-        assert f"/startlists/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+        assert f"/startlists/{STARTLIST_ID}" in resp.headers[hdrs.LOCATION]

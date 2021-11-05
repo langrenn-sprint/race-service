@@ -9,7 +9,13 @@ from .races_service import (
     RaceNotFoundException,
     RacesService,
 )
+from .start_entries_service import (
+    CouldNotCreateStartEntryException,
+    StartEntriesService,
+    StartEntryNotFoundException,
+)
 from .startlists_service import (
+    CouldNotCreateStartlistException,
     StartlistAllreadyExistException,
     StartlistNotFoundException,
     StartlistsService,

@@ -1175,7 +1175,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
 
 
 @pytest.mark.integration
-async def test_generate_raceplan_for_event_format_configuration_not_supported(
+async def test_generate_raceplan_for_event_competition_format_not_found(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -1207,6 +1207,57 @@ async def test_generate_raceplan_for_event_format_configuration_not_supported(
         side_effect=FormatConfigurationNotFoundException(
             "FormatConfiguration not found."
         ),
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
+        )
+        assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_generate_raceplan_for_event_competition_format_not_supported(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event_not_supported_competition_format: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad Request."""
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    mocker.patch(
+        "race_service.services.raceplans_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event_not_supported_competition_format,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
