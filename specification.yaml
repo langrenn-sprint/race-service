@@ -15,6 +15,8 @@
       description: Time-event operations
     - name: startlist
       description: Startlist operations
+    - name: start-entry
+      description: StartEntry operations
   paths:
     /raceplans:
       post:
@@ -162,6 +164,12 @@
         tags:
         - race
         description: Update a race
+        requestBody:
+          description: The updated race
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Race'
         responses:
           204:
             description: No content
@@ -169,6 +177,77 @@
         tags:
         - race
         description: Delete a race
+        responses:
+          204:
+            description: No content
+    /races/{raceId}/start-entries:
+      parameters:
+      - name: raceId
+        in: path
+        description: race id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      post:
+        tags:
+        - start-entry
+        security:
+        - bearerAuth: []
+        description: Add a new start-entry
+        requestBody:
+          description: The new race to be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartEntry'
+        responses:
+          201:
+            description: Created
+    /races/{raceId}/start-entries/{startEntryId}:
+      parameters:
+      - name: raceId
+        in: path
+        description: race id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: startEntryId
+        in: path
+        description: start-entry id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      get:
+        tags:
+        - start-entry
+        description: Get a unique start-entry of the race
+        responses:
+          200:
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/StartEntry'
+      put:
+        tags:
+        - start-entry
+        description: Update a start-entry
+        requestBody:
+          description: The updated start-entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StartEntry'
+        responses:
+          204:
+            description: No content
+      delete:
+        tags:
+        - start-entry
+        description: Delete a start-entry
         responses:
           204:
             description: No content
@@ -382,6 +461,11 @@
             type: string
             format: uuid
             description: reference to the raceplan the race is part of
+          startEntries:
+            type: array
+            description: the start-entries in this race
+            items:
+              $ref: '#/components/schemas/StartEntry'
       StartlistCollection:
         type: object
         properties:
@@ -402,6 +486,7 @@
             description: the total number of contestants in startlist
           startEntries:
             type: array
+            description: all the start-entries of the event
             items:
               $ref: '#/components/schemas/StartEntry'
       StartEntry:
@@ -418,6 +503,12 @@
           bib:
             type: integer
             description: the bib uniquely identifying the contestant
+          name:
+            type: string
+            description: the name of the contestant
+          club:
+            type: string
+            description: the club the contestant belongs to
           startingPosition:
             type: integer
             description: the starting position in e.g. heat starts

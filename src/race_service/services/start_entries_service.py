@@ -49,7 +49,7 @@ class StartEntriesService:
     async def get_start_entries_by_startlist_id(
         cls: Any, db: Any, startlist_id: str
     ) -> List[StartEntry]:
-        """Get all start_entries by event_id function."""
+        """Get all start_entries by startlist_id function."""
         start_entries: List[StartEntry] = []
         _start_entries = await StartEntriesAdapter.get_start_entries_by_startlist_id(
             db, startlist_id
