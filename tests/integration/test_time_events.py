@@ -183,11 +183,7 @@ async def test_get_time_events_by_event_id_and_point(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_point",
         return_value=time_events,
     )
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -214,11 +210,7 @@ async def test_get_time_events_by_race_id(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=time_events,
     )
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
