@@ -1,6 +1,6 @@
 """Module for startlist commands."""
 from datetime import date, time, timedelta
-from typing import Any, List, Union
+from typing import Any, List, Tuple, Union
 
 from race_service.adapters import (
     ContestantsNotFoundException,
@@ -20,6 +20,7 @@ from race_service.models import (
 from race_service.services import (
     RaceplansService,
     RacesService,
+    StartEntriesService,
     StartlistAllreadyExistException,
     StartlistsService,
 )
@@ -72,30 +73,61 @@ class StartlistsCommands:
         # And finally we get the list of contestants:
         contestants = await get_contestants(token, event_id)
 
+        # Sanity check:
+        no_of_contestants_in_raceclasses = sum(
+            raceclass["no_of_contestants"] for raceclass in raceclasses
+        )
+        if len(contestants) != no_of_contestants_in_raceclasses:
+            raise InconsistentInputDataException(
+                "len(contestants) does not match number of contestants in raceclasses:"
+                f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
+            )
+        #
+        if len(contestants) != raceplan.no_of_contestants:
+            raise InconsistentInputDataException(
+                "len(contestants) does not match number of contestants in raceplan:"
+                f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
+            )
+
         # We are ready to generate the raceplan:
-        startlist = None
         if event["competition_format"] == "Individual Sprint":
-            startlist = await generate_startlist_for_individual_sprint(
+            startlist, start_entries = await generate_startlist_for_individual_sprint(
                 event,
                 format_configuration,
                 raceclasses,
                 raceplan,
-                races,
+                races,  # type: ignore
                 contestants,
             )
         elif event["competition_format"] == "Interval Start":
-            startlist = await generate_startlist_for_interval_start(
+            startlist, start_entries = await generate_startlist_for_interval_start(
                 event,
                 format_configuration,
                 raceclasses,
                 raceplan,
-                races,
+                races,  # type: ignore
                 contestants,
             )
-        # Finally we store the new raceplan and return the id:
-        assert startlist
+        else:
+            raise CompetitionFormatNotSupportedException(
+                f'Competition-format "{event["competition_format"]}" not supported.'
+            )
+        # Finally we store the new startlist and return the id:
         startlist_id = await StartlistsService.create_startlist(db, startlist)
-        assert startlist_id
+        # We create each start_entry:
+        for start_entry in start_entries:
+            start_entry.startlist_id = startlist_id
+            start_entry_id = await StartEntriesService.create_start_entry(
+                db, start_entry
+            )
+            startlist.start_entries.append(start_entry_id)
+
+            # We add the start-entry to the respective race:
+            race = await RacesService.get_race_by_id(db, start_entry.race_id)
+            race.start_entries.append(start_entry_id)
+            await RacesService.update_race(db, race.id, race)
+        await StartlistsService.update_startlist(db, startlist_id, startlist)
+
         return startlist_id
 
 
@@ -106,31 +138,15 @@ async def generate_startlist_for_individual_sprint(
     raceplan: Raceplan,
     races: List[IndividualSprintRace],
     contestants: List[dict],
-) -> Startlist:  # pragma: no cover
+) -> Tuple[Startlist, List[StartEntry]]:
     """Generate a startlist for an individual sprint event."""
     no_of_contestants = len(contestants)
     start_entries: List[StartEntry] = []
     startlist = Startlist(
         event_id=event["id"],
         no_of_contestants=no_of_contestants,
-        start_entries=start_entries,
+        start_entries=[],
     )
-
-    # Sanity check:
-    no_of_contestants_in_raceclasses = sum(
-        raceclass["no_of_contestants"] for raceclass in raceclasses
-    )
-    if len(contestants) != no_of_contestants_in_raceclasses:
-        raise InconsistentInputDataException(
-            "len(contestants) does not match number of contestants in raceclasses:"
-            f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
-        )
-    #
-    if len(contestants) != raceplan.no_of_contestants:
-        raise InconsistentInputDataException(
-            "len(contestants) does not match number of contestants in raceplan:"
-            f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
-        )
     #
     no_of_contestants_in_races = sum(
         race.no_of_contestants for race in races if race.round == "Q"
@@ -140,6 +156,7 @@ async def generate_startlist_for_individual_sprint(
             "len(contestants) does not match sum of contestants in races quarterfinals:"
             f"{len(contestants)} != {no_of_contestants_in_races}."
         )
+
     #
     # For every race in round=Q in raceplan grouped by raceclass,
     # get the corresponding ageclasses from raceclass,
@@ -178,12 +195,15 @@ async def generate_startlist_for_individual_sprint(
             # Create the start-entry:
             start_entry = StartEntry(
                 id="",
+                startlist_id="",
                 race_id=quarter_finals[qf_index].id,
                 bib=contestant["bib"],
+                name=f'{contestant["first_name"]} {contestant["last_name"]}',
+                club=contestant["club"],
                 starting_position=starting_position,
                 scheduled_start_time=quarter_finals[qf_index].start_time,
             )
-            startlist.start_entries.append(start_entry)
+            start_entries.append(start_entry)
 
             no_of_contestants_in_qf += 1
             # Check if qf is full:
@@ -194,7 +214,7 @@ async def generate_startlist_for_individual_sprint(
                 starting_position = 1
                 no_of_contestants_in_qf = 0
 
-    return startlist
+    return startlist, start_entries
 
 
 async def generate_startlist_for_interval_start(
@@ -204,14 +224,22 @@ async def generate_startlist_for_interval_start(
     raceplan: Raceplan,
     races: List[IntervalStartRace],
     contestants: List[dict],
-) -> Startlist:
+) -> Tuple[Startlist, List[StartEntry]]:
     """Generate a startlist for an interval start event."""
     no_of_contestants = len(contestants)
+
+    no_of_contestants_in_races = sum(race.no_of_contestants for race in races)
+    if len(contestants) != no_of_contestants_in_races:
+        raise InconsistentInputDataException(
+            "len(contestants) does not match sum of contestants in races:"
+            f"{len(contestants)} != {no_of_contestants_in_races}."
+        )
+
     start_entries: List[StartEntry] = []
     startlist = Startlist(
         event_id=event["id"],
         no_of_contestants=no_of_contestants,
-        start_entries=start_entries,
+        start_entries=[],
     )
     interval = timedelta(
         hours=time.fromisoformat(format_configuration["intervals"]).hour,
@@ -250,15 +278,18 @@ async def generate_startlist_for_interval_start(
 
                 start_entry = StartEntry(
                     id="",
+                    startlist_id="",
                     race_id=race.id,
                     bib=bib,
+                    name=f'{contestant["first_name"]} {contestant["last_name"]}',
+                    club=contestant["club"],
                     starting_position=starting_position,
                     scheduled_start_time=scheduled_start_time,
                 )
                 scheduled_start_time = scheduled_start_time + interval
-                startlist.start_entries.append(start_entry)
+                start_entries.append(start_entry)
 
-    return startlist
+    return startlist, start_entries
 
 
 # helpers

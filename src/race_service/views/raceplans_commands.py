@@ -9,7 +9,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import (
     EventNotFoundException,
@@ -40,7 +39,7 @@ class GenerateRaceplanForEventView(View):
         # Authorize:
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
-        assert token
+        assert token  # noqa: S101
         try:
             await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
         except Exception as e:
@@ -64,5 +63,5 @@ class GenerateRaceplanForEventView(View):
             RaceplanAllreadyExistException,
         ) as e:
             raise HTTPBadRequest(reason=e) from e
-        headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})
+        headers = {hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"}
         return Response(status=201, headers=headers)

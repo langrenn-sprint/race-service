@@ -2,12 +2,12 @@
 from datetime import datetime
 import os
 from typing import Any, List
+import uuid
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
 import jwt
-from multidict import MultiDict
 import pytest
 from pytest_mock import MockFixture
 
@@ -27,19 +27,22 @@ async def request_body() -> dict:
     return {"event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95"}
 
 
+EVENT = {
+    "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+    "name": "Oslo Skagen sprint",
+    "competition_format": "Interval Start",
+    "date_of_event": "2021-08-31",
+    "time_of_event": "09:00:00",
+    "organiser": "Lyn Ski",
+    "webpage": "https://example.com",
+    "information": "Testarr for å teste den nye løysinga.",
+}
+
+
 @pytest.fixture
 async def event_interval_start() -> dict[str, Any]:
     """An event object for testing."""
-    return {
-        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "name": "Oslo Skagen sprint",
-        "competition_format": "Interval Start",
-        "date_of_event": "2021-08-31",
-        "time_of_event": "09:00:00",
-        "organiser": "Lyn Ski",
-        "webpage": "https://example.com",
-        "information": "Testarr for å teste den nye løysinga.",
-    }
+    return EVENT
 
 
 @pytest.fixture
@@ -63,7 +66,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "G15",
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 15,
+            "no_of_contestants": 2,
             "group": 2,
             "order": 1,
         },
@@ -72,7 +75,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "G16",
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 16,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 1,
         },
@@ -81,7 +84,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "J15",
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 17,
+            "no_of_contestants": 2,
             "group": 2,
             "order": 2,
         },
@@ -90,67 +93,72 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "J16",
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 18,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 2,
         },
     ]
 
 
+RACES: List[dict] = [
+    {
+        "id": "1",
+        "raceclass": "J15",
+        "order": 1,
+        "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "interval_start",
+    },
+    {
+        "id": "2",
+        "raceclass": "G15",
+        "order": 2,
+        "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "interval_start",
+    },
+    {
+        "id": "3",
+        "raceclass": "J16",
+        "order": 3,
+        "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "interval_start",
+    },
+    {
+        "id": "4",
+        "raceclass": "G16",
+        "order": 4,
+        "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "interval_start",
+    },
+]
+
+RACEPLAN = {
+    "event_id": EVENT["id"],
+    "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+    "no_of_contestants": 8,
+    "races": RACES,
+}
+
+
 @pytest.fixture
 async def raceplan_interval_start(event_interval_start: dict) -> dict:
     """Create a mock raceplan object."""
-    return {
-        "event_id": event_interval_start["id"],
-        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "no_of_contestants": 8,
-        "races": [
-            {
-                "id": "1",
-                "raceclass": "J15",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
-                "no_of_contestants": 2,
-                "event_id": event_interval_start["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "interval_start",
-            },
-            {
-                "id": "2",
-                "raceclass": "G15",
-                "order": 2,
-                "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
-                "no_of_contestants": 2,
-                "event_id": event_interval_start["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "interval_start",
-            },
-            {
-                "id": "3",
-                "raceclass": "J16",
-                "order": 3,
-                "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
-                "no_of_contestants": 2,
-                "event_id": event_interval_start["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "interval_start",
-            },
-            {
-                "id": "4",
-                "raceclass": "G16",
-                "order": 4,
-                "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
-                "no_of_contestants": 2,
-                "event_id": event_interval_start["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "interval_start",
-            },
-        ],
-    }
+    return RACEPLAN
 
 
 @pytest.fixture
@@ -170,7 +178,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 2,
@@ -183,7 +191,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 3,
@@ -196,7 +204,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 4,
@@ -209,7 +217,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 5,
@@ -222,7 +230,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 6,
@@ -235,7 +243,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 7,
@@ -248,7 +256,7 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
         {
             "bib": 8,
@@ -261,9 +269,14 @@ async def contestants(
             "club": "Lyn Ski",
             "team": "Team Kollen",
             "email": "post@example.com",
-            "event_id": event_interval_start["id"],
+            "event_id": EVENT["id"],
         },
     ]
+
+
+def get_race_by_id(db: Any, id: str) -> dict:
+    """Mock function to look up correct race from list."""
+    return next(race for race in RACES if race["id"] == id)
 
 
 @pytest.mark.integration
@@ -279,18 +292,30 @@ async def test_generate_startlist_for_event(
     request_body: dict,
 ) -> None:
     """Should return 201 Created, location header."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        side_effect=str(uuid.uuid4()),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value={"id": STARTLIST_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -318,19 +343,18 @@ async def test_generate_startlist_for_event(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_interval_start["races"],
+        side_effect=get_race_by_id,
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.update_race",
         return_value=True,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -340,4 +364,4 @@ async def test_generate_startlist_for_event(
             json=request_body,
         )
         assert resp.status == 201
-        assert f"/startlists/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+        assert f"/startlists/{STARTLIST_ID}" in resp.headers[hdrs.LOCATION]

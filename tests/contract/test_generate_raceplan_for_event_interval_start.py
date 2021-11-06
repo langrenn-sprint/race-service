@@ -48,6 +48,7 @@ async def token(http_service: Any) -> str:
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
+    await delete_start_entries(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
     await delete_raceclasses(token)
@@ -58,6 +59,7 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
+    await delete_start_entries(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
     await delete_raceclasses(token)
@@ -168,6 +170,46 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
     logging.info("Clear_db: Deleted all raceplans.")
 
 
+async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
+    """Delete all start_entries before we start."""
+    url = f"{http_service}/races"
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            races = await response.json()
+            for race in races:
+                race_id = race["id"]
+                for start_entry_id in race["start_entries"]:
+                    async with session.delete(
+                        f"{url}/{race_id}/start-entries/{start_entry_id}",
+                        headers=headers,
+                    ) as response:
+                        pass
+    logging.info("Clear_db: Deleted all start_entries.")
+
+
+async def delete_races(http_service: Any, token: MockFixture) -> None:
+    """Delete all races before we start."""
+    url = f"{http_service}/races"
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            races = await response.json()
+            for race in races:
+                race_id = race["id"]
+                async with session.delete(
+                    f"{url}/{race_id}", headers=headers
+                ) as response:
+                    pass
+    logging.info("Clear_db: Deleted all races.")
+
+
 @pytest.fixture
 async def expected_raceplan() -> dict:
     """Create a mock raceplan object."""
@@ -254,7 +296,6 @@ async def test_generate_raceplan_for_interval_start_entry(
         async with session.get(url, headers=headers) as response:
             assert response.status == 200
             raceclasses = await response.json()
-            # TODO: do some kind of sorting so that we can compare results
             for raceclass in raceclasses:
                 id = raceclass["id"]
                 raceclass["group"], raceclass["order"] = await _decide_group_and_order(
@@ -315,6 +356,14 @@ async def test_generate_raceplan_for_interval_start_entry(
                     == expected_raceplan["races"][i]["no_of_contestants"]
                 ), f'"no_of_contestants" in index {i}:{race}\n ne:\n{expected_race}'
                 i += 1
+
+        # We also need to check that all the races has raceplan-reference:
+        url = f'{http_service}/races?eventId={request_body["event_id"]}'
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            races = await response.json()
+            for race in races:
+                assert race["raceplan_id"] == raceplan["id"]
 
 
 # ---

@@ -8,7 +8,6 @@ from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
 import jwt
-from multidict import MultiDict
 import pytest
 from pytest_mock import MockFixture
 
@@ -41,6 +40,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J15",
                 "bib": 1,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "starting_position": 1,
                 "id": None,
@@ -48,6 +49,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J15",
                 "bib": 2,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
                 "starting_position": 2,
                 "id": None,
@@ -55,6 +58,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G15",
                 "bib": 3,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
                 "starting_position": 1,
                 "id": None,
@@ -62,6 +67,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G15",
                 "bib": 4,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
                 "starting_position": 2,
                 "id": None,
@@ -69,6 +76,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J16",
                 "bib": 5,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
                 "starting_position": 1,
                 "id": None,
@@ -76,6 +85,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "J16",
                 "bib": 6,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
                 "starting_position": 2,
                 "id": None,
@@ -83,6 +94,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G16",
                 "bib": 7,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
                 "starting_position": 1,
                 "id": None,
@@ -90,6 +103,8 @@ async def new_startlist() -> dict:
             {
                 "race_id": "G16",
                 "bib": 8,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
                 "starting_position": 2,
                 "id": None,
@@ -109,58 +124,82 @@ async def startlist() -> dict:
             {
                 "race_id": "J15",
                 "bib": 1,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "starting_position": 1,
                 "id": "11",
+                "startlist_id": 1,
             },
             {
                 "race_id": "J15",
                 "bib": 2,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
                 "starting_position": 2,
                 "id": "22",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G15",
                 "bib": 3,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
                 "starting_position": 1,
                 "id": "33",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G15",
                 "bib": 4,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
                 "starting_position": 2,
                 "id": "44",
+                "startlist_id": 1,
             },
             {
                 "race_id": "J16",
                 "bib": 5,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
                 "starting_position": 1,
                 "id": "55",
+                "startlist_id": 1,
             },
             {
                 "race_id": "J16",
                 "bib": 6,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
                 "starting_position": 2,
                 "id": "66",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G16",
                 "bib": 7,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
                 "starting_position": 1,
                 "id": "77",
+                "startlist_id": 1,
             },
             {
                 "race_id": "G16",
                 "bib": 8,
+                "name": "name names",
+                "club": "the club",
                 "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
                 "starting_position": 2,
                 "id": "88",
+                "startlist_id": 1,
             },
         ],
     }
@@ -191,12 +230,10 @@ async def test_create_startlist(
 
     request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -219,12 +256,12 @@ async def test_get_startlist_by_id(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
     )
-
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=startlist["start_entries"],
     )
+
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -260,11 +297,7 @@ async def test_get_startlist_by_event_id(
         return_value=[startlist],
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -304,12 +337,11 @@ async def test_update_startlist_by_id(
         return_value=STARTLIST_ID,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -336,11 +368,7 @@ async def test_get_all_startlists(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -372,11 +400,7 @@ async def test_delete_startlist_by_id(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -413,12 +437,10 @@ async def test_create_startlist_when_event_already_has_one(
 
     request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -447,12 +469,10 @@ async def test_create_startlist_with_input_id(
 
     request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -480,12 +500,10 @@ async def test_create_startlist_adapter_fails(
 
     request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -512,12 +530,11 @@ async def test_create_startlist_mandatory_property(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = {"id": STARTLIST_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -546,12 +563,11 @@ async def test_update_startlist_by_id_missing_mandatory_property(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = {"id": STARTLIST_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -582,12 +598,11 @@ async def test_update_startlist_by_id_different_id_in_body(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     update_body = deepcopy(startlist)
     update_body["id"] = "different_id"
     request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
@@ -624,7 +639,7 @@ async def test_create_startlist_no_authorization(
     )
 
     request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
-    headers = MultiDict({hdrs.CONTENT_TYPE: "application/json"})
+    headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=401)
@@ -674,11 +689,7 @@ async def test_update_startlist_by_id_no_authorization(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-        },
-    )
+    headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
 
@@ -757,12 +768,10 @@ async def test_create_startlist_insufficient_role(
     )
 
     request_body = dumps(new_startlist, indent=4, sort_keys=True, default=str)
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token_unsufficient_role}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token_unsufficient_role}",
+    }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=403)
@@ -788,11 +797,7 @@ async def test_get_startlist_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
@@ -820,12 +825,11 @@ async def test_update_startlist_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -855,11 +859,8 @@ async def test_delete_startlist_not_found(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.delete(f"/startlists/{STARTLIST_ID}", headers=headers)

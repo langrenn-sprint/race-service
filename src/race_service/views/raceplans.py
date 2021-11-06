@@ -13,7 +13,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
@@ -57,6 +56,7 @@ class RaceplansView(View):
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
+    # TODO: users should not be able to post raceplan, should post to /generate-raceplan-for-event
     async def post(self) -> Response:  # noqa: C901
         """Create the raceplan and all the races in it."""
         db = self.request.app["db"]
@@ -78,9 +78,8 @@ class RaceplansView(View):
                     race["event_id"] = raceplan.event_id
                 if "raceplan_id" not in race:
                     race["raceplan_id"] = ""
-                if "startlist_id" not in race:
-                    race["startlist_id"] = ""
-
+                if "start_entries" not in race:
+                    race["start_entries"] = []
                 if race["datatype"] == "individual_sprint":
                     races.append(IndividualSprintRace.from_dict(race))
                 elif race["datatype"] == "interval_start":
@@ -110,7 +109,7 @@ class RaceplansView(View):
             raise HTTPBadRequest(reason=e) from e
         if raceplan_id:
             logging.debug(f"inserted document with raceplan_id {raceplan_id}")
-            headers = MultiDict({hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"})
+            headers = {hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"}
 
             return Response(status=201, headers=headers)
         raise HTTPBadRequest() from None

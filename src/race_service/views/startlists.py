@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+from typing import List
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -12,12 +13,13 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
-from race_service.models import Startlist
+from race_service.models import StartEntry, Startlist
 from race_service.services import (
+    CouldNotCreateStartlistException,
     IllegalValueException,
+    StartEntriesService,
     StartlistAllreadyExistException,
     StartlistNotFoundException,
     StartlistsService,
@@ -54,6 +56,7 @@ class StartlistsView(View):
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
+    # TODO: users should not be able to post startlist, should post to /generate-startlist-for-event
     async def post(self) -> Response:
         """Post route function."""
         db = self.request.app["db"]
@@ -75,16 +78,13 @@ class StartlistsView(View):
             startlist_id = await StartlistsService.create_startlist(db, startlist)
         except IllegalValueException as e:
             raise HTTPUnprocessableEntity(reason=e) from e
-        except StartlistAllreadyExistException as e:
+        except (StartlistAllreadyExistException, CouldNotCreateStartlistException) as e:
             raise HTTPBadRequest(reason=e) from e
-        if startlist_id:
-            logging.debug(f"inserted document with startlist_id {startlist_id}")
-            headers = MultiDict(
-                {hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"}
-            )
 
-            return Response(status=201, headers=headers)
-        raise HTTPBadRequest() from None
+        logging.debug(f"inserted document with startlist_id {startlist_id}")
+        headers = {hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"}
+
+        return Response(status=201, headers=headers)
 
 
 class StartlistView(View):
@@ -103,7 +103,16 @@ class StartlistView(View):
         logging.debug(f"Got get request for startlist {startlist_id}")
 
         try:
-            startlist = await StartlistsService.get_startlist_by_id(db, startlist_id)
+            startlist: Startlist = await StartlistsService.get_startlist_by_id(
+                db, startlist_id
+            )
+            start_entries: List[StartEntry] = []
+            for start_entry_id in startlist.start_entries:
+                start_entry = await StartEntriesService.get_start_entry_by_id(
+                    db, start_entry_id
+                )
+                start_entries.append(start_entry)
+            startlist.start_entries = start_entries  # type: ignore
         except StartlistNotFoundException as e:
             raise HTTPNotFound(reason=e) from e
         logging.debug(f"Got startlist: {startlist}")

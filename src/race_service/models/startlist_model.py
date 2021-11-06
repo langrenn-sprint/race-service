@@ -13,6 +13,7 @@ from .changelog import Changelog
 class StartEntry(DataClassJsonMixin):
     """Data class with details about a starlist."""
 
+    startlist_id: str
     race_id: str
     bib: int
     starting_position: int
@@ -23,6 +24,8 @@ class StartEntry(DataClassJsonMixin):
             mm_field=DateTime(format="iso"),
         )
     )
+    name: str
+    club: str
     status: Optional[str] = field(default=None)
     changelog: Optional[List[Changelog]] = field(default=None)
     id: Optional[str] = field(default=None)
@@ -34,5 +37,5 @@ class Startlist(DataClassJsonMixin):
 
     event_id: str
     no_of_contestants: int
-    start_entries: List[StartEntry]
+    start_entries: List[str]
     id: Optional[str] = field(default=None)

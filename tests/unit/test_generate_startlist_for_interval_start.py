@@ -13,6 +13,65 @@ from race_service.models import IntervalStartRace, Raceplan, StartEntry, Startli
 # --- Interval Start ---
 
 
+@pytest.mark.unit
+@pytest.mark.asyncio
+async def test_generate_startlist_for_interval_start(
+    event_interval_start: dict,
+    competition_format_interval_start: dict,
+    raceclasses: List[dict],
+    raceplan_interval_start: Raceplan,
+    races_interval_start: List[IntervalStartRace],
+    contestants: List[dict],
+    expected_startlist_interval_start: Startlist,
+    expected_start_entries_interval_start: List[StartEntry],
+) -> None:
+    """Should return an instance of Raceplan equal to the expected raceplan."""
+    startlist, start_entries = await generate_startlist_for_interval_start(
+        event_interval_start,
+        competition_format_interval_start,
+        raceclasses,
+        raceplan_interval_start,
+        races_interval_start,
+        contestants,
+    )
+
+    assert type(startlist) is Startlist
+    assert startlist.id is None
+    assert startlist.event_id == expected_startlist_interval_start.event_id
+    assert (
+        startlist.no_of_contestants
+        == expected_startlist_interval_start.no_of_contestants
+    )
+    assert startlist.no_of_contestants == sum(
+        rc["no_of_contestants"] for rc in raceclasses
+    )
+    assert len(start_entries) == len(expected_start_entries_interval_start)
+    no_of_start_entries = 0
+    for start_entry in start_entries:
+        assert type(start_entry) is StartEntry
+        no_of_start_entries += 1
+    assert no_of_start_entries == startlist.no_of_contestants
+
+    # Check that the two race lists match:
+    if not reduce(
+        lambda x, y: x and y,
+        map(
+            lambda p, q: p == q,
+            startlist.start_entries,
+            expected_startlist_interval_start.start_entries,
+        ),
+        True,
+    ):
+        print("Calculated startlist:")
+        print(*startlist.start_entries, sep="\n")
+        print("----")
+        print("Expected startlist:")
+        print(*expected_startlist_interval_start.start_entries, sep="\n")
+        raise AssertionError("Startlist does not match expected.")
+    else:
+        assert 1 == 1
+
+
 @pytest.fixture
 async def competition_format_interval_start() -> dict:
     """An competition_format object for testing."""
@@ -120,7 +179,7 @@ async def races_interval_start(
             no_of_contestants=2,
             event_id=raceplan_interval_start.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -132,7 +191,7 @@ async def races_interval_start(
             no_of_contestants=2,
             event_id=raceplan_interval_start.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -144,7 +203,7 @@ async def races_interval_start(
             no_of_contestants=2,
             event_id=raceplan_interval_start.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     races.append(
@@ -156,7 +215,7 @@ async def races_interval_start(
             no_of_contestants=2,
             event_id=raceplan_interval_start.event_id,
             raceplan_id="",
-            startlist_id="",
+            start_entries=[],
         )
     )
     return races
@@ -170,8 +229,8 @@ async def contestants(
     return [
         {
             "bib": 1,
-            "first_name": "Cont E.",
-            "last_name": "Stant",
+            "first_name": "First",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "K",
             "ageclass": "J 15 år",
@@ -183,8 +242,8 @@ async def contestants(
         },
         {
             "bib": 2,
-            "first_name": "Conte E.",
-            "last_name": "Stante",
+            "first_name": "Second",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "M",
             "ageclass": "J 15 år",
@@ -196,8 +255,8 @@ async def contestants(
         },
         {
             "bib": 3,
-            "first_name": "Conta E.",
-            "last_name": "Stanta",
+            "first_name": "Third",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "K",
             "ageclass": "G 15 år",
@@ -209,8 +268,8 @@ async def contestants(
         },
         {
             "bib": 4,
-            "first_name": "Conti E.",
-            "last_name": "Stanti",
+            "first_name": "Fourth",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "M",
             "ageclass": "G 15 år",
@@ -222,8 +281,8 @@ async def contestants(
         },
         {
             "bib": 5,
-            "first_name": "AContA E.",
-            "last_name": "AStanta",
+            "first_name": "Fifth",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "K",
             "ageclass": "J 16 år",
@@ -235,8 +294,8 @@ async def contestants(
         },
         {
             "bib": 6,
-            "first_name": "AConte E.",
-            "last_name": "AStante",
+            "first_name": "Sixth",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "M",
             "ageclass": "J 16 år",
@@ -248,8 +307,8 @@ async def contestants(
         },
         {
             "bib": 7,
-            "first_name": "Contas E.",
-            "last_name": "Stantas",
+            "first_name": "Seventh",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "M",
             "ageclass": "G 16 år",
@@ -261,8 +320,8 @@ async def contestants(
         },
         {
             "bib": 8,
-            "first_name": "Contus E.",
-            "last_name": "Stantus",
+            "first_name": "Eight",
+            "last_name": "Contender",
             "birth_date": "1970-01-01",
             "gender": "M",
             "ageclass": "G 16 år",
@@ -279,142 +338,115 @@ async def contestants(
 async def expected_startlist_interval_start(
     event_interval_start: dict, raceplan_interval_start: Raceplan
 ) -> Startlist:
-    """Create a mock raceplan object."""
+    """Create a mock startlist object."""
     startlist = Startlist(
         event_id=event_interval_start["id"],
         no_of_contestants=raceplan_interval_start.no_of_contestants,
         start_entries=list(),
     )
-    startlist.start_entries.append(
+    return startlist
+
+
+@pytest.fixture
+async def expected_start_entries_interval_start(
+    event_interval_start: dict, raceplan_interval_start: Raceplan
+) -> List[StartEntry]:
+    """Create a mock list of start_entries object."""
+    start_entries: List[StartEntry] = []
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="1",
             bib=1,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
+            name="First Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="1",
             bib=2,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:00:30"),
+            name="Second Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=3,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
+            name="Third Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="2",
             bib=4,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:01:30"),
+            name="Fourth Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=5,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:11:30"),
+            name="Fifth Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="3",
             bib=6,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:12:00"),
+            name="Sixth Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=7,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:12:30"),
+            name="Seventh Contender",
+            club="Lyn Ski",
         )
     )
-    startlist.start_entries.append(
+    start_entries.append(
         StartEntry(
             id="",
+            startlist_id="",
             race_id="4",
             bib=8,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:13:00"),
+            name="Eigth Contender",
+            club="Lyn Ski",
         )
     )
-    return startlist
-
-
-@pytest.mark.unit
-@pytest.mark.asyncio
-async def test_generate_startlist_for_interval_start(
-    event_interval_start: dict,
-    competition_format_interval_start: dict,
-    raceclasses: List[dict],
-    raceplan_interval_start: Raceplan,
-    races_interval_start: List[IntervalStartRace],
-    contestants: List[dict],
-    expected_startlist_interval_start: Startlist,
-) -> None:
-    """Should return an instance of Raceplan equal to the expected raceplan."""
-    startlist = await generate_startlist_for_interval_start(
-        event_interval_start,
-        competition_format_interval_start,
-        raceclasses,
-        raceplan_interval_start,
-        races_interval_start,
-        contestants,
-    )
-
-    assert type(startlist) is Startlist
-    assert startlist.id is None
-    assert startlist.event_id == expected_startlist_interval_start.event_id
-    assert (
-        startlist.no_of_contestants
-        == expected_startlist_interval_start.no_of_contestants
-    )
-    assert startlist.no_of_contestants == sum(
-        rc["no_of_contestants"] for rc in raceclasses
-    )
-    assert len(startlist.start_entries) == len(
-        expected_startlist_interval_start.start_entries
-    )
-    no_of_start_entries = 0
-    for start_entry in startlist.start_entries:
-        assert type(start_entry) is StartEntry
-        no_of_start_entries += 1
-    assert no_of_start_entries == startlist.no_of_contestants
-
-    # Check that the two race lists match:
-    if not reduce(
-        lambda x, y: x and y,
-        map(
-            lambda p, q: p == q,
-            startlist.start_entries,
-            expected_startlist_interval_start.start_entries,
-        ),
-        True,
-    ):
-        print("Calculated startlist:")
-        print(*startlist.start_entries, sep="\n")
-        print("----")
-        print("Expected startlist:")
-        print(*expected_startlist_interval_start.start_entries, sep="\n")
-        raise AssertionError("Startlist does not match expected.")
-    else:
-        assert 1 == 1
+    return start_entries
