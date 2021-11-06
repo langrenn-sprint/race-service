@@ -43,8 +43,21 @@ class TimeEventsView(View):
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
-            time_events = await TimeEventsService.get_time_events_by_event_id(
-                db, event_id
+            if "point" in self.request.rel_url.query:
+                point = self.request.rel_url.query["point"]
+                time_events = (
+                    await TimeEventsService.get_time_events_by_event_id_and_point(
+                        db, event_id, point
+                    )
+                )
+            else:
+                time_events = await TimeEventsService.get_time_events_by_event_id(
+                    db, event_id
+                )
+        elif "raceId" in self.request.rel_url.query:
+            race_id = self.request.rel_url.query["raceId"]
+            time_events = await TimeEventsService.get_time_events_by_race_id(
+                db, race_id
             )
         else:
             time_events = await TimeEventsService.get_all_time_events(db)

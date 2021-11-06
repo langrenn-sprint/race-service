@@ -86,6 +86,7 @@ async def new_time_event() -> dict:
         "rank": "0",
         "registration_time": "12:01:02",
         "next_race_id": "semi_1",
+        "next_race_position": 1,
         "status": "OK",
         "changelog": "",
     }
