@@ -46,6 +46,30 @@ class TimeEventsService:
         return time_events
 
     @classmethod
+    async def get_time_events_by_event_id_and_point(
+        cls: Any, db: Any, event_id: str, point: str
+    ) -> List[TimeEvent]:
+        """Get all time_events by event_id and point function."""
+        time_events: List[TimeEvent] = []
+        _time_events = await TimeEventsAdapter.get_time_events_by_event_id_and_point(
+            db, event_id, point
+        )
+        for e in _time_events:
+            time_events.append(TimeEvent.from_dict(e))
+        return time_events
+
+    @classmethod
+    async def get_time_events_by_race_id(
+        cls: Any, db: Any, race_id: str
+    ) -> List[TimeEvent]:
+        """Get all time_events by race_id function."""
+        time_events: List[TimeEvent] = []
+        _time_events = await TimeEventsAdapter.get_time_events_by_race_id(db, race_id)
+        for e in _time_events:
+            time_events.append(TimeEvent.from_dict(e))
+        return time_events
+
+    @classmethod
     async def create_time_event(
         cls: Any, db: Any, time_event: TimeEvent
     ) -> Optional[str]:

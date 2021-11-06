@@ -42,6 +42,7 @@ async def new_time_event() -> dict:
         "rank": "0",
         "registration_time": "12:01:02",
         "next_race_id": "semi_1",
+        "next_race_position": 1,
         "status": "OK",
         "changelog": "",
     }
@@ -59,6 +60,7 @@ async def time_event() -> dict:
         "rank": "0",
         "registration_time": "12:01:02",
         "next_race_id": "semi_1",
+        "next_race_position": 1,
         "status": "OK",
         "changelog": "hello",
     }
@@ -77,6 +79,7 @@ async def time_events() -> List:
             "rank": 0,
             "registration_time": "12:01:02",
             "next_race_id": "semi_1",
+            "next_race_position": 1,
             "status": "OK",
             "changelog": "hello",
         }
@@ -177,6 +180,66 @@ async def test_get_time_events_by_event_id(
         assert type(body) is list
         assert len(body) == 1
         assert body[0]["event_id"] == time_events[0]["event_id"]
+
+
+@pytest.mark.integration
+async def test_get_time_events_by_event_id_and_point(
+    client: _TestClient, mocker: MockFixture, token: MockFixture, time_events: List
+) -> None:
+    """Should return OK, and a body containing one time_event."""
+    EVENT_ID = time_events[0]["event_id"]
+    POINT = time_events[0]["point"]
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_point",
+        return_value=time_events,
+    )
+    headers = MultiDict(
+        {
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.get(
+            f"/time-events?eventId={EVENT_ID}&point={POINT}", headers=headers
+        )
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["event_id"] == time_events[0]["event_id"]
+        assert body[0]["point"] == time_events[0]["point"]
+
+
+@pytest.mark.integration
+async def test_get_time_events_by_race_id(
+    client: _TestClient, mocker: MockFixture, token: MockFixture, time_events: List
+) -> None:
+    """Should return OK, and a body containing one time_event."""
+    RACE_ID = time_events[0]["race_id"]
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
+        return_value=time_events,
+    )
+    headers = MultiDict(
+        {
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        },
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.get(f"/time-events?raceId={RACE_ID}", headers=headers)
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["race_id"] == time_events[0]["race_id"]
 
 
 @pytest.mark.integration
