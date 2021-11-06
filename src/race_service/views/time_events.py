@@ -12,7 +12,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import TimeEvent
@@ -91,9 +90,7 @@ class TimeEventsView(View):
             raise HTTPUnprocessableEntity(reason=e) from e
         if time_event_id:
             logging.debug(f"inserted document with time_event_id {time_event_id}")
-            headers = MultiDict(
-                {hdrs.LOCATION: f"{BASE_URL}/time-events/{time_event_id}"}
-            )
+            headers = {hdrs.LOCATION: f"{BASE_URL}/time-events/{time_event_id}"}
 
             return Response(status=201, headers=headers)
         raise HTTPBadRequest() from None

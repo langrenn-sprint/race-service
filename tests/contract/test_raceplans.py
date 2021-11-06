@@ -1,4 +1,4 @@
-"""Contract test cases for raceclasses."""
+"""Contract test cases for raceplans."""
 import asyncio
 from copy import deepcopy
 from datetime import datetime

@@ -8,7 +8,6 @@ from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
 import jwt
-from multidict import MultiDict
 import pytest
 from pytest_mock import MockFixture
 
@@ -99,7 +98,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "G15",
             "ageclass_name": "G 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 15,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 2,
         },
@@ -108,7 +107,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "G16",
             "ageclass_name": "G 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 16,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 4,
         },
@@ -117,7 +116,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "J15",
             "ageclass_name": "J 15 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 17,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 1,
         },
@@ -126,7 +125,7 @@ async def raceclasses() -> List[dict[str, Any]]:
             "name": "J16",
             "ageclass_name": "J 16 år",
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "no_of_contestants": 18,
+            "no_of_contestants": 2,
             "group": 1,
             "order": 3,
         },
@@ -149,7 +148,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "no_of_contestants": 2,
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -160,7 +159,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "no_of_contestants": 2,
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -171,7 +170,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "no_of_contestants": 2,
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
             {
@@ -182,7 +181,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "no_of_contestants": 2,
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
+                "start_entries": [],
                 "datatype": "interval_start",
             },
         ],
@@ -352,12 +351,11 @@ async def test_generate_startlist_for_event_no_races_in_plan(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -422,12 +420,11 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
         return_value=contestants_bib_not_int,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -492,12 +489,11 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
         return_value=contestants_bib_not_unique,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -560,12 +556,11 @@ async def test_generate_startlist_for_event_no_contestants(
         return_value=None,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -628,12 +623,11 @@ async def test_generate_startlist_for_event_no_contestants_exception(
         side_effect=ContestantsNotFoundException("Contestants not found for event."),
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -696,12 +690,11 @@ async def test_generate_startlist_for_event_no_raceplan(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -766,12 +759,11 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -836,12 +828,11 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -853,6 +844,230 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
         assert resp.status == 400
         body = await resp.json()
         assert "Multiple raceplans for event " in body["detail"]
+
+
+@pytest.mark.integration
+async def test_generate_startlist_for_event_no_contestants_differ_from_raceclasses(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    raceplan_interval_start: dict,
+    contestants: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    raceclasses_with_wrong_no_of_contestants = deepcopy(raceclasses)
+    raceclasses_with_wrong_no_of_contestants[0]["no_of_contestants"] = 100000
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    mocker.patch(
+        "race_service.services.startlists_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses_with_wrong_no_of_contestants,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=[raceplan_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        return_value=contestants,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/startlists/generate-startlist-for-event",
+            headers=headers,
+            json=request_body,
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert (
+            "len(contestants) does not match number of contestants in raceclasses"
+            in body["detail"]
+        )
+
+
+@pytest.mark.integration
+async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    raceplan_interval_start: dict,
+    contestants: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    raceplan_with_wrong_no_of_contestants = deepcopy(raceplan_interval_start)
+    raceplan_with_wrong_no_of_contestants["no_of_contestants"] = 100000
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    mocker.patch(
+        "race_service.services.startlists_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=[raceplan_with_wrong_no_of_contestants],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_interval_start["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        return_value=contestants,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/startlists/generate-startlist-for-event",
+            headers=headers,
+            json=request_body,
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert (
+            "len(contestants) does not match number of contestants in raceplan"
+            in body["detail"]
+        )
+
+
+@pytest.mark.integration
+async def test_generate_startlist_for_event_no_contestants_differ_from_races(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    raceplan_interval_start: dict,
+    contestants: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    raceplan_races_with_wrong_no_of_contestants = deepcopy(raceplan_interval_start)
+    raceplan_races_with_wrong_no_of_contestants["races"][0][
+        "no_of_contestants"
+    ] = 100000
+    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    mocker.patch(
+        "race_service.services.startlists_service.create_id",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=RACEPLAN_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=[raceplan_races_with_wrong_no_of_contestants],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_races_with_wrong_no_of_contestants["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        return_value=contestants,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/startlists/generate-startlist-for-event",
+            headers=headers,
+            json=request_body,
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert (
+            "len(contestants) does not match sum of contestants in races"
+            in body["detail"]
+        )
 
 
 # Not authenticated
@@ -907,12 +1122,11 @@ async def test_generate_startlist_for_event_unauthorized(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=401)
 
@@ -976,12 +1190,11 @@ async def test_generate_startlist_for_event_already_has_startlist(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1045,12 +1258,11 @@ async def test_generate_startlist_for_event_event_not_found(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1115,12 +1327,11 @@ async def test_generate_startlist_for_event_format_configuration_not_found(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1183,12 +1394,11 @@ async def test_generate_startlist_for_event_no_raceclasses(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1251,12 +1461,11 @@ async def test_generate_startlist_for_event_no_competition_format(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1321,12 +1530,11 @@ async def test_generate_startlist_for_event_missing_intervals(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1391,12 +1599,11 @@ async def test_generate_startlist_for_event_time_missing(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1461,12 +1668,11 @@ async def test_generate_startlist_for_event_date_missing(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1531,12 +1737,11 @@ async def test_generate_startlist_for_event_invalid_date(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1601,12 +1806,11 @@ async def test_generate_startlist_for_event_invalid_time(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -1653,9 +1857,7 @@ async def test_generate_startlist_for_event_format_configuration_not_supported(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        side_effect=FormatConfigurationNotFoundException(
-            "FormatConfiguration not found."
-        ),
+        return_value=format_configuration,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1674,12 +1876,11 @@ async def test_generate_startlist_for_event_format_configuration_not_supported(
         return_value=contestants,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 

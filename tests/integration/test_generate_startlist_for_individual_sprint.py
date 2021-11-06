@@ -1,13 +1,14 @@
 """Integration test cases for the startlists route."""
+from copy import deepcopy
 from datetime import datetime
 import os
 from typing import Any, List
+import uuid
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
 import jwt
-from multidict import MultiDict
 import pytest
 from pytest_mock import MockFixture
 
@@ -27,19 +28,22 @@ async def request_body() -> dict:
     return {"event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95"}
 
 
+EVENT = {
+    "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+    "name": "Oslo Skagen sprint",
+    "competition_format": "Individual Sprint",
+    "date_of_event": "2021-08-31",
+    "time_of_event": "09:00:00",
+    "organiser": "Lyn Ski",
+    "webpage": "https://example.com",
+    "information": "Testarr for å teste den nye løysinga.",
+}
+
+
 @pytest.fixture
 async def event_individual_sprint() -> dict[str, Any]:
     """An event object for testing."""
-    return {
-        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "name": "Oslo Skagen sprint",
-        "competition_format": "Individual Sprint",
-        "date_of_event": "2021-08-31",
-        "time_of_event": "09:00:00",
-        "organiser": "Lyn Ski",
-        "webpage": "https://example.com",
-        "information": "Testarr for å teste den nye løysinga.",
-    }
+    return EVENT
 
 
 @pytest.fixture
@@ -101,72 +105,77 @@ async def raceclasses() -> List[dict[str, Any]]:
     ]
 
 
+RACES: List[dict] = [
+    {
+        "id": "1",
+        "order": 1,
+        "raceclass": "J15",
+        "round": "Q",
+        "index": "",
+        "heat": 1,
+        "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "individual_sprint",
+    },
+    {
+        "id": "2",
+        "order": 2,
+        "raceclass": "G15",
+        "round": "Q",
+        "index": "",
+        "heat": 1,
+        "start_time": datetime.fromisoformat("2021-08-31 09:02:30"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "individual_sprint",
+    },
+    {
+        "id": "3",
+        "order": 3,
+        "raceclass": "J16",
+        "round": "Q",
+        "index": "",
+        "heat": 1,
+        "start_time": datetime.fromisoformat("2021-08-31 09:05:00"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "individual_sprint",
+    },
+    {
+        "id": "4",
+        "order": 4,
+        "raceclass": "G16",
+        "round": "Q",
+        "index": "",
+        "heat": 1,
+        "start_time": datetime.fromisoformat("2021-08-31 09:07:30"),
+        "no_of_contestants": 2,
+        "event_id": EVENT["id"],
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": [],
+        "datatype": "individual_sprint",
+    },
+]
+
+RACEPLAN = {
+    "event_id": EVENT["id"],
+    "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+    "no_of_contestants": 8,
+    "races": RACES,
+}
+
+
 @pytest.fixture
 async def raceplan_individual_sprint(event_individual_sprint: dict) -> dict:
     """Create a mock raceplan object."""
-    return {
-        "event_id": event_individual_sprint["id"],
-        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "no_of_contestants": 8,
-        "races": [
-            {
-                "id": "1",
-                "order": 1,
-                "raceclass": "J15",
-                "round": "Q",
-                "index": "",
-                "heat": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
-                "no_of_contestants": 2,
-                "event_id": event_individual_sprint["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "individual_sprint",
-            },
-            {
-                "id": "2",
-                "order": 2,
-                "raceclass": "G15",
-                "round": "Q",
-                "index": "",
-                "heat": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 09:02:30"),
-                "no_of_contestants": 2,
-                "event_id": event_individual_sprint["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "individual_sprint",
-            },
-            {
-                "id": "3",
-                "order": 3,
-                "raceclass": "J16",
-                "round": "Q",
-                "index": "",
-                "heat": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 09:05:00"),
-                "no_of_contestants": 2,
-                "event_id": event_individual_sprint["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "individual_sprint",
-            },
-            {
-                "id": "4",
-                "order": 4,
-                "raceclass": "G16",
-                "round": "Q",
-                "index": "",
-                "heat": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 09:07:30"),
-                "no_of_contestants": 2,
-                "event_id": event_individual_sprint["id"],
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "startlist_id": "",
-                "datatype": "individual_sprint",
-            },
-        ],
-    }
+    return RACEPLAN
 
 
 @pytest.fixture
@@ -282,6 +291,14 @@ async def contestants(
     ]
 
 
+def get_race_by_id(db: Any, id: str) -> dict:
+    """Mock function to look up correct race from list."""
+    for race in RACES:
+        if race["id"] == id:
+            return race
+    return {}
+
+
 @pytest.mark.integration
 async def test_generate_startlist_for_event(
     client: _TestClient,
@@ -294,19 +311,31 @@ async def test_generate_startlist_for_event(
     contestants: List[dict],
     request_body: dict,
 ) -> None:
-    """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    """Should return 201 Created and location header."""
+    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=STARTLIST_ID,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        side_effect=str(uuid.uuid4()),
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value={"id": STARTLIST_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -334,19 +363,18 @@ async def test_generate_startlist_for_event(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint["races"],
+        side_effect=get_race_by_id,
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.update_race",
         return_value=True,
     )
 
-    headers = MultiDict(
-        {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        },
-    )
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
@@ -356,4 +384,101 @@ async def test_generate_startlist_for_event(
             json=request_body,
         )
         assert resp.status == 201
-        assert f"/startlists/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+        assert f"/startlists/{STARTLIST_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event_individual_sprint: dict,
+    format_configuration: dict,
+    raceclasses: List[dict],
+    raceplan_individual_sprint: dict,
+    contestants: List[dict],
+    request_body: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_races_with_wrong_no_of_contestants = deepcopy(raceplan_individual_sprint)
+    raceplan_races_with_wrong_no_of_contestants["races"][0][
+        "no_of_contestants"
+    ] = 100000
+
+    mocker.patch(
+        "race_service.services.startlists_service.create_id",
+        return_value=STARTLIST_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=STARTLIST_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        side_effect=str(uuid.uuid4()),
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value={"id": STARTLIST_ID},
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
+        return_value=format_configuration,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=[raceplan_races_with_wrong_no_of_contestants],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        return_value=raceplan_races_with_wrong_no_of_contestants["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        return_value=contestants,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=get_race_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.post(
+            "/startlists/generate-startlist-for-event",
+            headers=headers,
+            json=request_body,
+        )
+        assert resp.status == 400
+        body = await resp.json()
+        assert (
+            "len(contestants) does not match sum of contestants in races quarterfinals"
+            in body["detail"]
+        )

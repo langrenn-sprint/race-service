@@ -16,6 +16,8 @@ from .views import (
     RacesView,
     RaceView,
     Ready,
+    StartEntriesView,
+    StartEntryView,
     StartlistsView,
     StartlistView,
     TimeEventsView,
@@ -55,6 +57,8 @@ async def create_app() -> web.Application:
             web.view("/raceplans/{raceplanId}", RaceplanView),
             web.view("/races", RacesView),
             web.view("/races/{raceId}", RaceView),
+            web.view("/races/{raceId}/start-entries", StartEntriesView),
+            web.view("/races/{raceId}/start-entries/{startEntryId}", StartEntryView),
             web.view("/startlists", StartlistsView),
             web.view(
                 "/startlists/generate-startlist-for-event",
