@@ -12,6 +12,7 @@ class TimeEvent(DataClassJsonMixin):
 
     bib: int
     event_id: Optional[str] = field(default=None)
+    race: Optional[str] = field(default=None)
     race_id: Optional[str] = field(default=None)
     point: Optional[str] = field(default=None)
     rank: Optional[str] = field(default=None)
