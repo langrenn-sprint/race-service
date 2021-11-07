@@ -43,7 +43,7 @@ async def token(http_service: Any) -> str:
     return body["token"]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
@@ -215,25 +215,6 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
     logging.info("Clear_db: Deleted all start_entries.")
 
 
-async def delete_races(http_service: Any, token: MockFixture) -> None:
-    """Delete all races before we start."""
-    url = f"{http_service}/races"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            races = await response.json()
-            for race in races:
-                race_id = race["id"]
-                async with session.delete(
-                    f"{url}/{race_id}", headers=headers
-                ) as response:
-                    pass
-    logging.info("Clear_db: Deleted all races.")
-
-
 @pytest.fixture
 async def expected_startlist() -> dict:
     """Create a mock startlist object."""
@@ -249,7 +230,6 @@ async def expected_startlist() -> dict:
 async def test_generate_startlist_for_individual_sprint_event(
     http_service: Any,
     token: MockFixture,
-    clear_db: None,
     expected_startlist: dict,
 ) -> None:
     """Should return 201 created and a location header with url to startlist."""
