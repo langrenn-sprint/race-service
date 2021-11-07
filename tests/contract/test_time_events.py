@@ -81,6 +81,7 @@ async def new_time_event() -> dict:
     return {
         "bib": 14,
         "event_id": "event_1",
+        "race": "race_name",
         "race_id": "race_1",
         "point": "Finish",
         "rank": "0",
