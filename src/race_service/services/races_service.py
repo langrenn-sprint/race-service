@@ -4,7 +4,11 @@ from typing import Any, List, Optional, Union
 import uuid
 
 from race_service.adapters import RacesAdapter
-from race_service.models import IndividualSprintRace, IntervalStartRace, Race
+from race_service.models import (
+    IndividualSprintRace,
+    IntervalStartRace,
+    Race,
+)
 from .exceptions import IllegalValueException
 
 

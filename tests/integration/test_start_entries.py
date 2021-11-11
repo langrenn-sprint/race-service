@@ -41,6 +41,7 @@ async def race() -> dict:
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "round": "Q",
         "index": "",
         "heat": 1,
@@ -227,7 +228,7 @@ async def test_update_start_entry_by_id(
 
 
 @pytest.mark.integration
-async def test_get_all_start_entries(
+async def test_get_start_entries_by_race_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -237,7 +238,7 @@ async def test_get_all_start_entries(
     """Should return OK and a valid json body."""
     START_ENTRY_ID = start_entry["id"]
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_all_start_entries",
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=[start_entry],
     )
 
@@ -255,7 +256,7 @@ async def test_get_all_start_entries(
 
 
 @pytest.mark.integration
-async def test_get_start_entries_by_startlist_id(
+async def test_get_start_entries_by_race_id_and_startlist_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -266,7 +267,7 @@ async def test_get_start_entries_by_startlist_id(
     """Should return OK and a valid json body."""
     START_ENTRY_ID = start_entry["id"]
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_startlist_id",
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_startlist_id",  # noqa: B950
         return_value=[start_entry],
     )
 
@@ -747,7 +748,7 @@ async def test_list_start_entries_no_authorization(
 ) -> None:
     """Should return 401 Unauthorized."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_all_start_entries",
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=[start_entry],
     )
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:

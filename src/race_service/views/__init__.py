@@ -1,5 +1,6 @@
 """Package for all views."""
 from .liveness import Ping, Ready
+from .race_results import RaceResultsView, RaceResultView
 from .raceplans import RaceplansView, RaceplanView
 from .raceplans_commands import GenerateRaceplanForEventView
 from .races import RacesView, RaceView

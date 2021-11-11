@@ -3,7 +3,7 @@ import asyncio
 import json
 import logging
 import os
-from typing import Any, AsyncGenerator, List
+from typing import Any, AsyncGenerator, List, Tuple
 
 from aiohttp import ClientSession, hdrs
 import pytest
@@ -43,13 +43,13 @@ async def token(http_service: Any) -> str:
     return body["token"]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_startlists(http_service, token)
     await delete_start_entries(http_service, token)
+    await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
     await delete_raceclasses(token)
@@ -59,8 +59,8 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_startlists(http_service, token)
     await delete_start_entries(http_service, token)
+    await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
     await delete_raceclasses(token)
@@ -169,7 +169,6 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
                     f"{url}/{raceplan_id}", headers=headers
                 ) as response:
                     assert response.status == 204
-                    pass
     logging.info("Clear_db: Deleted all raceplans.")
 
 
@@ -190,7 +189,6 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
                     f"{url}/{startlist_id}", headers=headers
                 ) as response:
                     assert response.status == 204
-                    pass
     logging.info("Clear_db: Deleted all startlists.")
 
 
@@ -211,27 +209,8 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
                         f"{url}/{race_id}/start-entries/{start_entry_id}",
                         headers=headers,
                     ) as response:
-                        pass
+                        assert response.status == 204
     logging.info("Clear_db: Deleted all start_entries.")
-
-
-async def delete_races(http_service: Any, token: MockFixture) -> None:
-    """Delete all races before we start."""
-    url = f"{http_service}/races"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            races = await response.json()
-            for race in races:
-                race_id = race["id"]
-                async with session.delete(
-                    f"{url}/{race_id}", headers=headers
-                ) as response:
-                    pass
-    logging.info("Clear_db: Deleted all races.")
 
 
 @pytest.fixture
@@ -249,7 +228,6 @@ async def expected_startlist() -> dict:
 async def test_generate_startlist_for_individual_sprint_event(
     http_service: Any,
     token: MockFixture,
-    clear_db: None,
     expected_startlist: dict,
 ) -> None:
     """Should return 201 created and a location header with url to startlist."""
@@ -462,6 +440,7 @@ async def test_generate_startlist_for_individual_sprint_event(
 async def test_remove_start_entry_from_race(
     http_service: Any,
     token: MockFixture,
+    clear_db: None,
     expected_startlist: dict,
 ) -> None:
     """Should return 204 No content and remove start_entry from the race and the startlist."""
@@ -518,7 +497,7 @@ async def test_remove_start_entry_from_race(
 
 
 # ---
-async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: C901
+async def _decide_group_and_order(raceclass: dict) -> Tuple[int, int]:  # noqa: C901
     if raceclass["name"] == "G16":  # race-order: 1
         return (1, 1)
     elif raceclass["name"] == "J16":  # race-order: 2
@@ -546,7 +525,7 @@ async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: 
     return (0, 0)  # should not reach this point
 
 
-async def _print_raceclasses(raceclasses: list[dict]) -> None:
+async def _print_raceclasses(raceclasses: List[dict]) -> None:
     # print("--- RACECLASSES ---")
     # print("group;order;name;ageclass_name;no_of_contestants;distance;event_id")
     # for raceclass in raceclasses:

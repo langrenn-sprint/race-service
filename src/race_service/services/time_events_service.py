@@ -13,6 +13,15 @@ def create_id() -> str:  # pragma: no cover
     return str(uuid.uuid4())
 
 
+class CouldNotCreateTimeEventException(Exception):
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class TimeEventNotFoundException(Exception):
     """Class representing custom exception for fetch method."""
 
@@ -46,13 +55,15 @@ class TimeEventsService:
         return time_events
 
     @classmethod
-    async def get_time_events_by_event_id_and_point(
-        cls: Any, db: Any, event_id: str, point: str
+    async def get_time_events_by_event_id_and_timing_point(
+        cls: Any, db: Any, event_id: str, timing_point: str
     ) -> List[TimeEvent]:
-        """Get all time_events by event_id and point function."""
+        """Get all time_events by event_id and timing_point function."""
         time_events: List[TimeEvent] = []
-        _time_events = await TimeEventsAdapter.get_time_events_by_event_id_and_point(
-            db, event_id, point
+        _time_events = (
+            await TimeEventsAdapter.get_time_events_by_event_id_and_timing_point(
+                db, event_id, timing_point
+            )
         )
         for e in _time_events:
             time_events.append(TimeEvent.from_dict(e))
@@ -70,9 +81,7 @@ class TimeEventsService:
         return time_events
 
     @classmethod
-    async def create_time_event(
-        cls: Any, db: Any, time_event: TimeEvent
-    ) -> Optional[str]:
+    async def create_time_event(cls: Any, db: Any, time_event: TimeEvent) -> str:
         """Create time_event function.
 
         Args:
@@ -80,9 +89,10 @@ class TimeEventsService:
             time_event (TimeEvent): a time_event instanse to be created
 
         Returns:
-            Optional[str]: The id of the created time_event. None otherwise.
+            str: The id of the created time_event. None otherwise.
 
         Raises:
+            CouldNotCreateTimeEventException: creation failed
             IllegalValueException: input object has illegal values
         """
         logging.debug(f"trying to insert time_event: {time_event}")
@@ -100,7 +110,9 @@ class TimeEventsService:
         logging.debug(f"inserted time_event with id: {id}")
         if result:
             return id
-        return None
+        raise CouldNotCreateTimeEventException(
+            "Creation of time-event failed."
+        ) from None
 
     @classmethod
     async def get_time_event_by_id(cls: Any, db: Any, id: str) -> TimeEvent:

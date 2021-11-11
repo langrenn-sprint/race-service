@@ -13,6 +13,7 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
+from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
@@ -78,8 +79,6 @@ class RaceplansView(View):
                     race["event_id"] = raceplan.event_id
                 if "raceplan_id" not in race:
                     race["raceplan_id"] = ""
-                if "start_entries" not in race:
-                    race["start_entries"] = []
                 if race["datatype"] == "individual_sprint":
                     races.append(IndividualSprintRace.from_dict(race))
                 elif race["datatype"] == "interval_start":
@@ -104,12 +103,14 @@ class RaceplansView(View):
                         raceplan.races.append(race_id)
                 await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except RaceplanAllreadyExistException as e:
-            raise HTTPBadRequest(reason=e) from e
+            raise HTTPBadRequest(reason=str(e)) from e
         if raceplan_id:
             logging.debug(f"inserted document with raceplan_id {raceplan_id}")
-            headers = {hdrs.LOCATION: f"{BASE_URL}/raceplans/{raceplan_id}"}
+            headers = MultiDict(
+                [(hdrs.LOCATION, f"{BASE_URL}/raceplans/{raceplan_id}")]
+            )
 
             return Response(status=201, headers=headers)
         raise HTTPBadRequest() from None
@@ -139,7 +140,7 @@ class RaceplanView(View):
                 races.append(race)
             raceplan.races = races  # type: ignore
         except RaceplanNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got raceplan: {raceplan}")
         body = raceplan.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -168,13 +169,13 @@ class RaceplanView(View):
         try:
             await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except RaceplanNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
     async def delete(self) -> Response:
-        """Delete the reaceplan and all the races in it."""
+        """Delete the raceplan and all the races in it."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
@@ -191,5 +192,5 @@ class RaceplanView(View):
                 await RacesService.delete_race(db, race_id)
             await RaceplansService.delete_raceplan(db, raceplan_id)
         except (RaceplanNotFoundException, RaceNotFoundException) as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

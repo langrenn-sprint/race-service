@@ -1,5 +1,12 @@
 """Package for all services."""
 from .exceptions import IllegalValueException
+from .race_results_service import (
+    ContestantNotInStartEntriesException,
+    RaceResultNotFoundException,
+    RaceResultsService,
+    TimeEventDoesNotReferenceRaceException,
+    TimeEventIsNotIdentifiableException,
+)
 from .raceplans_service import (
     RaceplanAllreadyExistException,
     RaceplanNotFoundException,
@@ -21,6 +28,7 @@ from .startlists_service import (
     StartlistsService,
 )
 from .time_events_service import (
+    CouldNotCreateTimeEventException,
     TimeEventNotFoundException,
     TimeEventsService,
 )

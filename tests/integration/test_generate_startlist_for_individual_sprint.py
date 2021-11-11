@@ -2,7 +2,7 @@
 from copy import deepcopy
 from datetime import datetime
 import os
-from typing import Any, List
+from typing import Any, Dict, List
 import uuid
 
 from aiohttp import hdrs
@@ -41,13 +41,13 @@ EVENT = {
 
 
 @pytest.fixture
-async def event_individual_sprint() -> dict[str, Any]:
+async def event_individual_sprint() -> Dict[str, Any]:
     """An event object for testing."""
     return EVENT
 
 
 @pytest.fixture
-async def format_configuration() -> dict[str, Any]:
+async def format_configuration() -> Dict[str, Any]:
     """An format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -63,7 +63,7 @@ async def format_configuration() -> dict[str, Any]:
 
 
 @pytest.fixture
-async def raceclasses() -> List[dict[str, Any]]:
+async def raceclasses() -> List[Dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -118,6 +118,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
     {
@@ -132,6 +133,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
     {
@@ -146,6 +148,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
     {
@@ -160,6 +163,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
 ]

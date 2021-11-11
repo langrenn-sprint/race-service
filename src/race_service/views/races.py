@@ -2,7 +2,7 @@
 import json
 import logging
 import os
-from typing import List
+from typing import Dict, List, Union
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -13,6 +13,7 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
+from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import (
@@ -20,12 +21,16 @@ from race_service.models import (
     IntervalStartRace,
     Race,
     StartEntry,
+    TimeEvent,
 )
+from race_service.models.race_model import RaceResult
 from race_service.services import (
     IllegalValueException,
     RaceNotFoundException,
+    RaceResultsService,
     RacesService,
     StartEntriesService,
+    TimeEventsService,
 )
 from .utils import extract_token_from_request
 
@@ -72,6 +77,7 @@ class RacesView(View):
         body = await self.request.json()
         logging.debug(f"Got create request for race {body} of type {type(body)}")
         try:
+            race: Union[IndividualSprintRace, IntervalStartRace]
             if "id" not in body:
                 body["id"] = ""  # create dummy id property
             if body["datatype"] == "individual_sprint":
@@ -90,10 +96,10 @@ class RacesView(View):
         try:
             race_id = await RacesService.create_race(db, race)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         if race_id:
             logging.debug(f"inserted document with race_id {race_id}")
-            headers = {hdrs.LOCATION: f"{BASE_URL}/races/{race_id}"}
+            headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/races/{race_id}")])
 
             return Response(status=201, headers=headers)
         raise HTTPBadRequest() from None
@@ -116,6 +122,7 @@ class RaceView(View):
 
         try:
             race = await RacesService.get_race_by_id(db, race_id)
+            # Get the start_entries:
             start_entries: List[StartEntry] = []
             for start_entry_id in race.start_entries:
                 start_entry: StartEntry = (
@@ -123,8 +130,25 @@ class RaceView(View):
                 )
                 start_entries.append(start_entry)
             race.start_entries = start_entries  # type: ignore
+            # Get the race_results:
+            results: Dict[str, RaceResult] = {}
+            for key in race.results:
+                race_result: RaceResult = (
+                    await RaceResultsService.get_race_result_by_id(
+                        db, race.results[key]
+                    )
+                )
+                ranking_sequence: List[TimeEvent] = []
+                for time_event_id in race_result.ranking_sequence:
+                    time_event = await TimeEventsService.get_time_event_by_id(
+                        db, time_event_id
+                    )
+                    ranking_sequence.append(time_event)
+                race_result.ranking_sequence = ranking_sequence  # type: ignore
+                results[key] = race_result
+            race.results = results  # type: ignore
         except RaceNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got race: {race}")
         body = race.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -153,13 +177,13 @@ class RaceView(View):
         try:
             await RacesService.update_race(db, race_id, race)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except RaceNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
     async def delete(self) -> Response:
-        """Delete the reaceplan and all the races in it."""
+        """Delete the race."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
@@ -173,5 +197,5 @@ class RaceView(View):
         try:
             await RacesService.delete_race(db, race_id)
         except RaceNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

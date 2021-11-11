@@ -15,10 +15,7 @@ EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
 class EventNotFoundException(Exception):
     """Class representing custom exception for get method."""
 
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
+    pass
 
 
 class FormatConfigurationNotFoundException(Exception):
