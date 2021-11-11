@@ -18,7 +18,9 @@ class UsersAdapter:
     """Class representing an adapter for users."""
 
     @classmethod
-    async def authorize(cls: Any, token: Optional[str], roles: list) -> None:
+    async def authorize(
+        cls: Any, token: Optional[str], roles: list
+    ) -> None:  # pragma: no cover
         """Try to authorize."""
         url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize"
         body = {"token": token, "roles": roles}

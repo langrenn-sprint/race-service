@@ -6,6 +6,7 @@ from .events_adapter import (
     FormatConfigurationNotFoundException,
     RaceclassesNotFoundException,
 )
+from .race_results_adapter import RaceResultsAdapter
 from .raceplans_adapter import RaceplansAdapter
 from .races_adapter import RacesAdapter
 from .start_entries_adapter import StartEntriesAdapter

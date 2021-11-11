@@ -13,6 +13,7 @@ from aiohttp.web import (
 )
 from aiohttp.web_exceptions import HTTPInternalServerError
 from dotenv import load_dotenv
+from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import (
@@ -46,17 +47,23 @@ class StartEntriesView(View):
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
-            await UsersAdapter.authorize(token, roles=["admin", "start_entry-admin"])
+            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
         except Exception as e:
             raise e from e
 
+        race_id = self.request.match_info["raceId"]
+
         if "startlistId" in self.request.rel_url.query:
             startlist_id = self.request.rel_url.query["startlistId"]
-            start_entries = await StartEntriesService.get_start_entries_by_startlist_id(
-                db, startlist_id
+            start_entries = (
+                await StartEntriesService.get_start_entries_by_race_id_and_startlist_id(
+                    db, race_id, startlist_id
+                )
             )
         else:
-            start_entries = await StartEntriesService.get_all_start_entries(db)
+            start_entries = await StartEntriesService.get_start_entries_by_race_id(
+                db, race_id
+            )
         list = []
         for start_entry in start_entries:
             list.append(start_entry.to_dict())
@@ -65,11 +72,11 @@ class StartEntriesView(View):
         return Response(status=200, body=body, content_type="application/json")
 
     async def post(self) -> Response:  # noqa: C901
-        """Create the start_entry and all the start_entries in it."""
+        """Create the start_entry and add it to the race and startlist."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
-            await UsersAdapter.authorize(token, roles=["admin", "start_entry-admin"])
+            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
         except Exception as e:
             raise e from e
 
@@ -95,13 +102,19 @@ class StartEntriesView(View):
             # TODO: We also need to remove the start-entry from the startlist
             # and add the start_entry to it's no_of_contestants
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except CouldNotCreateStartEntryException as e:
-            raise HTTPBadRequest(reason=e) from e
+            raise HTTPBadRequest(reason=str(e)) from e
         logging.debug(f"inserted document with start_entry_id {start_entry_id}")
-        headers = {
-            hdrs.LOCATION: f"{BASE_URL}/races/{race.id}/start-entries/{start_entry_id}"
-        }
+
+        headers = MultiDict(
+            [
+                (
+                    hdrs.LOCATION,
+                    f"{BASE_URL}/races/{race.id}/start-entries/{start_entry_id}",
+                )
+            ]
+        )
 
         return Response(status=201, headers=headers)
 
@@ -114,7 +127,7 @@ class StartEntryView(View):
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
-            await UsersAdapter.authorize(token, roles=["admin", "start_entry-admin"])
+            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
         except Exception as e:
             raise e from e
 
@@ -126,7 +139,7 @@ class StartEntryView(View):
                 db, start_entry_id
             )
         except StartEntryNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got start_entry: {start_entry}")
         body = start_entry.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -136,7 +149,7 @@ class StartEntryView(View):
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
-            await UsersAdapter.authorize(token, roles=["admin", "start_entry-admin"])
+            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
         except Exception as e:
             raise e from e
 
@@ -159,26 +172,28 @@ class StartEntryView(View):
                 db, start_entry_id, start_entry
             )
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except StartEntryNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
     async def delete(self) -> Response:
-        """Delete the reaceplan and all the start_entries in it."""
+        """Delete the start-entry."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
-            await UsersAdapter.authorize(token, roles=["admin", "start_entry-admin"])
+            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
         except Exception as e:
             raise e from e
 
-        start_entry_id = self.request.match_info["startEntryId"]
-        logging.debug(f"Got delete request for start_entry {start_entry_id}")
+        start_entry_for_deletion_id = self.request.match_info["startEntryId"]
+        logging.debug(
+            f"Got delete request for start_entry {start_entry_for_deletion_id}"
+        )
 
         try:
             start_entry: StartEntry = await StartEntriesService.get_start_entry_by_id(
-                db, start_entry_id
+                db, start_entry_for_deletion_id
             )
             # We need to remove the start-entry from the race containing the start-entry:
             try:
@@ -190,10 +205,11 @@ class StartEntryView(View):
                         f"{start_entry.race_id} of start-entry with id {start_entry.id}"
                     )
                 ) from e
+            # Remove the start-entry from races start-entries
             new_start_entries = [
                 start_entry_id
                 for start_entry_id in race.start_entries
-                if start_entry_id != start_entry_id
+                if start_entry_id != start_entry_for_deletion_id
             ]
             race.start_entries = new_start_entries
             await RacesService.update_race(db, race.id, race)
@@ -207,21 +223,23 @@ class StartEntryView(View):
             except StartlistNotFoundException as e:
                 raise HTTPInternalServerError(
                     reason=(
-                        f"DB is inconsistent: cannot find startlist with id"
+                        f"DB is inconsistent: cannot find startlist with id "
                         f"{start_entry.startlist_id} of start-entry with id {start_entry.id}"
                     )
                 ) from e
             new_start_entries = [
                 start_entry_id
                 for start_entry_id in startlist.start_entries
-                if start_entry_id != start_entry_id
+                if start_entry_id != start_entry_for_deletion_id
             ]
             startlist.start_entries = new_start_entries
             startlist.no_of_contestants += -1
             await StartlistsService.update_startlist(db, startlist.id, startlist)  # type: ignore
 
             # We can finally delete the start-entry:
-            await StartEntriesService.delete_start_entry(db, start_entry_id)
+            await StartEntriesService.delete_start_entry(
+                db, start_entry_for_deletion_id
+            )
         except StartEntryNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

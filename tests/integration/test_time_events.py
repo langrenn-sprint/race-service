@@ -31,21 +31,71 @@ def token_unsufficient_role() -> str:
 
 
 @pytest.fixture
+async def start_entry() -> dict:
+    """Create a mock start_entry object."""
+    return {
+        "id": "start_entry_1",
+        "race_id": "race_1",
+        "startlist_id": "startlist_1",
+        "bib": 1,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": ("2021-08-31T12:00:00"),
+        "starting_position": 1,
+        "status": "",
+        "changelog": [],
+    }
+
+
+@pytest.fixture
+async def race() -> dict:
+    """Create a mock race object."""
+    return {
+        "id": "race_1",
+        "raceclass": "G16",
+        "order": 1,
+        "start_time": "2021-08-31T12:00:00",
+        "no_of_contestants": 0,
+        "event_id": "event_1",
+        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "start_entries": ["start_entry_1"],
+        "results": {},
+        "round": "Q",
+        "index": "",
+        "heat": 1,
+        "rule": {"A": {"S": {"A": 10, "C": 0}}},
+        "datatype": "individual_sprint",
+    }
+
+
+@pytest.fixture
+async def race_result() -> dict:
+    """Create a race_result object."""
+    return {
+        "id": "race_result_1",
+        "race_id": "race_1",
+        "timing_point": "Finish",
+        "no_of_contestants": 0,
+        "ranking_sequence": [],
+    }
+
+
+@pytest.fixture
 async def new_time_event() -> dict:
     """Create a time_event object."""
     return {
-        "bib": 14,
+        "bib": 1,
         "event_id": "event_1",
         "race": "race_name",
         "race_id": "race_1",
-        "point": "Finish",
+        "timing_point": "Finish",
         "rank": "0",
         "registration_time": "12:01:02",
         "next_race": "semi_name1",
         "next_race_id": "semi_1",
         "next_race_position": 1,
         "status": "OK",
-        "changelog": "",
+        "changelog": [],
     }
 
 
@@ -54,18 +104,20 @@ async def time_event() -> dict:
     """Create a mock time_event object."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "bib": 14,
+        "bib": 1,
         "event_id": "event_1",
         "race": "race_name",
         "race_id": "race_1",
-        "point": "Finish",
+        "timing_point": "Finish",
         "rank": "0",
         "registration_time": "12:01:02",
         "next_race": "semi_name1",
         "next_race_id": "semi_1",
         "next_race_position": 1,
         "status": "OK",
-        "changelog": "hello",
+        "changelog": [
+            {"timestamp": "2021-11-08T22:06:30", "user_id": "test", "comment": "hello"}
+        ],
     }
 
 
@@ -75,18 +127,24 @@ async def time_events() -> List:
     return [
         {
             "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-            "bib": 14,
+            "bib": 1,
             "event_id": "event_1",
             "race": "race_name",
             "race_id": "race_1",
-            "point": "Finish",
+            "timing_point": "Finish",
             "rank": 0,
             "registration_time": "12:01:02",
             "next_race": "semi_name1",
             "next_race_id": "semi_1",
             "next_race_position": 1,
             "status": "OK",
-            "changelog": "hello",
+            "changelog": [
+                {
+                    "timestamp": "2021-11-08T22:06:30",
+                    "user_id": "test",
+                    "comment": "hello",
+                }
+            ],
         }
     ]
 
@@ -96,6 +154,9 @@ async def test_create_time_event(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    start_entry: dict,
+    race: dict,
+    race_result: dict,
     new_time_event: dict,
     time_event: dict,
 ) -> None:
@@ -113,6 +174,34 @@ async def test_create_time_event(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=None,
     )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[start_entry],
+    )
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
 
@@ -121,7 +210,149 @@ async def test_create_time_event(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    # todo - fix header location
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/time-events", headers=headers, data=request_body)
+        assert resp.status == 201
+        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_create_time_event_race_result_not_found(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    start_entry: dict,
+    race: dict,
+    new_time_event: dict,
+    time_event: dict,
+) -> None:
+    """Should return OK, and a header containing time_event_id."""
+    TIME_EVENT_ID = time_event["id"]
+    race_result_ID = "new_race_result"
+    mocker.patch(
+        "race_service.services.time_events_service.create_id",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.create_race_result",  # noqa: B950
+        return_value=race_result_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[start_entry],
+    )
+
+    request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/time-events", headers=headers, data=request_body)
+        assert resp.status == 201
+        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_create_time_event_contestant_not_in_race(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    start_entry: dict,
+    race: dict,
+    race_result: dict,
+    new_time_event: dict,
+    time_event: dict,
+) -> None:
+    """Should return OK, and a header containing time_event_id."""
+    TIME_EVENT_ID = time_event["id"]
+    start_entry_wrong_bib = deepcopy(start_entry)
+    start_entry_wrong_bib["bib"] = 1000
+
+    mocker.patch(
+        "race_service.services.time_events_service.create_id",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[start_entry_wrong_bib],
+    )
+
+    request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
@@ -179,14 +410,14 @@ async def test_get_time_events_by_event_id(
 
 
 @pytest.mark.integration
-async def test_get_time_events_by_event_id_and_point(
+async def test_get_time_events_by_event_id_and_timing_point(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_events: List
 ) -> None:
     """Should return OK, and a body containing one time_event."""
     EVENT_ID = time_events[0]["event_id"]
-    POINT = time_events[0]["point"]
+    TIMING_POINT = time_events[0]["timing_point"]
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_point",
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
         return_value=time_events,
     )
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -195,7 +426,8 @@ async def test_get_time_events_by_event_id_and_point(
         m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.get(
-            f"/time-events?eventId={EVENT_ID}&point={POINT}", headers=headers
+            f"/time-events?eventId={EVENT_ID}&timingPoint={TIMING_POINT}",
+            headers=headers,
         )
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -203,7 +435,7 @@ async def test_get_time_events_by_event_id_and_point(
         assert type(body) is list
         assert len(body) == 1
         assert body[0]["event_id"] == time_events[0]["event_id"]
-        assert body[0]["point"] == time_events[0]["point"]
+        assert body[0]["timing_point"] == time_events[0]["timing_point"]
 
 
 @pytest.mark.integration
@@ -354,6 +586,201 @@ async def test_create_time_event_with_input_id(
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 422
+
+
+@pytest.mark.integration
+async def test_create_time_event_race_not_found(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    race_result: dict,
+    new_time_event: dict,
+    time_event: dict,
+) -> None:
+    """Should return OK, and a header containing time_event_id, status=Error."""
+    TIME_EVENT_ID = time_event["id"]
+    mocker.patch(
+        "race_service.services.time_events_service.create_id",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+
+    request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/time-events", headers=headers, data=request_body)
+        assert resp.status == 201
+        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_create_time_event_does_not_reference_race(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    race_result: dict,
+    new_time_event: dict,
+    time_event: dict,
+) -> None:
+    """Should return OK, and a header containing time_event_id, status=Error."""
+    TIME_EVENT_ID = time_event["id"]
+    time_event_with_no_race_reference = deepcopy(new_time_event)
+    time_event_with_no_race_reference["race_id"] = None
+    mocker.patch(
+        "race_service.services.time_events_service.create_id",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+
+    request_body = dumps(
+        time_event_with_no_race_reference, indent=4, sort_keys=True, default=str
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/time-events", headers=headers, data=request_body)
+        assert resp.status == 201
+        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+
+
+@pytest.mark.integration
+async def test_create_time_event_is_not_identifiable(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    race_result: dict,
+    new_time_event: dict,
+    time_event: dict,
+) -> None:
+    """Should return OK, and a header containing time_event_id, status=Error."""
+    TIME_EVENT_ID = time_event["id"]
+    time_event_with_no_id = deepcopy(new_time_event)
+    time_event_with_no_id["id"] = None
+    mocker.patch(
+        "race_service.services.time_events_service.create_id",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+
+    request_body = dumps(time_event_with_no_id, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post("/time-events", headers=headers, data=request_body)
+        assert resp.status == 201
+        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
 
 
 @pytest.mark.integration

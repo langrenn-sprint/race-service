@@ -1,7 +1,7 @@
 """Unit test cases for the event-service module."""
 from datetime import datetime
 from functools import reduce
-from typing import Any, List
+from typing import Any, Dict, List
 
 import pytest
 
@@ -41,7 +41,7 @@ async def event_interval_start() -> dict:
 
 
 @pytest.fixture
-async def raceclasses_interval_start() -> List[dict[str, Any]]:
+async def raceclasses_interval_start() -> List[Dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -108,6 +108,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -120,6 +121,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -132,6 +134,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -144,6 +147,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     return races

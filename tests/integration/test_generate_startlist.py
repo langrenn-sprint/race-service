@@ -2,7 +2,7 @@
 from copy import deepcopy
 from datetime import datetime
 import os
-from typing import Any, List
+from typing import Any, Dict, List
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -35,7 +35,7 @@ async def request_body() -> dict:
 
 
 @pytest.fixture
-async def event() -> dict[str, Any]:
+async def event() -> Dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -50,7 +50,7 @@ async def event() -> dict[str, Any]:
 
 
 @pytest.fixture
-async def event_not_supported_competition_format() -> dict[str, Any]:
+async def event_not_supported_competition_format() -> Dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -65,7 +65,7 @@ async def event_not_supported_competition_format() -> dict[str, Any]:
 
 
 @pytest.fixture
-async def event_has_no_competition_format() -> dict[str, Any]:
+async def event_has_no_competition_format() -> Dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -79,7 +79,7 @@ async def event_has_no_competition_format() -> dict[str, Any]:
 
 
 @pytest.fixture
-async def format_configuration() -> dict[str, Any]:
+async def format_configuration() -> Dict[str, Any]:
     """An format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -90,7 +90,7 @@ async def format_configuration() -> dict[str, Any]:
 
 
 @pytest.fixture
-async def raceclasses() -> List[dict[str, Any]]:
+async def raceclasses() -> List[Dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -149,6 +149,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -160,6 +161,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -171,6 +173,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -182,6 +185,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
         ],

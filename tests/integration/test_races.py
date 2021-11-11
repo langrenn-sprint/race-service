@@ -41,6 +41,7 @@ async def new_race_interval_start() -> dict:
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
+        "results": {"Finish": "race_result_1"},
         "datatype": "interval_start",
     }
 
@@ -57,6 +58,7 @@ async def race_interval_start() -> dict:
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
+        "results": {"Finish": "race_result_1"},
         "datatype": "interval_start",
     }
 
@@ -72,6 +74,7 @@ async def new_race_individual_sprint() -> dict:
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
+        "results": {"Finish": "race_result_1"},
         "round": "Q",
         "index": "",
         "heat": 1,
@@ -92,6 +95,7 @@ async def race_individual_sprint() -> dict:
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
+        "results": {"Finish": "race_result_1"},
         "round": "Q",
         "index": "",
         "heat": 1,
@@ -103,7 +107,7 @@ async def race_individual_sprint() -> dict:
 START_ENTRIES: List[dict] = [
     {
         "id": "11",
-        "race_id": "J15",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 1,
         "name": "name names",
         "club": "the club",
@@ -115,7 +119,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "22",
-        "race_id": "J15",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 2,
         "name": "name names",
         "club": "the club",
@@ -127,7 +131,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "33",
-        "race_id": "G15",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 3,
         "name": "name names",
         "club": "the club",
@@ -139,7 +143,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "44",
-        "race_id": "G15",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 4,
         "name": "name names",
         "club": "the club",
@@ -151,7 +155,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "55",
-        "race_id": "J16",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 5,
         "name": "name names",
         "club": "the club",
@@ -163,7 +167,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "66",
-        "race_id": "J16",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 6,
         "name": "name names",
         "club": "the club",
@@ -175,7 +179,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "77",
-        "race_id": "G16",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 7,
         "name": "name names",
         "club": "the club",
@@ -187,7 +191,7 @@ START_ENTRIES: List[dict] = [
     },
     {
         "id": "88",
-        "race_id": "G16",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
         "bib": 8,
         "name": "name names",
         "club": "the club",
@@ -200,6 +204,52 @@ START_ENTRIES: List[dict] = [
 ]
 
 
+TIME_EVENTS: List[dict] = [
+    {
+        "id": "time_event_1",
+        "bib": 8,
+        "event_id": "event_1",
+        "timing_point": "Finish",
+        "registration_time": "2021-08-31T12:33:30",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "rank": "1",
+        "status": "OK",
+        "changelog": None,
+        "race": None,
+        "next_race": None,
+        "next_race_id": None,
+        "next_race_position": None,
+    },
+    {
+        "id": "time_event_2",
+        "bib": 7,
+        "event_id": "event_1",
+        "timing_point": "Finish",
+        "registration_time": "2021-08-31T12:34:30",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "rank": "2",
+        "status": "OK",
+        "changelog": None,
+        "race": None,
+        "next_race": None,
+        "next_race_id": None,
+        "next_race_position": None,
+    },
+]
+
+
+@pytest.fixture
+async def mock_race_result() -> dict:
+    """Create a mock race-result object."""
+    return {
+        "id": "race_result_1",
+        "race_id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "timing_point": "Finish",
+        "no_of_contestants": 2,
+        "ranking_sequence": ["time_event_1", "time_event_2"],
+    }
+
+
 @pytest.fixture
 async def start_entries_() -> List[dict]:
     """Create a mock start-entry object."""
@@ -207,8 +257,13 @@ async def start_entries_() -> List[dict]:
 
 
 def get_start_entry_by_id(db: Any, id: str) -> dict:
-    """Mock function to look up correct race from list."""
+    """Mock function to look up correct start-entry from list."""
     return next(start_entry for start_entry in START_ENTRIES if start_entry["id"] == id)
+
+
+def get_time_event_by_id(db: Any, id: str) -> dict:
+    """Mock function to look up correct time-event from list."""
+    return next(time_event for time_event in TIME_EVENTS if time_event["id"] == id)
 
 
 @pytest.fixture
@@ -296,6 +351,7 @@ async def test_get_race_by_id_interval_start(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    mock_race_result: dict,
     race_interval_start: dict,
 ) -> None:
     """Should return OK, and a body containing one race."""
@@ -307,6 +363,14 @@ async def test_get_race_by_id_interval_start(
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=mock_race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
     )
 
     headers = {
@@ -333,6 +397,23 @@ async def test_get_race_by_id_interval_start(
         for start_entry in body["start_entries"]:
             assert type(start_entry) is dict
             assert start_entry == get_start_entry_by_id(db=None, id=start_entry["id"])
+        assert type(body["results"]) is dict
+        for key in body["results"]:
+            assert type(key) is str
+            race_result = body["results"][key]
+            assert type(race_result) is dict  # value of dict should be a RaceResult
+            assert race_result["id"] == mock_race_result["id"]
+            assert race_result["race_id"] == mock_race_result["race_id"]
+            assert (
+                race_result["no_of_contestants"]
+                == mock_race_result["no_of_contestants"]
+            )
+            assert type(race_result["ranking_sequence"])
+            assert len(race_result["ranking_sequence"]) > 0
+            for time_event in race_result["ranking_sequence"]:
+                assert type(time_event) is dict
+                expected_time_event = get_time_event_by_id(db=None, id=time_event["id"])
+                assert time_event == expected_time_event
 
 
 @pytest.mark.integration
@@ -340,6 +421,7 @@ async def test_get_race_by_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    mock_race_result: dict,
     race_individual_sprint: dict,
 ) -> None:
     """Should return OK, and a body containing one race."""
@@ -351,6 +433,14 @@ async def test_get_race_by_id_individual_sprint(
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=mock_race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -378,6 +468,23 @@ async def test_get_race_by_id_individual_sprint(
         for start_entry in body["start_entries"]:
             assert type(start_entry) is dict
             assert start_entry == get_start_entry_by_id(db=None, id=start_entry["id"])
+        assert type(body["results"]) is dict
+        for key in body["results"]:
+            assert type(key) is str
+            race_result = body["results"][key]
+            assert type(race_result) is dict  # value of dict should be a RaceResult
+            assert race_result["id"] == mock_race_result["id"]
+            assert race_result["race_id"] == mock_race_result["race_id"]
+            assert (
+                race_result["no_of_contestants"]
+                == mock_race_result["no_of_contestants"]
+            )
+            assert type(race_result["ranking_sequence"])
+            assert len(race_result["ranking_sequence"]) > 0
+            for time_event in race_result["ranking_sequence"]:
+                assert type(time_event) is dict
+                expected_time_event = get_time_event_by_id(db=None, id=time_event["id"])
+                assert time_event == expected_time_event
 
 
 @pytest.mark.integration

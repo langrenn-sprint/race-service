@@ -9,6 +9,7 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
+from multidict import MultiDict
 
 from race_service.adapters import (
     ContestantsNotFoundException,
@@ -58,7 +59,7 @@ class GenerateStartlistForEventView(View):
                 db, token, event_id
             )
         except EventNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         except (
             CompetitionFormatNotSupportedException,
             ContestantsNotFoundException,
@@ -72,6 +73,7 @@ class GenerateStartlistForEventView(View):
             RaceclassesNotFoundException,
             StartlistAllreadyExistException,
         ) as e:
-            raise HTTPBadRequest(reason=e) from e
-        headers = {hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"}
+            raise HTTPBadRequest(reason=str(e)) from e
+
+        headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/startlists/{startlist_id}")])
         return Response(status=201, headers=headers)
