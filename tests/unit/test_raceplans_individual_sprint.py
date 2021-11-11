@@ -1,7 +1,7 @@
 """Unit test cases for the event-service module."""
 from datetime import datetime
 from functools import reduce
-from typing import Any, List
+from typing import Any, Dict, List
 
 import pytest
 
@@ -44,7 +44,7 @@ async def event_individual_sprint() -> dict:
 
 
 @pytest.fixture
-async def raceclasses_individual_sprint() -> List[dict[str, Any]]:
+async def raceclasses_individual_sprint() -> List[Dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {

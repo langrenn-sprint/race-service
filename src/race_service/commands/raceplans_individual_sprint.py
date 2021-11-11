@@ -1,6 +1,6 @@
 """Module for raceplan commands."""
 from datetime import date, datetime, time, timedelta
-from typing import Any, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from race_service.models import IndividualSprintRace, Raceplan
 
@@ -43,7 +43,7 @@ async def calculate_raceplan_individual_sprint(
     # sort the raceclasses on order:
     raceclasses_sorted = sorted(raceclasses, key=lambda k: (k["group"], k["order"]))
     # We need to group the raceclasses by group:
-    d: dict[int, list] = {}
+    d: Dict[int, list] = {}
     for raceclass in raceclasses_sorted:
         d.setdefault(raceclass["group"], []).append(raceclass)
     raceclasses_grouped = list(d.values())
@@ -317,7 +317,7 @@ class ConfigMatrix:
     MAX_NO_OF_CONTESTANTS = 80  # TODO: Get this from competition-format
     ALL = 10
     REST = float("inf")
-    m: dict[int, dict[str, Any]] = {}
+    m: Dict[int, Dict[str, Any]] = {}
     m[1] = {
         "lim_no_contestants": 7,
         "no_of_heats": {
@@ -438,7 +438,7 @@ class ConfigMatrix:
         raceclass: dict,
         from_round: str,
         from_index: str,
-    ) -> dict[str, dict[str, Union[int, float]]]:
+    ) -> Dict[str, Dict[str, Union[int, float]]]:
         """Get race rule pr round and index."""
         _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
         return ConfigMatrix.m[_key]["from_to"][from_round][from_index]

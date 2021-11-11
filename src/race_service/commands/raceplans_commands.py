@@ -1,6 +1,6 @@
 """Module for raceplan commands."""
 from datetime import date, time
-from typing import Any, List
+from typing import Any, Dict, List
 
 from race_service.adapters import (
     EventNotFoundException,
@@ -210,7 +210,7 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C90
     # sort the raceclasses on group and order:
     raceclasses_sorted = sorted(raceclasses, key=lambda k: (k["group"], k["order"]))
     # We need to group the raceclasses by group:
-    d: dict[int, list] = {}
+    d: Dict[int, list] = {}
     for raceclass in raceclasses_sorted:
         d.setdefault(raceclass["group"], []).append(raceclass)
     raceclasses_grouped = list(d.values())

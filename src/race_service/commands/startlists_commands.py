@@ -1,6 +1,6 @@
 """Module for startlist commands."""
 from datetime import date, time, timedelta
-from typing import Any, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from race_service.adapters import (
     ContestantsNotFoundException,
@@ -165,7 +165,7 @@ async def generate_startlist_for_individual_sprint(
     # until race is full.
 
     # First we need to group the races by raceclass:
-    d: dict[str, list] = {}
+    d: Dict[str, list] = {}
     for race in races:
         d.setdefault(race.raceclass, []).append(race)
     races_grouped_by_raceclass = list(d.values())
@@ -252,7 +252,7 @@ async def generate_startlist_for_interval_start(
     # and for every such contestant, generate a start_entry:
 
     # First we need to group the races by raceclass:
-    d: dict[str, list] = {}
+    d: Dict[str, list] = {}
     for race in races:
         d.setdefault(race.raceclass, []).append(race)
     races_grouped = list(d.values())
