@@ -23,7 +23,7 @@ async def test_generate_startlist_for_individual_sprint(
     races_individual_sprint: List[IndividualSprintRace],
     contestants: List[dict],
     expected_startlist_individual_sprint: Startlist,
-    expected_start_entries_individual_sprint: Startlist,
+    expected_start_entries_individual_sprint: List[Startlist],
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
     startlist, start_entries = await generate_startlist_for_individual_sprint(
@@ -153,6 +153,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -169,6 +170,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -185,6 +187,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -201,6 +204,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -217,6 +221,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -233,6 +238,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -249,6 +255,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -265,6 +272,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -281,6 +289,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -297,6 +306,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -313,6 +323,7 @@ async def races_individual_sprint(
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     assert (

@@ -1,13 +1,14 @@
-"""Contract test cases for command generate-startlist-for-event."""
+"""Contract test cases for race-results."""
 import asyncio
 import json
 import logging
 import os
-from typing import Any, AsyncGenerator, List
+from typing import Any, AsyncGenerator
 
 from aiohttp import ClientSession, hdrs
 import pytest
 from pytest_mock import MockFixture
+
 
 EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
 EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
@@ -15,7 +16,7 @@ USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def event_loop(request: Any) -> Any:
     """Redefine the event_loop fixture to have the same scope."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
@@ -23,7 +24,8 @@ def event_loop(request: Any) -> Any:
     loop.close()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
+@pytest.mark.asyncio
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
@@ -32,22 +34,22 @@ async def token(http_service: Any) -> str:
         "username": os.getenv("ADMIN_USERNAME"),
         "password": os.getenv("ADMIN_PASSWORD"),
     }
-    async with ClientSession() as session:
-        async with session.post(url, headers=headers, json=request_body) as response:
-            assert response.status == 200
-            body = await response.json()
-            if response.status != 200:
-                logging.error(
-                    f"Got unexpected status {response.status} from {http_service}."
-                )
+    session = ClientSession()
+    async with session.post(url, headers=headers, json=request_body) as response:
+        body = await response.json()
+    await session.close()
+    if response.status != 200:
+        logging.error(f"Got unexpected status {response.status} from {http_service}.")
     return body["token"]
 
 
-@pytest.fixture
+@pytest.fixture(scope="module", autouse=True)
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
+    await delete_race_results(http_service, token)
+    await delete_time_events(http_service, token)
     await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
@@ -59,6 +61,8 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
+    await delete_race_results(http_service, token)
+    await delete_time_events(http_service, token)
     await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
@@ -210,11 +214,30 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
                         headers=headers,
                     ) as response:
                         assert response.status == 204
-    logging.info("Clear_db: Deleted all start_entries.")
+    logging.info("Clear_db: Deleted all start-entries.")
 
 
-async def delete_races(http_service: Any, token: MockFixture) -> None:
-    """Delete all races before we start."""
+async def delete_time_events(http_service: Any, token: MockFixture) -> None:
+    """Delete all time_events before we start."""
+    url = f"{http_service}/time-events"
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            time_events = await response.json()
+            for time_event in time_events:
+                time_event_id = time_event["id"]
+                async with session.delete(
+                    f"{url}/{time_event_id}", headers=headers
+                ) as response:
+                    assert response.status == 204
+    logging.info("Clear_db: Deleted all time-events.")
+
+
+async def delete_race_results(http_service: Any, token: MockFixture) -> None:
+    """Delete all race_results before we start."""
     url = f"{http_service}/races"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -225,36 +248,26 @@ async def delete_races(http_service: Any, token: MockFixture) -> None:
             races = await response.json()
             for race in races:
                 race_id = race["id"]
-                async with session.delete(
-                    f"{url}/{race_id}", headers=headers
-                ) as response:
-                    assert response.status == 204
-    logging.info("Clear_db: Deleted all races.")
+                for timing_point in race["results"]:
+                    async with session.delete(
+                        f'{url}/{race_id}/race-results/{race["results"][timing_point]}',
+                        headers=headers,
+                    ) as response:
+                        assert response.status == 204
+    logging.info("Clear_db: Deleted all race-results.")
 
 
-@pytest.fixture
-async def expected_startlist() -> dict:
-    """Create a mock startlist object."""
-    with open("tests/files/expected_startlist_interval_start.json", "r") as file:
-        startlist = json.load(file)
-
-    return startlist
-
-
-# Finally we test the test_generate_startlist_for_event function:
-@pytest.mark.contract
+@pytest.fixture(scope="module", autouse=True)
 @pytest.mark.asyncio
-async def test_generate_startlist_for_interval_start_entry(
+async def set_up_context(
     http_service: Any,
     token: MockFixture,
-    clear_db: None,
-    expected_startlist: dict,
-) -> None:
-    """Should return 201 created and a location header with url to startlist."""
+) -> str:
+    """Create context and return url to time-event."""
     event_id = ""
     async with ClientSession() as session:
         # First we need create the competition-format:
-        with open("tests/files/competition_format_interval_start.json", "r") as file:
+        with open("tests/files/competition_format_individual_sprint.json", "r") as file:
             competition_format = json.load(file)
             headers = {
                 hdrs.CONTENT_TYPE: "application/json",
@@ -271,7 +284,7 @@ async def test_generate_startlist_for_interval_start_entry(
                 assert response.status == 201
 
         # Next we create the event:
-        with open("tests/files/event_interval_start.json", "r") as file:
+        with open("tests/files/event_individual_sprint.json", "r") as file:
             event = json.load(file)
 
             headers = {
@@ -330,7 +343,6 @@ async def test_generate_startlist_for_interval_start_entry(
                     f"{url}/{id}", headers=headers, json=raceclass
                 ) as response:
                     assert response.status == 204
-        await _print_raceclasses(raceclasses)
 
         # Then we have to assign bibs to all contestants:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/assign-bibs"
@@ -342,9 +354,6 @@ async def test_generate_startlist_for_interval_start_entry(
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         async with session.get(url, headers=headers) as response:
             assert response.status == 200
-            _contestants = await response.json()
-
-        await _print_contestants(_contestants)
 
         # We need to base the startlist on the raceplan. Need to generate it.
         request_body = {"event_id": event_id}
@@ -367,9 +376,7 @@ async def test_generate_startlist_for_interval_start_entry(
             assert response.status == 200
             _raceplans = await response.json()
 
-        await _print_raceplan(_raceplans[0])
-
-        # Finally, we are ready to generate the startlist:
+        # We generate the startlist:
         request_body = {"event_id": event_id}
         url = f"{http_service}/startlists/generate-startlist-for-event"
         async with session.post(url, headers=headers, json=request_body) as response:
@@ -381,78 +388,90 @@ async def test_generate_startlist_for_interval_start_entry(
             assert response.status == 201
             assert "/startlists/" in response.headers[hdrs.LOCATION]
 
-        # We check that startlist is actually created:
-        startlist_id = response.headers[hdrs.LOCATION].split("/")[-1]
-        url = response.headers[hdrs.LOCATION]
+        raceplan = _raceplans[0]
+        race_id = raceplan["races"][0]
+
+        # We need to find a contestant that actually start in this race:
+        url = f"{http_service}/races/{race_id}/start-entries"
         async with session.get(url, headers=headers) as response:
             assert response.status == 200
-            startlist = await response.json()
-            assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
-            assert type(startlist) is dict
-            assert startlist["id"]
-            assert startlist["event_id"] == request_body["event_id"]
+            start_entries = await response.json()
 
-            await _print_startlist(startlist)
-            await _dump_startlist_to_json(startlist)
-
-            # And we compare the response to the expected startlist:
+        new_time_event: dict = {
+            "bib": start_entries[0]["bib"],
+            "event_id": raceplan["event_id"],
+            "race_id": race_id,
+            "race": "race_name",
+            "timing_point": "Finish",
+            "rank": "1",
+            "registration_time": "12:01:02",
+            "next_race_id": "semi_1",
+            "next_race_position": 1,
+            "status": "",
+            "changelog": None,
+        }
+        # And we add a time-event in order to create the race result.
+        request_body = json.dumps(new_time_event, indent=4, sort_keys=True, default=str)
+        url = f"{http_service}/time-events"
+        async with session.post(url, headers=headers, data=request_body) as response:
+            assert response.status == 201, "POST of new_time_event failed."
             assert (
-                startlist["no_of_contestants"]
-                == expected_startlist["no_of_contestants"]
-            )
-            assert len(startlist["start_entries"]) == len(
-                expected_startlist["start_entries"]
-            )
+                "/time-events/" in response.headers[hdrs.LOCATION]
+            ), "Location header has wrong content."
 
-            i = 0
-            for start_entry in startlist["start_entries"]:
-                expected_start_entry = expected_startlist["start_entries"][i]
-                assert (
-                    start_entry["bib"] == expected_start_entry["bib"]
-                ), f'"bib" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
-                assert (
-                    start_entry["starting_position"]
-                    == expected_start_entry["starting_position"]
-                ), f'"starting_position" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
-                assert (
-                    start_entry["scheduled_start_time"]
-                    == expected_start_entry["scheduled_start_time"]
-                ), f'"scheduled_start_time" in index {i}:{start_entry}\n ne:\n{expected_start_entry}'
-                i += 1
+        time_event_url = response.headers[hdrs.LOCATION]
+        return time_event_url
 
-        # We also need to check that all the relevant races has got a list of start_entries:
-        url = f'{http_service}/races?eventId={request_body["event_id"]}'
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_get_race_result(
+    http_service: Any, token: MockFixture, set_up_context: str
+) -> None:
+    """Should return 200 OK and a race result."""
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    time_event_url = set_up_context
+    async with ClientSession() as session:
+        url = time_event_url
         async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            races = await response.json()
-            no_of_contestants = 0
-            for race in races:
-                assert (
-                    len(race["start_entries"]) > 0
-                ), f'race with order {race["order"]} does not have start_entries'
-                no_of_contestants += len(race["start_entries"])
-            assert no_of_contestants == startlist["no_of_contestants"]
+            assert response.status == 200, "GET of new_time_event failed."
+            time_event = await response.json()
 
-        # We inspect one of the start_entries in the list of races:
-        start_entry = races[0]["start_entries"][0]
-        assert type(start_entry) is str
-
-        # We inspect the details of the first race, which should include the whole start_entry object:
-        url = f'{http_service}/races/{races[0]["id"]}'
+        # We should be able to get race and its results:
+        url = f'{http_service}/races/{time_event["race_id"]}'
         async with session.get(url, headers=headers) as response:
-            assert response.status == 200
+            assert response.status == 200, "GET of race-results failed."
             race = await response.json()
-            assert race["no_of_contestants"] == len(race["start_entries"])
-            for start_entry in race["start_entries"]:
-                assert type(start_entry) is dict
-                assert start_entry["id"]
-                assert start_entry["startlist_id"] == startlist_id
-                assert start_entry["race_id"] == race["id"]
-                assert start_entry["bib"]
-                assert start_entry["name"]
-                assert start_entry["club"]
-                assert start_entry["starting_position"]
-                assert start_entry["scheduled_start_time"]
+        assert type(race["results"]) is dict
+        assert "Finish" in race["results"]
+        assert len(race["results"]) == 1
+
+        # We should be also be able to get race-results:
+        url = f'{http_service}/races/{time_event["race_id"]}/race-results'
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200, "GET of race-results failed."
+            race_results = await response.json()
+        assert type(race_results) is list
+        assert len(race_results) == 1
+
+        # Inspect the race-result object:
+        race_result = race_results[0]
+        assert race_result["timing_point"] == "Finish"
+        assert race_result["race_id"] == race["id"]
+        assert race_result["no_of_contestants"] == 1
+
+        # Inspect the timing-point object of the ranking-sequence:
+        time_events = race_result["ranking_sequence"]
+        assert type(time_events) is list
+        time_event = time_events[0]
+        time_event_id = time_event_url.split("/")[-1]
+        assert time_event["id"] == time_event_id
+        assert time_event["race_id"] == race["id"]
+        assert "OK" == time_event["status"]
 
 
 # ---
@@ -482,76 +501,3 @@ async def _decide_group_and_order(raceclass: dict) -> tuple[int, int]:  # noqa: 
     elif raceclass["name"] == "J11":  # race-order: 12
         return (3, 4)
     return (0, 0)  # should not reach this point
-
-
-async def _print_raceclasses(raceclasses: list[dict]) -> None:
-    # print("--- RACECLASSES ---")
-    # print("group;order;name;ageclass_name;no_of_contestants;distance;event_id")
-    # for raceclass in raceclasses:
-    #     print(
-    #         str(raceclass["group"])
-    #         + ";"
-    #         + str(raceclass["order"])
-    #         + ";"
-    #         + raceclass["name"]
-    #         + ";"
-    #         + raceclass["ageclass_name"]
-    #         + ";"
-    #         + str(raceclass["no_of_contestants"])
-    #         + ";"
-    #         + str(raceclass["distance"])
-    #         + ";"
-    #         + raceclass["event_id"]
-    #     )
-    pass
-
-
-async def _print_raceplan(raceplan: dict) -> None:
-    # print("--- RACEPLAN ---")
-    # print(f'event_id: {raceplan["event_id"]}')
-    # print(f'no_of_contestants: {raceplan["no_of_contestants"]}')
-    # print("order;start_time;raceclass;no_of_contestants")
-    # for race in raceplan["races"]:
-    #     print(
-    #         str(race["order"])
-    #         + ";"
-    #         + str(race["start_time"])
-    #         + ";"
-    #         + str(race["raceclass"])
-    #         + ";"
-    #         + str(race["no_of_contestants"])
-    #     )
-    pass
-
-
-async def _print_contestants(contestants: List[dict]) -> None:
-    # print("--- CONTESTANTS ---")
-    # print(f"Number of contestants: {len(contestants)}.")
-    # print("bib;ageclass")
-    # for contestant in contestants:
-    #     print(str(contestant["bib"]) + ";" + str(contestant["ageclass"]))
-    pass
-
-
-async def _print_startlist(startlist: dict) -> None:
-    # print("--- STARTLIST ---")
-    # print(f'event_id: {startlist["event_id"]}')
-    # print(f'no_of_contestants: {startlist["no_of_contestants"]}')
-    # print("race_id;bib;starting_position;scheduled_start_time")
-    # for start_entry in startlist["start_entries"]:
-    #     print(
-    #         str(start_entry["race_id"])
-    #         + ";"
-    #         + str(start_entry["bib"])
-    #         + ";"
-    #         + str(start_entry["starting_position"])
-    #         + ";"
-    #         + str(start_entry["scheduled_start_time"])
-    #     )
-    pass
-
-
-async def _dump_startlist_to_json(startlist: dict) -> None:
-    # with open("tests/files/tmp_startlist.json", "w") as file:
-    #     json.dump(startlist, file)
-    pass

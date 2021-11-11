@@ -8,6 +8,17 @@ from marshmallow.fields import Constant, DateTime
 
 
 @dataclass
+class RaceResult(DataClassJsonMixin):
+    """Data class with details about a race-result."""
+
+    id: str
+    race_id: str
+    timing_point: str
+    no_of_contestants: int
+    ranking_sequence: List[str]  # list of references to TimeEvent
+
+
+@dataclass
 class Race(DataClassJsonMixin):
     """Data class with details about a race."""
 
@@ -24,7 +35,8 @@ class Race(DataClassJsonMixin):
     no_of_contestants: int
     event_id: str
     raceplan_id: str
-    start_entries: List[str]
+    start_entries: List[str]  # list of references to StartEntry
+    results: Dict[str, str]  # dict with reference to RaceResult pr timing point
 
 
 @dataclass

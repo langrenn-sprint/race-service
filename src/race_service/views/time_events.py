@@ -1,4 +1,5 @@
 """Resource module for time_events resources."""
+from datetime import datetime
 import json
 import logging
 import os
@@ -12,11 +13,18 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
+from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
-from race_service.models import TimeEvent
+from race_service.models import Changelog, TimeEvent
 from race_service.services import (
+    ContestantNotInStartEntriesException,
+    CouldNotCreateTimeEventException,
     IllegalValueException,
+    RaceNotFoundException,
+    RaceResultsService,
+    TimeEventDoesNotReferenceRaceException,
+    TimeEventIsNotIdentifiableException,
     TimeEventNotFoundException,
     TimeEventsService,
 )
@@ -42,12 +50,10 @@ class TimeEventsView(View):
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
-            if "point" in self.request.rel_url.query:
-                point = self.request.rel_url.query["point"]
-                time_events = (
-                    await TimeEventsService.get_time_events_by_event_id_and_point(
-                        db, event_id, point
-                    )
+            if "timingPoint" in self.request.rel_url.query:
+                timing_point = self.request.rel_url.query["timingPoint"]
+                time_events = await TimeEventsService.get_time_events_by_event_id_and_timing_point(
+                    db, event_id, timing_point
                 )
             else:
                 time_events = await TimeEventsService.get_time_events_by_event_id(
@@ -67,7 +73,7 @@ class TimeEventsView(View):
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
-    async def post(self) -> Response:
+    async def post(self) -> Response:  # noqa: C901
         """Post route function."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
@@ -84,16 +90,41 @@ class TimeEventsView(View):
             raise HTTPUnprocessableEntity(
                 reason=f"Mandatory property {e.args[0]} is missing."
             ) from e
+
         try:
             time_event_id = await TimeEventsService.create_time_event(db, time_event)
+            time_event.id = time_event_id
+            try:
+                # Add the time-event ref to the race-result for the race:
+                await RaceResultsService.add_time_event_to_race_result(db, time_event)
+                time_event.status = "OK"
+            except (
+                RaceNotFoundException,
+                TimeEventDoesNotReferenceRaceException,
+                TimeEventIsNotIdentifiableException,
+                ContestantNotInStartEntriesException,
+            ) as e:
+                time_event.status = "Error"
+                if not time_event.changelog:
+                    time_event.changelog = []
+                time_event.changelog.append(
+                    Changelog(
+                        timestamp=datetime.now(),
+                        user_id="race_service",
+                        comment=str(e),
+                    )
+                )
+            await TimeEventsService.update_time_event(db, time_event.id, time_event)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
-        if time_event_id:
-            logging.debug(f"inserted document with time_event_id {time_event_id}")
-            headers = {hdrs.LOCATION: f"{BASE_URL}/time-events/{time_event_id}"}
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
+        except (CouldNotCreateTimeEventException) as e:
+            raise HTTPBadRequest(reason=str(e)) from e
+        logging.debug(f"inserted document with time_event_id {time_event_id}")
+        headers = MultiDict(
+            [(hdrs.LOCATION, f"{BASE_URL}/time-events/{time_event_id}")]
+        )
 
-            return Response(status=201, headers=headers)
-        raise HTTPBadRequest() from None
+        return Response(status=201, headers=headers)
 
 
 class TimeEventView(View):
@@ -114,7 +145,7 @@ class TimeEventView(View):
         try:
             time_event = await TimeEventsService.get_time_event_by_id(db, time_event_id)
         except TimeEventNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got time_event: {time_event}")
         body = time_event.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -145,9 +176,9 @@ class TimeEventView(View):
         try:
             await TimeEventsService.update_time_event(db, time_event_id, time_event)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except TimeEventNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
     async def delete(self) -> Response:
@@ -165,5 +196,5 @@ class TimeEventView(View):
         try:
             await TimeEventsService.delete_time_event(db, time_event_id)
         except TimeEventNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

@@ -48,8 +48,8 @@ async def token(http_service: Any) -> str:
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_startlists(http_service, token)
     await delete_start_entries(http_service, token)
+    await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
     await delete_raceclasses(token)
@@ -59,8 +59,8 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_startlists(http_service, token)
     await delete_start_entries(http_service, token)
+    await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
     await delete_raceclasses(token)
@@ -169,7 +169,6 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
                     f"{url}/{raceplan_id}", headers=headers
                 ) as response:
                     assert response.status == 204
-                    pass
     logging.info("Clear_db: Deleted all raceplans.")
 
 
@@ -190,7 +189,6 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
                     f"{url}/{startlist_id}", headers=headers
                 ) as response:
                     assert response.status == 204
-                    pass
     logging.info("Clear_db: Deleted all startlists.")
 
 
@@ -211,7 +209,7 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
                         f"{url}/{race_id}/start-entries/{start_entry_id}",
                         headers=headers,
                     ) as response:
-                        pass
+                        assert response.status == 204
     logging.info("Clear_db: Deleted all start_entries.")
 
 
@@ -442,6 +440,7 @@ async def test_generate_startlist_for_individual_sprint_event(
 async def test_remove_start_entry_from_race(
     http_service: Any,
     token: MockFixture,
+    clear_db: None,
     expected_startlist: dict,
 ) -> None:
     """Should return 204 No content and remove start_entry from the race and the startlist."""

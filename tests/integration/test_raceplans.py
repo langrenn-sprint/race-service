@@ -45,6 +45,7 @@ async def new_raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -55,6 +56,7 @@ async def new_raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -65,6 +67,7 @@ async def new_raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -75,6 +78,7 @@ async def new_raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
         ],
@@ -98,6 +102,7 @@ async def raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -109,6 +114,7 @@ async def raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -120,6 +126,7 @@ async def raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -131,6 +138,7 @@ async def raceplan_interval_start() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
         ],
@@ -152,6 +160,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "individual_sprint",
             },
             {
@@ -162,6 +171,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "individual_sprint",
             },
             {
@@ -172,6 +182,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "individual_sprint",
             },
             {
@@ -182,6 +193,7 @@ async def new_raceplan_individual_sprint() -> dict:
                 "event_id": "event_1",
                 "raceplan_id": "",
                 "start_entries": [],
+                "results": {},
                 "datatype": "individual_sprint",
             },
         ],
@@ -256,6 +268,8 @@ async def new_raceplan_unsupported_datatype() -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
                 "no_of_contestants": 8,
+                "start_entries": [],
+                "results": {},
                 "datatype": "unsupported",
             },
         ],

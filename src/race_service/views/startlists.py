@@ -13,6 +13,7 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
+from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import StartEntry, Startlist
@@ -77,12 +78,12 @@ class StartlistsView(View):
         try:
             startlist_id = await StartlistsService.create_startlist(db, startlist)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except (StartlistAllreadyExistException, CouldNotCreateStartlistException) as e:
-            raise HTTPBadRequest(reason=e) from e
+            raise HTTPBadRequest(reason=str(e)) from e
 
         logging.debug(f"inserted document with startlist_id {startlist_id}")
-        headers = {hdrs.LOCATION: f"{BASE_URL}/startlists/{startlist_id}"}
+        headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/startlists/{startlist_id}")])
 
         return Response(status=201, headers=headers)
 
@@ -114,7 +115,7 @@ class StartlistView(View):
                 start_entries.append(start_entry)
             startlist.start_entries = start_entries  # type: ignore
         except StartlistNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got startlist: {startlist}")
         body = startlist.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -145,9 +146,9 @@ class StartlistView(View):
         try:
             await StartlistsService.update_startlist(db, startlist_id, startlist)
         except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=e) from e
+            raise HTTPUnprocessableEntity(reason=str(e)) from e
         except StartlistNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
     async def delete(self) -> Response:
@@ -165,5 +166,5 @@ class StartlistView(View):
         try:
             await StartlistsService.delete_startlist(db, startlist_id)
         except StartlistNotFoundException as e:
-            raise HTTPNotFound(reason=e) from e
+            raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

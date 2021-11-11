@@ -91,6 +91,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -107,6 +108,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -123,6 +125,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -139,6 +142,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -155,6 +159,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -171,6 +176,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -187,6 +193,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -203,6 +210,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -219,6 +227,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -235,6 +244,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -251,6 +261,7 @@ async def expected_races_individual_sprint(
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
 

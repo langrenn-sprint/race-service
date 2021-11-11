@@ -108,6 +108,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -120,6 +121,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -132,6 +134,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     races.append(
@@ -144,6 +147,7 @@ async def expected_races_interval_start(
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
+            results={},
         )
     )
     return races

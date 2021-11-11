@@ -52,6 +52,7 @@ async def calculate_raceplan_interval_start(
                 event_id=event["id"],
                 raceplan_id="",
                 start_entries=[],
+                results={},
             )
             # Calculate start_time for next raceclass:
             start_time = start_time + intervals * raceclass["no_of_contestants"]

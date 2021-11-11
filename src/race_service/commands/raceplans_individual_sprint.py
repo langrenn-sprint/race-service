@@ -72,6 +72,7 @@ async def calculate_raceplan_individual_sprint(
                             event_id=event["id"],
                             raceplan_id="",
                             start_entries=[],
+                            results={},
                         )
                         order += 1
                         # Calculate start_time for next heat:

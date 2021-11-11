@@ -118,6 +118,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
     {
@@ -132,6 +133,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
     {
@@ -146,6 +148,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
     {
@@ -160,6 +163,7 @@ RACES: List[dict] = [
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
+        "results": {},
         "datatype": "individual_sprint",
     },
 ]

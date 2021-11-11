@@ -144,35 +144,22 @@ async def test_delete_start_entry(
 
 
 @pytest.mark.integration
-async def test_get_all_start_entries(
+async def test_get_start_entries_by_race_id_and_startlist_id(
     loop: Any,
     mocker: MockFixture,
     start_entry_mock: dict,
 ) -> None:
     """Should return a list of start-entries."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_all_start_entries",
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_startlist_id",  # noqa: B950
         return_value=[start_entry_mock],
     )
-    start_entries = await StartEntriesService.get_all_start_entries(db=None)
-    assert type(start_entries) is list
-    for start_entry in start_entries:
-        assert type(start_entry) is StartEntry
-
-
-@pytest.mark.integration
-async def test_get_start_entries_by_startlist_id(
-    loop: Any,
-    mocker: MockFixture,
-    start_entry_mock: dict,
-) -> None:
-    """Should return a list of start-entries."""
-    mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_startlist_id",
-        return_value=[start_entry_mock],
-    )
-    start_entries = await StartEntriesService.get_start_entries_by_startlist_id(
-        db=None, startlist_id=start_entry_mock["startlist_id"]
+    start_entries = (
+        await StartEntriesService.get_start_entries_by_race_id_and_startlist_id(
+            db=None,
+            race_id=start_entry_mock["race_id"],
+            startlist_id=start_entry_mock["startlist_id"],
+        )
     )
     assert type(start_entries) is list
     for start_entry in start_entries:

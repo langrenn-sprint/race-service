@@ -149,6 +149,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -160,6 +161,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -171,6 +173,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
             {
@@ -182,6 +185,7 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
+                "results": {},
                 "datatype": "interval_start",
             },
         ],

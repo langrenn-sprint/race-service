@@ -6,23 +6,30 @@ class StartEntriesAdapter:
     """Class representing an adapter for start_entries."""
 
     @classmethod
-    async def get_all_start_entries(
-        cls: Any, db: Any
+    async def get_start_entries_by_race_id(
+        cls: Any, db: Any, race_id: str
     ) -> List[dict]:  # pragma: no cover
-        """Get all start_entries function."""
+        """Get start_entries by race_id function."""
         start_entries: List = []
-        cursor = db.start_entries_collection.find()
+        cursor = db.start_entries_collection.find({"race_id": race_id})
         for start_entry in await cursor.to_list(None):
             start_entries.append(start_entry)
         return start_entries
 
     @classmethod
-    async def get_start_entries_by_startlist_id(
-        cls: Any, db: Any, startlist_id: str
+    async def get_start_entries_by_race_id_and_startlist_id(
+        cls: Any, db: Any, race_id: str, startlist_id: str
     ) -> List[dict]:  # pragma: no cover
-        """Get start_entries by startlist_id function."""
+        """Get start_entries by race_id and startlist_id function."""
         start_entries: List = []
-        cursor = db.start_entries_collection.find({"startlist_id": startlist_id})
+        cursor = db.start_entries_collection.find(
+            {
+                "$and": [
+                    {"race_id": race_id},
+                    {"startlist_id": startlist_id},
+                ]
+            }
+        )
         for start_entry in await cursor.to_list(None):
             start_entries.append(start_entry)
         return start_entries

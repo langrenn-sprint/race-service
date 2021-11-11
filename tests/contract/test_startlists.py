@@ -55,7 +55,6 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
                     f"{url}/{startlist_id}", headers=headers
                 ) as response:
                     assert response.status == 204
-                    pass
     logging.info("Clear_db: Deleted all startlists.")
 
 
