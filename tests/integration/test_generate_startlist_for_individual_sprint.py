@@ -297,10 +297,7 @@ async def contestants(
 
 def get_race_by_id(db: Any, id: str) -> dict:
     """Mock function to look up correct race from list."""
-    for race in RACES:
-        if race["id"] == id:
-            return race
-    return {}
+    return next(race for race in RACES if race["id"] == id)
 
 
 @pytest.mark.integration

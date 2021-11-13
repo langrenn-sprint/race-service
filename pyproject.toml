@@ -65,6 +65,7 @@ omit = [
   "*gunicorn_config.py",
   "*raceplans_individual_sprint.py",
 ]
+
 source = ["race_service"]
 
 [tool.coverage.report]
