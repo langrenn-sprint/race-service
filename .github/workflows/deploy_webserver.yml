@@ -24,7 +24,7 @@ jobs:
 
       - name: Configure docker to use the gcloud command-line tool as a credential helper
         run: |-
-          gcloud auth configure-docker gcr.io
+          gcloud auth configure-docker eu.gcr.io
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
@@ -48,10 +48,8 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-
       - name: Tag and publish docker image to Google Cloud
         run: |-
-          docker tag gcr.io/$PROJECT_ID/race-service:test gcr.io/$PROJECT_ID/race-service:$GITHUB_SHA
-          docker tag gcr.io/$PROJECT_ID/race-service:test gcr.io/$PROJECT_ID/race-service:latest
-          docker rmi gcr.io/$PROJECT_ID/race-service:test
-          docker -- push gcr.io/$PROJECT_ID/race-service -a
+          docker tag eu.gcr.io/$PROJECT_ID/race-service:test eu.gcr.io/$PROJECT_ID/race-service
+          docker rmi eu.gcr.io/$PROJECT_ID/race-service:test
+          docker push eu.gcr.io/$PROJECT_ID/race-service
