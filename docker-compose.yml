@@ -2,7 +2,7 @@ version: '3'
 services:
   race-service:
     build: .
-    image: eu.gcr.io/langrenn-sprint/race-service:test
+    image: ghcr.io/langrenn-sprint/race-service:test
     ports:
       - 8080:8080
     environment:
@@ -38,7 +38,7 @@ services:
       - user-service
       - mongodb
   user-service:
-    image: eu.gcr.io/langrenn-sprint/user-service:latest
+    image: ghcr.io/langrenn-sprint/user-service:latest
     ports:
       - 8082:8080
     environment:
