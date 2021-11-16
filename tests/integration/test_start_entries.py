@@ -37,7 +37,7 @@ async def race() -> dict:
         "raceclass": "G16",
         "order": 1,
         "start_time": "2021-08-31T12:00:00",
-        "no_of_contestants": 0,
+        "no_of_contestants": 8,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -111,6 +111,10 @@ async def test_create_start_entry(
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=None,
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
@@ -338,12 +342,187 @@ async def test_delete_start_entry(
 
 
 @pytest.mark.integration
+async def test_create_start_entry_race_is_full(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    startlist: dict,
+    new_start_entry: dict,
+    start_entry: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    START_ENTRY_ID = start_entry["id"]
+    full_race = deepcopy(race)
+    full_race["start_entries"] = [
+        s % s for s in range(1, race["no_of_contestants"] + 1)
+    ]
+    mocker.patch(
+        "race_service.services.start_entries_service.create_id",
+        return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=full_race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value=startlist,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+
+    request_body = dumps(new_start_entry, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post(
+            "races/1/start-entries", headers=headers, data=request_body
+        )
+        assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_create_start_entry_race_bib_already_in_race(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    startlist: dict,
+    new_start_entry: dict,
+    start_entry: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    START_ENTRY_ID = start_entry["id"]
+    mocker.patch(
+        "race_service.services.start_entries_service.create_id",
+        return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[start_entry],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value=startlist,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+
+    request_body = dumps(new_start_entry, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post(
+            "races/1/start-entries", headers=headers, data=request_body
+        )
+        assert resp.status == 400
+
+
+@pytest.mark.integration
+async def test_create_start_entry_race_position_is_taken(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    startlist: dict,
+    new_start_entry: dict,
+    start_entry: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    START_ENTRY_ID = start_entry["id"]
+    start_entry_different_bib_same_starting_position = deepcopy(start_entry)
+    start_entry_different_bib_same_starting_position["bib"] = 1000
+    mocker.patch(
+        "race_service.services.start_entries_service.create_id",
+        return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[start_entry_different_bib_same_starting_position],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value=startlist,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+
+    request_body = dumps(new_start_entry, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.post(
+            "races/1/start-entries", headers=headers, data=request_body
+        )
+        assert resp.status == 400
+
+
+@pytest.mark.integration
 async def test_create_start_entry_with_input_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
     race: dict,
     start_entry: dict,
+    startlist: dict,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
     START_ENTRY_ID = start_entry["id"]
@@ -354,6 +533,10 @@ async def test_create_start_entry_with_input_id(
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=START_ENTRY_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=None,
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
@@ -394,6 +577,7 @@ async def test_create_start_entry_adapter_fails(
     token: MockFixture,
     race: dict,
     start_entry: dict,
+    startlist: dict,
     new_start_entry: dict,
 ) -> None:
     """Should return 400 HTTPBadRequest."""
@@ -404,6 +588,10 @@ async def test_create_start_entry_adapter_fails(
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=None,
     )
     mocker.patch(
@@ -454,6 +642,10 @@ async def test_create_start_entry_mandatory_property(
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=None,
     )
     mocker.patch(

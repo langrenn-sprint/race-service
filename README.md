@@ -98,8 +98,8 @@ Start the server locally:
 To build and run the api in a Docker container:
 
 ```shell
-% docker build -t gcr.io/langrenn-sprint/race-service:latest .
-% docker run --env-file .env -p 8080:8080 -d gcr.io/langrenn-sprint/race-service:latest
+% docker build -t ghcr.io/langrenn-sprint/race-service:latest .
+% docker run --env-file .env -p 8080:8080 -d ghcr.io/langrenn-sprint/race-service:latest
 ```
 
 The easier way would be with docker-compose:

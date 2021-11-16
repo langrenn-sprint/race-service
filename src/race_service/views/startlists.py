@@ -20,6 +20,7 @@ from race_service.models import StartEntry, Startlist
 from race_service.services import (
     CouldNotCreateStartlistException,
     IllegalValueException,
+    RacesService,
     StartEntriesService,
     StartlistAllreadyExistException,
     StartlistNotFoundException,
@@ -48,6 +49,15 @@ class StartlistsView(View):
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
             startlists = await StartlistsService.get_startlist_by_event_id(db, event_id)
+            for startlist in startlists:
+                start_entries: List[StartEntry] = []
+                for start_entry_id in startlist.start_entries:
+                    start_entry = await StartEntriesService.get_start_entry_by_id(
+                        db, start_entry_id
+                    )
+                    start_entries.append(start_entry)
+                startlist.start_entries = start_entries  # type: ignore
+
         else:
             startlists = await StartlistsService.get_all_startlists(db)
         list = []
@@ -120,39 +130,8 @@ class StartlistView(View):
         body = startlist.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
-    async def put(self) -> Response:
-        """Put route function."""
-        db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
-        except Exception as e:
-            raise e from e
-
-        body = await self.request.json()
-        startlist_id = self.request.match_info["startlistId"]
-        logging.debug(
-            f"Got request-body {body} for {startlist_id} of type {type(body)}"
-        )
-        body = await self.request.json()
-        logging.debug(f"Got put request for startlist {body} of type {type(body)}")
-        try:
-            startlist = Startlist.from_dict(body)
-        except KeyError as e:
-            raise HTTPUnprocessableEntity(
-                reason=f"Mandatory property {e.args[0]} is missing."
-            ) from e
-
-        try:
-            await StartlistsService.update_startlist(db, startlist_id, startlist)
-        except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except StartlistNotFoundException as e:
-            raise HTTPNotFound(reason=str(e)) from e
-        return Response(status=204)
-
     async def delete(self) -> Response:
-        """Delete route function."""
+        """Delete startlist, and start-entries in it."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
@@ -164,6 +143,23 @@ class StartlistView(View):
         logging.debug(f"Got delete request for startlist {startlist_id}")
 
         try:
+            startlist_to_be_deleted: Startlist = (
+                await StartlistsService.get_startlist_by_id(db, startlist_id)
+            )
+
+            # First we need to remove all the start-entries:
+            for start_entry_id in startlist_to_be_deleted.start_entries:
+                await StartEntriesService.delete_start_entry(db, start_entry_id)
+
+            # We also need to remove all start-entries in the event's races:
+            races = await RacesService.get_races_by_event_id(
+                db, startlist_to_be_deleted.event_id
+            )
+            for race in races:
+                race.start_entries = []
+                await RacesService.update_race(db, race.id, race)
+
+            # We can then delete the startlist:
             await StartlistsService.delete_startlist(db, startlist_id)
         except StartlistNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e

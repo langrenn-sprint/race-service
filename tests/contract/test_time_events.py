@@ -50,7 +50,6 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
     await delete_time_events(http_service, token)
-    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
@@ -62,7 +61,6 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
     await delete_time_events(http_service, token)
-    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
