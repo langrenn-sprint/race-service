@@ -85,25 +85,68 @@ class StartEntriesView(View):
         try:
             if "id" not in body:
                 body["id"] = ""  # create dummy id property
-            start_entry = StartEntry.from_dict(body)
+            new_start_entry = StartEntry.from_dict(body)
         except KeyError as e:
             raise HTTPUnprocessableEntity(
                 reason=f"Mandatory property {e.args[0]} is missing."
             ) from e
 
         try:
-            start_entry_id = await StartEntriesService.create_start_entry(
-                db, start_entry
+            # First we need to get to the startlist the new start-entry is part of:
+            startlist = await StartlistsService.get_startlist_by_id(
+                db, new_start_entry.startlist_id
             )
+            # We need to check if the bib is already in the race, and
+            # if the given starting-position is vacant, or
+            # if there open starting-positions:
+            race: Race = await RacesService.get_race_by_id(db, new_start_entry.race_id)
+            start_entries_in_race = (
+                await StartEntriesService.get_start_entries_by_race_id(db, race.id)
+            )
+            bibs_in_race = [start_entry.bib for start_entry in start_entries_in_race]
+            starting_positions_in_race = [
+                start_entry.starting_position for start_entry in start_entries_in_race
+            ]
+            if not len(race.start_entries) < race.no_of_contestants:
+                raise HTTPBadRequest(
+                    reason="Cannot add start-entry: race is full."
+                ) from None
+            elif new_start_entry.bib in bibs_in_race:
+                raise HTTPBadRequest(
+                    reason=f"Cannot add start-entry: Bib {new_start_entry.bib} is already in the race."
+                ) from None
+            elif new_start_entry.starting_position in starting_positions_in_race:
+                raise HTTPBadRequest(
+                    reason=(
+                        "Cannot add start-entry: Starting_position"
+                        f"{new_start_entry.starting_position} is taken."
+                    )
+                ) from None
+            else:
+                pass
+
+            # We can create the start-entry:
+            start_entry_id = await StartEntriesService.create_start_entry(
+                db, new_start_entry
+            )
+
             # We need to add the start-entry to the race:
-            race: Race = await RacesService.get_race_by_id(db, start_entry.race_id)
             race.start_entries.append(start_entry_id)
             await RacesService.update_race(db, race.id, race)
-            # TODO: We also need to remove the start-entry from the startlist
+
+            # We also need to add the start-entry to the startlist
             # and add the start_entry to it's no_of_contestants
+            startlist.no_of_contestants += 1
+            startlist.start_entries.append(start_entry_id)
+            assert startlist.id  # noqa: S101
+            await StartlistsService.update_startlist(db, startlist.id, startlist)
         except IllegalValueException as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except CouldNotCreateStartEntryException as e:
+        except (
+            StartlistNotFoundException,
+            RaceNotFoundException,
+            CouldNotCreateStartEntryException,
+        ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
         logging.debug(f"inserted document with start_entry_id {start_entry_id}")
 

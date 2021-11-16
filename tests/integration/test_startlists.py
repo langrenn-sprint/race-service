@@ -1,8 +1,8 @@
 """Integration test cases for the startlists route."""
-from copy import deepcopy
 from datetime import datetime
 from json import dumps
 import os
+from typing import Any, Dict, List
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -35,14 +35,14 @@ async def new_startlist() -> dict:
     """Create a startlist object."""
     return {
         "event_id": "event_1",
-        "no_of_contestants": 32,
+        "no_of_contestants": 8,
         "start_entries": [
             {
                 "race_id": "J15",
                 "bib": 1,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+                "scheduled_start_time": "2021-08-31T12:00:00",
                 "starting_position": 1,
                 "id": None,
             },
@@ -51,7 +51,7 @@ async def new_startlist() -> dict:
                 "bib": 2,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
+                "scheduled_start_time": "2021-08-31T12:00:30",
                 "starting_position": 2,
                 "id": None,
             },
@@ -60,7 +60,7 @@ async def new_startlist() -> dict:
                 "bib": 3,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
+                "scheduled_start_time": "2021-08-31T12:01:00",
                 "starting_position": 1,
                 "id": None,
             },
@@ -69,7 +69,7 @@ async def new_startlist() -> dict:
                 "bib": 4,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
+                "scheduled_start_time": "2021-08-31T12:01:30",
                 "starting_position": 2,
                 "id": None,
             },
@@ -78,7 +78,7 @@ async def new_startlist() -> dict:
                 "bib": 5,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
+                "scheduled_start_time": "2021-08-31T12:02:00",
                 "starting_position": 1,
                 "id": None,
             },
@@ -87,7 +87,7 @@ async def new_startlist() -> dict:
                 "bib": 6,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
+                "scheduled_start_time": "2021-08-31T12:02:30",
                 "starting_position": 2,
                 "id": None,
             },
@@ -96,7 +96,7 @@ async def new_startlist() -> dict:
                 "bib": 7,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
+                "scheduled_start_time": "2021-08-31T12:03:00",
                 "starting_position": 1,
                 "id": None,
             },
@@ -105,7 +105,7 @@ async def new_startlist() -> dict:
                 "bib": 8,
                 "name": "name names",
                 "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
+                "scheduled_start_time": "2021-08-31T12:03:30",
                 "starting_position": 2,
                 "id": None,
             },
@@ -117,92 +117,176 @@ async def new_startlist() -> dict:
 async def startlist() -> dict:
     """Create a mock startlist object."""
     return {
-        "id": "1",
+        "id": "startlist_1",
         "event_id": "event_1",
-        "no_of_contestants": 32,
-        "start_entries": [
-            {
-                "race_id": "J15",
-                "bib": 1,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
-                "starting_position": 1,
-                "id": "11",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "J15",
-                "bib": 2,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
-                "starting_position": 2,
-                "id": "22",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "G15",
-                "bib": 3,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
-                "starting_position": 1,
-                "id": "33",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "G15",
-                "bib": 4,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
-                "starting_position": 2,
-                "id": "44",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "J16",
-                "bib": 5,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
-                "starting_position": 1,
-                "id": "55",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "J16",
-                "bib": 6,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
-                "starting_position": 2,
-                "id": "66",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "G16",
-                "bib": 7,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
-                "starting_position": 1,
-                "id": "77",
-                "startlist_id": 1,
-            },
-            {
-                "race_id": "G16",
-                "bib": 8,
-                "name": "name names",
-                "club": "the club",
-                "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
-                "starting_position": 2,
-                "id": "88",
-                "startlist_id": 1,
-            },
-        ],
+        "no_of_contestants": 8,
+        "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
     }
+
+
+RACES: List[Dict] = [
+    {
+        "id": "race_1",
+        "raceclass": "J15",
+        "order": 1,
+        "event_id": "event_1",
+        "no_of_contestants": 2,
+        "start_time": "2021-08-31T12:00:00",
+        "no_of_contestants": 2,
+        "raceplan_id": "raceplan_1",
+        "start_entries": ["11", "22"],
+        "results": {},
+        "datatype": "interval_start",
+    },
+    {
+        "id": "race_2",
+        "raceclass": "G15",
+        "order": 2,
+        "event_id": "event_1",
+        "no_of_contestants": 2,
+        "start_time": "2021-08-31T12:01:00",
+        "no_of_contestants": 2,
+        "raceplan_id": "raceplan_1",
+        "start_entries": [
+            "33",
+            "44",
+        ],
+        "results": {},
+        "datatype": "interval_start",
+    },
+    {
+        "id": "race_3",
+        "raceclass": "G16",
+        "order": 3,
+        "event_id": "event_1",
+        "no_of_contestants": 2,
+        "start_time": "2021-08-31T12:02:00",
+        "no_of_contestants": 2,
+        "raceplan_id": "raceplan_1",
+        "start_entries": ["55", "66"],
+        "results": {},
+        "datatype": "interval_start",
+    },
+    {
+        "id": "race_4",
+        "raceclass": "J16",
+        "order": 4,
+        "event_id": "event_1",
+        "no_of_contestants": 2,
+        "start_time": "2021-08-31T12:03:00",
+        "no_of_contestants": 2,
+        "raceplan_id": "raceplan_1",
+        "start_entries": ["77", "88"],
+        "results": {},
+        "datatype": "interval_start",
+    },
+]
+
+
+@pytest.fixture
+async def races() -> List[Dict]:
+    """Create a mock race object."""
+    return RACES
+
+
+def get_race_by_id(db: Any, id: str) -> dict:
+    """Mock function to look up correct race from list."""
+    return next(race for race in RACES if race["id"] == id)
+
+
+START_ENTRIES: List[Dict] = [
+    {
+        "id": "11",
+        "race_id": "J15",
+        "bib": 1,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
+        "starting_position": 1,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "22",
+        "race_id": "J15",
+        "bib": 2,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:00:30"),
+        "starting_position": 2,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "33",
+        "race_id": "G15",
+        "bib": 3,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:00"),
+        "starting_position": 1,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "44",
+        "race_id": "G15",
+        "bib": 4,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:01:30"),
+        "starting_position": 2,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "55",
+        "race_id": "J16",
+        "bib": 5,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:00"),
+        "starting_position": 1,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "66",
+        "race_id": "J16",
+        "bib": 6,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:02:30"),
+        "starting_position": 2,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "77",
+        "race_id": "G16",
+        "bib": 7,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
+        "starting_position": 1,
+        "startlist_id": "startlist_1",
+    },
+    {
+        "id": "88",
+        "race_id": "G16",
+        "bib": 8,
+        "name": "name names",
+        "club": "the club",
+        "scheduled_start_time": datetime.fromisoformat("2021-08-31 12:03:30"),
+        "starting_position": 2,
+        "startlist_id": "startlist_1",
+    },
+]
+
+
+@pytest.fixture
+async def start_entries() -> List[Dict]:
+    """Create a mock startlist object."""
+    return START_ENTRIES
+
+
+def get_start_entry_by_id(db: Any, id: str) -> dict:
+    """Mock function to look up correct race from list."""
+    return next(start_entry for start_entry in START_ENTRIES if start_entry["id"] == id)
 
 
 @pytest.mark.integration
@@ -244,7 +328,10 @@ async def test_create_startlist(
 
 @pytest.mark.integration
 async def test_get_startlist_by_id(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    startlist: dict,
 ) -> None:
     """Should return OK, and a body containing one startlist."""
     STARTLIST_ID = startlist["id"]
@@ -258,7 +345,7 @@ async def test_get_startlist_by_id(
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
-        side_effect=startlist["start_entries"],
+        side_effect=get_start_entry_by_id,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -283,7 +370,10 @@ async def test_get_startlist_by_id(
 
 @pytest.mark.integration
 async def test_get_startlist_by_event_id(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    startlist: dict,
 ) -> None:
     """Should return OK, and a body containing one startlist."""
     EVENT_ID = startlist["event_id"]
@@ -295,6 +385,10 @@ async def test_get_startlist_by_event_id(
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=[startlist],
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -322,7 +416,7 @@ async def test_get_startlist_by_event_id(
 async def test_update_startlist_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
 ) -> None:
-    """Should return No Content."""
+    """Should return 405 Method not allowed."""
     STARTLIST_ID = startlist["id"]
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
@@ -350,7 +444,7 @@ async def test_update_startlist_by_id(
         resp = await client.put(
             f"/startlists/{STARTLIST_ID}", headers=headers, data=request_body
         )
-        assert resp.status == 204
+        assert resp.status == 405
 
 
 @pytest.mark.integration
@@ -383,7 +477,12 @@ async def test_get_all_startlists(
 
 @pytest.mark.integration
 async def test_delete_startlist_by_id(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    start_entries: List[Dict],
+    startlist: dict,
+    races: List[Dict],
 ) -> None:
     """Should return No Content."""
     STARTLIST_ID = startlist["id"]
@@ -398,6 +497,30 @@ async def test_delete_startlist_by_id(
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=start_entries,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id",
+        return_value=races,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=get_race_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -544,78 +667,6 @@ async def test_create_startlist_mandatory_property(
         assert resp.status == 422
 
 
-@pytest.mark.integration
-async def test_update_startlist_by_id_missing_mandatory_property(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
-) -> None:
-    """Should return 422 HTTPUnprocessableEntity."""
-    STARTLIST_ID = startlist["id"]
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value=startlist,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
-        return_value=STARTLIST_ID,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
-        return_value=None,
-    )
-
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    request_body = {"id": STARTLIST_ID}
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
-
-        resp = await client.put(
-            f"/startlists/{STARTLIST_ID}", headers=headers, json=request_body
-        )
-        assert resp.status == 422
-
-
-@pytest.mark.integration
-async def test_update_startlist_by_id_different_id_in_body(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
-) -> None:
-    """Should return 422 HTTPUnprocessableEntity."""
-    STARTLIST_ID = startlist["id"]
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value=startlist,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
-        return_value=STARTLIST_ID,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
-        return_value=None,
-    )
-
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    update_body = deepcopy(startlist)
-    update_body["id"] = "different_id"
-    request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
-
-        resp = await client.put(
-            f"/startlists/{STARTLIST_ID}", headers=headers, data=request_body
-        )
-        assert resp.status == 422
-
-
 # Unauthorized cases:
 
 
@@ -667,38 +718,6 @@ async def test_get_startlist_by_id_no_authorization(
         m.post("http://users.example.com:8081/authorize", status=401)
 
         resp = await client.get(f"/startlists/{STARTLIST_ID}")
-        assert resp.status == 401
-
-
-@pytest.mark.integration
-async def test_update_startlist_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, startlist: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    STARTLIST_ID = startlist["id"]
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value=startlist,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
-        return_value=STARTLIST_ID,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
-        return_value=None,
-    )
-
-    headers = {hdrs.CONTENT_TYPE: "application/json"}
-
-    request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-
-        resp = await client.put(
-            f"/startlists/{STARTLIST_ID}", headers=headers, data=request_body
-        )
         assert resp.status == 401
 
 
@@ -803,40 +822,6 @@ async def test_get_startlist_not_found(
         m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.get(f"/startlists/{STARTLIST_ID}", headers=headers)
-        assert resp.status == 404
-
-
-@pytest.mark.integration
-async def test_update_startlist_not_found(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
-) -> None:
-    """Should return 404 Not found."""
-    STARTLIST_ID = "does-not-exist"
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value=None,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
-        return_value=None,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
-        return_value=None,
-    )
-
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.put(
-            f"/startlists/{STARTLIST_ID}", headers=headers, data=request_body
-        )
         assert resp.status == 404
 
 

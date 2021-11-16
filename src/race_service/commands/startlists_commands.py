@@ -298,12 +298,12 @@ async def get_startlist(db: Any, token: str, event_id: str) -> None:
     _startlist = await StartlistsAdapter.get_startlist_by_event_id(db, event_id)
     if _startlist:
         raise StartlistAllreadyExistException(
-            f'Event "{event_id}" already has a raceplan.'
+            f'Event "{event_id}" already has a startlist.'
         )
 
 
 async def get_raceplan(db: Any, token: str, event_id: str) -> Raceplan:
-    """Check if the event already has a raceplan."""
+    """Check if the event has a raceplan."""
     raceplans = await RaceplansService.get_raceplan_by_event_id(db, event_id)
     if len(raceplans) == 0:
         raise NoRaceplanInEventException(
@@ -319,7 +319,7 @@ async def get_raceplan(db: Any, token: str, event_id: str) -> Raceplan:
 async def get_races(
     db: Any, token: str, raceplan_id: str
 ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
-    """Check if the event already has a raceplan."""
+    """Check if the event has a races."""
     races = await RacesService.get_races_by_raceplan_id(db, raceplan_id)
     if len(races) == 0:
         raise NoRacesInRaceplanException(

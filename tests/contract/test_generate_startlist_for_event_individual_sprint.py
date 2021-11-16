@@ -48,7 +48,6 @@ async def token(http_service: Any) -> str:
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
@@ -59,7 +58,6 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
@@ -192,28 +190,7 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
     logging.info("Clear_db: Deleted all startlists.")
 
 
-async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
-    """Delete all start_entries before we start."""
-    url = f"{http_service}/races"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            races = await response.json()
-            for race in races:
-                race_id = race["id"]
-                for start_entry_id in race["start_entries"]:
-                    async with session.delete(
-                        f"{url}/{race_id}/start-entries/{start_entry_id}",
-                        headers=headers,
-                    ) as response:
-                        assert response.status == 204
-    logging.info("Clear_db: Deleted all start_entries.")
-
-
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def expected_startlist() -> dict:
     """Create a mock startlist object."""
     with open("tests/files/expected_startlist_individual_sprint.json", "r") as file:
@@ -433,67 +410,6 @@ async def test_generate_startlist_for_individual_sprint_event(
                 assert start_entry["club"]
                 assert start_entry["starting_position"]
                 assert start_entry["scheduled_start_time"] == race["start_time"]
-
-
-@pytest.mark.contract
-@pytest.mark.asyncio
-async def test_remove_start_entry_from_race(
-    http_service: Any,
-    token: MockFixture,
-    clear_db: None,
-    expected_startlist: dict,
-) -> None:
-    """Should return 204 No content and remove start_entry from the race and the startlist."""
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-    async with ClientSession() as session:
-        # Need to get to a race:
-        url = f"{http_service}/races"
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            races = await response.json()
-            assert len(races) > 0
-            race = races[0]
-            assert len(race["start_entries"]) > 0
-        url = f'{http_service}/races/{race["id"]}/start-entries'
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            start_entries = await response.json()
-            assert len(start_entries) > 0
-            start_entry_to_be_removed = start_entries[0]
-        # We need to get the startlist:
-        url = f'{http_service}/startlists/{start_entry_to_be_removed["startlist_id"]}'
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            startlist = await response.json()
-
-        # We remove the start-entry:
-        startlist_id = start_entry_to_be_removed["startlist_id"]
-        url = f'{http_service}/races/{race["id"]}/start-entries/{start_entry_to_be_removed["id"]}'
-        async with session.delete(url, headers=headers) as response:
-            assert response.status == 204
-
-        # Check that the start-entry is no longer in the list of start-entries of the race:
-        url = f'{http_service}/races/{race["id"]}'
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            race_updated = await response.json()
-            assert start_entry_to_be_removed["id"] not in race_updated["start_entries"]
-
-        # Check that the start-entry is no longer in the list of start-entries of the startlist:
-        url = f"{http_service}/startlists/{startlist_id}"
-        async with session.get(url, headers=headers) as response:
-            assert response.status == 200
-            startlist_updated = await response.json()
-            assert (
-                startlist_updated["no_of_contestants"]
-                == startlist["no_of_contestants"] - 1
-            )
-            assert (
-                start_entry_to_be_removed["id"]
-                not in startlist_updated["start_entries"]
-            )
 
 
 # ---

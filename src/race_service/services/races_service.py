@@ -60,7 +60,7 @@ class RacesService:
     async def get_races_by_raceplan_id(
         cls: Any, db: Any, raceplan_id: str
     ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
-        """Get all races by event_id function."""
+        """Get all races by raceplan_id function."""
         races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
         _races = await RacesAdapter.get_races_by_raceplan_id(db, raceplan_id)
 

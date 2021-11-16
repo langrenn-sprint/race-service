@@ -15,7 +15,7 @@ USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def event_loop(request: Any) -> Any:
     """Redefine the event_loop fixture to have the same scope."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
@@ -23,7 +23,7 @@ def event_loop(request: Any) -> Any:
     loop.close()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
@@ -43,12 +43,11 @@ async def token(http_service: Any) -> str:
     return body["token"]
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
@@ -59,7 +58,6 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
@@ -153,7 +151,7 @@ async def delete_raceclasses(token: MockFixture) -> None:
 
 
 async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
-    """Delete all raceplans before we start."""
+    """Delete all raceplans."""
     url = f"{http_service}/raceplans"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -173,7 +171,7 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
 
 
 async def delete_startlists(http_service: Any, token: MockFixture) -> None:
-    """Delete all startlists before we start."""
+    """Delete all startlists."""
     url = f"{http_service}/startlists"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -192,29 +190,8 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
     logging.info("Clear_db: Deleted all startlists.")
 
 
-async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
-    """Delete all start_entries before we start."""
-    url = f"{http_service}/races"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            races = await response.json()
-            for race in races:
-                race_id = race["id"]
-                for start_entry_id in race["start_entries"]:
-                    async with session.delete(
-                        f"{url}/{race_id}/start-entries/{start_entry_id}",
-                        headers=headers,
-                    ) as response:
-                        assert response.status == 204
-    logging.info("Clear_db: Deleted all start_entries.")
-
-
 async def delete_races(http_service: Any, token: MockFixture) -> None:
-    """Delete all races before we start."""
+    """Delete all races."""
     url = f"{http_service}/races"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
@@ -232,7 +209,7 @@ async def delete_races(http_service: Any, token: MockFixture) -> None:
     logging.info("Clear_db: Deleted all races.")
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def expected_startlist() -> dict:
     """Create a mock startlist object."""
     with open("tests/files/expected_startlist_interval_start.json", "r") as file:

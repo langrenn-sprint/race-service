@@ -1,4 +1,5 @@
 """Resource module for startlist command resources."""
+from json.decoder import JSONDecodeError
 import os
 
 from aiohttp import hdrs
@@ -52,7 +53,11 @@ class GenerateStartlistForEventView(View):
             raise e
 
         # Execute command:
-        request_body = await self.request.json()
+        try:
+            request_body = await self.request.json()
+        except JSONDecodeError as e:
+            raise HTTPBadRequest(reason="Invalid request body") from e
+
         event_id = request_body["event_id"]
         try:
             startlist_id = await StartlistsCommands.generate_startlist_for_event(
