@@ -219,6 +219,31 @@ async def context(http_service: Any, token: MockFixture) -> Dict[str, Union[str,
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_create_startlist_should_fail(
+    http_service: Any,
+    token: MockFixture,
+    context: dict,
+) -> None:
+    """Should return 405 Method Not Allowed."""
+    # ACT
+    url = f"{http_service}/startlists"
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    request_startlist = {"event_id": context["event_id"]}
+    async with ClientSession() as session:
+        async with session.post(
+            url, headers=headers, json=request_startlist
+        ) as response:
+            await response.json()
+
+    # ASSERT
+    assert response.status == 405
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_generate_startlist_when_event_already_has_one(
     http_service: Any,
     token: MockFixture,

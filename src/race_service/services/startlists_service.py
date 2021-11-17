@@ -148,8 +148,7 @@ class StartlistsService:
 #   Validation:
 async def validate_startlist(db: Any, startlist: Startlist) -> None:
     """Validate the startlist."""
-    # Validate start_entries:
-    # TODO: validate race-properties.
+    # TODO: Validate startlist-properties:
     if startlist.start_entries:
         for _start_entry in startlist.start_entries:
             pass

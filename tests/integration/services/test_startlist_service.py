@@ -7,10 +7,22 @@ from pytest_mock import MockFixture
 
 from race_service.models import Startlist
 from race_service.services import (
+    CouldNotCreateStartlistException,
     IllegalValueException,
+    StartlistAllreadyExistException,
     StartlistsService,
 )
 from race_service.services.startlists_service import StartlistNotFoundException
+
+
+@pytest.fixture
+async def new_startlist() -> Startlist:
+    """Create a startlist object."""
+    return Startlist(
+        event_id="event_1",
+        no_of_contestants=8,
+        start_entries=["11", "22", "33", "44", "55", "66", "77", "88"],
+    )
 
 
 @pytest.fixture
@@ -33,6 +45,69 @@ async def startlist_mock() -> Dict:
         "no_of_contestants": 8,
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
     }
+
+
+@pytest.mark.integration
+async def test_create_startlist_input_id(
+    loop: Any,
+    mocker: MockFixture,
+    startlist: Startlist,
+    startlist_mock: Dict,
+) -> None:
+    """Should raise IllegalValueException."""
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=True,
+    )
+
+    with pytest.raises(IllegalValueException):
+        await StartlistsService.create_startlist(db=None, startlist=startlist)
+
+
+@pytest.mark.integration
+async def test_create_startlist_allready_exist(
+    loop: Any,
+    mocker: MockFixture,
+    new_startlist: Startlist,
+    startlist_mock: Dict,
+) -> None:
+    """Should raise IllegalValueException."""
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=startlist_mock,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=True,
+    )
+
+    with pytest.raises(StartlistAllreadyExistException):
+        await StartlistsService.create_startlist(db=None, startlist=new_startlist)
+
+
+@pytest.mark.integration
+async def test_create_startlist_adapter_fails(
+    loop: Any,
+    mocker: MockFixture,
+    new_startlist: Startlist,
+    startlist_mock: Dict,
+) -> None:
+    """Should raise IllegalValueException."""
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        return_value=[],
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
+        return_value=None,
+    )
+
+    with pytest.raises(CouldNotCreateStartlistException):
+        await StartlistsService.create_startlist(db=None, startlist=new_startlist)
 
 
 @pytest.mark.integration
