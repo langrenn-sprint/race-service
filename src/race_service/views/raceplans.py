@@ -4,23 +4,19 @@ import logging
 import os
 from typing import List, Union
 
-from aiohttp import hdrs
 from aiohttp.web import (
-    HTTPBadRequest,
     HTTPNotFound,
     HTTPUnprocessableEntity,
     Response,
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
 from race_service.services import (
     IllegalValueException,
     RaceNotFoundException,
-    RaceplanAllreadyExistException,
     RaceplanNotFoundException,
     RaceplansService,
     RacesService,
@@ -56,64 +52,6 @@ class RaceplansView(View):
 
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
-
-    # TODO: users should not be able to post raceplan, should post to /generate-raceplan-for-event
-    async def post(self) -> Response:  # noqa: C901
-        """Create the raceplan and all the races in it."""
-        db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
-        except Exception as e:
-            raise e from e
-
-        body = await self.request.json()
-        logging.debug(f"Got create request for raceplan {body} of type {type(body)}")
-        try:
-            raceplan = Raceplan.from_dict(body)
-            raceplan.races = []  # We add the races later.
-            races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
-            for race in body["races"]:
-                race["id"] = ""
-                if "event_id" not in race:
-                    race["event_id"] = raceplan.event_id
-                if "raceplan_id" not in race:
-                    race["raceplan_id"] = ""
-                if race["datatype"] == "individual_sprint":
-                    races.append(IndividualSprintRace.from_dict(race))
-                elif race["datatype"] == "interval_start":
-                    races.append(IntervalStartRace.from_dict(race))
-                else:
-                    raise HTTPBadRequest(
-                        reason=f'Race of type "{race["datatype"]}" not supported.'
-                    )
-        except KeyError as e:
-            raise HTTPUnprocessableEntity(
-                reason=f"Mandatory property {e.args[0]} is missing."
-            ) from e
-
-        try:
-            # Finally we store the races and the raceplan and return the id to the plan:
-            raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
-            if raceplan_id:
-                for race in races:
-                    race.raceplan_id = raceplan_id
-                    race_id = await RacesService.create_race(db, race)
-                    if race_id:
-                        raceplan.races.append(race_id)
-                await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
-        except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except RaceplanAllreadyExistException as e:
-            raise HTTPBadRequest(reason=str(e)) from e
-        if raceplan_id:
-            logging.debug(f"inserted document with raceplan_id {raceplan_id}")
-            headers = MultiDict(
-                [(hdrs.LOCATION, f"{BASE_URL}/raceplans/{raceplan_id}")]
-            )
-
-            return Response(status=201, headers=headers)
-        raise HTTPBadRequest() from None
 
 
 class RaceplanView(View):

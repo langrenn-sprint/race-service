@@ -4,25 +4,18 @@ import logging
 import os
 from typing import List
 
-from aiohttp import hdrs
 from aiohttp.web import (
-    HTTPBadRequest,
     HTTPNotFound,
-    HTTPUnprocessableEntity,
     Response,
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import StartEntry, Startlist
 from race_service.services import (
-    CouldNotCreateStartlistException,
-    IllegalValueException,
     RacesService,
     StartEntriesService,
-    StartlistAllreadyExistException,
     StartlistNotFoundException,
     StartlistsService,
 )
@@ -66,36 +59,6 @@ class StartlistsView(View):
 
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
-
-    # TODO: users should not be able to post startlist, should post to /generate-startlist-for-event
-    async def post(self) -> Response:
-        """Post route function."""
-        db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
-        except Exception as e:
-            raise e from e
-
-        body = await self.request.json()
-        logging.debug(f"Got create request for startlist {body} of type {type(body)}")
-        try:
-            startlist = Startlist.from_dict(body)
-        except KeyError as e:
-            raise HTTPUnprocessableEntity(
-                reason=f"Mandatory property {e.args[0]} is missing."
-            ) from e
-        try:
-            startlist_id = await StartlistsService.create_startlist(db, startlist)
-        except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except (StartlistAllreadyExistException, CouldNotCreateStartlistException) as e:
-            raise HTTPBadRequest(reason=str(e)) from e
-
-        logging.debug(f"inserted document with startlist_id {startlist_id}")
-        headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/startlists/{startlist_id}")])
-
-        return Response(status=201, headers=headers)
 
 
 class StartlistView(View):
