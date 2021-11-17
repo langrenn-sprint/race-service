@@ -2,23 +2,18 @@
 import json
 import logging
 import os
-from typing import Dict, List, Union
+from typing import Dict, List
 
-from aiohttp import hdrs
 from aiohttp.web import (
-    HTTPBadRequest,
     HTTPNotFound,
     HTTPUnprocessableEntity,
     Response,
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import (
-    IndividualSprintRace,
-    IntervalStartRace,
     Race,
     StartEntry,
     TimeEvent,
@@ -63,46 +58,6 @@ class RacesView(View):
 
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
-
-    # TODO: users should not be able to post race, should post to /generate-raceplan-for-event
-    async def post(self) -> Response:  # noqa: C901
-        """Create the race and all the races in it."""
-        db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "race-admin"])
-        except Exception as e:
-            raise e from e
-
-        body = await self.request.json()
-        logging.debug(f"Got create request for race {body} of type {type(body)}")
-        try:
-            race: Union[IndividualSprintRace, IntervalStartRace]
-            if "id" not in body:
-                body["id"] = ""  # create dummy id property
-            if body["datatype"] == "individual_sprint":
-                race = IndividualSprintRace.from_dict(body)
-            elif body["datatype"] == "interval_start":
-                race = IntervalStartRace.from_dict(body)
-            else:
-                raise HTTPBadRequest(
-                    reason=f'Race of type "{body["datatype"]}" not supported.'
-                )
-        except KeyError as e:
-            raise HTTPUnprocessableEntity(
-                reason=f"Mandatory property {e.args[0]} is missing."
-            ) from e
-
-        try:
-            race_id = await RacesService.create_race(db, race)
-        except IllegalValueException as e:
-            raise HTTPUnprocessableEntity(reason=str(e)) from e
-        if race_id:
-            logging.debug(f"inserted document with race_id {race_id}")
-            headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/races/{race_id}")])
-
-            return Response(status=201, headers=headers)
-        raise HTTPBadRequest() from None
 
 
 class RaceView(View):
