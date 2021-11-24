@@ -68,7 +68,18 @@ class RaceResultsView(View):
                     db, time_event_id
                 )
                 time_events.append(time_event)
-            race_result.ranking_sequence = time_events  # type: ignore
+                # We sort the time-events on rank:
+                time_events_sorted = sorted(
+                    time_events,
+                    key=lambda k: (
+                        k.rank is not None,
+                        k.rank != "",
+                        k.rank,
+                    ),
+                    reverse=False,
+                )
+
+            race_result.ranking_sequence = time_events_sorted  # type: ignore
 
         list = []
         for race_result in race_results:
@@ -104,7 +115,18 @@ class RaceResultView(View):
                     db, time_event_id
                 )
                 time_events.append(time_event)
-            race_result.ranking_sequence = time_events  # type: ignore
+                # We sort the time-events on rank:
+                time_events_sorted = sorted(
+                    time_events,
+                    key=lambda k: (
+                        k.rank is not None,
+                        k.rank != "",
+                        k.rank,
+                    ),
+                    reverse=False,
+                )
+
+            race_result.ranking_sequence = time_events_sorted  # type: ignore
         except RaceResultNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got race_result: {race_result}")
