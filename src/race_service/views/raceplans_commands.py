@@ -62,6 +62,7 @@ class GenerateRaceplanForEventView(View):
             MissingPropertyException,
             InconsistentValuesInRaceclassesException,
             RaceplanAllreadyExistException,
+            ValueError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
         headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/raceplans/{raceplan_id}")])
