@@ -130,40 +130,13 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
             and race.index == "C"
         ]
     )
-    no_of_FAs = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"]
-            and race.round == "F"
-            and race.index == "A"
-        ]
-    )
-    no_of_FBs = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"]
-            and race.round == "F"
-            and race.index == "B"
-        ]
-    )
-    no_of_FCs = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"]
-            and race.round == "F"
-            and race.index == "C"
-        ]
-    )
 
     no_of_contestants_to_Qs = raceclass["no_of_contestants"]
     no_of_contestants_to_SAs = 0
     no_of_contestants_to_SCs = 0
-    no_of_contestants_to_FAs = 0
-    no_of_contestants_to_FBs = 0
-    no_of_contestants_to_FCs = 0
+    no_of_contestants_to_FA = 0
+    no_of_contestants_to_FB = 0
+    no_of_contestants_to_FC = 0
 
     # Calculate number of contestants pr heat in Q:
     for race in [
@@ -196,7 +169,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         # or the rest may in some cases go directly to FC:
         if "F" in race.rule:
             if "C" in race.rule["F"]:
-                no_of_contestants_to_FCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
+                no_of_contestants_to_FC += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
 
     # Calculate number of contestants pr heat in SA:
     for race in [
@@ -240,12 +213,12 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         and race.round == "S"
         and race.index == "A"
     ]:
-        no_of_contestants_to_FAs += race.rule["F"]["A"]  # type: ignore
+        no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
         # rest to FB:
         if race.rule["F"]["B"] < float("inf"):
-            no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
+            no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
         else:
-            no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+            no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
 
     # Calculate number of contestants in FC:
     for race in [
@@ -255,7 +228,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         and race.round == "S"
         and race.index == "C"
     ]:
-        no_of_contestants_to_FCs += race.rule["F"]["C"]  # type: ignore
+        no_of_contestants_to_FC += race.rule["F"]["C"]  # type: ignore
 
     # Calculate number of contestants pr heat in FA:
     for race in [
@@ -265,14 +238,8 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         and race.round == "F"
         and race.index == "A"
     ]:
-        quotient, remainder = divmod(
-            no_of_contestants_to_FAs,
-            no_of_FAs,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
+        # There will always be only on FA, simplifying:
+        race.no_of_contestants = no_of_contestants_to_FA
 
     # Calculate number of contestants pr heat in FB:
     for race in [
@@ -282,14 +249,8 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         and race.round == "F"
         and race.index == "B"
     ]:
-        quotient, remainder = divmod(
-            no_of_contestants_to_FBs,
-            no_of_FBs,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
+        # There will always be only on FB, simplifying:
+        race.no_of_contestants = no_of_contestants_to_FB
 
     # Calculate number of contestants pr heat in FC:
     for race in [
@@ -299,14 +260,8 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         and race.round == "F"
         and race.index == "C"
     ]:
-        quotient, remainder = divmod(
-            no_of_contestants_to_FCs,
-            no_of_FCs,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
+        # There will always be only on FC, simplifying:
+        race.no_of_contestants = no_of_contestants_to_FC
 
 
 class ConfigMatrix:
