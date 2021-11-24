@@ -217,7 +217,7 @@ async def context(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        files = {"file": open("tests/files/all_contestants_eventid_364892.csv", "rb")}
+        files = {"file": open("tests/files/contestants_all_333.csv", "rb")}
         logging.debug(f"Adding contestants from file at url {url}.")
         async with session.post(url, headers=headers, data=files) as response:
             status = response.status

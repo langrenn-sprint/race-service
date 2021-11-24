@@ -215,6 +215,8 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
     clear_db: None,
 ) -> None:
     """Should return 201 created and a location header with url to the raceplan."""
+    # ARRANGE
+
     event_id = ""
     async with ClientSession() as session:
         # First we need create the competition-format:
@@ -259,7 +261,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        files = {"file": open("tests/files/J11_contestants_eventid_364892.csv", "rb")}
+        files = {"file": open("tests/files/contestants_J11_17.csv", "rb")}
         logging.debug(f"Adding contestants from file at url {url}.")
         async with session.post(url, headers=headers, data=files) as response:
             status = response.status
@@ -301,6 +303,8 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
 
         await _print_raceclasses(raceclasses)
 
+        # ACT
+
         # Finally, we are ready to generate the raceplan:
         request_body = {"event_id": event_id}
         url = f"{http_service}/raceplans/generate-raceplan-for-event"
@@ -312,8 +316,11 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
                 )
                 body = await response.json()
                 logging.error(f"Got body {body}.")
-            assert response.status == 201
-            assert "/raceplans/" in response.headers[hdrs.LOCATION]
+
+        # ASSERT
+
+        assert response.status == 201
+        assert "/raceplans/" in response.headers[hdrs.LOCATION]
 
         # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
@@ -377,7 +384,9 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
     token: MockFixture,
     clear_db: None,
 ) -> None:
-    """Should return 400 Bad request."""
+    """Should return 201 created and a location header with url to the raceplan."""
+    # ARRANGE
+
     event_id = ""
     async with ClientSession() as session:
         # First we need create the competition-format:
@@ -423,7 +432,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        files = {"file": open("tests/files/all_contestants_eventid_364892.csv", "rb")}
+        files = {"file": open("tests/files/contestants_all_333.csv", "rb")}
         logging.debug(f"Adding contestants from file at url {url}.")
         async with session.post(url, headers=headers, data=files) as response:
             status = response.status
@@ -464,6 +473,8 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
 
         await _print_raceclasses(raceclasses)
 
+        # ACT:
+
         # Finally, we are ready to generate the raceplan:
         request_body = {"event_id": event_id}
         url = f"{http_service}/raceplans/generate-raceplan-for-event"
@@ -475,8 +486,11 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
                 )
                 body = await response.json()
                 logging.error(f"Got body {body}.")
-            assert response.status == 201
-            assert "/raceplans/" in response.headers[hdrs.LOCATION]
+
+        # ASSERT:
+
+        assert response.status == 201
+        assert "/raceplans/" in response.headers[hdrs.LOCATION]
 
         # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
