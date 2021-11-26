@@ -84,13 +84,13 @@ LOGGING_LEVEL=DEBUG
 Start the server locally:
 
 ```shell
-% poetry run adev runserver -p 8080 --aux-port 8089 src/race_service
+% poetry run adev runserver -p 8080 --aux-port 8089 race_service
 ```
 
 ### Running the API in a wsgi-server (gunicorn)
 
 ```shell
-% cd src && poetry run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% poetry run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
 ```
 
 ### Running the wsgi-server in Docker
