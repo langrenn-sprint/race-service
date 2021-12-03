@@ -390,10 +390,12 @@ async def new_time_event(
     return {
         "bib": start_entries[0]["bib"],  # we pick the first start-entry in the race
         "event_id": raceplan["event_id"],
+        "name": "Petter Propell",
+        "club": "Barnehagen",
         "race_id": race_id,
         "race": "race_name",
         "timing_point": "Finish",
-        "rank": "1",
+        "rank": 1,
         "registration_time": "12:01:02",
         "next_race_id": "semi_1",
         "next_race_position": 1,

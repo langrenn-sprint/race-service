@@ -16,9 +16,11 @@ class TimeEvent(DataClassJsonMixin):
     event_id: str
     timing_point: str
     registration_time: time
+    name: Optional[str] = field(default=None)
+    club: Optional[str] = field(default=None)
     race: Optional[str] = field(default=None)
     race_id: Optional[str] = field(default=None)
-    rank: Optional[str] = field(default=None)
+    rank: Optional[int] = field(default=None)
     next_race: Optional[str] = field(default=None)
     next_race_id: Optional[str] = field(default=None)
     next_race_position: Optional[int] = field(default=None)
