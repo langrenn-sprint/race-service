@@ -377,7 +377,12 @@ async def test_get_race_by_id_interval_start(
                 == mock_race_result["no_of_contestants"]
             )
             assert type(race_result["ranking_sequence"])
-            assert len(race_result["ranking_sequence"]) > 0
+            assert len(race_result["ranking_sequence"]) == 2
+            # Simple test to check if the ranking_sequence is sorted:
+            assert (
+                race_result["ranking_sequence"][0]["rank"]
+                < race_result["ranking_sequence"][1]["rank"]
+            ), "ranking_sequence is not sorted correctly."
             for time_event in race_result["ranking_sequence"]:
                 assert type(time_event) is dict
                 expected_time_event = get_time_event_by_id(db=None, id=time_event["id"])
