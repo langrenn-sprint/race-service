@@ -99,7 +99,18 @@ class RaceView(View):
                         db, time_event_id
                     )
                     ranking_sequence.append(time_event)
-                race_result.ranking_sequence = ranking_sequence  # type: ignore
+                # We sort the time-events on rank:
+                ranking_sequence_sorted = sorted(
+                    ranking_sequence,
+                    key=lambda k: (
+                        k.rank is not None,
+                        k.rank != "",
+                        k.rank,
+                    ),
+                    reverse=False,
+                )
+
+                race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore
                 results[key] = race_result
             race.results = results  # type: ignore
         except RaceNotFoundException as e:
