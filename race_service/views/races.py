@@ -90,7 +90,6 @@ class RaceView(View):
                 start_entries,
                 key=lambda k: (
                     k.starting_position is not None,
-                    k.starting_position != "",
                     k.starting_position,
                 ),
                 reverse=False,
