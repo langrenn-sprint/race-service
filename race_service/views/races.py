@@ -85,17 +85,7 @@ class RaceView(View):
                 )
                 start_entries.append(start_entry)
 
-            # We sort the start_entries on position:
-            start_entries_sorted = sorted(
-                start_entries,
-                key=lambda k: (
-                    k.starting_position is not None,
-                    k.starting_position,
-                ),
-                reverse=False,
-            )
-
-            race.start_entries = start_entries_sorted  # type: ignore
+            race.start_entries = start_entries  # type: ignore
             # Get the race_results:
             results: Dict[str, RaceResult] = {}
             for key in race.results:
