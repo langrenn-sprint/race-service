@@ -383,21 +383,58 @@ async def test_get_raceplan(
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
+    id = context["id"]
+    url = f"{url}/{id}"
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            raceplans = await response.json()
-        id = raceplans[0]["id"]
-        url = f"{url}/{id}"
         async with session.get(url, headers=headers) as response:
             raceplan = await response.json()
 
     assert response.status == 200
     assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
     assert type(raceplan) is dict
-    assert raceplan["id"]
+    assert raceplan["id"] == context["id"]
     assert raceplan["event_id"] == context["event_id"]
-    assert raceplan["races"]
+    i = 0
+    for race in raceplan["races"]:
+        assert race["id"] == context["races"][i]
+        i += 1
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_update_race(
+    http_service: Any, token: MockFixture, context: dict
+) -> None:
+    """Should return No Content."""
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    races = context["races"]
+    race_to_be_updated_id = races[-1]  # we update the last race
+
+    url = f"{http_service}/races/{race_to_be_updated_id}"
+
+    async with ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            race_to_be_updated = await response.json()
+        # we change the start-time:
+        race_to_be_updated["start_time"] = "2021-12-06T11:00:00"
+        request_body = json.dumps(
+            race_to_be_updated, indent=4, sort_keys=True, default=str
+        )
+        async with session.put(url, headers=headers, data=request_body) as response:
+            pass
+
+        assert response.status == 204
+
+        # We get all the races in event to verify:
+        url = f'{http_service}/races?eventId={context["event_id"]}'
+        async with session.get(url, headers=headers, data=request_body) as response:
+            _ = await response.json()
+
+        assert response.status == 200
 
 
 @pytest.mark.contract
@@ -412,16 +449,12 @@ async def test_update_raceplan(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
+    id = context["id"]
+    url = f"{url}/{id}"
+    update_raceplan = deepcopy(context)
+    update_raceplan["event_id"] = "new_event_id"
+    request_body = json.dumps(update_raceplan, indent=4, sort_keys=True, default=str)
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
-            raceplans = await response.json()
-        id = raceplans[0]["id"]
-        url = f"{url}/{id}"
-        update_raceplan = deepcopy(raceplans[0])
-        update_raceplan["event_id"] = "new_event_id"
-        request_body = json.dumps(
-            update_raceplan, indent=4, sort_keys=True, default=str
-        )
         async with session.put(url, headers=headers, data=request_body) as response:
             pass
 

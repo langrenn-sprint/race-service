@@ -2,6 +2,7 @@
 import json
 import logging
 import os
+from typing import Union
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -17,10 +18,10 @@ from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import (
-    Race,
     StartEntry,
     Startlist,
 )
+from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
 from race_service.services import (
     CouldNotCreateStartEntryException,
     IllegalValueException,
@@ -99,7 +100,9 @@ class StartEntriesView(View):
             # We need to check if the bib is already in the race, and
             # if the given starting-position is vacant, or
             # if there open starting-positions:
-            race: Race = await RacesService.get_race_by_id(db, new_start_entry.race_id)
+            race: Union[
+                IndividualSprintRace, IntervalStartRace
+            ] = await RacesService.get_race_by_id(db, new_start_entry.race_id)
             start_entries_in_race = (
                 await StartEntriesService.get_start_entries_by_race_id(db, race.id)
             )
@@ -240,7 +243,9 @@ class StartEntryView(View):
             )
             # We need to remove the start-entry from the race containing the start-entry:
             try:
-                race: Race = await RacesService.get_race_by_id(db, start_entry.race_id)
+                race: Union[
+                    IndividualSprintRace, IntervalStartRace
+                ] = await RacesService.get_race_by_id(db, start_entry.race_id)
             except RaceNotFoundException as e:
                 raise HTTPInternalServerError(
                     reason=(

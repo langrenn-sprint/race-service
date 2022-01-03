@@ -30,9 +30,11 @@ class RacesService:
     """Class representing a service for races."""
 
     @classmethod
-    async def get_all_races(cls: Any, db: Any) -> List[Race]:
+    async def get_all_races(
+        cls: Any, db: Any
+    ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
         """Get all races function."""
-        races: List[Race] = []
+        races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
         _races = await RacesAdapter.get_all_races(db)
 
         if _races:
@@ -44,9 +46,11 @@ class RacesService:
         return races
 
     @classmethod
-    async def get_races_by_event_id(cls: Any, db: Any, event_id: str) -> List[Race]:
+    async def get_races_by_event_id(
+        cls: Any, db: Any, event_id: str
+    ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
         """Get all races by event_id function."""
-        races: List[Race] = []
+        races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
         _races = await RacesAdapter.get_races_by_event_id(db, event_id)
         if _races:
             for _race in _races:
@@ -118,7 +122,9 @@ class RacesService:
         raise RaceNotFoundException(f"Race with id {id} not found")
 
     @classmethod
-    async def update_race(cls: Any, db: Any, id: str, race: Race) -> Optional[str]:
+    async def update_race(
+        cls: Any, db: Any, id: str, race: Union[IndividualSprintRace, IntervalStartRace]
+    ) -> Optional[str]:
         """Update race function."""
         # get old document
         old_race = await RacesAdapter.get_race_by_id(db, id)
@@ -126,8 +132,11 @@ class RacesService:
         if old_race:
             if race.id != old_race["id"]:
                 raise IllegalValueException("Cannot change id for race.")
-            new_race = race.to_dict()
-            result = await RacesAdapter.update_race(db, id, new_race)
+            race_to_be_updated = race.to_dict()
+            logging.debug(
+                f"Updating race with following values:\n {race_to_be_updated}"
+            )
+            result = await RacesAdapter.update_race(db, id, race_to_be_updated)
             return result
         raise RaceNotFoundException(f"Race with id {id} not found.")
 
