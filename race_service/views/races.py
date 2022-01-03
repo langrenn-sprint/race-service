@@ -2,7 +2,7 @@
 import json
 import logging
 import os
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -14,11 +14,14 @@ from dotenv import load_dotenv
 
 from race_service.adapters import UsersAdapter
 from race_service.models import (
-    Race,
     StartEntry,
     TimeEvent,
 )
-from race_service.models.race_model import RaceResult
+from race_service.models.race_model import (
+    IndividualSprintRace,
+    IntervalStartRace,
+    RaceResult,
+)
 from race_service.services import (
     IllegalValueException,
     RaceNotFoundException,
@@ -134,8 +137,12 @@ class RaceView(View):
         logging.debug(f"Got request-body {body} for {race_id} of type {type(body)}")
         body = await self.request.json()
         logging.debug(f"Got put request for race {body} of type {type(body)}")
+        race: Union[IndividualSprintRace, IntervalStartRace]
         try:
-            race = Race.from_dict(body)
+            if body["datatype"] == "individual_sprint":
+                race = IndividualSprintRace.from_dict(body)
+            elif body["datatype"] == "interval_start":
+                race = IntervalStartRace.from_dict(body)
         except KeyError as e:
             raise HTTPUnprocessableEntity(
                 reason=f"Mandatory property {e.args[0]} is missing."

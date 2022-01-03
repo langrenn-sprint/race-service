@@ -540,7 +540,7 @@ async def test_get_races_by_event_id_individual_sprint(
 
 
 @pytest.mark.integration
-async def test_update_race_by_id(
+async def test_update_race_by_id_interval_start(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -563,6 +563,38 @@ async def test_update_race_by_id(
     }
 
     request_body = dumps(race_interval_start, indent=4, sort_keys=True, default=str)
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.put(f"/races/{RACE_ID}", headers=headers, data=request_body)
+        assert resp.status == 204
+
+
+@pytest.mark.integration
+async def test_update_race_by_id_individual_sprint(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race_individual_sprint: dict,
+) -> None:
+    """Should return No Content."""
+    RACE_ID = race_individual_sprint["id"]
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=RACE_ID,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    request_body = dumps(race_individual_sprint, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)

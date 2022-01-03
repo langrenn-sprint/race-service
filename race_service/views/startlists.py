@@ -2,7 +2,7 @@
 import json
 import logging
 import os
-from typing import List
+from typing import List, Union
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 from race_service.adapters import UsersAdapter
 from race_service.models import StartEntry, Startlist
+from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
 from race_service.services import (
     RacesService,
     StartEntriesService,
@@ -118,6 +119,7 @@ class StartlistView(View):
             races = await RacesService.get_races_by_event_id(
                 db, startlist_to_be_deleted.event_id
             )
+            race: Union[IndividualSprintRace, IntervalStartRace]
             for race in races:
                 race.start_entries = []
                 await RacesService.update_race(db, race.id, race)

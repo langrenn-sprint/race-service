@@ -2,7 +2,7 @@
 import json
 import logging
 import os
-from typing import List
+from typing import List, Union
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -15,7 +15,8 @@ from dotenv import load_dotenv
 
 from race_service.adapters import UsersAdapter
 from race_service.models import (
-    Race,
+    IndividualSprintRace,
+    IntervalStartRace,
     RaceResult,
     TimeEvent,
 )
@@ -184,7 +185,9 @@ class RaceResultView(View):
             )
             # We need to remove the race-result from the race containing the race-result:
             try:
-                race: Race = await RacesService.get_race_by_id(db, race_result.race_id)
+                race: Union[
+                    IndividualSprintRace, IntervalStartRace
+                ] = await RacesService.get_race_by_id(db, race_result.race_id)
             except RaceNotFoundException as e:
                 raise HTTPInternalServerError(
                     reason=(
