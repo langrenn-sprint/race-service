@@ -555,20 +555,33 @@ async def test_update_time_event(http_service: Any, token: MockFixture) -> None:
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_delete_time_event(http_service: Any, token: MockFixture) -> None:
+async def test_delete_time_event(
+    http_service: Any, token: MockFixture, new_time_event: dict
+) -> None:
     """Should return No Content."""
     url = f"{http_service}/time-events"
     headers = {
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
-
     async with ClientSession() as session:
         async with session.get(url, headers=headers) as response:
             time_events = await response.json()
-        id = time_events[0]["id"]
-        url = f"{url}/{id}"
+        time_event = time_events[0]
+        time_event_id = time_event["id"]
+        url = f"{url}/{time_event_id}"
         async with session.delete(url, headers=headers) as response:
             assert response.status == 204
+
+        # We check if the time_event is removed from the corresponding race-result:
+        url = f'{http_service}/races/{time_event["race_id"]}/race-results'
+        async with session.get(url, headers=headers) as response:
+            body = await response.json()
+            assert (
+                response.status == 200
+            ), f'status={response.status}, detail={body["detail"]}'
+            race_results = body
+            race_result = race_results[0]
+            assert time_event_id not in race_result["ranking_sequence"]
 
 
 @pytest.mark.contract

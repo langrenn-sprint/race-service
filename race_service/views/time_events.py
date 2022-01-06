@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import logging
 import os
+from typing import List
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -17,6 +18,7 @@ from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import Changelog, TimeEvent
+from race_service.models.race_model import RaceResult
 from race_service.services import (
     ContestantNotInStartEntriesException,
     CouldNotCreateTimeEventException,
@@ -182,7 +184,7 @@ class TimeEventView(View):
         return Response(status=204)
 
     async def delete(self) -> Response:
-        """Delete route function."""
+        """Delete time-event and also remove from race-result function."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
         try:
@@ -194,6 +196,25 @@ class TimeEventView(View):
         logging.debug(f"Got delete request for time_event {time_event_id}")
 
         try:
+            time_event: TimeEvent = await TimeEventsService.get_time_event_by_id(
+                db, time_event_id
+            )
+            # First we try to remove time-event from race-result's ranking-sequence:
+            if time_event.race_id:
+                race_results: List[
+                    RaceResult
+                ] = await RaceResultsService.get_race_results_by_race_id_and_timing_point(
+                    db, time_event.race_id, time_event.timing_point
+                )
+                for race_result in race_results:
+                    # Remove time-event and subtract counter:
+                    race_result.ranking_sequence.remove(time_event_id)
+                    race_result.no_of_contestants -= 1
+                    # Update race-result:
+                    await RaceResultsService.update_race_result(
+                        db, race_result.id, race_result
+                    )
+            # We are ready to remove the time-event
             await TimeEventsService.delete_time_event(db, time_event_id)
         except TimeEventNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
