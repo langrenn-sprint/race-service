@@ -64,6 +64,7 @@ class RaceResultsView(View):
         # We expand references to time-events in race-results ranking-sequence:
         for race_result in race_results:
             time_events: List[TimeEvent] = []
+            time_events_sorted: List[TimeEvent] = []
             for time_event_id in race_result.ranking_sequence:
                 time_event = await TimeEventsService.get_time_event_by_id(
                     db, time_event_id

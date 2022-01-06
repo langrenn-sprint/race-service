@@ -142,13 +142,11 @@ class TimeEventsService:
     @classmethod
     async def delete_time_event(cls: Any, db: Any, id: str) -> Optional[str]:
         """Get time_event function."""
-        # get old document
-        time_event = await TimeEventsAdapter.get_time_event_by_id(db, id)
+        # check if time-event exist:
+        await TimeEventsAdapter.get_time_event_by_id(db, id)
         # delete the document if found:
-        if time_event:
-            result = await TimeEventsAdapter.delete_time_event(db, id)
-            return result
-        raise TimeEventNotFoundException(f"TimeEvent with id {id} not found")
+        result = await TimeEventsAdapter.delete_time_event(db, id)
+        return result
 
 
 #   Validation:

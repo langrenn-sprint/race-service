@@ -76,7 +76,7 @@ async def race_result() -> dict:
         "race_id": "race_1",
         "timing_point": "Finish",
         "no_of_contestants": 0,
-        "ranking_sequence": [],
+        "ranking_sequence": ["290e70d5-0933-4af0-bb53-1d705ba7eb95"],
     }
 
 
@@ -533,7 +533,11 @@ async def test_get_all_time_events(
 
 @pytest.mark.integration
 async def test_delete_time_event_by_id(
-    client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: dict
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    time_event: dict,
+    race_result: dict,
 ) -> None:
     """Should return No Content."""
     TIME_EVENT_ID = time_event["id"]
@@ -548,6 +552,18 @@ async def test_delete_time_event_by_id(
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=race_result["id"],
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -923,6 +939,50 @@ async def test_update_time_event_by_id_different_id_in_body(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
         )
         assert resp.status == 422
+
+
+@pytest.mark.integration
+async def test_delete_time_event_by_id_not_found(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    time_event: dict,
+    race_result: dict,
+) -> None:
+    """Should return 404 Not Found."""
+    TIME_EVENT_ID = time_event["id"]
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.delete_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=race_result["id"],
+    )
+
+    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
+        assert resp.status == 404
 
 
 # Unauthorized cases:
