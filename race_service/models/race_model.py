@@ -32,6 +32,7 @@ class Race(DataClassJsonMixin):
             mm_field=DateTime(format="iso"),
         )
     )
+    max_no_of_contestants: int
     no_of_contestants: int
     event_id: str
     raceplan_id: str

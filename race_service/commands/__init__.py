@@ -1,6 +1,7 @@
 """Package for all commands."""
 from .exceptions import (
     CompetitionFormatNotSupportedException,
+    CouldNotCreateRaceException,
     CouldNotCreateRaceplanException,
     DuplicateRaceplansInEventException,
     InconsistentInputDataException,

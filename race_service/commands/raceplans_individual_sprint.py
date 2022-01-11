@@ -65,6 +65,9 @@ async def calculate_raceplan_individual_sprint(
                             index="" if round == "Q" else index,
                             heat=heat,
                             start_time=start_time,
+                            max_no_of_contestants=format_configuration[
+                                "max_no_of_contestants_in_race"
+                            ],
                             no_of_contestants=0,
                             rule={}
                             if round == "F"
@@ -269,8 +272,8 @@ class ConfigMatrix:
 
     ROUNDS = ["Q", "S", "F"]
 
-    MAX_NO_OF_CONTESTANTS = 80  # TODO: Get this from competition-format
-    ALL = 10
+    MAX_NO_OF_CONTESTANTS_IN_RACECLASS = 80  # TODO: Get this from competition-format
+    ALL = MAX_NO_OF_CONTESTANTS_IN_HEAT = 10  # TODO: Get this from competition-format
     REST = float("inf")
     m: Dict[int, Dict[str, Any]] = {}
     m[1] = {
@@ -358,7 +361,7 @@ class ConfigMatrix:
         },
     }
     m[8] = {
-        "lim_no_contestants": MAX_NO_OF_CONTESTANTS,
+        "lim_no_contestants": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
         "no_of_heats": {
             "Q": {"A": 8},
             "S": {"A": 4, "C": 4},
@@ -415,7 +418,7 @@ class ConfigMatrix:
             return 6
         elif 48 < no_of_contestants <= 56:
             return 7
-        elif 56 < no_of_contestants <= ConfigMatrix.MAX_NO_OF_CONTESTANTS:
+        elif 56 < no_of_contestants <= ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS:
             return 8
         else:
             raise ValueError(

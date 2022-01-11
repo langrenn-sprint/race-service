@@ -17,6 +17,8 @@ from race_service.adapters import (
 )
 from race_service.commands import (
     CompetitionFormatNotSupportedException,
+    CouldNotCreateRaceException,
+    CouldNotCreateRaceplanException,
     InconsistentValuesInRaceclassesException,
     InvalidDateFormatException,
     MissingPropertyException,
@@ -57,6 +59,8 @@ class GenerateRaceplanForEventView(View):
             raise HTTPNotFound(reason=str(e)) from e
         except (
             CompetitionFormatNotSupportedException,
+            CouldNotCreateRaceException,
+            CouldNotCreateRaceplanException,
             InvalidDateFormatException,
             NoRaceclassesInEventException,
             MissingPropertyException,

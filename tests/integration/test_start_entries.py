@@ -38,6 +38,7 @@ async def race() -> dict:
         "order": 1,
         "start_time": "2021-08-31T12:00:00",
         "no_of_contestants": 8,
+        "max_no_of_contestants": 10,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -355,7 +356,7 @@ async def test_create_start_entry_race_is_full(
     START_ENTRY_ID = start_entry["id"]
     full_race = deepcopy(race)
     full_race["start_entries"] = [
-        s % s for s in range(1, race["no_of_contestants"] + 1)
+        s % s for s in range(1, race["max_no_of_contestants"] + 1)
     ]
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
@@ -766,7 +767,7 @@ async def test_delete_start_entry_race_not_found(
     startlist: dict,
     start_entry: dict,
 ) -> None:
-    """Should return No Content."""
+    """Should return 404 Not found."""
     START_ENTRY_ID = start_entry["id"]
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
@@ -801,7 +802,7 @@ async def test_delete_start_entry_race_not_found(
         resp = await client.delete(
             f'races/{race["id"]}/start-entries/{START_ENTRY_ID}', headers=headers
         )
-        assert resp.status == 500
+        assert resp.status == 404
         body = await resp.json()
         assert "DB is inconsistent: cannot find race with id" in body["detail"]
 
@@ -815,7 +816,7 @@ async def test_delete_start_entry_startlist_not_found(
     startlist: dict,
     start_entry: dict,
 ) -> None:
-    """Should return No Content."""
+    """Should return 404 Not found."""
     START_ENTRY_ID = start_entry["id"]
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
@@ -850,7 +851,7 @@ async def test_delete_start_entry_startlist_not_found(
         resp = await client.delete(
             f'races/{race["id"]}/start-entries/{START_ENTRY_ID}', headers=headers
         )
-        assert resp.status == 500
+        assert resp.status == 404
         body = await resp.json()
         assert "DB is inconsistent: cannot find startlist with id" in body["detail"]
 

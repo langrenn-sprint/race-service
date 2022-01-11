@@ -43,7 +43,7 @@ async def event() -> Dict[str, Any]:
 
 @pytest.fixture
 async def format_configuration() -> Dict[str, Any]:
-    """An format configuration for testing."""
+    """A format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Individual Sprint",
@@ -52,7 +52,8 @@ async def format_configuration() -> Dict[str, Any]:
         "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
-        "max_no_of_contestants": 80,
+        "max_no_of_contestants_in_racelass": 80,
+        "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
     }
 
@@ -221,7 +222,7 @@ async def raceclass_with_more_than_max_contestants() -> List[Dict[str, Any]]:
 
 
 @pytest.mark.integration
-async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants(
+async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_raceclass(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
