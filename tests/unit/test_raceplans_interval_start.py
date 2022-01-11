@@ -15,9 +15,10 @@ from race_service.models import IntervalStartRace, Raceplan
 
 @pytest.fixture
 async def competition_format_interval_start() -> dict:
-    """An competition_format object for testing."""
+    """A competition_format object for testing."""
     return {
         "name": "Interval Start",
+        "max_no_of_contestants_in_race": 1000,
         "starting_order": "Draw",
         "start_procedure": "Interval Start",
         "time_between_groups": "00:10:00",
@@ -27,7 +28,7 @@ async def competition_format_interval_start() -> dict:
 
 @pytest.fixture
 async def event_interval_start() -> dict:
-    """An competition_format object for testing."""
+    """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Oslo Skagen sprint",
@@ -94,6 +95,7 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
 
 @pytest.fixture
 async def expected_races_interval_start(
+    competition_format_interval_start: dict,
     event_interval_start: dict,
 ) -> List[IntervalStartRace]:
     """Create a mock raceplan object."""
@@ -105,6 +107,9 @@ async def expected_races_interval_start(
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
             no_of_contestants=16,
+            max_no_of_contestants=competition_format_interval_start[
+                "max_no_of_contestants_in_race"
+            ],
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
@@ -118,6 +123,9 @@ async def expected_races_interval_start(
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
             no_of_contestants=14,
+            max_no_of_contestants=competition_format_interval_start[
+                "max_no_of_contestants_in_race"
+            ],
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
@@ -131,6 +139,9 @@ async def expected_races_interval_start(
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:25:00"),
             no_of_contestants=17,
+            max_no_of_contestants=competition_format_interval_start[
+                "max_no_of_contestants_in_race"
+            ],
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],
@@ -144,6 +155,9 @@ async def expected_races_interval_start(
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:33:30"),
             no_of_contestants=15,
+            max_no_of_contestants=competition_format_interval_start[
+                "max_no_of_contestants_in_race"
+            ],
             event_id=event_interval_start["id"],
             raceplan_id="",
             start_entries=[],

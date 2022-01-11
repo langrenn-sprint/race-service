@@ -11,6 +11,9 @@ import jwt
 import pytest
 from pytest_mock import MockFixture
 
+MAX_NO_OF_CONTESTANTS_IN_RACECLASS = 80
+MAX_NO_OF_CONTESTANTS_IN_RACE = 10
+
 
 @pytest.fixture
 def token() -> str:
@@ -54,6 +57,8 @@ async def format_configuration() -> Dict[str, Any]:
         "start_procedure": "Interval Start",
         "time_between_groups": "00:10:00",
         "intervals": "00:00:30",
+        "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+        "max_no_of_contestants_in_race": MAX_NO_OF_CONTESTANTS_IN_RACE,
     }
 
 
@@ -107,6 +112,7 @@ RACES: List[dict] = [
         "order": 1,
         "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -119,6 +125,7 @@ RACES: List[dict] = [
         "order": 2,
         "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -131,6 +138,7 @@ RACES: List[dict] = [
         "order": 3,
         "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -143,6 +151,7 @@ RACES: List[dict] = [
         "order": 4,
         "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],

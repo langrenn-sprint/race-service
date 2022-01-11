@@ -10,7 +10,6 @@ from aiohttp.web import (
     Response,
     View,
 )
-from aiohttp.web_exceptions import HTTPInternalServerError
 from dotenv import load_dotenv
 
 from race_service.adapters import UsersAdapter
@@ -190,7 +189,7 @@ class RaceResultView(View):
                     IndividualSprintRace, IntervalStartRace
                 ] = await RacesService.get_race_by_id(db, race_result.race_id)
             except RaceNotFoundException as e:
-                raise HTTPInternalServerError(
+                raise HTTPNotFound(
                     reason=(
                         f"DB is inconsistent: cannot find race with id "
                         f"{race_result.race_id} of race-result with id {race_result.id}"

@@ -559,6 +559,9 @@ components:
           type: string
           format: date-time
           description: the starting order of the race
+        max_no_of_contestants:
+          type: integer
+          description: the max number of contestants in the race
         no_of_contestants:
           type: integer
           description: the number of contestants in the race

@@ -48,6 +48,9 @@ async def calculate_raceplan_interval_start(
                 raceclass=raceclass["name"],
                 order=order,
                 start_time=start_time,
+                max_no_of_contestants=format_configuration[
+                    "max_no_of_contestants_in_race"
+                ],
                 no_of_contestants=raceclass["no_of_contestants"],
                 event_id=event["id"],
                 raceplan_id="",

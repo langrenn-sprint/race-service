@@ -12,6 +12,9 @@ import jwt
 import pytest
 from pytest_mock import MockFixture
 
+MAX_NO_OF_CONTESTANTS_IN_RACECLASS = 80
+MAX_NO_OF_CONTESTANTS_IN_RACE = 10
+
 
 @pytest.fixture
 def token() -> str:
@@ -48,7 +51,7 @@ async def event_individual_sprint() -> Dict[str, Any]:
 
 @pytest.fixture
 async def format_configuration() -> Dict[str, Any]:
-    """An format configuration for testing."""
+    """A format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Individual Sprint",
@@ -57,7 +60,8 @@ async def format_configuration() -> Dict[str, Any]:
         "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
-        "max_no_of_contestants": 80,
+        "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+        "max_no_of_contestants_in_race": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "datatype": "individual_sprint",
     }
 
@@ -115,6 +119,7 @@ RACES: List[dict] = [
         "heat": 1,
         "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -130,6 +135,7 @@ RACES: List[dict] = [
         "heat": 1,
         "start_time": datetime.fromisoformat("2021-08-31 09:02:30"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -145,6 +151,7 @@ RACES: List[dict] = [
         "heat": 1,
         "start_time": datetime.fromisoformat("2021-08-31 09:05:00"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
@@ -160,6 +167,7 @@ RACES: List[dict] = [
         "heat": 1,
         "start_time": datetime.fromisoformat("2021-08-31 09:07:30"),
         "no_of_contestants": 2,
+        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "event_id": EVENT["id"],
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": [],
