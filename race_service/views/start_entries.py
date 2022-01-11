@@ -12,7 +12,6 @@ from aiohttp.web import (
     Response,
     View,
 )
-from aiohttp.web_exceptions import HTTPInternalServerError
 from dotenv import load_dotenv
 from multidict import MultiDict
 
@@ -110,7 +109,7 @@ class StartEntriesView(View):
             starting_positions_in_race = [
                 start_entry.starting_position for start_entry in start_entries_in_race
             ]
-            if not len(race.start_entries) < race.no_of_contestants:
+            if not len(race.start_entries) < race.max_no_of_contestants:
                 raise HTTPBadRequest(
                     reason="Cannot add start-entry: race is full."
                 ) from None
@@ -247,7 +246,7 @@ class StartEntryView(View):
                     IndividualSprintRace, IntervalStartRace
                 ] = await RacesService.get_race_by_id(db, start_entry.race_id)
             except RaceNotFoundException as e:
-                raise HTTPInternalServerError(
+                raise HTTPNotFound(
                     reason=(
                         f"DB is inconsistent: cannot find race with id "
                         f"{start_entry.race_id} of start-entry with id {start_entry.id}"
@@ -269,7 +268,7 @@ class StartEntryView(View):
                     db, start_entry.startlist_id
                 )
             except StartlistNotFoundException as e:
-                raise HTTPInternalServerError(
+                raise HTTPNotFound(
                     reason=(
                         f"DB is inconsistent: cannot find startlist with id "
                         f"{start_entry.startlist_id} of start-entry with id {start_entry.id}"

@@ -15,7 +15,7 @@ from race_service.models import IndividualSprintRace, Raceplan
 
 @pytest.fixture
 async def competition_format_individual_sprint() -> dict:
-    """An competition_format object for testing."""
+    """A competition_format object for testing."""
     return {
         "name": "Individual Sprint",
         "starting_order": "Draw",
@@ -23,14 +23,15 @@ async def competition_format_individual_sprint() -> dict:
         "time_between_groups": "00:10:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
-        "max_no_of_contestants": 80,
+        "max_no_of_contestants_in_raceclass": 80,
+        "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
     }
 
 
 @pytest.fixture
 async def event_individual_sprint() -> dict:
-    """An competition_format object for testing."""
+    """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Oslo Skagen sprint",
@@ -73,6 +74,7 @@ async def expected_raceplan_individual_sprint(
 
 @pytest.fixture
 async def expected_races_individual_sprint(
+    competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
 ) -> List[IndividualSprintRace]:
     """Create a mock raceplan object."""
@@ -87,6 +89,9 @@ async def expected_races_individual_sprint(
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
             no_of_contestants=7,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -104,6 +109,9 @@ async def expected_races_individual_sprint(
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
             no_of_contestants=7,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -121,6 +129,9 @@ async def expected_races_individual_sprint(
             heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
             no_of_contestants=7,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -138,6 +149,9 @@ async def expected_races_individual_sprint(
             heat=4,
             start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
             no_of_contestants=6,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"S": {"A": 4, "C": float("inf")}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -155,6 +169,9 @@ async def expected_races_individual_sprint(
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
             no_of_contestants=6,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"F": {"C": 4}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -172,6 +189,9 @@ async def expected_races_individual_sprint(
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
             no_of_contestants=5,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"F": {"C": 4}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -189,6 +209,9 @@ async def expected_races_individual_sprint(
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
             no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"F": {"A": 4, "B": float("inf")}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -206,6 +229,9 @@ async def expected_races_individual_sprint(
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
             no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={"F": {"A": 4, "B": float("inf")}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -223,6 +249,9 @@ async def expected_races_individual_sprint(
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:35:00"),
             no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -240,6 +269,9 @@ async def expected_races_individual_sprint(
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:37:30"),
             no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
@@ -257,6 +289,9 @@ async def expected_races_individual_sprint(
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:40:00"),
             no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
             rule={},
             event_id=event_individual_sprint["id"],
             raceplan_id="",

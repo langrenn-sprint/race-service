@@ -15,6 +15,7 @@ from race_service.services import (
 )
 from .exceptions import (
     CompetitionFormatNotSupportedException,
+    CouldNotCreateRaceException,
     CouldNotCreateRaceplanException,
     InconsistentValuesInRaceclassesException,
     InvalidDateFormatException,
@@ -77,7 +78,7 @@ class RaceplansCommands:
                 if race_id:
                     raceplan.races.append(race_id)
                 else:
-                    raise CouldNotCreateRaceplanException(
+                    raise CouldNotCreateRaceException(
                         "Something went wrong when creating race."
                     ) from None
             await RaceplansService.update_raceplan(db, raceplan_id, raceplan)

@@ -129,6 +129,7 @@ async def race() -> dict:
         "order": 1,
         "start_time": "2021-08-31T12:00:00",
         "no_of_contestants": 8,
+        "max_no_of_contestants": 10,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
@@ -451,7 +452,7 @@ async def test_delete_race_result_race_not_found(
     race: dict,
     race_result: dict,
 ) -> None:
-    """Should return No Content."""
+    """Should return 404 Not found."""
     RACE_RESULT_ID = race_result["id"]
     mocker.patch(
         "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
@@ -478,7 +479,7 @@ async def test_delete_race_result_race_not_found(
         resp = await client.delete(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}', headers=headers
         )
-        assert resp.status == 500
+        assert resp.status == 404
         body = await resp.json()
         assert "DB is inconsistent: cannot find race" in body["detail"]
 

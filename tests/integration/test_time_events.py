@@ -56,6 +56,7 @@ async def race() -> dict:
         "order": 1,
         "start_time": "2021-08-31T12:00:00",
         "no_of_contestants": 0,
+        "max_no_of_contestants": 10,
         "event_id": "event_1",
         "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "start_entries": ["start_entry_1"],

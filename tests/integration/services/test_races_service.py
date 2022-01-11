@@ -16,11 +16,29 @@ from race_service.services import (
 async def new_race() -> Race:
     """Create a race object."""
     return Race(
+        id="",
+        raceclass="G16",
+        order=1,
+        start_time=datetime.fromisoformat("2021-11-17T20:00:00"),
+        no_of_contestants=8,
+        max_no_of_contestants=10,
+        event_id="event_1",
+        raceplan_id="raceplan_1",
+        start_entries=["11", "22", "33", "44", "55", "66", "77", "88"],
+        results={},
+    )
+
+
+@pytest.fixture
+async def race() -> Race:
+    """Create a race object."""
+    return Race(
         id="race_1",
         raceclass="G16",
         order=1,
         start_time=datetime.fromisoformat("2021-11-17T20:00:00"),
         no_of_contestants=8,
+        max_no_of_contestants=10,
         event_id="event_1",
         raceplan_id="raceplan_1",
         start_entries=["11", "22", "33", "44", "55", "66", "77", "88"],
@@ -37,6 +55,7 @@ async def race_mock() -> Dict:
         "order": 1,
         "start_time": "2021-08-31T12:00:00",
         "no_of_contestants": 8,
+        "max_no_of_contestants": 10,
         "event_id": "event_1",
         "raceplan_id": "raceplan_1",
         "start_entries": ["11", "22", "33", "44", "55", "66", "77", "88"],
@@ -53,7 +72,7 @@ async def race_mock() -> Dict:
 async def test_create_race_input_id(
     loop: Any,
     mocker: MockFixture,
-    new_race: Race,
+    race: Race,
     race_mock: Dict,
 ) -> None:
     """Should raise IllegalValueException."""
@@ -63,4 +82,22 @@ async def test_create_race_input_id(
     )
 
     with pytest.raises(IllegalValueException):
-        await RacesService.create_race(db=None, race=new_race)
+        await RacesService.create_race(db=None, race=race)
+
+
+@pytest.mark.integration
+async def test_create_race_adapter_fails(
+    loop: Any,
+    mocker: MockFixture,
+    new_race: Race,
+    race_mock: Dict,
+) -> None:
+    """Should raise IllegalValueException."""
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        return_value=None,
+    )
+
+    result = await RacesService.create_race(db=None, race=new_race)
+
+    assert result is None

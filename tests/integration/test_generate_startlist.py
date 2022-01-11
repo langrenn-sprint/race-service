@@ -86,6 +86,8 @@ async def format_configuration() -> Dict[str, Any]:
         "name": "Interval Start",
         "start_procedure": "Interval Start",
         "intervals": "00:00:30",
+        "max_no_of_contestants_in_raceclass": 10000,
+        "max_no_of_contestants_in_race": 10000,
     }
 
 
@@ -133,7 +135,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-async def raceplan_interval_start(event: dict) -> dict:
+async def raceplan_interval_start(event: dict, format_configuration: dict) -> dict:
     """Create a mock raceplan object."""
     return {
         "event_id": event["id"],
@@ -146,6 +148,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 1,
                 "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
                 "no_of_contestants": 2,
+                "max_no_of_contestants": format_configuration[
+                    "max_no_of_contestants_in_race"
+                ],
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
@@ -158,6 +163,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 2,
                 "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
                 "no_of_contestants": 2,
+                "max_no_of_contestants": format_configuration[
+                    "max_no_of_contestants_in_race"
+                ],
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
@@ -170,6 +178,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 3,
                 "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
                 "no_of_contestants": 2,
+                "max_no_of_contestants": format_configuration[
+                    "max_no_of_contestants_in_race"
+                ],
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],
@@ -182,6 +193,9 @@ async def raceplan_interval_start(event: dict) -> dict:
                 "order": 4,
                 "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
                 "no_of_contestants": 2,
+                "max_no_of_contestants": format_configuration[
+                    "max_no_of_contestants_in_race"
+                ],
                 "event_id": event["id"],
                 "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
                 "start_entries": [],

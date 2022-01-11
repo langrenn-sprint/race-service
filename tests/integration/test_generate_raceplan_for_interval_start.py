@@ -43,13 +43,15 @@ async def event() -> Dict[str, Any]:
 
 @pytest.fixture
 async def format_configuration() -> Dict[str, Any]:
-    """An format configuration for testing."""
+    """A format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Interval Start",
         "start_procedure": "Interval Start",
         "time_between_groups": "00:10:00",
         "intervals": "00:00:30",
+        "max_no_of_contestants_in_raceclass": 10000,
+        "max_no_of_contestants_in_race": 10000,
     }
 
 

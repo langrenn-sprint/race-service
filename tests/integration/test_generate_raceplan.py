@@ -85,6 +85,8 @@ async def format_configuration() -> Dict[str, Any]:
         "start_procedure": "Interval Start",
         "time_between_groups": "00:10:00",
         "intervals": "00:00:30",
+        "max_no_of_contestants_in_raceclass": 10000,
+        "max_no_of_contestants_in_race": 10000,
     }
 
 
@@ -195,7 +197,7 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 500
+        assert resp.status == 400
 
 
 @pytest.mark.integration
@@ -208,7 +210,7 @@ async def test_generate_raceplan_for_event_create_race_fails(
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
-    """Should return 500 Server error."""
+    """Should return 400 Bad request."""
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
@@ -262,7 +264,7 @@ async def test_generate_raceplan_for_event_create_race_fails(
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 500
+        assert resp.status == 400
 
 
 # Not authenticated
