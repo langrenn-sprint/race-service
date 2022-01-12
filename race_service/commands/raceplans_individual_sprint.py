@@ -11,8 +11,11 @@ async def calculate_raceplan_individual_sprint(
     raceclasses: List[dict],
 ) -> Tuple[Raceplan, List[IndividualSprintRace]]:
     """Calculate raceplan for Individual Sprint event."""
+    # Initialize
     raceplan = Raceplan(event_id=event["id"], races=list())
     races: List[IndividualSprintRace] = []
+    ConfigMatrix.initialize(format_configuration)
+
     # We get the number of contestants in plan from the raceclasses:
     raceplan.no_of_contestants = sum(
         raceclass["no_of_contestants"] for raceclass in raceclasses
@@ -270,108 +273,122 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
 class ConfigMatrix:
     """Class to represent the config matrix."""
 
-    ROUNDS = ["Q", "S", "F"]
+    ROUNDS = ["Q", "S", "F"]  # _Q_uarterfinals, _S_emifinals, _F_inals
 
-    MAX_NO_OF_CONTESTANTS_IN_RACECLASS = 80  # TODO: Get this from competition-format
-    ALL = MAX_NO_OF_CONTESTANTS_IN_HEAT = 10  # TODO: Get this from competition-format
-    REST = float("inf")
+    MAX_NO_OF_CONTESTANTS_IN_RACECLASS: int
+    MAX_NO_OF_CONTESTANTS_IN_RACE: int
     m: Dict[int, Dict[str, Any]] = {}
-    m[1] = {
-        "lim_no_contestants": 7,
-        "no_of_heats": {
-            "Q": {"A": 0},
-            "S": {"A": 1, "C": 0},
-            "F": {"A": 1, "B": 0, "C": 0},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": ALL, "C": 0}}},
-            "S": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
-        },
-    }
-    m[2] = {
-        "lim_no_contestants": 16,
-        "no_of_heats": {
-            "Q": {"A": 0},
-            "S": {"A": 2, "C": 0},
-            "F": {"A": 1, "B": 1, "C": 0},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": ALL, "C": 0}}},
-            "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
-        },
-    }
-    m[3] = {
-        "lim_no_contestants": 24,
-        "no_of_heats": {
-            "Q": {"A": 3},
-            "S": {"A": 2, "C": 0},
-            "F": {"A": 1, "B": 1, "C": 1},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
-            "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
-        },
-    }
-    m[4] = {
-        "lim_no_contestants": 32,
-        "no_of_heats": {
-            "Q": {"A": 4},
-            "S": {"A": 2, "C": 2},
-            "F": {"A": 1, "B": 1, "C": 1},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": 4, "C": REST}}},
-            "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
-        },
-    }
-    m[5] = {
-        "lim_no_contestants": 40,
-        "no_of_heats": {
-            "Q": {"A": 5},
-            "S": {"A": 3, "C": 2},
-            "F": {"A": 1, "B": 1, "C": 1},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": 5, "C": REST}}},
-            "S": {"A": {"F": {"A": 3, "B": 3}}, "C": {"F": {"C": 4}}},
-        },
-    }
-    m[6] = {
-        "lim_no_contestants": 48,
-        "no_of_heats": {
-            "Q": {"A": 6},
-            "S": {"A": 3, "C": 3},
-            "F": {"A": 1, "B": 1, "C": 1},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": 4, "C": REST}}},
-            "S": {"A": {"F": {"A": 3, "B": 3}}, "C": {"F": {"C": 3}}},
-        },
-    }
-    m[7] = {
-        "lim_no_contestants": 56,
-        "no_of_heats": {
-            "Q": {"A": 7},
-            "S": {"A": 4, "C": 3},
-            "F": {"A": 1, "B": 1, "C": 1},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": 5, "C": REST}}},
-            "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 3}}},
-        },
-    }
-    m[8] = {
-        "lim_no_contestants": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
-        "no_of_heats": {
-            "Q": {"A": 8},
-            "S": {"A": 4, "C": 4},
-            "F": {"A": 1, "B": 1, "C": 1},
-        },
-        "from_to": {
-            "Q": {"A": {"S": {"A": 4, "C": REST}}},
-            "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-        },
-    }
+
+    @classmethod
+    def initialize(cls: Any, format_configuration: Dict) -> None:
+        """Initalize parameters based on format-configuration."""
+        ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS = format_configuration[
+            "max_no_of_contestants_in_raceclass"
+        ]
+        ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE = format_configuration[
+            "max_no_of_contestants_in_race"
+        ]
+
+        # Initialize matrix
+        # TODO: Get this from format-configuration
+        ALL = ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE
+        REST = float("inf")
+        ConfigMatrix.m[1] = {
+            "lim_no_contestants": 7,
+            "no_of_heats": {
+                "Q": {"A": 0},
+                "S": {"A": 1, "C": 0},
+                "F": {"A": 1, "B": 0, "C": 0},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": ALL, "C": 0}}},
+                "S": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
+            },
+        }
+        ConfigMatrix.m[2] = {
+            "lim_no_contestants": 16,
+            "no_of_heats": {
+                "Q": {"A": 0},
+                "S": {"A": 2, "C": 0},
+                "F": {"A": 1, "B": 1, "C": 0},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": ALL, "C": 0}}},
+                "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+            },
+        }
+        ConfigMatrix.m[3] = {
+            "lim_no_contestants": 24,
+            "no_of_heats": {
+                "Q": {"A": 3},
+                "S": {"A": 2, "C": 0},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
+                "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+            },
+        }
+        ConfigMatrix.m[4] = {
+            "lim_no_contestants": 32,
+            "no_of_heats": {
+                "Q": {"A": 4},
+                "S": {"A": 2, "C": 2},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
+            },
+        }
+        ConfigMatrix.m[5] = {
+            "lim_no_contestants": 40,
+            "no_of_heats": {
+                "Q": {"A": 5},
+                "S": {"A": 3, "C": 2},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 5, "C": REST}}},
+                "S": {"A": {"F": {"A": 3, "B": 3}}, "C": {"F": {"C": 4}}},
+            },
+        }
+        ConfigMatrix.m[6] = {
+            "lim_no_contestants": 48,
+            "no_of_heats": {
+                "Q": {"A": 6},
+                "S": {"A": 3, "C": 3},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                "S": {"A": {"F": {"A": 3, "B": 3}}, "C": {"F": {"C": 3}}},
+            },
+        }
+        ConfigMatrix.m[7] = {
+            "lim_no_contestants": 56,
+            "no_of_heats": {
+                "Q": {"A": 7},
+                "S": {"A": 4, "C": 3},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 5, "C": REST}}},
+                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 3}}},
+            },
+        }
+        ConfigMatrix.m[8] = {
+            "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+            "no_of_heats": {
+                "Q": {"A": 8},
+                "S": {"A": 4, "C": 4},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+            },
+        }
 
     @classmethod
     def get_rounds(cls: Any) -> list:
