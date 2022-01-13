@@ -60,6 +60,9 @@ async def calculate_raceplan_individual_sprint(
                     for heat in range(
                         1, ConfigMatrix.get_no_of_heats(raceclass, round, index) + 1
                     ):
+                        print(
+                            f'round/raceclass/index/heat: {round}/{raceclass["name"]}/{index}/{heat}'
+                        )
                         race = IndividualSprintRace(
                             id="",
                             order=order,
@@ -85,32 +88,26 @@ async def calculate_raceplan_individual_sprint(
                         start_time = start_time + TIME_BETWEEN_HEATS
                         # Add the race to the raceplan:
                         races.append(race)
-                # Calculate start_time for next round:
+            # Calculate start_time for next round:
+            if round in ConfigMatrix.get_rounds_in_raceclass(raceclass):
                 start_time = start_time - TIME_BETWEEN_HEATS + TIME_BETWEEN_ROUNDS
         # Calculate start_time for next group:
         start_time = start_time + TIME_BETWEEN_GROUPS
 
-    # We need to calculate the number of contestants pr heat:
+    # We need to calculate the number of contestants pr race:
     for raceclasses in raceclasses_grouped:
-        await _calculate_number_of_contestants_pr_race(raceclasses, raceplan, races)
+        for raceclass in raceclasses:
+            await _calculate_number_of_contestants_pr_race_in_raceclass(
+                raceclass, races
+            )
 
     return raceplan, races
 
 
-async def _calculate_number_of_contestants_pr_race(
-    raceclasses: List[dict], raceplan: Raceplan, races: List[IndividualSprintRace]
-) -> None:
-    """Calculate number of contestants pr race based on plan."""
-    for raceclass in raceclasses:
-        await _calculate_number_of_contestants_pr_race_in_raceclass(
-            raceclass, raceplan, races
-        )
-
-
 async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
-    raceclass: dict, raceplan: Raceplan, races: List[IndividualSprintRace]
+    raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
-    """Calculate number of contestants pr race pr raceclass based on plan."""
+    """Calculate number of contestants pr race in given raceclass."""
     no_of_Qs = len(
         [
             race
@@ -150,7 +147,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         for race in races
         if race.raceclass == raceclass["name"] and race.round == "Q"
     ]:
-        # First we calculate no of cs in each Q race:
+        # First we calculate no of contestants in each Q race:
         # We need to "smooth" the contestants across the heats:
         quotient, remainder = divmod(
             no_of_contestants_to_Qs,
@@ -161,21 +158,30 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         else:
             race.no_of_contestants = quotient
 
-    # Calculate number of contestants in SA, SC and FC:
+    # If there is to be a round "S", calculate number of contestants in SA, SC and FC:
     for race in [
         race
         for race in races
         if race.raceclass == raceclass["name"] and race.round == "Q"
     ]:
-        # Then, for each race in round Q, some goes to SA:
-        no_of_contestants_to_SAs += race.rule["S"]["A"]  # type: ignore
-        # rest to SC:
-        if race.rule["S"]["C"] != 0:
-            no_of_contestants_to_SCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
-        # or the rest may in some cases go directly to FC:
+        if "S" in race.rule:
+            # Then, for each race in round Q, some goes to SA:
+            no_of_contestants_to_SAs += race.rule["S"]["A"]  # type: ignore
+            # rest to SC:
+            if race.rule["S"]["C"] != 0:
+                no_of_contestants_to_SCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
+            # or the rest may in some cases go directly to FC:
         if "F" in race.rule:
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FC += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
+            if "A" in race.rule["F"]:
+                no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
+            # rest to FB:
+            if "B" in race.rule["F"]:
+                if race.rule["F"]["B"] < float("inf"):
+                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
+                else:
+                    no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
 
     # Calculate number of contestants pr heat in SA:
     for race in [
@@ -211,30 +217,23 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         else:
             race.no_of_contestants = quotient
 
-    # Calculate number of contestants in FA and FB:
+    # Calculate number of contestants in FA, FB and FC:
     for race in [
         race
         for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "S"
-        and race.index == "A"
+        if race.raceclass == raceclass["name"] and race.round == "S"
     ]:
-        no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
-        # rest to FB:
-        if race.rule["F"]["B"] < float("inf"):
-            no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
-        else:
-            no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
-
-    # Calculate number of contestants in FC:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "S"
-        and race.index == "C"
-    ]:
-        no_of_contestants_to_FC += race.rule["F"]["C"]  # type: ignore
+        if "F" in race.rule:
+            if "A" in race.rule["F"]:
+                no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
+            # rest to FB:
+            if "B" in race.rule["F"]:
+                if race.rule["F"]["B"] < float("inf"):
+                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
+                else:
+                    no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+            if "C" in race.rule["F"]:
+                no_of_contestants_to_FC += race.rule["F"]["C"]  # type: ignore
 
     # Calculate number of contestants pr heat in FA:
     for race in [
@@ -273,8 +272,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
 class ConfigMatrix:
     """Class to represent the config matrix."""
 
-    ROUNDS = ["Q", "S", "F"]  # _Q_uarterfinals, _S_emifinals, _F_inals
-
+    ROUNDS = ["Q", "S", "F"]
     MAX_NO_OF_CONTESTANTS_IN_RACECLASS: int
     MAX_NO_OF_CONTESTANTS_IN_RACE: int
     m: Dict[int, Dict[str, Any]] = {}
@@ -295,30 +293,29 @@ class ConfigMatrix:
         REST = float("inf")
         ConfigMatrix.m[1] = {
             "lim_no_contestants": 7,
+            "rounds": ["Q", "F"],
             "no_of_heats": {
-                "Q": {"A": 0},
-                "S": {"A": 1, "C": 0},
+                "Q": {"A": 1},
                 "F": {"A": 1, "B": 0, "C": 0},
             },
             "from_to": {
-                "Q": {"A": {"S": {"A": ALL, "C": 0}}},
-                "S": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
+                "Q": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
             },
         }
         ConfigMatrix.m[2] = {
             "lim_no_contestants": 16,
+            "rounds": ["Q", "F"],
             "no_of_heats": {
-                "Q": {"A": 0},
-                "S": {"A": 2, "C": 0},
+                "Q": {"A": 2},
                 "F": {"A": 1, "B": 1, "C": 0},
             },
             "from_to": {
-                "Q": {"A": {"S": {"A": ALL, "C": 0}}},
-                "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+                "Q": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
             },
         }
         ConfigMatrix.m[3] = {
             "lim_no_contestants": 24,
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 3},
                 "S": {"A": 2, "C": 0},
@@ -331,6 +328,7 @@ class ConfigMatrix:
         }
         ConfigMatrix.m[4] = {
             "lim_no_contestants": 32,
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 4},
                 "S": {"A": 2, "C": 2},
@@ -343,6 +341,7 @@ class ConfigMatrix:
         }
         ConfigMatrix.m[5] = {
             "lim_no_contestants": 40,
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 5},
                 "S": {"A": 3, "C": 2},
@@ -355,6 +354,7 @@ class ConfigMatrix:
         }
         ConfigMatrix.m[6] = {
             "lim_no_contestants": 48,
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 6},
                 "S": {"A": 3, "C": 3},
@@ -367,6 +367,7 @@ class ConfigMatrix:
         }
         ConfigMatrix.m[7] = {
             "lim_no_contestants": 56,
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 7},
                 "S": {"A": 4, "C": 3},
@@ -379,6 +380,7 @@ class ConfigMatrix:
         }
         ConfigMatrix.m[8] = {
             "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 8},
                 "S": {"A": 4, "C": 4},
@@ -392,8 +394,14 @@ class ConfigMatrix:
 
     @classmethod
     def get_rounds(cls: Any) -> list:
-        """Get no of heats pr round and index."""
+        """Get default rounds."""
         return ConfigMatrix.ROUNDS
+
+    @classmethod
+    def get_rounds_in_raceclass(cls: Any, raceclass: dict) -> list:
+        """Get actual rounds in raceclass."""
+        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        return ConfigMatrix.m[_key]["rounds"]
 
     @classmethod
     def get_no_of_heats(cls: Any, raceclass: dict, round: str, index: str) -> int:
@@ -405,6 +413,9 @@ class ConfigMatrix:
     def get_race_indexes(cls: Any, raceclass: dict, round: str) -> list:
         """Get race indexes pr round."""
         _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        print(f"_key: {_key}")
+        if round not in ConfigMatrix.m[_key]["no_of_heats"]:
+            return []
         return [key for key in ConfigMatrix.m[_key]["no_of_heats"][round]]
 
     @classmethod
