@@ -157,6 +157,18 @@ async def get_format_configuration(
     except FormatConfigurationNotFoundException as e:
         raise e from e
     # Validate:
+    if "max_no_of_contestants_in_raceclass" not in format_configuration:
+        raise MissingPropertyException(
+            f'Format configuration "{competition_format_name}" '
+            'is missing the "max_no_of_contestants_in_raceclass" property.'
+        )
+
+    if "max_no_of_contestants_in_race" not in format_configuration:
+        raise MissingPropertyException(
+            f'Format configuration "{competition_format_name}" '
+            'is missing the "max_no_of_contestants_in_race" property.'
+        )
+
     if format_configuration["name"] == "Interval Start":
         if "intervals" not in format_configuration:
             raise MissingPropertyException(
