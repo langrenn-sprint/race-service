@@ -379,6 +379,176 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_generate_raceplan_for_individual_sprint_event_G11(
+    http_service: Any,
+    token: MockFixture,
+    clear_db: None,
+) -> None:
+    """Should return 201 created and a location header with url to the raceplan."""
+    # ARRANGE
+
+    event_id = ""
+    async with ClientSession() as session:
+        # First we need create the competition-format:
+        with open("tests/files/competition_format_individual_sprint.json", "r") as file:
+            competition_format = json.load(file)
+            headers = {
+                hdrs.CONTENT_TYPE: "application/json",
+                hdrs.AUTHORIZATION: f"Bearer {token}",
+            }
+            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
+            request_body = competition_format
+            async with session.post(
+                url, headers=headers, json=request_body
+            ) as response:
+                assert response.status == 201
+
+        # Next we create the event:
+        with open("tests/files/event_individual_sprint.json", "r") as file:
+            event = json.load(file)
+
+            headers = {
+                hdrs.CONTENT_TYPE: "application/json",
+                hdrs.AUTHORIZATION: f"Bearer {token}",
+            }
+            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            request_body = event
+            async with session.post(
+                url, headers=headers, json=request_body
+            ) as response:
+                if response.status != 201:
+                    logging.error(
+                        f"Got unexpected status {response.status} from {http_service}."
+                    )
+                    body = await response.json()
+                    logging.error(f"Got body {body}.")
+                assert response.status == 201
+                # return the event_id, which is the last item of the path
+                event_id = response.headers[hdrs.LOCATION].split("/")[-1]
+
+        # Add list of contestants to event:
+        headers = {
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        }
+        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
+        files = {"file": open("tests/files/contestants_G11_10.csv", "rb")}
+        logging.debug(f"Adding contestants from file at url {url}.")
+        async with session.post(url, headers=headers, data=files) as response:
+            status = response.status
+            body = await response.json()
+            if response.status != 200:
+                body = await response.json()
+                logging.error(
+                    f"Got unexpected status {response.status}, reason {body}."
+                )
+            assert status == 200
+
+        # Generate raceclasses based on contestants:
+        url = (
+            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
+            f"/events/{event_id}/generate-raceclasses"
+        )
+        async with session.post(url, headers=headers) as response:
+            assert response.status == 201
+            assert f"/events/{event_id}/raceclasses" in response.headers[hdrs.LOCATION]
+
+        # Set order on all raceclasses:
+        url = (
+            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
+            f"/events/{event_id}/raceclasses"
+        )
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            raceclasses = await response.json()
+            order = 0
+            for raceclass in raceclasses:
+                id = raceclass["id"]
+                order = order + 1
+                raceclass["group"] = 1
+                raceclass["order"] = order
+                async with session.put(
+                    f"{url}/{id}", headers=headers, json=raceclass
+                ) as response:
+                    assert response.status == 204
+
+        await _print_raceclasses(raceclasses)
+
+        # ACT
+
+        # Finally, we are ready to generate the raceplan:
+        request_body = {"event_id": event_id}
+        url = f"{http_service}/raceplans/generate-raceplan-for-event"
+        async with session.post(url, headers=headers, json=request_body) as response:
+            if response.status != 201:
+                body = await response.json()
+                logging.error(
+                    f"Got unexpected status {response.status}, reason {body}."
+                )
+                body = await response.json()
+                logging.error(f"Got body {body}.")
+
+        # ASSERT
+
+        assert response.status == 201
+        assert "/raceplans/" in response.headers[hdrs.LOCATION]
+
+        # We check that raceplan are actually created:
+        url = response.headers[hdrs.LOCATION]
+        async with session.get(url, headers=headers) as response:
+            assert response.status == 200
+            raceplan = await response.json()
+            assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+            assert type(raceplan) is dict
+            assert raceplan["id"]
+            assert raceplan["event_id"] == request_body["event_id"]
+
+            await _print_raceplan(raceplan)
+            await _dump_raceplan_to_json("G11", raceplan)
+
+            with open(
+                "tests/files/G11_expected_raceplan_individual_sprint.json", "r"
+            ) as file:
+                expected_raceplan = json.load(file)
+
+            # And we compare the response to the expected raceplan:
+            assert (
+                raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
+            )
+            # Check that all the contestants have been assigned to a Quarterfinal:
+            assert (
+                sum(
+                    race["no_of_contestants"]
+                    for race in raceplan["races"]
+                    if race["round"] == "Q"
+                )
+                == raceplan["no_of_contestants"]
+            )
+            assert type(raceplan["races"]) is list
+            assert len(raceplan["races"]) == len(expected_raceplan["races"])
+
+            i = 0
+            for race in raceplan["races"]:
+                expected_race = expected_raceplan["races"][i]
+                assert race["raceplan_id"] == raceplan["id"]
+                assert race["order"] == i + 1
+                assert (
+                    race["order"] == expected_race["order"]
+                ), f'"order" in index {i}:{race}\n ne:\n{expected_race}'
+                assert (
+                    race["raceclass"] == expected_raceplan["races"][i]["raceclass"]
+                ), f'"raceclass" in index {i}:{race}\n ne:\n{expected_race}'
+                assert (
+                    race["start_time"] == expected_raceplan["races"][i]["start_time"]
+                ), f'"start_time" in index {i}:{race}\n ne:\n{expected_race}'
+                assert (
+                    race["no_of_contestants"]
+                    == expected_raceplan["races"][i]["no_of_contestants"]
+                ), f'"no_of_contestants" in index {i}:{race}\n ne:\n{expected_race}'
+                i += 1
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_individual_sprint_event_all(
     http_service: Any,
     token: MockFixture,
@@ -585,7 +755,9 @@ async def _decide_group_and_order(raceclass: dict) -> Tuple[int, int]:  # noqa: 
 
 async def _print_raceclasses(raceclasses: List[dict]) -> None:
     # print("group;order;name;ageclass_name;no_of_contestants;distance;event_id")
-    # for raceclass in raceclasses:
+    # raceclasses_sorted = sorted(raceclasses, key=lambda k: (k["group"], k["order"]))
+
+    # for raceclass in raceclasses_sorted:
     #     print(
     #         str(raceclass["group"])
     #         + ";"
