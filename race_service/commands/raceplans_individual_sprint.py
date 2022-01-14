@@ -158,7 +158,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         else:
             race.no_of_contestants = quotient
 
-    # If there is to be a round "S", calculate number of contestants in SA, SC and FC:
+    # If there is to be a round "S" or "F", calculate number of contestants in SA, SC and FC:
     for race in [
         race
         for race in races
@@ -175,7 +175,10 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FC += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
             if "A" in race.rule["F"]:
-                no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
+                if race.rule["F"]["A"] > race.no_of_contestants:
+                    no_of_contestants_to_FA = race.no_of_contestants
+                else:
+                    no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
             # rest to FB:
             if "B" in race.rule["F"]:
                 if race.rule["F"]["B"] < float("inf"):
@@ -226,7 +229,6 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         if "F" in race.rule:
             if "A" in race.rule["F"]:
                 no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
-            # rest to FB:
             if "B" in race.rule["F"]:
                 if race.rule["F"]["B"] < float("inf"):
                     no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
