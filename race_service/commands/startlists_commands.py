@@ -172,11 +172,10 @@ async def generate_startlist_for_individual_sprint(
 
     for races in races_grouped_by_raceclass:
         # We find the actual ageclasses in this raceclass:
-        ageclasses = [
-            raceclass["ageclass_name"]
-            for raceclass in raceclasses
-            if raceclass["name"] == races[0].raceclass
-        ]
+        ageclasses: List[str] = []
+        for raceclass in raceclasses:
+            if raceclass["name"] == races[0].raceclass:
+                ageclasses += raceclass["ageclasses"]
         # For every contestant in ageclass, create a start_entry in
         # a quarter-final until it is full, continue with next quarter-final:
 
@@ -261,11 +260,10 @@ async def generate_startlist_for_interval_start(
         for race in races:
             starting_position = 0
             # Get the correponding ageclasses:
-            ageclasses = [
-                raceclass["ageclass_name"]
-                for raceclass in raceclasses
-                if raceclass["name"] == race.raceclass
-            ]
+            ageclasses: List[str] = []
+            for raceclass in raceclasses:
+                if raceclass["name"] == race.raceclass:
+                    ageclasses += raceclass["ageclasses"]
             # For every contestant in ageclass, create a start_entry:
             scheduled_start_time = race.start_time
             for contestant in [

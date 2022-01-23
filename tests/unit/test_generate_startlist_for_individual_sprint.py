@@ -112,7 +112,7 @@ async def raceclasses(
             "name": "J15",
             "group": 1,
             "order": 1,
-            "ageclass_name": "J 15 år",
+            "ageclasses": ["J 15 år"],
             "no_of_contestants": 27,
             "event_id": event_individual_sprint["id"],
             "distance": "5km",
