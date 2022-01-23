@@ -49,7 +49,7 @@ async def startlist_mock() -> Dict:
 
 @pytest.mark.integration
 async def test_create_startlist_input_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Dict,
@@ -70,7 +70,7 @@ async def test_create_startlist_input_id(
 
 @pytest.mark.integration
 async def test_create_startlist_allready_exist(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_startlist: Startlist,
     startlist_mock: Dict,
@@ -91,7 +91,7 @@ async def test_create_startlist_allready_exist(
 
 @pytest.mark.integration
 async def test_create_startlist_adapter_fails(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_startlist: Startlist,
     startlist_mock: Dict,
@@ -112,7 +112,7 @@ async def test_create_startlist_adapter_fails(
 
 @pytest.mark.integration
 async def test_update_startlist_change_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Dict,
@@ -137,7 +137,7 @@ async def test_update_startlist_change_id(
 
 @pytest.mark.integration
 async def test_update_startlist_not_found(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Dict,
@@ -160,7 +160,7 @@ async def test_update_startlist_not_found(
 
 @pytest.mark.integration
 async def test_delete_startlist_not_found(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Dict,
