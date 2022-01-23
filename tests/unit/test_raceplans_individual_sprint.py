@@ -50,7 +50,7 @@ async def raceclasses_individual_sprint_10_contestants() -> List[Dict[str, Any]]
         {
             "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "G11",
-            "ageclass_name": "G 11 år",
+            "ageclasses": ["G 11 år"],
             "event_id": "e90e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 10,
             "group": 1,
@@ -66,7 +66,7 @@ async def raceclasses_individual_sprint_17_contestants() -> List[Dict[str, Any]]
         {
             "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "J11",
-            "ageclass_name": "J 11 år",
+            "ageclasses": ["J 11 år"],
             "event_id": "e90e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 17,
             "group": 1,
@@ -82,7 +82,7 @@ async def raceclasses_individual_sprint_27_contestants() -> List[Dict[str, Any]]
         {
             "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "J15",
-            "ageclass_name": "J 15 år",
+            "ageclasses": ["J 15 år"],
             "event_id": "e90e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 27,
             "group": 1,

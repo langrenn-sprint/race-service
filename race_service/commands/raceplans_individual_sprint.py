@@ -60,9 +60,6 @@ async def calculate_raceplan_individual_sprint(
                     for heat in range(
                         1, ConfigMatrix.get_no_of_heats(raceclass, round, index) + 1
                     ):
-                        print(
-                            f'round/raceclass/index/heat: {round}/{raceclass["name"]}/{index}/{heat}'
-                        )
                         race = IndividualSprintRace(
                             id="",
                             order=order,
@@ -415,7 +412,6 @@ class ConfigMatrix:
     def get_race_indexes(cls: Any, raceclass: dict, round: str) -> list:
         """Get race indexes pr round."""
         _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
-        print(f"_key: {_key}")
         if round not in ConfigMatrix.m[_key]["no_of_heats"]:
             return []
         return [key for key in ConfigMatrix.m[_key]["no_of_heats"][round]]

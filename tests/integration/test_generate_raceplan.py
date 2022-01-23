@@ -97,7 +97,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
         {
             "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "G15",
-            "ageclass_name": "G 15 år",
+            "ageclasses": ["G 15 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 15,
             "group": 1,
@@ -106,7 +106,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
         {
             "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "G16",
-            "ageclass_name": "G 16 år",
+            "ageclasses": ["G 16 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 16,
             "group": 1,
@@ -115,7 +115,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
         {
             "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "J15",
-            "ageclass_name": "J 15 år",
+            "ageclasses": ["J 15 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 17,
             "group": 1,
@@ -124,7 +124,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
         {
             "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
             "name": "J16",
-            "ageclass_name": "J 16 år",
+            "ageclasses": ["J 16 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 18,
             "group": 1,
