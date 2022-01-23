@@ -164,7 +164,7 @@ async def race_result_empty_ranking_sequence_mock() -> dict:
 
 @pytest.mark.integration
 async def test_add_time_event_to_race_result(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     time_event: TimeEvent,
     race_mock: dict,
@@ -209,7 +209,7 @@ async def test_add_time_event_to_race_result(
 
 @pytest.mark.integration
 async def test_add_time_event_to_race_result_race_does_not_have_any_results(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     time_event: TimeEvent,
     race_mock_without_results: dict,
@@ -254,7 +254,7 @@ async def test_add_time_event_to_race_result_race_does_not_have_any_results(
 
 @pytest.mark.integration
 async def test_add_time_event_to_race_result_no_ranking_sequence(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     time_event: TimeEvent,
     start_entry_mock: dict,
@@ -299,7 +299,7 @@ async def test_add_time_event_to_race_result_no_ranking_sequence(
 
 @pytest.mark.integration
 async def test_add_time_event_to_race_result_no_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     time_event_with_no_id: TimeEvent,
     race_mock: dict,
@@ -339,7 +339,7 @@ async def test_add_time_event_to_race_result_no_id(
 
 @pytest.mark.integration
 async def test_add_time_event_to_race_race_does_not_exist(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     time_event_with_no_race_id: TimeEvent,
     race_mock: dict,
@@ -379,7 +379,7 @@ async def test_add_time_event_to_race_race_does_not_exist(
 
 @pytest.mark.integration
 async def test_delete_race_result_race_result_not_found(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     race_mock: dict,
     race_result_mock: dict,

@@ -74,7 +74,7 @@ async def raceplan_mock() -> Dict:
 
 @pytest.mark.integration
 async def test_create_race_input_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     raceplan: Raceplan,
     raceplan_mock: Dict,
@@ -95,7 +95,7 @@ async def test_create_race_input_id(
 
 @pytest.mark.integration
 async def test_create_race_allready_exist(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_raceplan: Raceplan,
     raceplan_mock: Dict,
@@ -116,7 +116,7 @@ async def test_create_race_allready_exist(
 
 @pytest.mark.integration
 async def test_create_race_adapter_fails(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_raceplan: Raceplan,
     raceplan_mock: Dict,

@@ -50,7 +50,7 @@ async def start_entry_mock() -> dict:
 
 @pytest.mark.integration
 async def test_create_start_entry(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: dict,
@@ -73,7 +73,7 @@ async def test_create_start_entry(
 
 @pytest.mark.integration
 async def test_get_start_entry_by_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: dict,
 ) -> None:
@@ -100,7 +100,7 @@ async def test_get_start_entry_by_id(
 
 @pytest.mark.integration
 async def test_update_start_entry(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: dict,
@@ -124,7 +124,7 @@ async def test_update_start_entry(
 
 @pytest.mark.integration
 async def test_delete_start_entry(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: dict,
 ) -> None:
@@ -145,7 +145,7 @@ async def test_delete_start_entry(
 
 @pytest.mark.integration
 async def test_get_start_entries_by_race_id_and_startlist_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: dict,
 ) -> None:
@@ -171,7 +171,7 @@ async def test_get_start_entries_by_race_id_and_startlist_id(
 
 @pytest.mark.integration
 async def test_create_start_entry_input_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: dict,
@@ -196,7 +196,7 @@ async def test_create_start_entry_input_id(
 
 @pytest.mark.integration
 async def test_create_start_entry_adapter_fails(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: dict,
@@ -219,7 +219,7 @@ async def test_create_start_entry_adapter_fails(
 
 @pytest.mark.integration
 async def test_get_start_entry_by_id_not_found(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: dict,
 ) -> None:
@@ -236,7 +236,7 @@ async def test_get_start_entry_by_id_not_found(
 
 @pytest.mark.integration
 async def test_update_start_entry_not_found(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: dict,
@@ -257,7 +257,7 @@ async def test_update_start_entry_not_found(
 
 @pytest.mark.integration
 async def test_update_start_entry_wrong_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: dict,
@@ -278,7 +278,7 @@ async def test_update_start_entry_wrong_id(
 
 @pytest.mark.integration
 async def test_delete_start_entry_not_found(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: dict,
 ) -> None:
