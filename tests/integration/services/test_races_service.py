@@ -70,7 +70,7 @@ async def race_mock() -> Dict:
 
 @pytest.mark.integration
 async def test_create_race_input_id(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     race: Race,
     race_mock: Dict,
@@ -87,7 +87,7 @@ async def test_create_race_input_id(
 
 @pytest.mark.integration
 async def test_create_race_adapter_fails(
-    loop: Any,
+    event_loop: Any,
     mocker: MockFixture,
     new_race: Race,
     race_mock: Dict,
