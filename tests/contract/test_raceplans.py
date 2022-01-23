@@ -287,7 +287,6 @@ async def context(
                 )
             assert response.status == 200
             _raceplans = await response.json()
-
         # We generate the startlist:
         request_body = {"event_id": event_id}
         url = f"{http_service}/startlists/generate-startlist-for-event"
@@ -297,7 +296,7 @@ async def context(
                 logging.error(
                     f"Got unexpected status {response.status}, reason {body}."
                 )
-            assert response.status == 201
+            assert response.status == 201, body
             assert "/startlists/" in response.headers[hdrs.LOCATION]
 
         return _raceplans[0]
