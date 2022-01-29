@@ -90,8 +90,6 @@ paths:
     get:
       tags:
         - raceplan
-      security:
-        - bearerAuth: []
       description: Get a unique race plan
       responses:
         200:

@@ -34,11 +34,6 @@ class StartlistsView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
-        except Exception as e:
-            raise e from e
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
@@ -68,11 +63,6 @@ class StartlistView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
-        except Exception as e:
-            raise e from e
 
         startlist_id = self.request.match_info["startlistId"]
         logging.debug(f"Got get request for startlist {startlist_id}")

@@ -168,17 +168,10 @@ async def test_get_start_entry_by_id(
         return_value=start_entry,
     )
 
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(
-            f'races/{race["id"]}/start-entries/{START_ENTRY_ID}', headers=headers
-        )
+        resp = await client.get(f'races/{race["id"]}/start-entries/{START_ENTRY_ID}')
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -247,11 +240,9 @@ async def test_get_start_entries_by_race_id(
         return_value=[start_entry],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.get(f'races/{race["id"]}/start-entries', headers=headers)
+        resp = await client.get(f'races/{race["id"]}/start-entries')
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         start_entries = await resp.json()
@@ -276,13 +267,10 @@ async def test_get_start_entries_by_race_id_and_startlist_id(
         return_value=[start_entry],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.get(
-            f'races/{race["id"]}/start-entries?startlistId={startlist["id"]}',
-            headers=headers,
+            f'races/{race["id"]}/start-entries?startlistId={startlist["id"]}'
         )
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -888,24 +876,6 @@ async def test_create_start_entry_no_authorization(
 
 
 @pytest.mark.integration
-async def test_get_start_entry_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, race: dict, start_entry: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    START_ENTRY_ID = start_entry["id"]
-    mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
-        return_value=start_entry,
-    )
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-
-        resp = await client.get(f'races/{race["id"]}/start-entries/{START_ENTRY_ID}')
-        assert resp.status == 401
-
-
-@pytest.mark.integration
 async def test_update_start_entry_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, race: dict, start_entry: dict
 ) -> None:
@@ -932,21 +902,6 @@ async def test_update_start_entry_by_id_no_authorization(
             headers=headers,
             data=request_body,
         )
-        assert resp.status == 401
-
-
-@pytest.mark.integration
-async def test_list_start_entries_no_authorization(
-    client: _TestClient, mocker: MockFixture, race: dict, start_entry: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
-        return_value=[start_entry],
-    )
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-        resp = await client.get(f'races/{race["id"]}/start-entries')
         assert resp.status == 401
 
 
@@ -1022,14 +977,10 @@ async def test_get_start_entry_not_found(
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(
-            f'races/{race["id"]}/start-entries/{START_ENTRY_ID}', headers=headers
-        )
+        resp = await client.get(f'races/{race["id"]}/start-entries/{START_ENTRY_ID}')
         assert resp.status == 404
 
 

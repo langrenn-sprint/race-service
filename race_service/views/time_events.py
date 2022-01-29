@@ -44,11 +44,6 @@ class TimeEventsView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
-        except Exception as e:
-            raise e from e
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
@@ -135,11 +130,6 @@ class TimeEventView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "raceplan-admin"])
-        except Exception as e:
-            raise e from e
 
         time_event_id = self.request.match_info["time_eventId"]
         logging.debug(f"Got get request for time_event {time_event_id}")

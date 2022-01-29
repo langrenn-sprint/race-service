@@ -73,7 +73,7 @@ async def delete_competition_formats(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             competition_formats = await response.json()
             for competition_format in competition_formats:
@@ -92,7 +92,7 @@ async def delete_events(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -111,7 +111,7 @@ async def delete_contestants(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -130,7 +130,7 @@ async def delete_raceclasses(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -156,7 +156,7 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             raceplans = await response.json()
             for raceplan in raceplans:
                 raceplan_id = raceplan["id"]
@@ -175,7 +175,7 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             races = await response.json()
             for race in races:
                 race_id = race["id"]
@@ -196,7 +196,7 @@ async def delete_races(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             races = await response.json()
             for race in races:
                 race_id = race["id"]
@@ -287,7 +287,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceclasses = await response.json()
             order = 0
@@ -324,7 +324,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
 
         # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceplan = await response.json()
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
@@ -457,7 +457,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceclasses = await response.json()
             order = 0
@@ -494,7 +494,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(
 
         # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceplan = await response.json()
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
@@ -628,7 +628,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceclasses = await response.json()
             for raceclass in raceclasses:
@@ -664,7 +664,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
 
         # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceplan = await response.json()
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
@@ -717,7 +717,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
 
         # We also need to check that all the races has raceplan-reference:
         url = f'{http_service}/races?eventId={request_body["event_id"]}'
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             races = await response.json()
             for race in races:
@@ -804,7 +804,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceclasses = await response.json()
             order = 0
@@ -841,7 +841,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(
 
         # We check that raceplan are actually created:
         url = response.headers[hdrs.LOCATION]
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceplan = await response.json()
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]

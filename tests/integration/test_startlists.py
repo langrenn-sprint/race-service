@@ -351,12 +351,10 @@ async def test_get_startlist_by_id(
         side_effect=get_start_entry_by_id,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/startlists/{STARTLIST_ID}", headers=headers)
+        resp = await client.get(f"/startlists/{STARTLIST_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -394,12 +392,10 @@ async def test_get_startlist_by_event_id(
         side_effect=get_start_entry_by_id,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/startlists?eventId={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/startlists?eventId={EVENT_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -465,11 +461,9 @@ async def test_get_all_startlists(
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.get("/startlists", headers=headers)
+        resp = await client.get("/startlists")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         startlists = await resp.json()
@@ -542,47 +536,6 @@ async def test_delete_startlist_by_id(
 
 
 @pytest.mark.integration
-async def test_get_startlist_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, startlist: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    STARTLIST_ID = startlist["id"]
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value=startlist,
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
-        return_value=None,
-    )
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-
-        resp = await client.get(f"/startlists/{STARTLIST_ID}")
-        assert resp.status == 401
-
-
-@pytest.mark.integration
-async def test_list_startlists_no_authorization(
-    client: _TestClient, mocker: MockFixture, startlist: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_all_startlists",
-        return_value=[startlist],
-    )
-    mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
-        return_value=None,
-    )
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-        resp = await client.get("/startlists")
-        assert resp.status == 401
-
-
-@pytest.mark.integration
 async def test_delete_startlist_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, startlist: dict
 ) -> None:
@@ -622,12 +575,10 @@ async def test_get_startlist_not_found(
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/startlists/{STARTLIST_ID}", headers=headers)
+        resp = await client.get(f"/startlists/{STARTLIST_ID}")
         assert resp.status == 404
 
 
