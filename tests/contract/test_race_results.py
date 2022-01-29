@@ -81,7 +81,7 @@ async def delete_competition_formats(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             competition_formats = await response.json()
             for competition_format in competition_formats:
@@ -100,7 +100,7 @@ async def delete_events(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -119,7 +119,7 @@ async def delete_contestants(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -138,7 +138,7 @@ async def delete_raceclasses(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -164,7 +164,7 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceplans = await response.json()
             for raceplan in raceplans:
@@ -184,7 +184,7 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             startlists = await response.json()
             for startlist in startlists:
@@ -204,7 +204,7 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             races = await response.json()
             for race in races:
                 race_id = race["id"]
@@ -225,7 +225,7 @@ async def delete_time_events(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             time_events = await response.json()
             for time_event in time_events:
                 time_event_id = time_event["id"]
@@ -244,7 +244,7 @@ async def delete_race_results(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             races = await response.json()
             for race in races:
                 race_id = race["id"]
@@ -331,7 +331,7 @@ async def set_up_context(
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceclasses = await response.json()
             for raceclass in raceclasses:
@@ -352,7 +352,7 @@ async def set_up_context(
 
         # Get the contestants for debugging purposes:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
 
         # We need to base the startlist on the raceplan. Need to generate it.
@@ -367,7 +367,7 @@ async def set_up_context(
             assert response.status == 201
         # Get the raceplan for debugging purposes:
         url = f"{http_service}/raceplans?eventId={event_id}"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             if response.status != 200:
                 body = await response.json()
                 logging.error(
@@ -393,7 +393,7 @@ async def set_up_context(
 
         # We need to find a contestant that actually start in this race:
         url = f"{http_service}/races/{race_id}/start-entries"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             start_entries = await response.json()
 
@@ -429,21 +429,16 @@ async def test_get_race_result(
     http_service: Any, token: MockFixture, set_up_context: str
 ) -> None:
     """Should return 200 OK and a race result."""
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
     time_event_url = set_up_context
     async with ClientSession() as session:
         url = time_event_url
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200, "GET of new_time_event failed."
             time_event = await response.json()
 
         # We should be able to get race and its results:
         url = f'{http_service}/races/{time_event["race_id"]}'
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200, "GET of race-results failed."
             race = await response.json()
         assert type(race["results"]) is dict
@@ -452,7 +447,7 @@ async def test_get_race_result(
 
         # We should be also be able to get race-results:
         url = f'{http_service}/races/{time_event["race_id"]}/race-results'
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200, "GET of race-results failed."
             race_results = await response.json()
         assert type(race_results) is list

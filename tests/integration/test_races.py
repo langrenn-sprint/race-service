@@ -346,15 +346,10 @@ async def test_get_race_by_id_interval_start(
         side_effect=get_time_event_by_id,
     )
 
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/races/{RACE_ID}", headers=headers)
+        resp = await client.get(f"/races/{RACE_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -421,12 +416,10 @@ async def test_get_race_by_id_individual_sprint(
         side_effect=get_time_event_by_id,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/races/{RACE_ID}", headers=headers)
+        resp = await client.get(f"/races/{RACE_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -480,12 +473,10 @@ async def test_get_races_by_event_id(
         return_value=[race_interval_start],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/races?eventId={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/races?eventId={EVENT_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -517,12 +508,10 @@ async def test_get_races_by_event_id_individual_sprint(
         return_value=[race_individual_sprint],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/races?eventId={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/races?eventId={EVENT_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -622,11 +611,9 @@ async def test_get_all_races(
         return_value=[race_interval_start],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.get("/races", headers=headers)
+        resp = await client.get("/races")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         races = await resp.json()
@@ -649,11 +636,9 @@ async def test_get_all_races_individual_sprint(
         return_value=[race_individual_sprint],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.get("/races", headers=headers)
+        resp = await client.get("/races")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -762,24 +747,6 @@ async def test_update_race_by_id_different_id_in_body(
 
 
 @pytest.mark.integration
-async def test_get_race_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, race_interval_start: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    RACE_ID = race_interval_start["id"]
-    mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        return_value=race_interval_start,
-    )
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-
-        resp = await client.get(f"/races/{RACE_ID}")
-        assert resp.status == 401
-
-
-@pytest.mark.integration
 async def test_update_race_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, race_interval_start: dict
 ) -> None:
@@ -802,21 +769,6 @@ async def test_update_race_by_id_no_authorization(
         m.post("http://users.example.com:8081/authorize", status=401)
 
         resp = await client.put(f"/races/{RACE_ID}", headers=headers, data=request_body)
-        assert resp.status == 401
-
-
-@pytest.mark.integration
-async def test_list_races_no_authorization(
-    client: _TestClient, mocker: MockFixture, race_interval_start: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_all_races",
-        return_value=[race_interval_start],
-    )
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-        resp = await client.get("/races")
         assert resp.status == 401
 
 
@@ -888,12 +840,10 @@ async def test_get_race_not_found(
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/races/{RACE_ID}", headers=headers)
+        resp = await client.get(f"/races/{RACE_ID}")
         assert resp.status == 404
 
 

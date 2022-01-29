@@ -378,12 +378,10 @@ async def test_get_time_event_by_id(
         return_value=time_event,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/time-events/{TIME_EVENT_ID}", headers=headers)
+        resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -402,12 +400,11 @@ async def test_get_time_events_by_event_id(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=time_events,
     )
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/time-events?eventId={EVENT_ID}", headers=headers)
+        resp = await client.get(f"/time-events?eventId={EVENT_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -427,14 +424,12 @@ async def test_get_time_events_by_event_id_and_timing_point(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
         return_value=time_events,
     )
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
         resp = await client.get(
-            f"/time-events?eventId={EVENT_ID}&timingPoint={TIMING_POINT}",
-            headers=headers,
+            f"/time-events?eventId={EVENT_ID}&timingPoint={TIMING_POINT}"
         )
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -455,12 +450,11 @@ async def test_get_time_events_by_race_id(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=time_events,
     )
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/time-events?raceId={RACE_ID}", headers=headers)
+        resp = await client.get(f"/time-events?raceId={RACE_ID}")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
@@ -519,11 +513,9 @@ async def test_get_all_time_events(
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.get("/time-events", headers=headers)
+        resp = await client.get("/time-events")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         time_events = await resp.json()
@@ -1019,28 +1011,6 @@ async def test_create_time_event_no_authorization(
 
 
 @pytest.mark.integration
-async def test_get_time_event_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, time_event: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    TIME_EVENT_ID = time_event["id"]
-    mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        return_value=time_event,
-    )
-    mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
-        return_value=None,
-    )
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-
-        resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
-        assert resp.status == 401
-
-
-@pytest.mark.integration
 async def test_update_time_event_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, time_event: dict
 ) -> None:
@@ -1069,25 +1039,6 @@ async def test_update_time_event_by_id_no_authorization(
         resp = await client.put(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
         )
-        assert resp.status == 401
-
-
-@pytest.mark.integration
-async def test_list_time_events_no_authorization(
-    client: _TestClient, mocker: MockFixture, time_event: dict
-) -> None:
-    """Should return 401 Unauthorized."""
-    mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_all_time_events",
-        return_value=[time_event],
-    )
-    mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
-        return_value=None,
-    )
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
-        resp = await client.get("/time-events")
         assert resp.status == 401
 
 
@@ -1167,12 +1118,10 @@ async def test_get_time_event_not_found(
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
-
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
 
-        resp = await client.get(f"/time-events/{TIME_EVENT_ID}", headers=headers)
+        resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
         assert resp.status == 404
 
 
