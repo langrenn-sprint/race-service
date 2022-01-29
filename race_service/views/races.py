@@ -44,11 +44,6 @@ class RacesView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "race-admin"])
-        except Exception as e:
-            raise e from e
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
@@ -69,11 +64,6 @@ class RaceView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "race-admin"])
-        except Exception as e:
-            raise e from e
 
         race_id = self.request.match_info["raceId"]
         logging.debug(f"Got get request for race {race_id}")

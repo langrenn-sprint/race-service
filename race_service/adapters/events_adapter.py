@@ -2,7 +2,7 @@
 import os
 from typing import Any, List
 
-from aiohttp import ClientSession, hdrs
+from aiohttp import ClientSession
 from aiohttp.web import (
     HTTPInternalServerError,
 )
@@ -55,13 +55,8 @@ class EventsAdapter:
         """Get event from event-service."""
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}"
 
-        headers = {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-            hdrs.ACCEPT: "application/json",
-        }
-
         async with ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
                 if response.status == 200:
                     event = await response.json()
                     return event
@@ -79,18 +74,13 @@ class EventsAdapter:
         cls: Any, token: str, event_id: str, competition_format_name: str
     ) -> dict:  # pragma: no cover
         """Get format_configuration from event-service."""
-        headers = {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-            hdrs.ACCEPT: "application/json",
-        }
-
         async with ClientSession() as session:
             # First we try to get the configuration from the event:
             url = (
                 f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
                 f"/events/{event_id}/format"
             )
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
                 if response.status == 200:
                     format_configuration = await response.json()
                     return format_configuration
@@ -109,7 +99,7 @@ class EventsAdapter:
                 f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
                 f"/competition-formats?name={competition_format_name}"
             )
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
                 if response.status == 200:
                     format_configurations = await response.json()
                     return format_configurations[0]
@@ -133,13 +123,8 @@ class EventsAdapter:
         """Get raceclasses from event-service."""
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/raceclasses"
 
-        headers = {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-            hdrs.ACCEPT: "application/json",
-        }
-
         async with ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
                 if response.status == 200:
                     raceclasses = await response.json()
                     if len(raceclasses) == 0:
@@ -163,13 +148,8 @@ class EventsAdapter:
         """Get contestants from event-service."""
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
 
-        headers = {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-            hdrs.ACCEPT: "application/json",
-        }
-
         async with ClientSession() as session:
-            async with session.get(url, headers=headers) as response:
+            async with session.get(url) as response:
                 if response.status == 200:
                     contestants = await response.json()
                     if len(contestants) == 0:

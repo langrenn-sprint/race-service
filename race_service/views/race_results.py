@@ -41,11 +41,6 @@ class RaceResultsView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
-        except Exception as e:
-            raise e from e
 
         race_id = self.request.match_info["raceId"]
 
@@ -96,11 +91,6 @@ class RaceResultView(View):
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
-        token = extract_token_from_request(self.request)
-        try:
-            await UsersAdapter.authorize(token, roles=["admin", "race-result-admin"])
-        except Exception as e:
-            raise e from e
 
         race_result_id = self.request.match_info["raceResultId"]
         logging.debug(f"Got get request for race_result {race_result_id}")

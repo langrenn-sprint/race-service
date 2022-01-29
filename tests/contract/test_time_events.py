@@ -78,7 +78,7 @@ async def delete_competition_formats(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             competition_formats = await response.json()
             for competition_format in competition_formats:
@@ -97,7 +97,7 @@ async def delete_events(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -116,7 +116,7 @@ async def delete_contestants(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -135,7 +135,7 @@ async def delete_raceclasses(token: MockFixture) -> None:
 
     async with ClientSession() as session:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             events = await response.json()
             for event in events:
@@ -161,7 +161,7 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceplans = await response.json()
             for raceplan in raceplans:
@@ -181,7 +181,7 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             startlists = await response.json()
             for startlist in startlists:
@@ -201,7 +201,7 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             races = await response.json()
             for race in races:
                 race_id = race["id"]
@@ -222,7 +222,7 @@ async def delete_time_events(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             time_events = await response.json()
             for time_event in time_events:
                 time_event_id = time_event["id"]
@@ -307,7 +307,7 @@ async def set_up_context(
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             raceclasses = await response.json()
             for raceclass in raceclasses:
@@ -328,7 +328,7 @@ async def set_up_context(
 
         # Get the contestants for debugging purposes:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
 
         # We need to base the startlist on the raceplan. Need to generate it.
@@ -343,7 +343,7 @@ async def set_up_context(
             assert response.status == 201
         # Get the raceplan for debugging purposes:
         url = f"{http_service}/raceplans?eventId={event_id}"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             if response.status != 200:
                 body = await response.json()
                 logging.error(
@@ -377,13 +377,8 @@ async def new_time_event(
     race_id = raceplan["races"][0]
     # We need to find a valid bib in this particular race:
     async with ClientSession() as session:
-        headers = {
-            hdrs.CONTENT_TYPE: "application/json",
-            hdrs.AUTHORIZATION: f"Bearer {token}",
-        }
-
         url = f"{http_service}/races/{race_id}/start-entries"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             start_entries = await response.json()
 
@@ -425,7 +420,7 @@ async def test_create_time_event(
 
         # We check that the race has a race_result for the given timing point:
         url = f'{http_service}/races/{new_time_event["race_id"]}'
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200, "GET of race failed."
             race = await response.json()
         assert type(race["results"]) is dict
@@ -455,12 +450,9 @@ async def test_create_time_event(
 async def test_get_all_time_events(http_service: Any, token: MockFixture) -> None:
     """Should return OK and a list of time_events as json."""
     url = f"{http_service}/time-events"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
             time_events = await response.json()
@@ -476,12 +468,9 @@ async def test_get_all_time_events_by_event_id(
     """Should return OK and a list with one time_event as json."""
     event_id = new_time_event["event_id"]
     url = f"{http_service}/time-events?eventId={event_id}"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
             time_events = await response.json()
@@ -499,16 +488,12 @@ async def test_get_time_event(
     """Should return OK and an time_event as json."""
     url = f"{http_service}/time-events"
 
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             time_events = await response.json()
         id = time_events[0]["id"]
         url = f"{url}/{id}"
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             time_event = await response.json()
 
@@ -538,7 +523,7 @@ async def test_update_time_event(http_service: Any, token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             time_events = await response.json()
 
@@ -564,7 +549,7 @@ async def test_delete_time_event(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             time_events = await response.json()
         time_event = time_events[0]
         time_event_id = time_event["id"]
@@ -574,7 +559,7 @@ async def test_delete_time_event(
 
         # We check if the time_event is removed from the corresponding race-result:
         url = f'{http_service}/races/{time_event["race_id"]}/race-results'
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             body = await response.json()
             assert (
                 response.status == 200
@@ -592,12 +577,9 @@ async def test_get_all_time_event_by_event_id_when_event_does_not_exist(
     """Should return OK and an empty list."""
     event_id = "does_not_exist"
     url = f"{http_service}/time-events?eventId={event_id}"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
 
     async with ClientSession() as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url) as response:
             assert response.status == 200
             assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
             time_events = await response.json()
