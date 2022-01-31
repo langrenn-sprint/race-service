@@ -43,10 +43,6 @@ async def create_app() -> web.Application:
             error_middleware(),  # default error handler for whole application
         ]
     )
-    # Set up logging
-    logging.basicConfig(level=LOGGING_LEVEL)
-    logging.getLogger("chardet.charsetprober").setLevel(LOGGING_LEVEL)
-
     # Set up routes:
     app.add_routes(
         [
@@ -73,6 +69,14 @@ async def create_app() -> web.Application:
             web.view("/time-events/{time_eventId}", TimeEventView),
         ]
     )
+
+    # logging configurataion:
+    logging.basicConfig(
+        format="%(asctime)s,%(msecs)d %(levelname)s - %(module)s:%(lineno)d: %(message)s",
+        datefmt="%H:%M:%S",
+        level=LOGGING_LEVEL,
+    )
+    logging.getLogger("chardet.charsetprober").setLevel(LOGGING_LEVEL)
 
     async def mongo_context(app: Any) -> Any:
         # Set up database connection:
