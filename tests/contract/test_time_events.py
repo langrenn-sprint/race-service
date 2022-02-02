@@ -413,10 +413,9 @@ async def test_create_time_event(
     async with ClientSession() as session:
         url = f"{http_service}/time-events"
         async with session.post(url, headers=headers, data=request_body) as response:
-            assert response.status == 201, "POST of new_time_event failed."
-            assert (
-                "/time-events/" in response.headers[hdrs.LOCATION]
-            ), "Location header has wrong content."
+            assert response.status == 200, "POST of new_time_event failed."
+            body = await response.json()
+            assert body["status"] == "OK"
 
         # We check that the race has a race_result for the given timing point:
         url = f'{http_service}/races/{new_time_event["race_id"]}'

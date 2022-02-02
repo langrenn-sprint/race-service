@@ -414,12 +414,11 @@ async def set_up_context(
         request_body = json.dumps(new_time_event, indent=4, sort_keys=True, default=str)
         url = f"{http_service}/time-events"
         async with session.post(url, headers=headers, data=request_body) as response:
-            assert response.status == 201, "POST of new_time_event failed."
-            assert (
-                "/time-events/" in response.headers[hdrs.LOCATION]
-            ), "Location header has wrong content."
+            assert response.status == 200, "POST of new_time_event failed."
+            new_time_event = await response.json()
+            assert new_time_event["status"] == "OK"
 
-        time_event_url = response.headers[hdrs.LOCATION]
+        time_event_url = f'{http_service}/time-events/{new_time_event["id"]}'
         return time_event_url
 
 
