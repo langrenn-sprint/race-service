@@ -5,7 +5,6 @@ import logging
 import os
 from typing import List
 
-from aiohttp import hdrs
 from aiohttp.web import (
     HTTPBadRequest,
     HTTPNotFound,
@@ -14,7 +13,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from multidict import MultiDict
 
 from race_service.adapters import UsersAdapter
 from race_service.models import Changelog, TimeEvent
@@ -117,11 +115,9 @@ class TimeEventsView(View):
         except (CouldNotCreateTimeEventException) as e:
             raise HTTPBadRequest(reason=str(e)) from e
         logging.debug(f"inserted document with time_event_id {time_event_id}")
-        headers = MultiDict(
-            [(hdrs.LOCATION, f"{BASE_URL}/time-events/{time_event_id}")]
-        )
 
-        return Response(status=201, headers=headers)
+        body = time_event.to_json()
+        return Response(status=200, body=body, content_type="application/json")
 
 
 class TimeEventView(View):

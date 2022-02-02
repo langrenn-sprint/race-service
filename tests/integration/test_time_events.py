@@ -167,7 +167,7 @@ async def test_create_time_event(
     new_time_event: dict,
     time_event: dict,
 ) -> None:
-    """Should return OK, and a header containing time_event_id."""
+    """Should return 200 OK, and a body containing the new time-event."""
     TIME_EVENT_ID = time_event["id"]
     mocker.patch(
         "race_service.services.time_events_service.create_id",
@@ -220,8 +220,10 @@ async def test_create_time_event(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 201
-        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == 200
+
+        new_time_event = await resp.json()
+        assert new_time_event["status"] == "OK"
 
 
 @pytest.mark.integration
@@ -234,7 +236,7 @@ async def test_create_time_event_race_result_not_found(
     new_time_event: dict,
     time_event: dict,
 ) -> None:
-    """Should return OK, and a header containing time_event_id."""
+    """Should return 200 OK, and a body containing the new time-event."""
     TIME_EVENT_ID = time_event["id"]
     race_result_ID = "new_race_result"
     mocker.patch(
@@ -292,8 +294,10 @@ async def test_create_time_event_race_result_not_found(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 201
-        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == 200
+
+        new_time_event = await resp.json()
+        assert new_time_event["status"] == "OK"
 
 
 @pytest.mark.integration
@@ -307,7 +311,7 @@ async def test_create_time_event_contestant_not_in_race(
     new_time_event: dict,
     time_event: dict,
 ) -> None:
-    """Should return OK, and a header containing time_event_id."""
+    """Should return 200 OK, and a body containing the new time-event."""
     TIME_EVENT_ID = time_event["id"]
     start_entry_wrong_bib = deepcopy(start_entry)
     start_entry_wrong_bib["bib"] = 1000
@@ -363,8 +367,10 @@ async def test_create_time_event_contestant_not_in_race(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 201
-        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == 200
+
+        new_time_event = await resp.json()
+        assert new_time_event["status"] == "Error"
 
 
 @pytest.mark.integration
@@ -613,7 +619,7 @@ async def test_create_time_event_race_not_found(
     new_time_event: dict,
     time_event: dict,
 ) -> None:
-    """Should return OK, and a header containing time_event_id, status=Error."""
+    """Should return 200 OK, and a body containing the new time-event, status=Error."""
     TIME_EVENT_ID = time_event["id"]
     mocker.patch(
         "race_service.services.time_events_service.create_id",
@@ -662,8 +668,10 @@ async def test_create_time_event_race_not_found(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 201
-        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == 200
+
+        new_time_event = await resp.json()
+        assert new_time_event["status"] == "Error"
 
 
 @pytest.mark.integration
@@ -676,7 +684,7 @@ async def test_create_time_event_does_not_reference_race(
     new_time_event: dict,
     time_event: dict,
 ) -> None:
-    """Should return OK, and a header containing time_event_id, status=Error."""
+    """Should return 200 OK, and a body containing the new time-event, status=Error."""
     TIME_EVENT_ID = time_event["id"]
     time_event_with_no_race_reference = deepcopy(new_time_event)
     time_event_with_no_race_reference["race_id"] = None
@@ -729,8 +737,10 @@ async def test_create_time_event_does_not_reference_race(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 201
-        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == 200
+
+        new_time_event = await resp.json()
+        assert new_time_event["status"] == "Error"
 
 
 @pytest.mark.integration
@@ -743,7 +753,7 @@ async def test_create_time_event_is_not_identifiable(
     new_time_event: dict,
     time_event: dict,
 ) -> None:
-    """Should return OK, and a header containing time_event_id, status=Error."""
+    """Should return 200 OK, and a body containing the new time-event, status=Error."""
     TIME_EVENT_ID = time_event["id"]
     time_event_with_no_id = deepcopy(new_time_event)
     time_event_with_no_id["id"] = None
@@ -794,8 +804,10 @@ async def test_create_time_event_is_not_identifiable(
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 201
-        assert f"/time-events/{TIME_EVENT_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == 200
+
+        new_time_event = await resp.json()
+        assert new_time_event["status"] == "Error"
 
 
 @pytest.mark.integration
