@@ -134,11 +134,11 @@ To run tests with logging, do:
 
 | Max no of contestants | no of heats Q | To S pr heat  | no of SA | to F pr heat         | no of SC | to FC pr heat  | no of F (A-C) |
 | :-------------------: | :-----------: | :-----------  | :------: | :--------------      | :------: | :------------  | :-----------: |
-|           7           |       0       | ALL SA        |    1     | All to FA            |     0    | n/a            |       1       |
-|          16           |       0       | ALL SA        |    2     | 4 FA, REST FB        |     0    | n/a            |       2       |
+|           7           |       1       | n/a           |    0     | All to FA            |     0    | n/a            |       1       |
+|          16           |       2       | n/a           |    0     | 4 FA, REST FB        |     0    | n/a            |       2       |
 |          24           |       3       | 5 SA, REST FC |    2     | 4 FA, REST FB        |     0    | n/a            |       3       |
 |          32           |       4       | 4 SA, REST SC |    2     | 4 FA, REST FB        |     2    | 4 FC, REST OUT |       3       |
-|          40           |       5       | 5 SA, REST SC |    3     | 3 FA, 3 FB, REST OUT |     2    | 4 FC, REST OUT |       3       |
-|          48           |       6       | 4 SA, REST SC |    3     | 3 FA, 3 FB, REST OUT |     3    | 3 FC, REST OUT |       3       |
-|          56           |       7       | 5 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     3    | 3 FC, REST OUT |       3       |
+|          40           |       6       | 4 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     2    | 4 FC, REST OUT |       3       |
+|          48           |       6       | 4 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     4    | 2 FC, REST OUT |       3       |
+|          56           |       7       | 4 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     4    | 2 FC, REST OUT |       3       |
 |          80           |       8       | 4 SA, REST SC |    4     | 2 FA, 2 FB, REST OUT |     4    | 2 FC, REST OUT |       3       |
