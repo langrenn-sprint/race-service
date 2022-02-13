@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Tuple, Union
 from race_service.models import IndividualSprintRace, Raceplan
 
 
-async def calculate_raceplan_individual_sprint(
+async def calculate_raceplan_individual_sprint(  # noqa: C901
     event: dict,
     format_configuration: dict,
     raceclasses: List[dict],
@@ -14,7 +14,6 @@ async def calculate_raceplan_individual_sprint(
     # Initialize
     raceplan = Raceplan(event_id=event["id"], races=list())
     races: List[IndividualSprintRace] = []
-    ConfigMatrix.initialize(format_configuration)
 
     # We get the number of contestants in plan from the raceclasses:
     raceplan.no_of_contestants = sum(
@@ -43,7 +42,7 @@ async def calculate_raceplan_individual_sprint(
         time.fromisoformat(event["time_of_event"]),
     )
 
-    # sort the raceclasses on order:
+    # Sort the raceclasses on group and order:
     raceclasses_sorted = sorted(raceclasses, key=lambda k: (k["group"], k["order"]))
     # We need to group the raceclasses by group:
     d: Dict[int, list] = {}
@@ -51,9 +50,11 @@ async def calculate_raceplan_individual_sprint(
         d.setdefault(raceclass["group"], []).append(raceclass)
     raceclasses_grouped = list(d.values())
 
-    # Generate the races based on configuration and number of contestants
+    # Generate the races, group by group, based on configuration and number of contestants
     order = 1
     for raceclasses in raceclasses_grouped:
+        # Initalize ConfigMatrix pr group:
+        ConfigMatrix.initialize(format_configuration, raceclasses)
         for round in ConfigMatrix.get_rounds():
             for raceclass in raceclasses:
                 for index in reversed(ConfigMatrix.get_race_indexes(raceclass, round)):
@@ -65,7 +66,7 @@ async def calculate_raceplan_individual_sprint(
                             order=order,
                             raceclass=raceclass["name"],
                             round=round,
-                            index="" if round == "Q" else index,
+                            index="" if round in ["Q", "R1", "R2"] else index,
                             heat=heat,
                             start_time=start_time,
                             max_no_of_contestants=format_configuration[
@@ -73,7 +74,7 @@ async def calculate_raceplan_individual_sprint(
                             ],
                             no_of_contestants=0,
                             rule={}
-                            if round == "F"
+                            if round in ["F", "R2"]
                             else ConfigMatrix.get_rule_from_to(raceclass, round, index),
                             event_id=event["id"],
                             raceplan_id="",
@@ -94,14 +95,19 @@ async def calculate_raceplan_individual_sprint(
     # We need to calculate the number of contestants pr race:
     for raceclasses in raceclasses_grouped:
         for raceclass in raceclasses:
-            await _calculate_number_of_contestants_pr_race_in_raceclass(
-                raceclass, races
-            )
+            if raceclass["ranking"]:
+                await _calculate_number_of_contestants_pr_race_in_raceclass_ranked(
+                    raceclass, races
+                )
+            else:
+                await _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(
+                    raceclass, races
+                )
 
     return raceplan, races
 
 
-async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
+async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa: C901
     raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race in given raceclass."""
@@ -268,17 +274,79 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
         race.no_of_contestants = no_of_contestants_to_FC
 
 
+async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # noqa: C901
+    raceclass: dict, races: List[IndividualSprintRace]
+) -> None:
+    """Calculate number of contestants pr race in given raceclass."""
+    no_of_R1s = no_of_R2s = len(
+        [
+            race
+            for race in races
+            if race.raceclass == raceclass["name"] and race.round == "R1"
+        ]
+    )
+
+    no_of_contestants_to_R1 = no_of_contestants_to_R2 = raceclass["no_of_contestants"]
+
+    # Calculate number of contestants pr heat in R1:
+    for race in [
+        race
+        for race in races
+        if race.raceclass == raceclass["name"] and race.round == "R1"
+    ]:
+        # First we calculate no of contestants in each Q race:
+        # We need to "smooth" the contestants across the heats:
+        quotient, remainder = divmod(
+            no_of_contestants_to_R1,
+            no_of_R1s,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+    # Calculate number of contestants pr heat in R2:
+    for race in [
+        race
+        for race in races
+        if race.raceclass == raceclass["name"] and race.round == "R2"
+    ]:
+        # First we calculate no of contestants in each Q race:
+        # We need to "smooth" the contestants across the heats:
+        quotient, remainder = divmod(
+            no_of_contestants_to_R2,
+            no_of_R2s,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+
 class ConfigMatrix:
     """Class to represent the config matrix."""
 
-    ROUNDS = ["Q", "S", "F"]
+    ROUNDS: List[str] = []
+    RANKING: bool = True
     MAX_NO_OF_CONTESTANTS_IN_RACECLASS: int
     MAX_NO_OF_CONTESTANTS_IN_RACE: int
     m: Dict[int, Dict[str, Any]] = {}
 
     @classmethod
-    def initialize(cls: Any, format_configuration: Dict) -> None:
-        """Initalize parameters based on format-configuration."""
+    def initialize(
+        cls: Any, format_configuration: Dict, raceclasses_in_group: List[Dict]
+    ) -> None:
+        """Initalize parameters based on format-configuration and raceclasses in group."""
+        if raceclasses_in_group[0]["ranking"]:
+            ConfigMatrix.RANKING = True
+        else:
+            ConfigMatrix.RANKING = False
+
+        if ConfigMatrix.RANKING:
+            ConfigMatrix.ROUNDS = ["Q", "S", "F"]
+        else:
+            ConfigMatrix.ROUNDS = ["R1", "R2"]
+
         ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS = format_configuration[
             "max_no_of_contestants_in_raceclass"
         ]
@@ -290,106 +358,199 @@ class ConfigMatrix:
         # TODO: Get this from format-configuration
         ALL = ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE
         REST = float("inf")
-        ConfigMatrix.m[1] = {
-            "lim_no_contestants": 7,
-            "rounds": ["Q", "F"],
-            "no_of_heats": {
-                "Q": {"A": 1},
-                "F": {"A": 1, "B": 0, "C": 0},
-            },
-            "from_to": {
-                "Q": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
-            },
-        }
-        ConfigMatrix.m[2] = {
-            "lim_no_contestants": 16,
-            "rounds": ["Q", "F"],
-            "no_of_heats": {
-                "Q": {"A": 2},
-                "F": {"A": 1, "B": 1, "C": 0},
-            },
-            "from_to": {
-                "Q": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
-            },
-        }
-        ConfigMatrix.m[3] = {
-            "lim_no_contestants": 24,
-            "rounds": ["Q", "S", "F"],
-            "no_of_heats": {
-                "Q": {"A": 3},
-                "S": {"A": 2, "C": 0},
-                "F": {"A": 1, "B": 1, "C": 1},
-            },
-            "from_to": {
-                "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
-                "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
-            },
-        }
-        ConfigMatrix.m[4] = {
-            "lim_no_contestants": 32,
-            "rounds": ["Q", "S", "F"],
-            "no_of_heats": {
-                "Q": {"A": 4},
-                "S": {"A": 2, "C": 2},
-                "F": {"A": 1, "B": 1, "C": 1},
-            },
-            "from_to": {
-                "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
-            },
-        }
-        ConfigMatrix.m[5] = {
-            "lim_no_contestants": 40,
-            "rounds": ["Q", "S", "F"],
-            "no_of_heats": {
-                "Q": {"A": 6},
-                "S": {"A": 4, "C": 2},
-                "F": {"A": 1, "B": 1, "C": 1},
-            },
-            "from_to": {
-                "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 4}}},
-            },
-        }
-        ConfigMatrix.m[6] = {
-            "lim_no_contestants": 48,
-            "rounds": ["Q", "S", "F"],
-            "no_of_heats": {
-                "Q": {"A": 6},
-                "S": {"A": 4, "C": 4},
-                "F": {"A": 1, "B": 1, "C": 1},
-            },
-            "from_to": {
-                "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-            },
-        }
-        ConfigMatrix.m[7] = {
-            "lim_no_contestants": 56,
-            "rounds": ["Q", "S", "F"],
-            "no_of_heats": {
-                "Q": {"A": 7},
-                "S": {"A": 4, "C": 4},
-                "F": {"A": 1, "B": 1, "C": 1},
-            },
-            "from_to": {
-                "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-            },
-        }
-        ConfigMatrix.m[8] = {
-            "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
-            "rounds": ["Q", "S", "F"],
-            "no_of_heats": {
-                "Q": {"A": 8},
-                "S": {"A": 4, "C": 4},
-                "F": {"A": 1, "B": 1, "C": 1},
-            },
-            "from_to": {
-                "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-            },
-        }
+
+        if ConfigMatrix.RANKING:
+            # ConfigMatrix for ranked raceclasses:
+            ConfigMatrix.m[1] = {
+                "lim_no_contestants": 7,
+                "rounds": ["Q", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 1},
+                    "F": {"A": 1, "B": 0, "C": 0},
+                },
+                "from_to": {
+                    "Q": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
+                },
+            }
+            ConfigMatrix.m[2] = {
+                "lim_no_contestants": 16,
+                "rounds": ["Q", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 2},
+                    "F": {"A": 1, "B": 1, "C": 0},
+                },
+                "from_to": {
+                    "Q": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+                },
+            }
+            ConfigMatrix.m[3] = {
+                "lim_no_contestants": 24,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 3},
+                    "S": {"A": 2, "C": 0},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
+                    "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+                },
+            }
+            ConfigMatrix.m[4] = {
+                "lim_no_contestants": 32,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 4},
+                    "S": {"A": 2, "C": 2},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
+                },
+            }
+            ConfigMatrix.m[5] = {
+                "lim_no_contestants": 40,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 6},
+                    "S": {"A": 4, "C": 2},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 4}}},
+                },
+            }
+            ConfigMatrix.m[6] = {
+                "lim_no_contestants": 48,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 6},
+                    "S": {"A": 4, "C": 4},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+                },
+            }
+            ConfigMatrix.m[7] = {
+                "lim_no_contestants": 56,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 7},
+                    "S": {"A": 4, "C": 4},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+                },
+            }
+            ConfigMatrix.m[8] = {
+                "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 8},
+                    "S": {"A": 4, "C": 4},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+                },
+            }
+        else:
+            # ConfigMatrix for non ranked raceclasses:
+            ConfigMatrix.m[1] = {
+                "lim_no_contestants": 7,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 1},
+                    "R2": {"A": 1},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[2] = {
+                "lim_no_contestants": 16,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 2},
+                    "R2": {"A": 2},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[3] = {
+                "lim_no_contestants": 24,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 3},
+                    "R2": {"A": 3},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[4] = {
+                "lim_no_contestants": 32,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 4},
+                    "R2": {"A": 4},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[5] = {
+                "lim_no_contestants": 40,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 6},
+                    "R2": {"A": 6},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[6] = {
+                "lim_no_contestants": 48,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 6},
+                    "R2": {"A": 6},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[7] = {
+                "lim_no_contestants": 56,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 7},
+                    "R2": {"A": 7},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
+            ConfigMatrix.m[8] = {
+                "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {
+                    "R1": {"A": 8},
+                    "R2": {"A": 8},
+                },
+                "from_to": {
+                    "R1": {"A": {"R2": {"A": REST}}},
+                },
+            }
 
     @classmethod
     def get_rounds(cls: Any) -> list:

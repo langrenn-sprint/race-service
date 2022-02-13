@@ -55,6 +55,7 @@ async def raceclasses_individual_sprint_10_contestants() -> List[Dict[str, Any]]
             "no_of_contestants": 10,
             "group": 1,
             "order": 1,
+            "ranking": True,
         },
     ]
 
@@ -71,6 +72,7 @@ async def raceclasses_individual_sprint_17_contestants() -> List[Dict[str, Any]]
             "no_of_contestants": 17,
             "group": 1,
             "order": 1,
+            "ranking": True,
         },
     ]
 
@@ -87,6 +89,7 @@ async def raceclasses_individual_sprint_27_contestants() -> List[Dict[str, Any]]
             "no_of_contestants": 27,
             "group": 1,
             "order": 1,
+            "ranking": True,
         },
     ]
 
