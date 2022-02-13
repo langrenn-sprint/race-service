@@ -245,4 +245,10 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C90
                 f"Raceclasses order values for event {event_id} are not consecutive."
             )
 
+    # Ranking-value must be the same for all races in a group:
+    for _raceclasses in raceclasses_grouped:
+        if len(set([r["ranking"] for r in _raceclasses])) > 1:
+            raise InconsistentValuesInRaceclassesException(
+                f'Ranking-value differs in group {raceclass["group"]}.'
+            )
     return raceclasses
