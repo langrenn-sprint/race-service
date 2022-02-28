@@ -10,12 +10,12 @@ from race_service.commands.startlists_commands import (
 )
 from race_service.models import IndividualSprintRace, Raceplan, StartEntry, Startlist
 
-# --- Individual Sprint, ranked. ---
+# --- Individual Sprint, not ranked. ---
 
 
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_generate_startlist_for_individual_sprint(
+async def test_generate_startlist_for_individual_sprint_not_ranked(
     event_individual_sprint: dict,
     competition_format_individual_sprint: dict,
     raceclasses: List[dict],
@@ -50,7 +50,9 @@ async def test_generate_startlist_for_individual_sprint(
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
         no_of_start_entries += 1
-    assert no_of_start_entries == startlist.no_of_contestants
+    assert (
+        no_of_start_entries == startlist.no_of_contestants * 2
+    )  # for non ranked there are twice as many
 
     # Check that the two race lists match:
     if not reduce(
@@ -112,12 +114,12 @@ async def raceclasses(
     raceclasses: List[dict] = []
     raceclasses.append(
         {
-            "name": "J15",
+            "name": "J10",
             "group": 1,
             "order": 1,
-            "ageclasses": ["J 15 år"],
+            "ageclasses": ["J 10 år"],
             "no_of_contestants": 27,
-            "ranking": True,
+            "ranking": False,
             "event_id": event_individual_sprint["id"],
             "distance": "5km",
         }
@@ -132,7 +134,7 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 27
     # Add list of race_ids:
-    for id in range(1, 12):
+    for id in range(1, 9):
         raceplan.races.append(str(id))
 
     return raceplan
@@ -149,8 +151,8 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="1",
             order=1,
-            raceclass="J15",
-            round="Q",
+            raceclass="J10",
+            round="R1",
             index="",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -158,7 +160,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"S": {"A": 4, "C": float("inf")}},
+            rule={"R2": {"A": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -169,8 +171,8 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="2",
             order=2,
-            raceclass="J15",
-            round="Q",
+            raceclass="J10",
+            round="R1",
             index="",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -178,7 +180,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"S": {"A": 4, "C": float("inf")}},
+            rule={"R2": {"A": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -189,8 +191,8 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="3",
             order=3,
-            raceclass="J15",
-            round="Q",
+            raceclass="J10",
+            round="R1",
             index="",
             heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -198,7 +200,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"S": {"A": 4, "C": float("inf")}},
+            rule={"R2": {"A": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -209,8 +211,8 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="4",
             order=4,
-            raceclass="J15",
-            round="Q",
+            raceclass="J10",
+            round="R1",
             index="",
             heat=4,
             start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
@@ -218,27 +220,28 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"S": {"A": 4, "C": float("inf")}},
+            rule={"R2": {"A": float("inf")}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
             results={},
         )
     )
+
     races.append(
         IndividualSprintRace(
             id="5",
             order=5,
-            raceclass="J15",
-            round="S",
-            index="C",
+            raceclass="J10",
+            round="R2",
+            index="",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
-            no_of_contestants=6,
+            no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"F": {"C": 4}},
+            rule={},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -249,16 +252,16 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="6",
             order=6,
-            raceclass="J15",
-            round="S",
-            index="C",
+            raceclass="J10",
+            round="R2",
+            index="",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
-            no_of_contestants=5,
+            no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"F": {"C": 4}},
+            rule={},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -269,16 +272,16 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="7",
             order=7,
-            raceclass="J15",
-            round="S",
-            index="A",
-            heat=1,
+            raceclass="J10",
+            round="R2",
+            index="",
+            heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
-            no_of_contestants=8,
+            no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"F": {"A": 4, "B": float("inf")}},
+            rule={},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -289,32 +292,12 @@ async def races_individual_sprint(
         IndividualSprintRace(
             id="8",
             order=8,
-            raceclass="J15",
-            round="S",
-            index="A",
-            heat=2,
+            raceclass="J10",
+            round="R2",
+            index="",
+            heat=4,
             start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
-            no_of_contestants=8,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={"F": {"A": 4, "B": float("inf")}},
-            event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="9",
-            order=9,
-            raceclass="J15",
-            round="F",
-            index="C",
-            heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:35:00"),
-            no_of_contestants=8,
+            no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
@@ -325,51 +308,6 @@ async def races_individual_sprint(
             results={},
         )
     )
-    races.append(
-        IndividualSprintRace(
-            id="10",
-            order=10,
-            raceclass="J15",
-            round="F",
-            index="B",
-            heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:37:30"),
-            no_of_contestants=8,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={},
-            event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="11",
-            order=11,
-            raceclass="J15",
-            round="F",
-            index="A",
-            heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:40:00"),
-            no_of_contestants=8,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={},
-            event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    assert (
-        sum(race.no_of_contestants for race in races if race.round == "Q")
-        == raceplan_individual_sprint.no_of_contestants
-    )
-
     return races
 
 
@@ -384,7 +322,7 @@ async def contestants(
             "first_name": "First",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -392,7 +330,7 @@ async def contestants(
             "first_name": "Second",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -400,7 +338,7 @@ async def contestants(
             "first_name": "Third",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -408,7 +346,7 @@ async def contestants(
             "first_name": "Fourth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -416,7 +354,7 @@ async def contestants(
             "first_name": "Fifth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -424,7 +362,7 @@ async def contestants(
             "first_name": "Sixth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -432,7 +370,7 @@ async def contestants(
             "first_name": "Seventh",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -440,7 +378,7 @@ async def contestants(
             "first_name": "Eight",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -448,7 +386,7 @@ async def contestants(
             "first_name": "Ninth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -456,7 +394,7 @@ async def contestants(
             "first_name": "Tenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -464,7 +402,7 @@ async def contestants(
             "first_name": "Eleventh",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -472,7 +410,7 @@ async def contestants(
             "first_name": "Twelfth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -480,7 +418,7 @@ async def contestants(
             "first_name": "Thirteenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -488,7 +426,7 @@ async def contestants(
             "first_name": "Fourteenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -496,7 +434,7 @@ async def contestants(
             "first_name": "Fifteenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -504,7 +442,7 @@ async def contestants(
             "first_name": "Sixteenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -512,7 +450,7 @@ async def contestants(
             "first_name": "Seventeenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -520,7 +458,7 @@ async def contestants(
             "first_name": "Eighteenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -528,7 +466,7 @@ async def contestants(
             "first_name": "Nineteenth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -536,7 +474,7 @@ async def contestants(
             "first_name": "Twentieth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -544,7 +482,7 @@ async def contestants(
             "first_name": "Twenty First",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -552,7 +490,7 @@ async def contestants(
             "first_name": "Twenty Second",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -560,7 +498,7 @@ async def contestants(
             "first_name": "Twenty Third",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -568,7 +506,7 @@ async def contestants(
             "first_name": "Twenty Fourth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -576,7 +514,7 @@ async def contestants(
             "first_name": "Twenty Fifth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -584,7 +522,7 @@ async def contestants(
             "first_name": "Twenty Sixth",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
         {
@@ -592,7 +530,7 @@ async def contestants(
             "first_name": "Twenty Seventh",
             "last_name": "Contender",
             "club": "Lyn Ski",
-            "ageclass": "J 15 år",
+            "ageclass": "J 10 år",
             "event_id": event_individual_sprint["id"],
         },
     ]
@@ -617,6 +555,7 @@ async def expected_start_entries_individual_sprint(
 ) -> List[StartEntry]:
     """Create a mock list of start_entries object."""
     start_entries: List[StartEntry] = []
+    # R1:
     start_entries.append(
         StartEntry(
             id="",
@@ -939,6 +878,331 @@ async def expected_start_entries_individual_sprint(
             club="Lyn Ski",
             starting_position=6,
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
+        )
+    )
+    # R2:
+    start_entries.append(
+        StartEntry(
+            id="",
+            race_id="5",
+            startlist_id="",
+            bib=1,
+            starting_position=1,
+            name="First Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            race_id="5",
+            startlist_id="",
+            bib=2,
+            starting_position=2,
+            name="Second Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            race_id="5",
+            startlist_id="",
+            bib=3,
+            starting_position=3,
+            name="Third Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="5",
+            bib=4,
+            starting_position=4,
+            name="Fourth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="5",
+            bib=5,
+            starting_position=5,
+            name="Fifth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="5",
+            bib=6,
+            starting_position=6,
+            name="Sixth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="5",
+            bib=7,
+            starting_position=7,
+            name="Seventh Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=8,
+            starting_position=1,
+            name="Eigth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=9,
+            starting_position=2,
+            name="Nineth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=10,
+            starting_position=3,
+            name="Tenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=11,
+            starting_position=4,
+            name="Eleventh Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=12,
+            starting_position=5,
+            name="Twelvth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=13,
+            starting_position=6,
+            name="Thirteenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="6",
+            bib=14,
+            starting_position=7,
+            name="Fourtheenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=15,
+            starting_position=1,
+            name="Fifteenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=16,
+            starting_position=2,
+            name="Sixteenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=17,
+            starting_position=3,
+            name="Seventeenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=18,
+            starting_position=4,
+            name="Eighteenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=19,
+            starting_position=5,
+            name="Nineteenth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=20,
+            starting_position=6,
+            name="Twentieth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="7",
+            bib=21,
+            starting_position=7,
+            name="Twenty First Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="8",
+            bib=22,
+            starting_position=1,
+            name="Twenty Second Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="8",
+            bib=23,
+            starting_position=2,
+            name="Twenty Third Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="8",
+            bib=24,
+            starting_position=3,
+            name="Twenty Fourth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="8",
+            bib=25,
+            starting_position=4,
+            name="Twenty Fifth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="8",
+            bib=26,
+            starting_position=5,
+            name="Twenty Sixth Contender",
+            club="Lyn Ski",
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+        )
+    )
+    start_entries.append(
+        StartEntry(
+            id="",
+            startlist_id="",
+            race_id="8",
+            bib=27,
+            name="Twenty Seventh Contender",
+            club="Lyn Ski",
+            starting_position=6,
+            scheduled_start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
         )
     )
     return start_entries

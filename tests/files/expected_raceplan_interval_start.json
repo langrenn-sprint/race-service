@@ -1,77 +1,293 @@
 {
-  "no_of_contestants": 333,
+  "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
   "races": [
-		{
-      "no_of_contestants": 36,
+    {
+      "id": "6bac6ac8-e683-4531-ae38-30821215b958",
+      "raceclass": "M19/20",
       "order": 1,
-      "raceclass": "G16",
-      "start_time": "2021-08-31T09:00:00"
+      "start_time": "2021-08-31T09:00:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 8,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
-		{
-      "no_of_contestants": 18,
+    {
+      "id": "bccc8ec4-a640-4c3d-a5a9-0bc97ad8238c",
+      "raceclass": "K19/20",
       "order": 2,
-      "raceclass": "J16",
-      "start_time": "2021-08-31T09:18:00"
+      "start_time": "2021-08-31T09:04:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 7,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
-		{
-      "no_of_contestants": 45,
+    {
+      "id": "8a37a839-2e15-4a87-b8ba-bd78da754b22",
+      "raceclass": "M18",
       "order": 3,
-      "raceclass": "G15",
-      "start_time": "2021-08-31T09:27:00"
+      "start_time": "2021-08-31T09:17:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 8,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
-		{
-      "no_of_contestants": 42,
+    {
+      "id": "083f7c2b-84b7-45cc-8c85-4c8495472495",
+      "raceclass": "K18",
       "order": 4,
-      "raceclass": "J15",
-      "start_time": "2021-08-31T09:49:30"
+      "start_time": "2021-08-31T09:21:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 5,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
     {
-      "no_of_contestants": 26,
+      "id": "2f6ef890-1a41-4b5e-9cb5-0db89fc4e09c",
+      "raceclass": "M17",
       "order": 5,
-      "raceclass": "G14",
-      "start_time": "2021-08-31T10:20:30"
+      "start_time": "2021-08-31T09:34:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 16,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
     {
-      "no_of_contestants": 19,
+      "id": "7a86b641-2310-48ee-8d97-04e4575227aa",
+      "raceclass": "K17",
       "order": 6,
-      "raceclass": "J14",
-      "start_time": "2021-08-31T10:33:30"
+      "start_time": "2021-08-31T09:42:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 20,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
-		{
-      "no_of_contestants": 29,
+    {
+      "id": "43884853-a9e2-4ddf-8f91-86df111ce1eb",
+      "raceclass": "G16",
       "order": 7,
-      "raceclass": "G13",
-      "start_time": "2021-08-31T10:43:00"
+      "start_time": "2021-08-31T10:02:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 34,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
     {
-      "no_of_contestants": 29,
+      "id": "a688d48b-6f0a-40ed-8876-b16e353090df",
+      "raceclass": "J16",
       "order": 8,
-      "raceclass": "J13",
-      "start_time": "2021-08-31T10:57:30"
-    },
-		{
-      "no_of_contestants": 37,
-      "order": 9,
-      "raceclass": "G12",
-      "start_time": "2021-08-31T11:22:00"
+      "start_time": "2021-08-31T10:19:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 29,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
     {
-      "no_of_contestants": 18,
+      "id": "7bf7d29d-a7f7-4e33-b93a-d692b36ebe6f",
+      "raceclass": "G15",
+      "order": 9,
+      "start_time": "2021-08-31T10:33:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 33,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "bd267e66-6889-4472-957a-eca0b3b54d8a",
+      "raceclass": "J15",
       "order": 10,
-      "raceclass": "J12",
-      "start_time": "2021-08-31T11:40:30"
+      "start_time": "2021-08-31T10:50:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 26,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
-		{
-      "no_of_contestants": 17,
+    {
+      "id": "8b5a9f54-db7f-40f6-a433-2366550d8035",
+      "raceclass": "G14",
       "order": 11,
-      "raceclass": "G11",
-      "start_time": "2021-08-31T11:49:30"
+      "start_time": "2021-08-31T11:13:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 49,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     },
-		{
-      "no_of_contestants": 17,
+    {
+      "id": "b7384fdd-91e9-4e76-ac11-9370db14424e",
+      "raceclass": "J14",
       "order": 12,
+      "start_time": "2021-08-31T11:37:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 39,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "5817ba53-33f2-4c15-8257-adb4d15e0b4c",
+      "raceclass": "G13",
+      "order": 13,
+      "start_time": "2021-08-31T11:57:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 51,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "b0c25c7e-d8f3-48a3-b56c-1b7185450cd0",
+      "raceclass": "J13",
+      "order": 14,
+      "start_time": "2021-08-31T12:22:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 45,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "f3291b48-2dec-46a3-9aef-c0eb2c217eb4",
+      "raceclass": "G12",
+      "order": 15,
+      "start_time": "2021-08-31T12:55:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 36,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "e837ee9b-fa66-4de6-94bc-fa91a3e2d52b",
+      "raceclass": "J12",
+      "order": 16,
+      "start_time": "2021-08-31T13:13:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 43,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "e90647f6-0b32-4464-af68-c99823cb79f4",
+      "raceclass": "G11",
+      "order": 17,
+      "start_time": "2021-08-31T13:34:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 40,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "6bd201b6-f9eb-486e-85a0-51247fe0923a",
       "raceclass": "J11",
-      "start_time": "2021-08-31T11:58:00"
+      "order": 18,
+      "start_time": "2021-08-31T13:54:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 41,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "448bfa6c-3ec3-4052-93f3-88dae6c91f8c",
+      "raceclass": "G10",
+      "order": 19,
+      "start_time": "2021-08-31T14:25:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 54,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "49fc285b-5b78-4fff-862b-cec6bf072fe7",
+      "raceclass": "J10",
+      "order": 20,
+      "start_time": "2021-08-31T14:52:00",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 39,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "f0426fdc-e40a-414c-803c-d3a481ac79d7",
+      "raceclass": "G9",
+      "order": 21,
+      "start_time": "2021-08-31T15:21:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 32,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
+    },
+    {
+      "id": "560918cd-229f-4c92-bcc6-d7170a294f84",
+      "raceclass": "J9",
+      "order": 22,
+      "start_time": "2021-08-31T15:37:30",
+      "max_no_of_contestants": 10000,
+      "no_of_contestants": 13,
+      "event_id": "3f2e8ed9-e058-47d9-9567-2b771cdd4fdc",
+      "raceplan_id": "2f53475d-d06b-41b1-9607-292a6dbd52a2",
+      "start_entries": [],
+      "results": {},
+      "datatype": "interval_start"
     }
-  ]
+  ],
+  "no_of_contestants": 668,
+  "id": "2f53475d-d06b-41b1-9607-292a6dbd52a2"
 }

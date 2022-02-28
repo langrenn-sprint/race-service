@@ -337,7 +337,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(
             await _dump_raceplan_to_json("J10", raceplan)
 
             with open(
-                "tests/files/J10_expected_raceplan_individual_sprint.json", "r"
+                "tests/files/expected_raceplan_individual_sprint_J10.json", "r"
             ) as file:
                 expected_raceplan = json.load(file)
 
@@ -345,7 +345,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
             )
-            # Check that all the contestants have been assigned to round 1:
+            # Check that all the contestants have been assigned to Round 1:
             assert (
                 sum(
                     race["no_of_contestants"]
@@ -517,7 +517,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
             await _dump_raceplan_to_json("J11", raceplan)
 
             with open(
-                "tests/files/J11_expected_raceplan_individual_sprint.json", "r"
+                "tests/files/expected_raceplan_individual_sprint_J11.json", "r"
             ) as file:
                 expected_raceplan = json.load(file)
 
@@ -525,12 +525,12 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
             )
-            # Check that all the contestants have been assigned to a Quarterfinal:
+            # Check that all the contestants have been assigned to a Quarterfinal or Round 1:
             assert (
                 sum(
                     race["no_of_contestants"]
                     for race in raceplan["races"]
-                    if race["round"] == "Q"
+                    if race["round"] in ["Q", "R1"]
                 )
                 == raceplan["no_of_contestants"]
             )
@@ -687,7 +687,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(
             await _dump_raceplan_to_json("G11", raceplan)
 
             with open(
-                "tests/files/G11_expected_raceplan_individual_sprint_10.json", "r"
+                "tests/files/expected_raceplan_individual_sprint_G11_10.json", "r"
             ) as file:
                 expected_raceplan = json.load(file)
 
@@ -695,12 +695,12 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
             )
-            # Check that all the contestants have been assigned to a Quarterfinal:
+            # Check that all the contestants have been assigned to a Quarterfinal or Round 1:
             assert (
                 sum(
                     race["no_of_contestants"]
                     for race in raceplan["races"]
-                    if race["round"] == "Q"
+                    if race["round"] in ["Q", "R1"]
                 )
                 == raceplan["no_of_contestants"]
             )
@@ -783,7 +783,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             hdrs.AUTHORIZATION: f"Bearer {token}",
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        files = {"file": open("tests/files/contestants_all_333.csv", "rb")}
+        files = {"file": open("tests/files/contestants_all.csv", "rb")}
         logging.debug(f"Adding contestants from file at url {url}.")
         async with session.post(url, headers=headers, data=files) as response:
             status = response.status
@@ -814,9 +814,11 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             raceclasses = await response.json()
             for raceclass in raceclasses:
                 id = raceclass["id"]
-                raceclass["group"], raceclass["order"] = await _decide_group_and_order(
-                    raceclass
-                )
+                (
+                    raceclass["group"],
+                    raceclass["order"],
+                    raceclass["ranking"],
+                ) = await _decide_group_order_and_ranking(raceclass)
                 async with session.put(
                     f"{url}/{id}", headers=headers, json=raceclass
                 ) as response:
@@ -857,7 +859,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             await _dump_raceplan_to_json("all", raceplan)
 
             with open(
-                "tests/files/all_expected_raceplan_individual_sprint.json", "r"
+                "tests/files/expected_raceplan_individual_sprint.json", "r"
             ) as file:
                 expected_raceplan = json.load(file)
 
@@ -865,12 +867,12 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
             )
-            # Check that all the contestants have been assigned to a Quarterfinal:
+            # Check that all the contestants have been assigned to a Quarterfinal or Round 1:
             assert (
                 sum(
                     race["no_of_contestants"]
                     for race in raceplan["races"]
-                    if race["round"] == "Q"
+                    if race["round"] in ["Q", "R1"]
                 )
                 == raceplan["no_of_contestants"]
             )
@@ -1034,7 +1036,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(
             await _dump_raceplan_to_json("G11", raceplan)
 
             with open(
-                "tests/files/G11_expected_raceplan_individual_sprint_7.json", "r"
+                "tests/files/expected_raceplan_individual_sprint_G11_7.json", "r"
             ) as file:
                 expected_raceplan = json.load(file)
 
@@ -1042,12 +1044,12 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(
             assert (
                 raceplan["no_of_contestants"] == expected_raceplan["no_of_contestants"]
             )
-            # Check that all the contestants have been assigned to a Quarterfinal:
+            # Check that all the contestants have been assigned to a Quarterfinal or Round 1:
             assert (
                 sum(
                     race["no_of_contestants"]
                     for race in raceplan["races"]
-                    if race["round"] == "Q"
+                    if race["round"] in ["Q", "R1"]
                 )
                 == raceplan["no_of_contestants"]
             )
@@ -1076,32 +1078,54 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(
 
 
 # ---
-async def _decide_group_and_order(raceclass: dict) -> Tuple[int, int]:  # noqa: C901
-    if raceclass["name"] == "G16":  # race-order: 1
-        return (1, 1)
-    elif raceclass["name"] == "J16":  # race-order: 2
-        return (1, 2)
-    elif raceclass["name"] == "G15":  # race-order: 3
-        return (1, 3)
-    elif raceclass["name"] == "J15":  # race-order: 4
-        return (1, 4)
-    elif raceclass["name"] == "G14":  # race-order: 5
-        return (2, 1)
-    elif raceclass["name"] == "J14":  # race-order: 6
-        return (2, 2)
-    elif raceclass["name"] == "G13":  # race-order: 7
-        return (2, 3)
-    elif raceclass["name"] == "J13":  # race-order: 8
-        return (2, 4)
-    elif raceclass["name"] == "G12":  # race-order: 9
-        return (3, 1)
-    elif raceclass["name"] == "J12":  # race-order: 10
-        return (3, 2)
-    elif raceclass["name"] == "G11":  # race-order: 11
-        return (3, 3)
-    elif raceclass["name"] == "J11":  # race-order: 12
-        return (3, 4)
-    return (0, 0)  # should not reach this point
+async def _decide_group_order_and_ranking(  # noqa: C901
+    raceclass: dict,
+) -> Tuple[int, int, bool]:
+    if raceclass["name"] == "M19/20":
+        return (1, 1, True)
+    elif raceclass["name"] == "K19/20":
+        return (1, 2, True)
+    elif raceclass["name"] == "M18":
+        return (2, 1, True)
+    elif raceclass["name"] == "K18":
+        return (2, 2, True)
+    elif raceclass["name"] == "M17":
+        return (3, 1, True)
+    elif raceclass["name"] == "K17":
+        return (3, 2, True)
+    elif raceclass["name"] == "G16":
+        return (4, 1, True)
+    elif raceclass["name"] == "J16":
+        return (4, 2, True)
+    elif raceclass["name"] == "G15":
+        return (4, 3, True)
+    elif raceclass["name"] == "J15":
+        return (4, 4, True)
+    elif raceclass["name"] == "G14":
+        return (5, 1, True)
+    elif raceclass["name"] == "J14":
+        return (5, 2, True)
+    elif raceclass["name"] == "G13":
+        return (5, 3, True)
+    elif raceclass["name"] == "J13":
+        return (5, 4, True)
+    elif raceclass["name"] == "G12":
+        return (6, 1, True)
+    elif raceclass["name"] == "J12":
+        return (6, 2, True)
+    elif raceclass["name"] == "G11":
+        return (6, 3, True)
+    elif raceclass["name"] == "J11":
+        return (6, 4, True)
+    elif raceclass["name"] == "G10":
+        return (7, 1, False)
+    elif raceclass["name"] == "J10":
+        return (7, 2, False)
+    elif raceclass["name"] == "G9":
+        return (8, 1, False)
+    elif raceclass["name"] == "J9":
+        return (8, 2, False)
+    return (0, 0, True)  # should not reach this point
 
 
 async def _print_raceclasses(raceclasses: List[dict]) -> None:
@@ -1155,6 +1179,8 @@ async def _print_raceplan(raceplan: dict) -> None:
 
 
 async def _dump_raceplan_to_json(raceclass: str, raceplan: dict) -> None:
-    with open(f"tests/files/tmp_{raceclass}_raceplan.json", "w") as file:
+    with open(
+        f"tests/files/tmp_{raceclass}_raceplan_individual_sprint.json", "w"
+    ) as file:
         json.dump(raceplan, file)
     pass

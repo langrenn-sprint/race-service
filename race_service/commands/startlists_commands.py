@@ -89,7 +89,7 @@ class StartlistsCommands:
                 f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
             )
 
-        # We are ready to generate the raceplan:
+        # We are ready to generate the startlist:
         if event["competition_format"] == "Individual Sprint":
             startlist, start_entries = await generate_startlist_for_individual_sprint(
                 event,
@@ -131,7 +131,7 @@ class StartlistsCommands:
         return startlist_id
 
 
-async def generate_startlist_for_individual_sprint(
+async def generate_startlist_for_individual_sprint(  # noqa: C901
     event: dict,
     format_configuration: dict,
     raceclasses: List[dict],
@@ -149,16 +149,16 @@ async def generate_startlist_for_individual_sprint(
     )
     #
     no_of_contestants_in_races = sum(
-        race.no_of_contestants for race in races if race.round == "Q"
+        race.no_of_contestants for race in races if race.round in ["R1", "Q"]
     )
     if len(contestants) != no_of_contestants_in_races:
         raise InconsistentInputDataException(
-            "len(contestants) does not match sum of contestants in races quarterfinals:"
+            "Number of contestants in event does not match sum of contestants in races:"
             f"{len(contestants)} != {no_of_contestants_in_races}."
         )
 
     #
-    # For every race in round=Q in raceplan grouped by raceclass,
+    # For every race in rounds=Q, R1 or R2 in raceplan grouped by raceclass,
     # get the corresponding ageclasses from raceclass,
     # pick all contestants in ageclasses,
     # and for every such contestant, generate a start_entry.
@@ -175,43 +175,86 @@ async def generate_startlist_for_individual_sprint(
         ageclasses: List[str] = []
         for raceclass in raceclasses:
             if raceclass["name"] == races[0].raceclass:
+                ranking = raceclass["ranking"]
                 ageclasses += raceclass["ageclasses"]
-        # For every contestant in ageclass, create a start_entry in
-        # a quarter-final until it is full, continue with next quarter-final:
 
-        # Get the actual quarter-finals and set up control variables:
-        quarter_finals = [race for race in races if race.round == "Q"]
-        qf_index = 0
+        # For every contestant in corresponding ageclasses, create a start_entry in
+        # a race until it is full, continue with next race:
+        race_index = 0
         starting_position = 1
-        no_of_contestants_in_qf = 0
+        no_of_contestants_in_race = 0
 
         for contestant in [
             contestant
             for contestant in contestants
             if contestant["ageclass"] in ageclasses
         ]:
+            # Get the actual relevant races and set up control variables:
+            if ranking:
+                target_races = [race for race in races if race.round == "Q"]
+            else:
+                target_races = [
+                    race for race in races if race.round in ["R1"]
+                ]  # pragma: no cover
 
             # Create the start-entry:
             start_entry = StartEntry(
                 id="",
                 startlist_id="",
-                race_id=quarter_finals[qf_index].id,
+                race_id=target_races[race_index].id,
                 bib=contestant["bib"],
                 name=f'{contestant["first_name"]} {contestant["last_name"]}',
                 club=contestant["club"],
                 starting_position=starting_position,
-                scheduled_start_time=quarter_finals[qf_index].start_time,
+                scheduled_start_time=target_races[race_index].start_time,
             )
             start_entries.append(start_entry)
 
-            no_of_contestants_in_qf += 1
-            # Check if qf is full:
-            if no_of_contestants_in_qf < quarter_finals[qf_index].no_of_contestants:
+            no_of_contestants_in_race += 1
+            # Check if race is full:
+            if no_of_contestants_in_race < target_races[race_index].no_of_contestants:
                 starting_position += 1
             else:
-                qf_index += 1
+                race_index += 1
                 starting_position = 1
-                no_of_contestants_in_qf = 0
+                no_of_contestants_in_race = 0
+
+        # For not ranked ageclasses we generate round 2 ("R2") also:
+        race_index = 0
+        starting_position = 1
+        no_of_contestants_in_race = 0
+        if not ranking:  # pragma: no cover
+            for contestant in [
+                contestant
+                for contestant in contestants
+                if contestant["ageclass"] in ageclasses
+            ]:
+                target_races = [race for race in races if race.round in ["R2"]]
+
+                # Create the start-entry:
+                start_entry = StartEntry(
+                    id="",
+                    startlist_id="",
+                    race_id=target_races[race_index].id,
+                    bib=contestant["bib"],
+                    name=f'{contestant["first_name"]} {contestant["last_name"]}',
+                    club=contestant["club"],
+                    starting_position=starting_position,
+                    scheduled_start_time=target_races[race_index].start_time,
+                )
+                start_entries.append(start_entry)
+
+                no_of_contestants_in_race += 1
+                # Check if race is full:
+                if (
+                    no_of_contestants_in_race
+                    < target_races[race_index].no_of_contestants
+                ):
+                    starting_position += 1
+                else:
+                    race_index += 1
+                    starting_position = 1
+                    no_of_contestants_in_race = 0
 
     return startlist, start_entries
 
