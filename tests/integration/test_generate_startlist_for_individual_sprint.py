@@ -76,6 +76,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
             "ageclasses": ["G 15 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 2,
+            "ranking": True,
             "group": 2,
             "order": 1,
         },
@@ -85,6 +86,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
             "ageclasses": ["G 16 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 2,
+            "ranking": True,
             "group": 1,
             "order": 1,
         },
@@ -94,6 +96,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
             "ageclasses": ["J 15 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 2,
+            "ranking": True,
             "group": 2,
             "order": 2,
         },
@@ -103,6 +106,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
             "ageclasses": ["J 16 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 2,
+            "ranking": True,
             "group": 1,
             "order": 2,
         },
@@ -488,6 +492,6 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
         assert resp.status == 400
         body = await resp.json()
         assert (
-            "len(contestants) does not match sum of contestants in races quarterfinals"
+            "Number of contestants in event does not match sum of contestants in races"
             in body["detail"]
         )
