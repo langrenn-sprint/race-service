@@ -1,10 +1,20 @@
 """Raceplan data class module."""
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import IntEnum
 from typing import Dict, List, Union
 
 from dataclasses_json import config, DataClassJsonMixin
 from marshmallow.fields import Constant, DateTime
+
+
+@dataclass
+class RaceResultStatus(IntEnum):
+    """Valid values for a raceresult status."""
+
+    NONE = 0
+    UNOFFICIAL = 1
+    OFFICIAL = 2
 
 
 @dataclass
@@ -16,6 +26,7 @@ class RaceResult(DataClassJsonMixin):
     timing_point: str
     no_of_contestants: int
     ranking_sequence: List[str]  # list of references to TimeEvent
+    status: int  # int with reference to RaceResultStatus
 
 
 @dataclass
