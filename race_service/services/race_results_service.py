@@ -5,6 +5,7 @@ import uuid
 from race_service.adapters import RaceResultsAdapter
 from race_service.models import (
     RaceResult,
+    RaceResultStatus,
     StartEntry,
     TimeEvent,
 )
@@ -163,6 +164,7 @@ class RaceResultsService:
                     timing_point=time_event.timing_point,
                     no_of_contestants=0,
                     ranking_sequence=[],
+                    status=RaceResultStatus.UNOFFICIAL,
                 )
                 new_race_result = race_result.to_dict()
                 await RaceResultsAdapter.create_race_result(db, new_race_result)

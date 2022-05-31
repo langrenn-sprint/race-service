@@ -78,6 +78,7 @@ async def race_result() -> dict:
         "timing_point": "Finish",
         "no_of_contestants": 0,
         "ranking_sequence": ["290e70d5-0933-4af0-bb53-1d705ba7eb95"],
+        "status": 0,
     }
 
 
