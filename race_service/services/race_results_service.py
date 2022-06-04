@@ -1,4 +1,5 @@
 """Module for race-results service."""
+import logging
 from typing import Any, List, Optional
 import uuid
 
@@ -164,9 +165,10 @@ class RaceResultsService:
                     timing_point=time_event.timing_point,
                     no_of_contestants=0,
                     ranking_sequence=[],
-                    status=RaceResultStatus.UNOFFICIAL,
+                    status=RaceResultStatus.UNOFFICIAL.value,
                 )
                 new_race_result = race_result.to_dict()
+                logging.debug(f"Create race result for {new_race_result}")
                 await RaceResultsAdapter.create_race_result(db, new_race_result)
             else:
                 race_result = race_results[0]
