@@ -47,7 +47,13 @@ class RacesView(View):
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
-            races = await RacesService.get_races_by_event_id(db, event_id)
+            if "raceclass" in self.request.rel_url.query:
+                raceclass = self.request.rel_url.query["raceclass"]
+                races = await RacesService.get_races_by_event_id_and_raceclass(
+                    db, event_id, raceclass
+                )
+            else:
+                races = await RacesService.get_races_by_event_id(db, event_id)
         else:
             races = await RacesService.get_all_races(db)
         list = []
