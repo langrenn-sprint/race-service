@@ -41,6 +41,25 @@ class RacesAdapter:
         return races
 
     @classmethod
+    async def get_races_by_event_id_and_raceclass(
+        cls: Any, db: Any, event_id: str, raceclass: str
+    ) -> List[dict]:  # pragma: no cover
+        """Get races by event_id and raceclass function."""
+        races: List = []
+        cursor = db.races_collection.find(
+            {
+                "$and": [
+                    {"raceclass": raceclass},
+                    {"event_id": event_id},
+                ]
+            }
+        )
+        for race in await cursor.to_list(None):
+            races.append(race)
+            logging.debug(race)
+        return races
+
+    @classmethod
     async def get_races_by_raceplan_id(
         cls: Any, db: Any, raceplan_id: str
     ) -> List[dict]:  # pragma: no cover

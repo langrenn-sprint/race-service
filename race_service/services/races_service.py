@@ -61,6 +61,24 @@ class RacesService:
         return races
 
     @classmethod
+    async def get_races_by_event_id_and_raceclass(
+        cls: Any, db: Any, event_id: str, raceclass: str
+    ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
+        """Get all races by event_id and raceclass function."""
+        races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
+        _races = await RacesAdapter.get_races_by_event_id_and_raceclass(
+            db, event_id, raceclass
+        )
+        if _races:
+            for _race in _races:
+                logging.debug(f"Got race {_race}")
+                if _race["datatype"] == "interval_start":
+                    races.append(IntervalStartRace.from_dict(_race))
+                elif _race["datatype"] == "individual_sprint":
+                    races.append(IndividualSprintRace.from_dict(_race))
+        return races
+
+    @classmethod
     async def get_races_by_raceplan_id(
         cls: Any, db: Any, raceplan_id: str
     ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:

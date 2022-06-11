@@ -495,6 +495,42 @@ async def test_get_races_by_event_id(
 
 
 @pytest.mark.integration
+async def test_get_races_by_event_id_and_raceclass(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race_interval_start: dict,
+) -> None:
+    """Should return OK, and a body containing one race."""
+    EVENT_ID = race_interval_start["event_id"]
+    RACECLASS = race_interval_start["raceclass"]
+    RACE_ID = race_interval_start["id"]
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id_and_raceclass",
+        return_value=[race_interval_start],
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.get(f"/races?eventId={EVENT_ID}&raceclass={RACECLASS}")
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["id"] == RACE_ID
+        assert body[0]["event_id"] == race_interval_start["event_id"]
+        assert body[0]["raceclass"] == RACECLASS
+        assert body[0]["order"] == race_interval_start["order"]
+        assert body[0]["start_time"] == race_interval_start["start_time"]
+        assert body[0]["no_of_contestants"] == race_interval_start["no_of_contestants"]
+        assert body[0]["event_id"] == race_interval_start["event_id"]
+        assert body[0]["start_entries"] == race_interval_start["start_entries"]
+        assert body[0]["datatype"] == race_interval_start["datatype"]
+
+
+@pytest.mark.integration
 async def test_get_races_by_event_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -520,6 +556,47 @@ async def test_get_races_by_event_id_individual_sprint(
         assert len(body) == 1
         assert body[0]["id"] == RACE_ID
         assert body[0]["raceclass"] == race_individual_sprint["raceclass"]
+        assert body[0]["order"] == race_individual_sprint["order"]
+        assert body[0]["start_time"] == race_individual_sprint["start_time"]
+        assert (
+            body[0]["no_of_contestants"] == race_individual_sprint["no_of_contestants"]
+        )
+        assert body[0]["event_id"] == race_individual_sprint["event_id"]
+        assert body[0]["start_entries"] == race_individual_sprint["start_entries"]
+        assert body[0]["round"] == race_individual_sprint["round"]
+        assert body[0]["index"] == race_individual_sprint["index"]
+        assert body[0]["heat"] == race_individual_sprint["heat"]
+        assert body[0]["rule"] == race_individual_sprint["rule"]
+        assert body[0]["datatype"] == race_individual_sprint["datatype"]
+
+
+@pytest.mark.integration
+async def test_get_races_by_event_id_and_raceclass_individual_sprint(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race_individual_sprint: dict,
+) -> None:
+    """Should return OK, and a body containing one race."""
+    EVENT_ID = race_individual_sprint["event_id"]
+    RACE_ID = race_individual_sprint["id"]
+    RACECLASS = race_individual_sprint["raceclass"]
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id_and_raceclass",
+        return_value=[race_individual_sprint],
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+
+        resp = await client.get(f"/races?eventId={EVENT_ID}&raceclass={RACECLASS}")
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["id"] == RACE_ID
+        assert body[0]["raceclass"] == RACECLASS
         assert body[0]["order"] == race_individual_sprint["order"]
         assert body[0]["start_time"] == race_individual_sprint["start_time"]
         assert (
