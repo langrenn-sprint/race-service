@@ -9,7 +9,6 @@ from race_service.models import (
     IntervalStartRace,
     Race,
 )
-
 from .exceptions import IllegalValueException
 
 
