@@ -498,6 +498,7 @@ async def test_get_races_by_event_id(
 async def test_get_races_by_event_id_and_raceclass(
     client: _TestClient,
     mocker: MockFixture,
+    mock_race_result: dict,
     token: MockFixture,
     race_interval_start: dict,
 ) -> None:
@@ -508,6 +509,18 @@ async def test_get_races_by_event_id_and_raceclass(
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id_and_raceclass",
         return_value=[race_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=mock_race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -526,8 +539,11 @@ async def test_get_races_by_event_id_and_raceclass(
         assert body[0]["start_time"] == race_interval_start["start_time"]
         assert body[0]["no_of_contestants"] == race_interval_start["no_of_contestants"]
         assert body[0]["event_id"] == race_interval_start["event_id"]
-        assert body[0]["start_entries"] == race_interval_start["start_entries"]
+        assert len(body[0]["start_entries"]) == len(
+            race_interval_start["start_entries"]
+        )
         assert body[0]["datatype"] == race_interval_start["datatype"]
+        assert body[0]["id"] == mock_race_result["race_id"]
 
 
 @pytest.mark.integration
@@ -574,6 +590,7 @@ async def test_get_races_by_event_id_individual_sprint(
 async def test_get_races_by_event_id_and_raceclass_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
+    mock_race_result: dict,
     token: MockFixture,
     race_individual_sprint: dict,
 ) -> None:
@@ -584,6 +601,18 @@ async def test_get_races_by_event_id_and_raceclass_individual_sprint(
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id_and_raceclass",
         return_value=[race_individual_sprint],
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=mock_race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -603,12 +632,12 @@ async def test_get_races_by_event_id_and_raceclass_individual_sprint(
             body[0]["no_of_contestants"] == race_individual_sprint["no_of_contestants"]
         )
         assert body[0]["event_id"] == race_individual_sprint["event_id"]
-        assert body[0]["start_entries"] == race_individual_sprint["start_entries"]
         assert body[0]["round"] == race_individual_sprint["round"]
         assert body[0]["index"] == race_individual_sprint["index"]
         assert body[0]["heat"] == race_individual_sprint["heat"]
         assert body[0]["rule"] == race_individual_sprint["rule"]
         assert body[0]["datatype"] == race_individual_sprint["datatype"]
+        assert body[0]["id"] == mock_race_result["race_id"]
 
 
 @pytest.mark.integration
