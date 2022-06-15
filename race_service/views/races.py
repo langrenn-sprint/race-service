@@ -2,7 +2,7 @@
 import json
 import logging
 import os
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -52,6 +52,12 @@ class RacesView(View):
                 races = await RacesService.get_races_by_event_id_and_raceclass(
                     db, event_id, raceclass
                 )
+                if races:
+                    for race in races:
+                        # Get the start_entries:
+                        race.start_entries = await get_start_entries(db, race.start_entries)  # type: ignore
+                        # Get the race_results:
+                        race.results = await get_race_results(db, race.results)  # type: ignore
             else:
                 races = await RacesService.get_races_by_event_id(db, event_id)
         else:
@@ -77,42 +83,9 @@ class RaceView(View):
         try:
             race = await RacesService.get_race_by_id(db, race_id)
             # Get the start_entries:
-            start_entries: List[StartEntry] = []
-            for start_entry_id in race.start_entries:
-                start_entry: StartEntry = (
-                    await StartEntriesService.get_start_entry_by_id(db, start_entry_id)
-                )
-                start_entries.append(start_entry)
-
-            race.start_entries = start_entries  # type: ignore
+            race.start_entries = await get_start_entries(db, race.start_entries)  # type: ignore
             # Get the race_results:
-            results: Dict[str, RaceResult] = {}
-            for key in race.results:
-                race_result: RaceResult = (
-                    await RaceResultsService.get_race_result_by_id(
-                        db, race.results[key]
-                    )
-                )
-                ranking_sequence: List[TimeEvent] = []
-                for time_event_id in race_result.ranking_sequence:
-                    time_event = await TimeEventsService.get_time_event_by_id(
-                        db, time_event_id
-                    )
-                    ranking_sequence.append(time_event)
-                # We sort the time-events on rank:
-                ranking_sequence_sorted = sorted(
-                    ranking_sequence,
-                    key=lambda k: (
-                        k.rank is not None,
-                        k.rank != "",
-                        k.rank,
-                    ),
-                    reverse=False,
-                )
-
-                race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore
-                results[key] = race_result
-            race.results = results  # type: ignore
+            race.results = await get_race_results(db, race.results)  # type: ignore
         except RaceNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got race: {race}")
@@ -169,3 +142,40 @@ class RaceView(View):
         except RaceNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
+
+
+async def get_start_entries(db: Any, start_entry_ids: list) -> List[StartEntry]:
+    """Get the start entries."""
+    start_entries: List[StartEntry] = []
+    for start_entry_id in start_entry_ids:
+        start_entry: StartEntry = await StartEntriesService.get_start_entry_by_id(
+            db, start_entry_id
+        )
+        start_entries.append(start_entry)
+    return start_entries
+
+
+async def get_race_results(db: Any, race_results: dict) -> Dict[str, RaceResult]:
+    """Get the race results in sorted order."""
+    results: Dict[str, RaceResult] = {}
+    for key in race_results:
+        race_result: RaceResult = await RaceResultsService.get_race_result_by_id(
+            db, race_results[key]
+        )
+        ranking_sequence: List[TimeEvent] = []
+        for time_event_id in race_result.ranking_sequence:
+            time_event = await TimeEventsService.get_time_event_by_id(db, time_event_id)
+            ranking_sequence.append(time_event)
+        # We sort the time-events on rank:
+        ranking_sequence_sorted = sorted(
+            ranking_sequence,
+            key=lambda k: (
+                k.rank is not None,
+                k.rank != "",
+                k.rank,
+            ),
+            reverse=False,
+        )
+        race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore
+        results[key] = race_result
+    return results
