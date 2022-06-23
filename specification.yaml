@@ -295,6 +295,14 @@ paths:
         description: timing point of the race result
         schema:
           type: string
+      - name: idsOnly
+        in: query
+        description: possibility to not retrieve timing point details, only references
+        schema:
+        schema:
+          type: boolean
+          default: false
+        required: false
     get:
       tags:
         - race-results
