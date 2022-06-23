@@ -56,7 +56,12 @@ class RaceResultsView(View):
                 db, race_id
             )
         # We expand references to time-events in race-results ranking-sequence:
-        if "idsOnly" not in self.request.rel_url.query:
+        idsOnly = (
+            self.request.rel_url.query["idsOnly"]
+            if "idsOnly" in self.request.rel_url.query
+            else None
+        )
+        if not idsOnly:
             for race_result in race_results:
                 time_events: List[TimeEvent] = []
                 time_events_sorted: List[TimeEvent] = []
