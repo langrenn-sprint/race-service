@@ -56,26 +56,32 @@ class RaceResultsView(View):
                 db, race_id
             )
         # We expand references to time-events in race-results ranking-sequence:
-        for race_result in race_results:
-            time_events: List[TimeEvent] = []
-            time_events_sorted: List[TimeEvent] = []
-            for time_event_id in race_result.ranking_sequence:
-                time_event = await TimeEventsService.get_time_event_by_id(
-                    db, time_event_id
-                )
-                time_events.append(time_event)
-                # We sort the time-events on rank:
-                time_events_sorted = sorted(
-                    time_events,
-                    key=lambda k: (
-                        k.rank is not None,
-                        k.rank != "",
-                        k.rank,
-                    ),
-                    reverse=False,
-                )
+        idsOnly = (
+            self.request.rel_url.query["idsOnly"]
+            if "idsOnly" in self.request.rel_url.query
+            else None
+        )
+        if not idsOnly:
+            for race_result in race_results:
+                time_events: List[TimeEvent] = []
+                time_events_sorted: List[TimeEvent] = []
+                for time_event_id in race_result.ranking_sequence:
+                    time_event = await TimeEventsService.get_time_event_by_id(
+                        db, time_event_id
+                    )
+                    time_events.append(time_event)
+                    # We sort the time-events on rank:
+                    time_events_sorted = sorted(
+                        time_events,
+                        key=lambda k: (
+                            k.rank is not None,
+                            k.rank != "",
+                            k.rank,
+                        ),
+                        reverse=False,
+                    )
 
-            race_result.ranking_sequence = time_events_sorted  # type: ignore
+                race_result.ranking_sequence = time_events_sorted  # type: ignore
 
         list = []
         for race_result in race_results:
