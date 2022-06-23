@@ -299,7 +299,10 @@ paths:
         in: query
         description: possibility to not retrieve timing point details, only references
         schema:
+        schema:
           type: boolean
+          default: false
+        required: false
     get:
       tags:
         - race-results
