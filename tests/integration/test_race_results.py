@@ -280,6 +280,40 @@ async def test_get_race_results_by_race_id(
 
 
 @pytest.mark.integration
+async def test_get_race_results_by_race_id_idsonly(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: dict,
+    race_result: dict,
+) -> None:
+    """Should return OK and a valid json body."""
+    RACE_RESULT_ID = race_result["id"]
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id",
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8081/authorize", status=204)
+        resp = await client.get(f'races/{race["id"]}/race-results?idsOnly')
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        race_results = await resp.json()
+        assert type(race_results) is list
+        assert len(race_results) > 0
+        assert RACE_RESULT_ID == race_results[0]["id"]
+        for time_event in race_results[0]["ranking_sequence"]:
+            assert type(time_event) is str
+            expected_time_event = get_time_event_by_id(db=None, id=time_event)
+            assert time_event == expected_time_event["id"]
+
+
+@pytest.mark.integration
 async def test_get_race_results_by_race_id_and_timing_point(
     client: _TestClient,
     mocker: MockFixture,
