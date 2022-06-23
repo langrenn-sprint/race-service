@@ -300,7 +300,7 @@ async def test_get_race_results_by_race_id_idsonly(
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8081/authorize", status=204)
-        resp = await client.get(f'races/{race["id"]}/race-results?idsOnly')
+        resp = await client.get(f'races/{race["id"]}/race-results?idsOnly=true')
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         race_results = await resp.json()
