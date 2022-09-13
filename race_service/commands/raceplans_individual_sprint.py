@@ -178,16 +178,16 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FC += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
             if "A" in race.rule["F"]:
-                if race.rule["F"]["A"] > race.no_of_contestants:
+                if race.rule["F"]["A"] == "ALL":
                     no_of_contestants_to_FA = race.no_of_contestants
                 else:
                     no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
             # rest to FB:
             if "B" in race.rule["F"]:
-                if race.rule["F"]["B"] < float("inf"):
-                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
-                else:
+                if race.rule["F"]["B"] == "REST":
                     no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+                else:
+                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
 
     # Calculate number of contestants pr heat in SA:
     for race in [
@@ -233,10 +233,10 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
             if "A" in race.rule["F"]:
                 no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
             if "B" in race.rule["F"]:
-                if race.rule["F"]["B"] < float("inf"):
-                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
-                else:
+                if race.rule["F"]["B"] == "REST":
                     no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+                else:
+                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FC += race.rule["F"]["C"]  # type: ignore
 
@@ -330,22 +330,23 @@ class ConfigMatrix:
     RANKING: bool = True
     MAX_NO_OF_CONTESTANTS_IN_RACECLASS: int
     MAX_NO_OF_CONTESTANTS_IN_RACE: int
-    m: Dict[int, Dict[str, Any]] = {}
+    m: List[Dict[str, Any]] = []
 
     @classmethod
     def initialize(
         cls: Any, format_configuration: Dict, raceclasses_in_group: List[Dict]
     ) -> None:
         """Initalize parameters based on format-configuration and raceclasses in group."""
+        # TODO: Get this from format-configuration, should use the class from event-service
         if raceclasses_in_group[0]["ranking"]:
             ConfigMatrix.RANKING = True
         else:
             ConfigMatrix.RANKING = False
 
         if ConfigMatrix.RANKING:
-            ConfigMatrix.ROUNDS = ["Q", "S", "F"]
+            ConfigMatrix.ROUNDS = format_configuration["rounds_ranked_classes"]
         else:
-            ConfigMatrix.ROUNDS = ["R1", "R2"]
+            ConfigMatrix.ROUNDS = format_configuration["rounds_non_ranked_classes"]
 
         ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS = format_configuration[
             "max_no_of_contestants_in_raceclass"
@@ -355,202 +356,12 @@ class ConfigMatrix:
         ]
 
         # Initialize matrix
-        # TODO: Get this from format-configuration
-        ALL = ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE
-        REST = float("inf")
-
         if ConfigMatrix.RANKING:
             # ConfigMatrix for ranked raceclasses:
-            ConfigMatrix.m[1] = {
-                "lim_no_contestants": 7,
-                "rounds": ["Q", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 1},
-                    "F": {"A": 1, "B": 0, "C": 0},
-                },
-                "from_to": {
-                    "Q": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
-                },
-            }
-            ConfigMatrix.m[2] = {
-                "lim_no_contestants": 16,
-                "rounds": ["Q", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 2},
-                    "F": {"A": 1, "B": 1, "C": 0},
-                },
-                "from_to": {
-                    "Q": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
-                },
-            }
-            ConfigMatrix.m[3] = {
-                "lim_no_contestants": 24,
-                "rounds": ["Q", "S", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 3},
-                    "S": {"A": 2, "C": 0},
-                    "F": {"A": 1, "B": 1, "C": 1},
-                },
-                "from_to": {
-                    "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
-                    "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
-                },
-            }
-            ConfigMatrix.m[4] = {
-                "lim_no_contestants": 32,
-                "rounds": ["Q", "S", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 4},
-                    "S": {"A": 2, "C": 2},
-                    "F": {"A": 1, "B": 1, "C": 1},
-                },
-                "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                    "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
-                },
-            }
-            ConfigMatrix.m[5] = {
-                "lim_no_contestants": 40,
-                "rounds": ["Q", "S", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 6},
-                    "S": {"A": 4, "C": 2},
-                    "F": {"A": 1, "B": 1, "C": 1},
-                },
-                "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 4}}},
-                },
-            }
-            ConfigMatrix.m[6] = {
-                "lim_no_contestants": 48,
-                "rounds": ["Q", "S", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 6},
-                    "S": {"A": 4, "C": 4},
-                    "F": {"A": 1, "B": 1, "C": 1},
-                },
-                "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-                },
-            }
-            ConfigMatrix.m[7] = {
-                "lim_no_contestants": 56,
-                "rounds": ["Q", "S", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 7},
-                    "S": {"A": 4, "C": 4},
-                    "F": {"A": 1, "B": 1, "C": 1},
-                },
-                "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-                },
-            }
-            ConfigMatrix.m[8] = {
-                "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
-                "rounds": ["Q", "S", "F"],
-                "no_of_heats": {
-                    "Q": {"A": 8},
-                    "S": {"A": 4, "C": 4},
-                    "F": {"A": 1, "B": 1, "C": 1},
-                },
-                "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
-                },
-            }
+            ConfigMatrix.m = format_configuration["race_config_ranked"]
         else:
             # ConfigMatrix for non ranked raceclasses:
-            ConfigMatrix.m[1] = {
-                "lim_no_contestants": 7,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 1},
-                    "R2": {"A": 1},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[2] = {
-                "lim_no_contestants": 16,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 2},
-                    "R2": {"A": 2},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[3] = {
-                "lim_no_contestants": 24,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 3},
-                    "R2": {"A": 3},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[4] = {
-                "lim_no_contestants": 32,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 4},
-                    "R2": {"A": 4},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[5] = {
-                "lim_no_contestants": 40,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 6},
-                    "R2": {"A": 6},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[6] = {
-                "lim_no_contestants": 48,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 6},
-                    "R2": {"A": 6},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[7] = {
-                "lim_no_contestants": 56,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 7},
-                    "R2": {"A": 7},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
-            ConfigMatrix.m[8] = {
-                "lim_no_contestants": ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
-                "rounds": ["R1", "R2"],
-                "no_of_heats": {
-                    "R1": {"A": 8},
-                    "R2": {"A": 8},
-                },
-                "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
-                },
-            }
+            ConfigMatrix.m = format_configuration["race_config_non_ranked"]
 
     @classmethod
     def get_rounds(cls: Any) -> list:
@@ -560,19 +371,19 @@ class ConfigMatrix:
     @classmethod
     def get_rounds_in_raceclass(cls: Any, raceclass: dict) -> list:
         """Get actual rounds in raceclass."""
-        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        _key = ConfigMatrix._get_index(raceclass["no_of_contestants"])
         return ConfigMatrix.m[_key]["rounds"]
 
     @classmethod
     def get_no_of_heats(cls: Any, raceclass: dict, round: str, index: str) -> int:
         """Get no of heats pr round and index."""
-        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        _key = ConfigMatrix._get_index(raceclass["no_of_contestants"])
         return ConfigMatrix.m[_key]["no_of_heats"][round][index]
 
     @classmethod
     def get_race_indexes(cls: Any, raceclass: dict, round: str) -> list:
         """Get race indexes pr round."""
-        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        _key = ConfigMatrix._get_index(raceclass["no_of_contestants"])
         if round not in ConfigMatrix.m[_key]["no_of_heats"]:
             return []
         return [key for key in ConfigMatrix.m[_key]["no_of_heats"][round]]
@@ -583,31 +394,24 @@ class ConfigMatrix:
         raceclass: dict,
         from_round: str,
         from_index: str,
-    ) -> Dict[str, Dict[str, Union[int, float]]]:
+    ) -> Dict[str, Dict[str, Union[int, str]]]:
         """Get race rule pr round and index."""
-        _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
+        _key = ConfigMatrix._get_index(raceclass["no_of_contestants"])
         return ConfigMatrix.m[_key]["from_to"][from_round][from_index]
 
     @classmethod
-    def _get_key(cls: Any, no_of_contestants: int) -> int:
-        """Looks up key of matrix based on no_of_contestants."""
-        if 1 <= no_of_contestants <= 7:
-            return 1
-        elif 7 < no_of_contestants <= 16:
-            return 2
-        elif 16 < no_of_contestants <= 24:
-            return 3
-        elif 24 < no_of_contestants <= 32:
-            return 4
-        elif 32 < no_of_contestants <= 40:
-            return 5
-        elif 40 < no_of_contestants <= 48:
-            return 6
-        elif 48 < no_of_contestants <= 56:
-            return 7
-        elif 56 < no_of_contestants <= ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS:
-            return 8
-        else:
+    def _get_index(cls: Any, no_of_contestants: int) -> int:
+        """Find index of correct matrix in list based on no_of_contestants."""
+        _index = next(
+            (
+                index
+                for (index, d) in enumerate(ConfigMatrix.m)
+                if no_of_contestants <= d["max_no_of_contestants"]
+            ),
+            None,
+        )
+        if _index is None:
             raise ValueError(
                 f"Unsupported value for no of contestants: {no_of_contestants}"
             )
+        return _index

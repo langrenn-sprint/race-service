@@ -196,7 +196,7 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -263,7 +263,7 @@ async def test_generate_raceplan_for_event_create_race_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -315,7 +315,7 @@ async def test_generate_raceplan_for_event_unauthorized(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -367,7 +367,7 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -419,7 +419,7 @@ async def test_generate_raceplan_for_event_event_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -472,7 +472,7 @@ async def test_generate_raceplan_for_event_format_configuration_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -530,7 +530,7 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -588,7 +588,7 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -638,7 +638,7 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -689,7 +689,7 @@ async def test_generate_raceplan_for_event_no_competition_format(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -742,7 +742,7 @@ async def test_generate_raceplan_for_event_missing_intervals(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -795,7 +795,7 @@ async def test_generate_raceplan_for_event_time_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -848,7 +848,7 @@ async def test_generate_raceplan_for_event_date_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -901,7 +901,7 @@ async def test_generate_raceplan_for_event_invalid_date(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -954,7 +954,7 @@ async def test_generate_raceplan_for_event_invalid_time(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1007,7 +1007,7 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1062,7 +1062,7 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1117,7 +1117,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1172,7 +1172,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1228,7 +1228,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1283,7 +1283,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1341,7 +1341,7 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1392,7 +1392,7 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -1461,7 +1461,7 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
