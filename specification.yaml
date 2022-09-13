@@ -22,7 +22,7 @@ tags:
     description: StartEntry operations
   - name: time-event
     description: Time-event operations
-  - name: race-results
+  - name: race-result
     description: Race result operations
 paths:
   /raceplans:
@@ -299,13 +299,12 @@ paths:
         in: query
         description: possibility to not retrieve timing point details, only references
         schema:
-        schema:
           type: boolean
           default: false
         required: false
     get:
       tags:
-        - race-results
+        - race-result
       description: Get a list of race results
       responses:
         200:
@@ -314,7 +313,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RaceResultCollection"
-  /races/{raceId}/race-results/{raceId}:
+  /races/{raceId}/race-results/{raceResultId}:
     parameters:
       - name: raceId
         in: path
@@ -323,9 +322,16 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: raceResultId
+        in: path
+        description: race-result id
+        required: true
+        schema:
+          type: string
+          format: uuid
     get:
       tags:
-        - race-results
+        - race-result
       description: Get a race result identified by its id
       responses:
         200:
@@ -336,7 +342,7 @@ paths:
                 $ref: "#/components/schemas/RaceResult"
     put:
       tags:
-        - race-results
+        - race-result
       security:
         - bearerAuth: []
       description: Update a race result
@@ -351,7 +357,7 @@ paths:
           description: No content
     delete:
       tags:
-        - race-results
+        - race-result
       security:
         - bearerAuth: []
       description: Delete a race result
