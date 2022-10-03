@@ -68,7 +68,7 @@ class IndividualSprintRace(Race, DataClassJsonMixin):
     round: str = ""
     index: str = ""
     heat: int = 0
-    rule: Dict[str, Dict[str, Union[int, float]]] = field(default_factory=dict)
+    rule: Dict[str, Dict[str, Union[int, str]]] = field(default_factory=dict)
     datatype: str = field(
         metadata=dict(marshmallow_field=Constant("individual_sprint")),
         default="individual_sprint",

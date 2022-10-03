@@ -160,7 +160,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -180,7 +180,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -200,7 +200,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],
@@ -220,7 +220,7 @@ async def races_individual_sprint(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=raceplan_individual_sprint.event_id,
             raceplan_id="",
             start_entries=[],

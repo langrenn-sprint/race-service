@@ -18,7 +18,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -40,7 +40,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -135,7 +135,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -157,7 +157,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -252,7 +252,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -274,7 +274,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -299,7 +299,7 @@
           "C": 0
         },
         "F": {
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -324,7 +324,7 @@
           "C": 0
         },
         "F": {
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -349,7 +349,7 @@
           "C": 0
         },
         "F": {
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -371,7 +371,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -393,7 +393,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -500,7 +500,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -522,7 +522,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -544,7 +544,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -566,7 +566,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -588,7 +588,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -610,7 +610,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -632,7 +632,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -654,7 +654,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -676,7 +676,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -698,7 +698,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -720,7 +720,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -742,7 +742,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -764,7 +764,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -786,7 +786,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -808,7 +808,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -830,7 +830,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -852,7 +852,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -874,7 +874,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -896,7 +896,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -918,7 +918,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1112,7 +1112,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1134,7 +1134,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1328,7 +1328,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1350,7 +1350,7 @@
       "rule": {
         "F": {
           "A": 4,
-          "B": "Infinity"
+          "B": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1576,7 +1576,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1598,7 +1598,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1620,7 +1620,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1642,7 +1642,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1664,7 +1664,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1686,7 +1686,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1708,7 +1708,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1730,7 +1730,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1752,7 +1752,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1774,7 +1774,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1796,7 +1796,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1818,7 +1818,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1840,7 +1840,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1862,7 +1862,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1884,7 +1884,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1906,7 +1906,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1928,7 +1928,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1950,7 +1950,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1972,7 +1972,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -1994,7 +1994,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2016,7 +2016,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2038,7 +2038,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2060,7 +2060,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2082,7 +2082,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2104,7 +2104,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2126,7 +2126,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -2998,7 +2998,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3020,7 +3020,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3042,7 +3042,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3064,7 +3064,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3086,7 +3086,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3108,7 +3108,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3130,7 +3130,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3152,7 +3152,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3174,7 +3174,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3196,7 +3196,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3218,7 +3218,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3240,7 +3240,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3262,7 +3262,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3284,7 +3284,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3306,7 +3306,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3328,7 +3328,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3350,7 +3350,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3372,7 +3372,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3394,7 +3394,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3416,7 +3416,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3438,7 +3438,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3460,7 +3460,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3482,7 +3482,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -3504,7 +3504,7 @@
       "rule": {
         "S": {
           "A": 4,
-          "C": "Infinity"
+          "C": "REST"
         }
       },
       "datatype": "individual_sprint"
@@ -4333,7 +4333,7 @@
       "heat": 1,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4354,7 +4354,7 @@
       "heat": 2,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4375,7 +4375,7 @@
       "heat": 3,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4396,7 +4396,7 @@
       "heat": 4,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4417,7 +4417,7 @@
       "heat": 5,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4438,7 +4438,7 @@
       "heat": 6,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4459,7 +4459,7 @@
       "heat": 7,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4480,7 +4480,7 @@
       "heat": 1,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4501,7 +4501,7 @@
       "heat": 2,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4522,7 +4522,7 @@
       "heat": 3,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4543,7 +4543,7 @@
       "heat": 4,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4564,7 +4564,7 @@
       "heat": 5,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4585,7 +4585,7 @@
       "heat": 6,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4827,7 +4827,7 @@
       "heat": 1,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4848,7 +4848,7 @@
       "heat": 2,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4869,7 +4869,7 @@
       "heat": 3,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4890,7 +4890,7 @@
       "heat": 4,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4911,7 +4911,7 @@
       "heat": 1,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -4932,7 +4932,7 @@
       "heat": 2,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
