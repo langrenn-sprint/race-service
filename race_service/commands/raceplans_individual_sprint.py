@@ -178,16 +178,16 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FC += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
             if "A" in race.rule["F"]:
-                if race.rule["F"]["A"] > race.no_of_contestants:
+                if race.rule["F"]["A"] == "ALL":
                     no_of_contestants_to_FA = race.no_of_contestants
                 else:
                     no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
             # rest to FB:
             if "B" in race.rule["F"]:
-                if race.rule["F"]["B"] < float("inf"):
-                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
-                else:
+                if race.rule["F"]["B"] == "REST":
                     no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+                else:
+                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
 
     # Calculate number of contestants pr heat in SA:
     for race in [
@@ -233,10 +233,10 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
             if "A" in race.rule["F"]:
                 no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
             if "B" in race.rule["F"]:
-                if race.rule["F"]["B"] < float("inf"):
-                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
-                else:
+                if race.rule["F"]["B"] == "REST":
                     no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+                else:
+                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FC += race.rule["F"]["C"]  # type: ignore
 
@@ -356,9 +356,6 @@ class ConfigMatrix:
 
         # Initialize matrix
         # TODO: Get this from format-configuration
-        ALL = ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE
-        REST = float("inf")
-
         if ConfigMatrix.RANKING:
             # ConfigMatrix for ranked raceclasses:
             ConfigMatrix.m[1] = {
@@ -369,7 +366,7 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 0, "C": 0},
                 },
                 "from_to": {
-                    "Q": {"A": {"F": {"A": ALL, "B": 0}}, "C": {"F": {"C": 0}}},
+                    "Q": {"A": {"F": {"A": "ALL", "B": 0}}, "C": {"F": {"C": 0}}},
                 },
             }
             ConfigMatrix.m[2] = {
@@ -380,7 +377,7 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 0},
                 },
                 "from_to": {
-                    "Q": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+                    "Q": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 0}}},
                 },
             }
             ConfigMatrix.m[3] = {
@@ -392,8 +389,8 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 1},
                 },
                 "from_to": {
-                    "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": REST}}},
-                    "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 0}}},
+                    "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": "REST"}}},
+                    "S": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 0}}},
                 },
             }
             ConfigMatrix.m[4] = {
@@ -405,8 +402,8 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 1},
                 },
                 "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
-                    "S": {"A": {"F": {"A": 4, "B": REST}}, "C": {"F": {"C": 4}}},
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                    "S": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 4}}},
                 },
             }
             ConfigMatrix.m[5] = {
@@ -418,7 +415,7 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 1},
                 },
                 "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
                     "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 4}}},
                 },
             }
@@ -431,7 +428,7 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 1},
                 },
                 "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
                     "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
                 },
             }
@@ -444,7 +441,7 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 1},
                 },
                 "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
                     "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
                 },
             }
@@ -457,7 +454,7 @@ class ConfigMatrix:
                     "F": {"A": 1, "B": 1, "C": 1},
                 },
                 "from_to": {
-                    "Q": {"A": {"S": {"A": 4, "C": REST}}},
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
                     "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
                 },
             }
@@ -471,7 +468,7 @@ class ConfigMatrix:
                     "R2": {"A": 1},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[2] = {
@@ -482,7 +479,7 @@ class ConfigMatrix:
                     "R2": {"A": 2},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[3] = {
@@ -493,7 +490,7 @@ class ConfigMatrix:
                     "R2": {"A": 3},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[4] = {
@@ -504,7 +501,7 @@ class ConfigMatrix:
                     "R2": {"A": 4},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[5] = {
@@ -515,7 +512,7 @@ class ConfigMatrix:
                     "R2": {"A": 6},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[6] = {
@@ -526,7 +523,7 @@ class ConfigMatrix:
                     "R2": {"A": 6},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[7] = {
@@ -537,7 +534,7 @@ class ConfigMatrix:
                     "R2": {"A": 7},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
             ConfigMatrix.m[8] = {
@@ -548,7 +545,7 @@ class ConfigMatrix:
                     "R2": {"A": 8},
                 },
                 "from_to": {
-                    "R1": {"A": {"R2": {"A": REST}}},
+                    "R1": {"A": {"R2": {"A": "ALL"}}},
                 },
             }
 
@@ -583,7 +580,7 @@ class ConfigMatrix:
         raceclass: dict,
         from_round: str,
         from_index: str,
-    ) -> Dict[str, Dict[str, Union[int, float]]]:
+    ) -> Dict[str, Dict[str, Union[int, str]]]:
         """Get race rule pr round and index."""
         _key = ConfigMatrix._get_key(raceclass["no_of_contestants"])
         return ConfigMatrix.m[_key]["from_to"][from_round][from_index]

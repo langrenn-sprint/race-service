@@ -159,7 +159,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -179,7 +179,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -250,7 +250,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -270,7 +270,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -290,7 +290,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -381,7 +381,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -401,7 +401,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -421,7 +421,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -441,7 +441,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],

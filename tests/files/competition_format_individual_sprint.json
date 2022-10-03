@@ -17,7 +17,7 @@
       },
       "rules": {
         "Q": {
-          "FA": "Infinity"
+          "FA": "ALL"
         }
       }
     },
@@ -31,7 +31,7 @@
       "rules": {
         "Q": {
           "FA": 4,
-          "FB": "Infinity"
+          "FB": "REST"
         }
       }
     },
@@ -47,7 +47,7 @@
       "rules": {
         "Q": {
           "SA": 5,
-          "FC": "Infinity"
+          "FC": "REST"
         },
         "SA": {
           "FA": 4,
@@ -68,7 +68,7 @@
       "rules": {
         "Q": {
           "SA": 4,
-          "SC": "Infinity"
+          "SC": "REST"
         },
         "SA": {
           "FA": 4,
@@ -92,7 +92,7 @@
       "rules": {
         "Q": {
           "SA": 4,
-          "SC": "Infinity"
+          "SC": "REST"
         },
         "SA": {
           "FA": 2,
