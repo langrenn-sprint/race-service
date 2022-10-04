@@ -337,6 +337,7 @@ class ConfigMatrix:
         cls: Any, format_configuration: Dict, raceclasses_in_group: List[Dict]
     ) -> None:
         """Initalize parameters based on format-configuration and raceclasses in group."""
+        # TODO: Get this from format-configuration, should use the class from event-service
         if raceclasses_in_group[0]["ranking"]:
             ConfigMatrix.RANKING = True
         else:
@@ -355,7 +356,6 @@ class ConfigMatrix:
         ]
 
         # Initialize matrix
-        # TODO: Get this from format-configuration
         if ConfigMatrix.RANKING:
             # ConfigMatrix for ranked raceclasses:
             ConfigMatrix.m[1] = {
