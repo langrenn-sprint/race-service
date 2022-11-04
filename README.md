@@ -32,14 +32,14 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 % curl -H "Content-Type: application/json" \
   -X POST \
   --data '{"username":"admin","password":"passw123"}' \
-  http://localhost:8082/login
+  http://localhost:8083/login
 % export ACCESS="" #token from response
 % # Create a competition-format:
 % curl -H "Content-Type: application/json" \
   -H "Authorization: Bearer $ACCESS" \
   -X POST \
   --data @tests/files/competition_format_individual_sprint.json \
-  http://localhost:8081/competition-formats
+  http://localhost:8082/competition-formats
 % # Create the event:
 % curl -H "Content-Type: application/json" \
   -H "Authorization: Bearer $ACCESS" \

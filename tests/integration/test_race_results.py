@@ -162,7 +162,7 @@ async def test_create_race_result(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post(
             "races/1/race-results", headers=headers, data=request_body
         )
@@ -189,7 +189,7 @@ async def test_get_race_result_by_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f'races/{race["id"]}/race-results/{RACE_RESULT_ID}')
         assert resp.status == 200
@@ -235,7 +235,7 @@ async def test_update_race_result_by_id(
     request_body = dumps(race_result, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}',
@@ -265,7 +265,7 @@ async def test_get_race_results_by_race_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.get(f'races/{race["id"]}/race-results')
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -299,7 +299,7 @@ async def test_get_race_results_by_race_id_idsonly(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.get(f'races/{race["id"]}/race-results?idsOnly=true')
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -333,7 +333,7 @@ async def test_get_race_results_by_race_id_and_timing_point(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.get(
             f'races/{race["id"]}/race-results?timingPoint={"Finish"}'
         )
@@ -380,7 +380,7 @@ async def test_delete_race_result(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.delete(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}', headers=headers
@@ -418,7 +418,7 @@ async def test_update_race_result_by_id_missing_mandatory_property(
     request_body = {"id": RACE_RESULT_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}',
@@ -457,7 +457,7 @@ async def test_update_race_result_by_id_different_id_in_body(
     request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}',
@@ -497,7 +497,7 @@ async def test_delete_race_result_race_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.delete(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}', headers=headers
@@ -530,7 +530,7 @@ async def test_update_race_result_by_id_no_authorization(
     request_body = dumps(race_result, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.put(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}',
@@ -556,7 +556,7 @@ async def test_delete_race_result_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.delete(f'races/{race["id"]}/race-results/{RACE_RESULT_ID}')
         assert resp.status == 401
@@ -580,7 +580,7 @@ async def test_get_race_result_not_found(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f'races/{race["id"]}/race-results/{RACE_RESULT_ID}')
         assert resp.status == 404
@@ -613,7 +613,7 @@ async def test_update_race_result_not_found(
     request_body = dumps(race_result, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.put(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}',
             headers=headers,
@@ -643,7 +643,7 @@ async def test_delete_race_result_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.delete(
             f'races/{race["id"]}/race-results/{RACE_RESULT_ID}', headers=headers
         )
