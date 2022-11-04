@@ -389,7 +389,7 @@ async def test_generate_startlist_for_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -482,7 +482,7 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",

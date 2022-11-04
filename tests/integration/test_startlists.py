@@ -324,7 +324,7 @@ async def test_create_startlist(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/startlists", headers=headers, data=request_body)
         assert resp.status == 405
 
@@ -352,7 +352,7 @@ async def test_get_startlist_by_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/startlists/{STARTLIST_ID}")
         assert resp.status == 200
@@ -393,7 +393,7 @@ async def test_get_startlist_by_event_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/startlists?eventId={EVENT_ID}")
         assert resp.status == 200
@@ -438,7 +438,7 @@ async def test_update_startlist_by_id(
     request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f"/startlists/{STARTLIST_ID}", headers=headers, data=request_body
@@ -462,7 +462,7 @@ async def test_get_all_startlists(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.get("/startlists")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -523,7 +523,7 @@ async def test_delete_startlist_by_id(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.delete(f"/startlists/{STARTLIST_ID}", headers=headers)
         assert resp.status == 204
@@ -551,7 +551,7 @@ async def test_delete_startlist_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.delete(f"/startlists/{STARTLIST_ID}")
         assert resp.status == 401
@@ -576,7 +576,7 @@ async def test_get_startlist_not_found(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/startlists/{STARTLIST_ID}")
         assert resp.status == 404
@@ -604,6 +604,6 @@ async def test_delete_startlist_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.delete(f"/startlists/{STARTLIST_ID}", headers=headers)
         assert resp.status == 404

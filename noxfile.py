@@ -59,7 +59,7 @@ def integration_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m integration",
-        "-rF",
+        "-rA",
         *args,
         env={
             "CONFIG": "test",
@@ -67,9 +67,11 @@ def integration_tests(session: Session) -> None:
             "ADMIN_USERNAME": "admin",
             "ADMIN_PASSWORD": "password",
             "EVENTS_HOST_SERVER": "events.example.com",
-            "EVENTS_HOST_PORT": "8081",
+            "EVENTS_HOST_PORT": "8080",
+            "COMPETITION_FORMAT_HOST_SERVER": "competition-format.example.com",
+            "COMPETITION_FORMAT_HOST_PORT": "8080",
             "USERS_HOST_SERVER": "users.example.com",
-            "USERS_HOST_PORT": "8081",
+            "USERS_HOST_PORT": "8080",
         },
     )
 
@@ -99,8 +101,10 @@ def contract_tests(session: Session) -> None:
             "ADMIN_PASSWORD": "password",
             "EVENTS_HOST_SERVER": "localhost",
             "EVENTS_HOST_PORT": "8081",
+            "COMPETITION_FORMAT_HOST_SERVER": "localhost",
+            "COMPETITION_FORMAT_HOST_PORT": "8082",
             "USERS_HOST_SERVER": "localhost",
-            "USERS_HOST_PORT": "8082",
+            "USERS_HOST_PORT": "8083",
             "DB_USER": "event-service",
             "DB_PASSWORD": "password",
             "LOGGING_LEVEL": "DEBUG",

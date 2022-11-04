@@ -42,7 +42,114 @@ async def event() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def format_configuration() -> Dict[str, Any]:
+async def race_config() -> List[Dict[str, Any]]:
+    """A race_config used in format_configuration."""
+    return [
+        {
+            "max_no_of_contestants": 7,
+            "rounds": ["Q", "F"],
+            "no_of_heats": {
+                "Q": {"A": 1},
+                "F": {"A": 1, "B": 0, "C": 0},
+            },
+            "from_to": {
+                "Q": {"A": {"F": {"A": "ALL", "B": 0}}, "C": {"F": {"C": 0}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 16,
+            "rounds": ["Q", "F"],
+            "no_of_heats": {
+                "Q": {"A": 2},
+                "F": {"A": 1, "B": 1, "C": 0},
+            },
+            "from_to": {
+                "Q": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 0}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 24,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 3},
+                "S": {"A": 2, "C": 0},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": "REST"}}},
+                "S": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 0}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 32,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 4},
+                "S": {"A": 2, "C": 2},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                "S": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 4}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 40,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 6},
+                "S": {"A": 4, "C": 2},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 4}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 48,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 6},
+                "S": {"A": 4, "C": 4},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 56,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 7},
+                "S": {"A": 4, "C": 4},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 80,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 8},
+                "S": {"A": 4, "C": 4},
+                "F": {"A": 1, "B": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+            },
+        },
+    ]
+
+
+@pytest.fixture
+async def format_configuration(race_config: Dict) -> Dict[str, Any]:
     """A format configuration for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -52,9 +159,13 @@ async def format_configuration() -> Dict[str, Any]:
         "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
+        "rounds_ranked_classes": ["Q", "S", "F"],
+        "rounds_non_ranked_classes": ["R1", "R2"],
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
+        "race_config_non_ranked": None,
+        "race_config_ranked": race_config,
     }
 
 
@@ -204,7 +315,7 @@ async def test_generate_raceplan_for_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
@@ -289,7 +400,7 @@ async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_race
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
