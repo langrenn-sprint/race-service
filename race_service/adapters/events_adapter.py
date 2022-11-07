@@ -10,6 +10,8 @@ from aiohttp.web import (
 
 EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
 EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
+COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
+COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
 
 
 class EventNotFoundException(Exception):
@@ -96,7 +98,7 @@ class EventsAdapter:
                     ) from None
             # We have not found event specific format, get the global config:
             url = (
-                f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
+                f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}"
                 f"/competition-formats?name={competition_format_name}"
             )
             async with session.get(url) as response:

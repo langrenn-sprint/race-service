@@ -161,7 +161,7 @@ async def test_generate_raceplan_for_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body

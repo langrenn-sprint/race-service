@@ -375,7 +375,7 @@ async def test_generate_startlist_for_event_no_request_body(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event", headers=headers
@@ -440,7 +440,7 @@ async def test_generate_startlist_for_event_no_races_in_plan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -509,7 +509,7 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -578,7 +578,7 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -645,7 +645,7 @@ async def test_generate_startlist_for_event_no_contestants(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -712,7 +712,7 @@ async def test_generate_startlist_for_event_no_contestants_exception(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -779,7 +779,7 @@ async def test_generate_startlist_for_event_no_raceplan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -848,7 +848,7 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -917,7 +917,7 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -988,7 +988,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceclass
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1062,7 +1062,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1138,7 +1138,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1211,7 +1211,7 @@ async def test_generate_startlist_for_event_unauthorized(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1279,7 +1279,7 @@ async def test_generate_startlist_for_event_already_has_startlist(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1347,7 +1347,7 @@ async def test_generate_startlist_for_event_event_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1416,7 +1416,7 @@ async def test_generate_startlist_for_event_format_configuration_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1483,7 +1483,7 @@ async def test_generate_startlist_for_event_no_raceclasses(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1550,7 +1550,7 @@ async def test_generate_startlist_for_event_no_competition_format(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1619,7 +1619,7 @@ async def test_generate_startlist_for_event_missing_intervals(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1688,7 +1688,7 @@ async def test_generate_startlist_for_event_time_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1757,7 +1757,7 @@ async def test_generate_startlist_for_event_date_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1826,7 +1826,7 @@ async def test_generate_startlist_for_event_invalid_date(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1895,7 +1895,7 @@ async def test_generate_startlist_for_event_invalid_time(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
@@ -1965,7 +1965,7 @@ async def test_generate_startlist_for_event_format_configuration_not_supported(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",

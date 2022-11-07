@@ -219,7 +219,7 @@ async def test_create_time_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 200
 
@@ -293,7 +293,7 @@ async def test_create_time_event_race_result_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 200
 
@@ -366,7 +366,7 @@ async def test_create_time_event_contestant_not_in_race(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 200
 
@@ -386,7 +386,7 @@ async def test_get_time_event_by_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
         assert resp.status == 200
@@ -409,7 +409,7 @@ async def test_get_time_events_by_event_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/time-events?eventId={EVENT_ID}")
         assert resp.status == 200
@@ -433,7 +433,7 @@ async def test_get_time_events_by_event_id_and_timing_point(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(
             f"/time-events?eventId={EVENT_ID}&timingPoint={TIMING_POINT}"
@@ -459,7 +459,7 @@ async def test_get_time_events_by_race_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/time-events?raceId={RACE_ID}")
         assert resp.status == 200
@@ -497,7 +497,7 @@ async def test_update_time_event_by_id(
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
@@ -521,7 +521,7 @@ async def test_get_all_time_events(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.get("/time-events")
         assert resp.status == 200
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
@@ -569,7 +569,7 @@ async def test_delete_time_event_by_id(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
         assert resp.status == 204
@@ -605,7 +605,7 @@ async def test_create_time_event_with_input_id(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 422
 
@@ -667,7 +667,7 @@ async def test_create_time_event_race_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 200
 
@@ -736,7 +736,7 @@ async def test_create_time_event_does_not_reference_race(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 200
 
@@ -803,7 +803,7 @@ async def test_create_time_event_is_not_identifiable(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 200
 
@@ -837,7 +837,7 @@ async def test_create_time_event_adapter_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 400
 
@@ -869,7 +869,7 @@ async def test_create_time_event_mandatory_property(
     request_body = {"id": TIME_EVENT_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.post("/time-events", headers=headers, json=request_body)
         assert resp.status == 422
@@ -902,7 +902,7 @@ async def test_update_time_event_by_id_missing_mandatory_property(
     request_body = {"id": TIME_EVENT_ID}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, json=request_body
@@ -939,7 +939,7 @@ async def test_update_time_event_by_id_different_id_in_body(
     request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.put(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
@@ -985,7 +985,7 @@ async def test_delete_time_event_by_id_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
         assert resp.status == 404
@@ -1017,7 +1017,7 @@ async def test_create_time_event_no_authorization(
     headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 401
@@ -1047,7 +1047,7 @@ async def test_update_time_event_by_id_no_authorization(
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.put(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
@@ -1071,7 +1071,7 @@ async def test_delete_time_event_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=401)
+        m.post("http://users.example.com:8080/authorize", status=401)
 
         resp = await client.delete(f"/time-events/{TIME_EVENT_ID}")
         assert resp.status == 401
@@ -1108,7 +1108,7 @@ async def test_create_time_event_insufficient_role(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=403)
+        m.post("http://users.example.com:8080/authorize", status=403)
         resp = await client.post("/time-events", headers=headers, data=request_body)
         assert resp.status == 403
 
@@ -1132,7 +1132,7 @@ async def test_get_time_event_not_found(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
 
         resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
         assert resp.status == 404
@@ -1165,7 +1165,7 @@ async def test_update_time_event_not_found(
     request_body = dumps(time_event, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.put(
             f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
         )
@@ -1194,6 +1194,6 @@ async def test_delete_time_event_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8081/authorize", status=204)
+        m.post("http://users.example.com:8080/authorize", status=204)
         resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
         assert resp.status == 404

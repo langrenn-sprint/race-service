@@ -5,12 +5,14 @@ import logging
 import os
 from typing import Any, AsyncGenerator, List, Tuple
 
-from aiohttp import ClientSession, hdrs
+from aiohttp import ClientSession, ContentTypeError, hdrs
 import pytest
 from pytest_mock import MockFixture
 
 EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
 EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
+COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
+COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
 USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
@@ -75,7 +77,7 @@ async def delete_competition_formats(token: MockFixture) -> None:
     }
 
     async with ClientSession() as session:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
+        url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
         async with session.get(url) as response:
             assert response.status == 200
             competition_formats = await response.json()
@@ -238,7 +240,7 @@ async def test_generate_raceplan_for_interval_start_entry(
                 hdrs.CONTENT_TYPE: "application/json",
                 hdrs.AUTHORIZATION: f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/competition-formats"
+            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"  # noqa: B950
             request_body = competition_format
             async with session.post(
                 url, headers=headers, json=request_body
@@ -258,7 +260,13 @@ async def test_generate_raceplan_for_interval_start_entry(
             async with session.post(
                 url, headers=headers, json=request_body
             ) as response:
-                assert response.status == 201
+                try:
+                    body = await response.json()
+                except ContentTypeError:
+                    body = None
+                    pass
+
+                assert response.status == 201, body if body else ""
                 # return the event_id, which is the last item of the path
                 event_id = response.headers[hdrs.LOCATION].split("/")[-1]
 

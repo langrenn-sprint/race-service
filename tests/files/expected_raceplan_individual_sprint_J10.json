@@ -17,7 +17,7 @@
       "heat": 1,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -38,7 +38,7 @@
       "heat": 2,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"
@@ -59,7 +59,7 @@
       "heat": 3,
       "rule": {
         "R2": {
-          "A": "Infinity"
+          "A": "ALL"
         }
       },
       "datatype": "individual_sprint"

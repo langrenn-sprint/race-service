@@ -21,8 +21,105 @@ def event_loop() -> Any:
     loop.close()
 
 
+@pytest.fixture
+async def race_config() -> List[Dict[str, Any]]:
+    """A race_config used in format_configuration."""
+    return [
+        {
+            "max_no_of_contestants": 7,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 1},
+                "R2": {"A": 1},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 16,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 2},
+                "R2": {"A": 2},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 24,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 3},
+                "R2": {"A": 3},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 32,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 4},
+                "R2": {"A": 4},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 40,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 6},
+                "R2": {"A": 6},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 48,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 6},
+                "R2": {"A": 6},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 56,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 7},
+                "R2": {"A": 7},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+        {
+            "max_no_of_contestants": 80,
+            "rounds": ["R1", "R2"],
+            "no_of_heats": {
+                "R1": {"A": 8},
+                "R2": {"A": 8},
+            },
+            "from_to": {
+                "R1": {"A": {"R2": {"A": "REST"}}},
+            },
+        },
+    ]
+
+
 @pytest.fixture(scope="function")
-async def competition_format_individual_sprint() -> dict:
+async def competition_format_individual_sprint(
+    race_config: List[Dict[str, Any]]
+) -> dict:
     """A competition_format object for testing."""
     return {
         "name": "Individual Sprint",
@@ -31,9 +128,13 @@ async def competition_format_individual_sprint() -> dict:
         "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
+        "rounds_ranked_classes": ["Q", "S", "F"],
+        "rounds_non_ranked_classes": ["R1", "R2"],
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
+        "race_config_ranked": None,
+        "race_config_non_ranked": race_config,
     }
 
 
@@ -159,7 +260,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -179,7 +280,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -250,7 +351,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -270,7 +371,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -290,7 +391,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -381,7 +482,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -401,7 +502,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -421,7 +522,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -441,7 +542,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": float("inf")}},
+            rule={"R2": {"A": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
