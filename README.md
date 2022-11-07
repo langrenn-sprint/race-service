@@ -25,18 +25,59 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 
 ## Example of usage
 
+### Scenario: generate raceplan and startlist for an event
+
 ```shell
+% # Login to get a token:
 % curl -H "Content-Type: application/json" \
   -X POST \
   --data '{"username":"admin","password":"passw123"}' \
-  http://localhost:8082/login
+  http://localhost:8083/login
 % export ACCESS="" #token from response
+% # Create a competition-format:
 % curl -H "Content-Type: application/json" \
   -H "Authorization: Bearer $ACCESS" \
   -X POST \
-  --data @tests/files/event_interval_start.json \
-  http://localhost:8080/raceplans/generate-plan-for-event
-% curl -H "Authorization: Bearer $ACCESS"  http://localhost:8080/raceplans
+  --data @tests/files/competition_format_individual_sprint.json \
+  http://localhost:8082/competition-formats
+% # Create the event:
+% curl -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ACCESS" \
+  -X POST \
+  --data @tests/files/event_individual_sprint.json \
+  http://localhost:8081/events
+% # Find the id of the event:
+% curl http://localhost:8081/events
+% # Add contestants to the event
+% curl -H "Content-Type: multipart/form-data" \
+  -H "Authorization: Bearer $ACCESS" \
+  -X POST \
+  -F "data=@tests/files/contestants_all.csv; type=text/csv" \
+  http://localhost:8081/events/1234/contestants # use the id from the event in previous step
+% # Generate raceclasses based on contestants
+% curl -H "Authorization: Bearer $ACCESS" \
+  -X POST \
+  http://localhost:8081/events/1234/generate-raceclasses
+% # Generate raceplan:
+% curl -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ACCESS" \
+  -X POST \
+  --data '{"event_id": "1234"}' \
+  http://localhost:8080/raceplans/generate-raceplan-for-event
+% curl -H "Authorization: Bearer $ACCESS"  http://localhost:8080/raceplans?eventId=1234
+% curl -H "Authorization: Bearer $ACCESS"  http://localhost:8080/races?eventId=1234
+% # Assign bibs to contestants:
+% curl -H "Authorization: Bearer $ACCESS" \
+  -X POST \
+  http://localhost:8081/events/1234/contestants/assign-bibs
+% # Finally, generate the startlist:
+% curl -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $ACCESS" \
+  -X POST \
+  --data '{"event_id": "1234"}' \
+  http://localhost:8080/startlists/generate-startlist-for-event
+% # Inspect the startlist:
+% curl http://localhost:8080/startlists?eventId=1234
 ```
 
 ## Develop and run locally
@@ -58,8 +99,8 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 ```shell
 % git clone https://github.com/langrenn-sprint/race-service.git
 % cd race-service
-% pyenv install 3.9.6
-% pyenv local 3.9.6
+% pyenv install 3.10.6
+% pyenv local 3.10.6
 % poetry install
 ```
 
