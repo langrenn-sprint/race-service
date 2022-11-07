@@ -159,6 +159,8 @@ version = "0.13.0"
 [[package]]
 category = "main"
 description = "Classes Without Boilerplate"
+description = "Classes Without Boilerplate"
+name = "attrs"
 name = "attrs"
 optional = false
 python-versions = ">=3.5"
@@ -1489,6 +1491,15 @@ name = "typed-ast"
 optional = false
 python-versions = ">=3.6"
 version = "1.5.4"
+version = "0.11.6"
+
+[[package]]
+category = "dev"
+description = "a fork of Python 2 and 3 ast modules with type comment support"
+name = "typed-ast"
+optional = false
+python-versions = ">=3.6"
+version = "1.5.4"
 
 [[package]]
 category = "main"
@@ -1613,6 +1624,7 @@ testing = [
 ]
 
 [metadata]
+content-hash = "f1f8657b53df01f1be28d563fbe9562a57198cc5ea16bc1714f6c02a393a7e3a"
 content-hash = "f1f8657b53df01f1be28d563fbe9562a57198cc5ea16bc1714f6c02a393a7e3a"
 lock-version = "1.1"
 python-versions = ">=3.7,<3.11"
