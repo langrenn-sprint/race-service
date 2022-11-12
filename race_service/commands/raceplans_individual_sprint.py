@@ -127,6 +127,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
         raceclass=raceclass,
     )
 
+    # TODO: Figure out if there is a way to make a more generic function for this:
     # If there is to be a round "S" or "F", calculate number of contestants in SA, SC and FC:
     for race in [
         race
@@ -222,49 +223,23 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
     raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race in given raceclass and store in race."""
-    no_of_R1s = no_of_R2s = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"] and race.round == "R1"
-        ]
+    # Calculate number of contestants pr heat in R1:
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="R1",
+        index="",
+        no_of_contestants_to_round=raceclass["no_of_contestants"],
+        races=races,
+        raceclass=raceclass,
     )
 
-    no_of_contestants_to_R1 = no_of_contestants_to_R2 = raceclass["no_of_contestants"]
-
-    # Calculate number of contestants pr heat in R1:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"] and race.round == "R1"
-    ]:
-        # First we calculate no of contestants in each Q race:
-        # We need to "smooth" the contestants across the heats:
-        quotient, remainder = divmod(
-            no_of_contestants_to_R1,
-            no_of_R1s,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
-
     # Calculate number of contestants pr heat in R2:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"] and race.round == "R2"
-    ]:
-        # First we calculate no of contestants in each Q race:
-        # We need to "smooth" the contestants across the heats:
-        quotient, remainder = divmod(
-            no_of_contestants_to_R2,
-            no_of_R2s,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="R2",
+        index="",
+        no_of_contestants_to_round=raceclass["no_of_contestants"],
+        races=races,
+        raceclass=raceclass,
+    )
 
 
 async def _calculate_number_of_contestants_pr_heat_in_round(
