@@ -111,55 +111,21 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
     raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race in given raceclass."""
-    no_of_Qs = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"] and race.round == "Q"
-        ]
-    )
-    no_of_SAs = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"]
-            and race.round == "S"
-            and race.index == "A"
-        ]
-    )
-    no_of_SCs = len(
-        [
-            race
-            for race in races
-            if race.raceclass == raceclass["name"]
-            and race.round == "S"
-            and race.index == "C"
-        ]
-    )
-
     no_of_contestants_to_Qs = raceclass["no_of_contestants"]
     no_of_contestants_to_SAs = 0
     no_of_contestants_to_SCs = 0
-    no_of_contestants_to_FA = 0
-    no_of_contestants_to_FB = 0
-    no_of_contestants_to_FC = 0
+    no_of_contestants_to_FAs = 0
+    no_of_contestants_to_FBs = 0
+    no_of_contestants_to_FCs = 0
 
-    # Calculate number of contestants pr heat in Q:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"] and race.round == "Q"
-    ]:
-        # First we calculate no of contestants in each Q race:
-        # We need to "smooth" the contestants across the heats:
-        quotient, remainder = divmod(
-            no_of_contestants_to_Qs,
-            no_of_Qs,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
+    # Calculate number of contestants pr heat in Q and store in race:
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="Q",
+        index="",
+        no_of_contestants_to_round=no_of_contestants_to_Qs,
+        races=races,
+        raceclass=raceclass,
+    )
 
     # If there is to be a round "S" or "F", calculate number of contestants in SA, SC and FC:
     for race in [
@@ -176,52 +142,36 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
             # or the rest may in some cases go directly to FC:
         if "F" in race.rule:
             if "C" in race.rule["F"]:
-                no_of_contestants_to_FC += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
+                no_of_contestants_to_FCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
             if "A" in race.rule["F"]:
                 if race.rule["F"]["A"] == "ALL":
-                    no_of_contestants_to_FA = race.no_of_contestants
+                    no_of_contestants_to_FAs = race.no_of_contestants
                 else:
-                    no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
+                    no_of_contestants_to_FAs += race.rule["F"]["A"]  # type: ignore
             # rest to FB:
             if "B" in race.rule["F"]:
                 if race.rule["F"]["B"] == "REST":
-                    no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+                    no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
                 else:
-                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
+                    no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
 
     # Calculate number of contestants pr heat in SA:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "S"
-        and race.index == "A"
-    ]:
-        quotient, remainder = divmod(
-            no_of_contestants_to_SAs,
-            no_of_SAs,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
-
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="S",
+        index="A",
+        no_of_contestants_to_round=no_of_contestants_to_SAs,
+        races=races,
+        raceclass=raceclass,
+    )
     # Calculate number of contestants pr heat in SC:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "S"
-        and race.index == "C"
-    ]:
-        quotient, remainder = divmod(
-            no_of_contestants_to_SCs,
-            no_of_SCs,
-        )
-        if race.heat <= remainder:
-            race.no_of_contestants = quotient + 1
-        else:
-            race.no_of_contestants = quotient
+    # Calculate number of contestants pr heat in SA:
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="S",
+        index="C",
+        no_of_contestants_to_round=no_of_contestants_to_SCs,
+        races=races,
+        raceclass=raceclass,
+    )
 
     # Calculate number of contestants in FA, FB and FC:
     for race in [
@@ -231,53 +181,47 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
     ]:
         if "F" in race.rule:
             if "A" in race.rule["F"]:
-                no_of_contestants_to_FA += race.rule["F"]["A"]  # type: ignore
+                no_of_contestants_to_FAs += race.rule["F"]["A"]  # type: ignore
             if "B" in race.rule["F"]:
                 if race.rule["F"]["B"] == "REST":
-                    no_of_contestants_to_FB += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
+                    no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
                 else:
-                    no_of_contestants_to_FB += race.rule["F"]["B"]  # type: ignore
+                    no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
             if "C" in race.rule["F"]:
-                no_of_contestants_to_FC += race.rule["F"]["C"]  # type: ignore
+                no_of_contestants_to_FCs += race.rule["F"]["C"]  # type: ignore
 
     # Calculate number of contestants pr heat in FA:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "F"
-        and race.index == "A"
-    ]:
-        # There will always be only on FA, simplifying:
-        race.no_of_contestants = no_of_contestants_to_FA
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="F",
+        index="A",
+        no_of_contestants_to_round=no_of_contestants_to_FAs,
+        races=races,
+        raceclass=raceclass,
+    )
 
     # Calculate number of contestants pr heat in FB:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "F"
-        and race.index == "B"
-    ]:
-        # There will always be only on FB, simplifying:
-        race.no_of_contestants = no_of_contestants_to_FB
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="F",
+        index="B",
+        no_of_contestants_to_round=no_of_contestants_to_FBs,
+        races=races,
+        raceclass=raceclass,
+    )
 
     # Calculate number of contestants pr heat in FC:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"]
-        and race.round == "F"
-        and race.index == "C"
-    ]:
-        # There will always be only on FC, simplifying:
-        race.no_of_contestants = no_of_contestants_to_FC
+    await _calculate_number_of_contestants_pr_heat_in_round(
+        round="F",
+        index="C",
+        no_of_contestants_to_round=no_of_contestants_to_FCs,
+        races=races,
+        raceclass=raceclass,
+    )
 
 
 async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # noqa: C901
     raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
-    """Calculate number of contestants pr race in given raceclass."""
+    """Calculate number of contestants pr race in given raceclass and store in race."""
     no_of_R1s = no_of_R2s = len(
         [
             race
@@ -316,6 +260,43 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
         quotient, remainder = divmod(
             no_of_contestants_to_R2,
             no_of_R2s,
+        )
+        if race.heat <= remainder:
+            race.no_of_contestants = quotient + 1
+        else:
+            race.no_of_contestants = quotient
+
+
+async def _calculate_number_of_contestants_pr_heat_in_round(
+    raceclass: Dict,
+    round: str,
+    index: str,
+    no_of_contestants_to_round: int,
+    races: List[IndividualSprintRace],
+) -> None:
+    # Calculate number of contestants pr heat in round:
+
+    no_of_races_in_round = len(
+        [
+            race
+            for race in races
+            if race.raceclass == raceclass["name"]
+            and race.round == round
+            and race.index == index
+        ]
+    )
+
+    for race in [
+        race
+        for race in races
+        if race.raceclass == raceclass["name"]
+        and race.round == round
+        and race.index == index
+    ]:
+        # We need to "smooth" the contestants across the heats:
+        quotient, remainder = divmod(
+            no_of_contestants_to_round,
+            no_of_races_in_round,
         )
         if race.heat <= remainder:
             race.no_of_contestants = quotient + 1
