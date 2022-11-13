@@ -66,16 +66,14 @@ async def calculate_raceplan_individual_sprint(  # noqa: C901
                             order=order,
                             raceclass=raceclass["name"],
                             round=round,
-                            index="" if round in ["Q", "R1", "R2"] else index,
+                            index=index,
                             heat=heat,
                             start_time=start_time,
                             max_no_of_contestants=competition_format[
                                 "max_no_of_contestants_in_race"
                             ],
                             no_of_contestants=0,
-                            rule={}
-                            if round in ["F", "R2"]
-                            else ConfigMatrix.get_rule_from_to(raceclass, round, index),
+                            rule=ConfigMatrix.get_rule_from_to(raceclass, round, index),
                             event_id=event["id"],
                             raceplan_id="",
                             start_entries=[],
@@ -118,10 +116,10 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
     no_of_contestants_to_FBs = 0
     no_of_contestants_to_FCs = 0
 
-    # Calculate number of contestants pr heat in Q and store in race:
+    # Calculate number of contestants pr heat in first round and store in race:
     await _calculate_number_of_contestants_pr_heat_in_round(
         round="Q",
-        index="",
+        index="A",
         no_of_contestants_to_round=no_of_contestants_to_Qs,
         races=races,
         raceclass=raceclass,
@@ -226,7 +224,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
     # Calculate number of contestants pr heat in R1:
     await _calculate_number_of_contestants_pr_heat_in_round(
         round="R1",
-        index="",
+        index="A",
         no_of_contestants_to_round=raceclass["no_of_contestants"],
         races=races,
         raceclass=raceclass,
@@ -235,7 +233,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
     # Calculate number of contestants pr heat in R2:
     await _calculate_number_of_contestants_pr_heat_in_round(
         round="R2",
-        index="",
+        index="A",
         no_of_contestants_to_round=raceclass["no_of_contestants"],
         races=races,
         raceclass=raceclass,
@@ -352,7 +350,12 @@ class ConfigMatrix:
     ) -> Dict[str, Dict[str, Union[int, str]]]:
         """Get race rule pr round and index."""
         _key = ConfigMatrix._get_index(raceclass["no_of_contestants"])
-        return ConfigMatrix.m[_key]["from_to"][from_round][from_index]
+        rule = {}
+        try:
+            rule = ConfigMatrix.m[_key]["from_to"][from_round][from_index]
+        except KeyError:
+            pass
+        return rule
 
     @classmethod
     def _get_index(cls: Any, no_of_contestants: int) -> int:
