@@ -7,7 +7,7 @@ from race_service.models import IndividualSprintRace, Raceplan
 
 async def calculate_raceplan_individual_sprint(  # noqa: C901
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
 ) -> Tuple[Raceplan, List[IndividualSprintRace]]:
     """Calculate raceplan for Individual Sprint event."""
@@ -22,19 +22,19 @@ async def calculate_raceplan_individual_sprint(  # noqa: C901
     # First we prepare the parameters:
     # get the time_between_groups as timedelta:
     TIME_BETWEEN_GROUPS = timedelta(
-        hours=time.fromisoformat(format_configuration["time_between_groups"]).hour,
-        minutes=time.fromisoformat(format_configuration["time_between_groups"]).minute,
-        seconds=time.fromisoformat(format_configuration["time_between_groups"]).second,
+        hours=time.fromisoformat(competition_format["time_between_groups"]).hour,
+        minutes=time.fromisoformat(competition_format["time_between_groups"]).minute,
+        seconds=time.fromisoformat(competition_format["time_between_groups"]).second,
     )
     TIME_BETWEEN_HEATS = timedelta(
-        hours=time.fromisoformat(format_configuration["time_between_heats"]).hour,
-        minutes=time.fromisoformat(format_configuration["time_between_heats"]).minute,
-        seconds=time.fromisoformat(format_configuration["time_between_heats"]).second,
+        hours=time.fromisoformat(competition_format["time_between_heats"]).hour,
+        minutes=time.fromisoformat(competition_format["time_between_heats"]).minute,
+        seconds=time.fromisoformat(competition_format["time_between_heats"]).second,
     )
     TIME_BETWEEN_ROUNDS = timedelta(
-        hours=time.fromisoformat(format_configuration["time_between_rounds"]).hour,
-        minutes=time.fromisoformat(format_configuration["time_between_rounds"]).minute,
-        seconds=time.fromisoformat(format_configuration["time_between_rounds"]).second,
+        hours=time.fromisoformat(competition_format["time_between_rounds"]).hour,
+        minutes=time.fromisoformat(competition_format["time_between_rounds"]).minute,
+        seconds=time.fromisoformat(competition_format["time_between_rounds"]).second,
     )
     # get the first start_time from the event:
     start_time = datetime.combine(
@@ -50,11 +50,11 @@ async def calculate_raceplan_individual_sprint(  # noqa: C901
         d.setdefault(raceclass["group"], []).append(raceclass)
     raceclasses_grouped = list(d.values())
 
-    # Generate the races, group by group, based on configuration and number of contestants
+    # Generate the races, group by group, based on competition-format and number of contestants
     order = 1
     for raceclasses in raceclasses_grouped:
         # Initalize ConfigMatrix pr group:
-        ConfigMatrix.initialize(format_configuration, raceclasses)
+        ConfigMatrix.initialize(competition_format, raceclasses)
         for round in ConfigMatrix.get_rounds():
             for raceclass in raceclasses:
                 for index in reversed(ConfigMatrix.get_race_indexes(raceclass, round)):
@@ -69,7 +69,7 @@ async def calculate_raceplan_individual_sprint(  # noqa: C901
                             index="" if round in ["Q", "R1", "R2"] else index,
                             heat=heat,
                             start_time=start_time,
-                            max_no_of_contestants=format_configuration[
+                            max_no_of_contestants=competition_format[
                                 "max_no_of_contestants_in_race"
                             ],
                             no_of_contestants=0,
@@ -290,34 +290,33 @@ class ConfigMatrix:
 
     @classmethod
     def initialize(
-        cls: Any, format_configuration: Dict, raceclasses_in_group: List[Dict]
+        cls: Any, competition_format: Dict, raceclasses_in_group: List[Dict]
     ) -> None:
-        """Initalize parameters based on format-configuration and raceclasses in group."""
-        # TODO: Get this from format-configuration, should use the class from event-service
+        """Initalize parameters based on competition-format and raceclasses in group."""
         if raceclasses_in_group[0]["ranking"]:
             ConfigMatrix.RANKING = True
         else:
             ConfigMatrix.RANKING = False
 
         if ConfigMatrix.RANKING:
-            ConfigMatrix.ROUNDS = format_configuration["rounds_ranked_classes"]
+            ConfigMatrix.ROUNDS = competition_format["rounds_ranked_classes"]
         else:
-            ConfigMatrix.ROUNDS = format_configuration["rounds_non_ranked_classes"]
+            ConfigMatrix.ROUNDS = competition_format["rounds_non_ranked_classes"]
 
-        ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS = format_configuration[
+        ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACECLASS = competition_format[
             "max_no_of_contestants_in_raceclass"
         ]
-        ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE = format_configuration[
+        ConfigMatrix.MAX_NO_OF_CONTESTANTS_IN_RACE = competition_format[
             "max_no_of_contestants_in_race"
         ]
 
         # Initialize matrix
         if ConfigMatrix.RANKING:
             # ConfigMatrix for ranked raceclasses:
-            ConfigMatrix.m = format_configuration["race_config_ranked"]
+            ConfigMatrix.m = competition_format["race_config_ranked"]
         else:
             # ConfigMatrix for non ranked raceclasses:
-            ConfigMatrix.m = format_configuration["race_config_non_ranked"]
+            ConfigMatrix.m = competition_format["race_config_non_ranked"]
 
     @classmethod
     def get_rounds(cls: Any) -> list:

@@ -14,7 +14,7 @@ from race_service.models import IndividualSprintRace, Raceplan
 
 @pytest.fixture
 async def race_config() -> List[Dict[str, Any]]:
-    """A race_config used in format_configuration."""
+    """A race_config used in competition_format."""
     return [
         {
             "max_no_of_contestants": 7,

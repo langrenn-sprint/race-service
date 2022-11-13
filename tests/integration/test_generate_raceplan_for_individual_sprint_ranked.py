@@ -43,7 +43,7 @@ async def event() -> Dict[str, Any]:
 
 @pytest.fixture
 async def race_config() -> List[Dict[str, Any]]:
-    """A race_config used in format_configuration."""
+    """A race_config used in competition_format."""
     return [
         {
             "max_no_of_contestants": 7,
@@ -149,8 +149,8 @@ async def race_config() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-async def format_configuration(race_config: Dict) -> Dict[str, Any]:
-    """A format configuration for testing."""
+async def competition_format(race_config: Dict) -> Dict[str, Any]:
+    """A competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Individual Sprint",
@@ -262,7 +262,7 @@ async def test_generate_raceplan_for_event(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -301,8 +301,8 @@ async def test_generate_raceplan_for_event(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -347,7 +347,7 @@ async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_race
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclass_with_more_than_max_contestants: List[dict],
     request_body: dict,
 ) -> None:
@@ -386,8 +386,8 @@ async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_race
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",

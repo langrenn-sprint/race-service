@@ -3,9 +3,9 @@ from datetime import date, time
 from typing import Any, Dict, List
 
 from race_service.adapters import (
+    CompetitionFormatNotFoundException,
     EventNotFoundException,
     EventsAdapter,
-    FormatConfigurationNotFoundException,
     RaceplansAdapter,
 )
 from race_service.services import (
@@ -44,12 +44,12 @@ class RaceplansCommands:
             event = await get_event(token, event_id)
         except EventNotFoundException as e:
             raise e from e
-        # We fetch the configuration of the competition-format:
+        # We fetch the competition-format:
         try:
-            format_configuration = await get_format_configuration(
+            competition_format = await get_competition_format(
                 token, event_id, event["competition_format"]
             )
-        except FormatConfigurationNotFoundException as e:
+        except CompetitionFormatNotFoundException as e:
             raise CompetitionFormatNotSupportedException(
                 f'Competition-format {event["competition_format"]} is not supported.'
             ) from e
@@ -59,11 +59,11 @@ class RaceplansCommands:
         # Calculate the raceplan:
         if event["competition_format"] == "Individual Sprint":
             raceplan, races = await calculate_raceplan_individual_sprint(
-                event, format_configuration, raceclasses
+                event, competition_format, raceclasses
             )
         elif event["competition_format"] == "Interval Start":
             raceplan, races = await calculate_raceplan_interval_start(  # type: ignore
-                event, format_configuration, raceclasses
+                event, competition_format, raceclasses
             )
         else:
             raise CompetitionFormatNotSupportedException(
@@ -104,7 +104,7 @@ async def get_event(token: str, event_id: str) -> dict:
         event = await EventsAdapter.get_event_by_id(token, event_id)
     except EventNotFoundException as e:
         raise e from e
-    # Check if the event has a competition format:
+    # Check if the event has a competition-format:
     if "competition_format" not in event:
         raise CompetitionFormatNotSupportedException(
             f"Event {event_id} has no value for competition_format."
@@ -146,39 +146,39 @@ async def check_time(time_str: str) -> None:
         raise InvalidDateFormatException('Time "{time_str}" has invalid format.') from e
 
 
-async def get_format_configuration(
+async def get_competition_format(
     token: str, event_id: str, competition_format_name: str
 ) -> dict:
-    """Get the format configuration."""
+    """Get the competition-format."""
     try:
-        format_configuration = await EventsAdapter.get_format_configuration(
+        competition_format = await EventsAdapter.get_competition_format(
             token, event_id, competition_format_name
         )
-    except FormatConfigurationNotFoundException as e:
+    except CompetitionFormatNotFoundException as e:
         raise e from e
     # Validate:
-    if "max_no_of_contestants_in_raceclass" not in format_configuration:
+    if "max_no_of_contestants_in_raceclass" not in competition_format:
         raise MissingPropertyException(
-            f'Format configuration "{competition_format_name}" '
+            f'Competition format "{competition_format_name}" '
             'is missing the "max_no_of_contestants_in_raceclass" property.'
         )
 
-    if "max_no_of_contestants_in_race" not in format_configuration:
+    if "max_no_of_contestants_in_race" not in competition_format:
         raise MissingPropertyException(
-            f'Format configuration "{competition_format_name}" '
+            f'Competition format "{competition_format_name}" '
             'is missing the "max_no_of_contestants_in_race" property.'
         )
 
-    if format_configuration["name"] == "Interval Start":
-        if "intervals" not in format_configuration:
+    if competition_format["name"] == "Interval Start":
+        if "intervals" not in competition_format:
             raise MissingPropertyException(
-                f'Format configuration "{competition_format_name}" '
+                f'Competition format "{competition_format_name}" '
                 'is missing the "intervals" property.'
             )
         # We do have intervals, check if valid format:
-        await check_time(format_configuration["intervals"])
+        await check_time(competition_format["intervals"])
 
-    return format_configuration
+    return competition_format
 
 
 async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C901

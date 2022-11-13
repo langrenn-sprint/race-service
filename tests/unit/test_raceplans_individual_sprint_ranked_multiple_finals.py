@@ -1,5 +1,4 @@
 """Unit test cases for the event-service module."""
-import asyncio
 from datetime import datetime
 from typing import Any, Dict, List
 
@@ -13,110 +12,27 @@ from race_service.models import IndividualSprintRace, Raceplan
 # --- Individual Sprint ---
 
 
-@pytest.fixture(scope="function")
-def event_loop() -> Any:
-    """Redefine the event_loop fixture to have the same scope."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 @pytest.fixture
 async def race_config() -> List[Dict[str, Any]]:
     """A race_config used in competition_format."""
     return [
         {
-            "max_no_of_contestants": 7,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 1},
-                "R2": {"A": 1},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 16,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 2},
-                "R2": {"A": 2},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 24,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 3},
-                "R2": {"A": 3},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 32,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 4},
-                "R2": {"A": 4},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 40,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 6},
-                "R2": {"A": 6},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 48,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 6},
-                "R2": {"A": 6},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 56,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 7},
-                "R2": {"A": 7},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
             "max_no_of_contestants": 80,
-            "rounds": ["R1", "R2"],
+            "rounds": ["Q", "S", "F"],
             "no_of_heats": {
-                "R1": {"A": 8},
-                "R2": {"A": 8},
+                "Q": {"A": 3},
+                "S": {"A": 2, "C": 0},
+                "F": {"A": 1, "B": 2, "C": 1},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "Q": {"A": {"S": {"A": 5, "C": 0}}},
+                "S": {"A": {"F": {"A": 4, "B": 2}}, "C": {"F": {"C": 0}}},
             },
         },
     ]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def competition_format_individual_sprint(
     race_config: List[Dict[str, Any]]
 ) -> dict:
@@ -133,12 +49,12 @@ async def competition_format_individual_sprint(
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
-        "race_config_ranked": None,
-        "race_config_non_ranked": race_config,
+        "race_config_ranked": race_config,
+        "race_config_non_ranked": None,
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def event_individual_sprint() -> dict:
     """An event object for testing."""
     return {
@@ -153,7 +69,7 @@ async def event_individual_sprint() -> dict:
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def raceclasses_individual_sprint_10_contestants() -> List[Dict[str, Any]]:
     """A raceclass object for testing - 10 contestants."""
     return [
@@ -165,12 +81,12 @@ async def raceclasses_individual_sprint_10_contestants() -> List[Dict[str, Any]]
             "no_of_contestants": 10,
             "group": 1,
             "order": 1,
-            "ranking": False,
+            "ranking": True,
         },
     ]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def raceclasses_individual_sprint_17_contestants() -> List[Dict[str, Any]]:
     """A raceclass object for testing - 17 contestants."""
     return [
@@ -182,12 +98,12 @@ async def raceclasses_individual_sprint_17_contestants() -> List[Dict[str, Any]]
             "no_of_contestants": 17,
             "group": 1,
             "order": 1,
-            "ranking": False,
+            "ranking": True,
         },
     ]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def raceclasses_individual_sprint_27_contestants() -> List[Dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
@@ -199,12 +115,12 @@ async def raceclasses_individual_sprint_27_contestants() -> List[Dict[str, Any]]
             "no_of_contestants": 27,
             "group": 1,
             "order": 1,
-            "ranking": False,
+            "ranking": True,
         },
     ]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_raceplan_individual_sprint_10_contestants(
     event_individual_sprint: dict,
 ) -> Raceplan:
@@ -216,7 +132,7 @@ async def expected_raceplan_individual_sprint_10_contestants(
     return raceplan
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_raceplan_individual_sprint_17_contestants(
     event_individual_sprint: dict,
 ) -> Raceplan:
@@ -228,7 +144,7 @@ async def expected_raceplan_individual_sprint_17_contestants(
     return raceplan
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_raceplan_individual_sprint_27_contestants(
     event_individual_sprint: dict,
 ) -> Raceplan:
@@ -240,7 +156,7 @@ async def expected_raceplan_individual_sprint_27_contestants(
     return raceplan
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_races_individual_sprint_10_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
@@ -252,7 +168,7 @@ async def expected_races_individual_sprint_10_contestants(
             id="",
             order=1,
             raceclass="G11",
-            round="R1",
+            round="Q",
             index="",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -260,7 +176,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"F": {"A": 4, "B": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -272,7 +188,7 @@ async def expected_races_individual_sprint_10_contestants(
             id="",
             order=2,
             raceclass="G11",
-            round="R1",
+            round="Q",
             index="",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -280,7 +196,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"F": {"A": 4, "B": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -292,11 +208,11 @@ async def expected_races_individual_sprint_10_contestants(
             id="",
             order=3,
             raceclass="G11",
-            round="R2",
-            index="",
+            round="F",
+            index="B",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:12:30"),
-            no_of_contestants=5,
+            no_of_contestants=2,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
@@ -312,11 +228,11 @@ async def expected_races_individual_sprint_10_contestants(
             id="",
             order=4,
             raceclass="G11",
-            round="R2",
-            index="",
-            heat=2,
+            round="F",
+            index="A",
+            heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
-            no_of_contestants=5,
+            no_of_contestants=8,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
@@ -331,7 +247,7 @@ async def expected_races_individual_sprint_10_contestants(
     return races
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_races_individual_sprint_17_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
@@ -343,7 +259,7 @@ async def expected_races_individual_sprint_17_contestants(
             id="",
             order=1,
             raceclass="J11",
-            round="R1",
+            round="Q",
             index="",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
@@ -351,7 +267,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"S": {"A": 5, "C": 0}, "F": {"C": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -363,7 +279,7 @@ async def expected_races_individual_sprint_17_contestants(
             id="",
             order=2,
             raceclass="J11",
-            round="R1",
+            round="Q",
             index="",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
@@ -371,7 +287,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"S": {"A": 5, "C": 0}, "F": {"C": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -383,7 +299,7 @@ async def expected_races_individual_sprint_17_contestants(
             id="",
             order=3,
             raceclass="J11",
-            round="R1",
+            round="Q",
             index="",
             heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
@@ -391,7 +307,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"S": {"A": 5, "C": 0}, "F": {"C": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -403,15 +319,15 @@ async def expected_races_individual_sprint_17_contestants(
             id="",
             order=4,
             raceclass="J11",
-            round="R2",
-            index="",
+            round="S",
+            index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
-            no_of_contestants=6,
+            no_of_contestants=8,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={},
+            rule={"F": {"A": 4, "B": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -423,15 +339,15 @@ async def expected_races_individual_sprint_17_contestants(
             id="",
             order=5,
             raceclass="J11",
-            round="R2",
-            index="",
+            round="S",
+            index="A",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
-            no_of_contestants=6,
+            no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={},
+            rule={"F": {"A": 4, "B": "REST"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -443,142 +359,11 @@ async def expected_races_individual_sprint_17_contestants(
             id="",
             order=6,
             raceclass="J11",
-            round="R2",
-            index="",
-            heat=3,
-            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
-            no_of_contestants=5,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={},
-            event_id=event_individual_sprint["id"],
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-
-    return races
-
-
-@pytest.fixture(scope="function")
-async def expected_races_individual_sprint_27_contestants(
-    competition_format_individual_sprint: dict,
-    event_individual_sprint: dict,
-) -> List[IndividualSprintRace]:
-    """Create a mock raceplan object, races - 27 contestants."""
-    races: List[IndividualSprintRace] = []
-    races.append(
-        IndividualSprintRace(
-            id="",
-            order=1,
-            raceclass="J15",
-            round="R1",
-            index="",
+            round="F",
+            index="C",
             heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
-            no_of_contestants=7,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={"R2": {"A": "REST"}},
-            event_id=event_individual_sprint["id"],
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="",
-            order=2,
-            raceclass="J15",
-            round="R1",
-            index="",
-            heat=2,
-            start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
-            no_of_contestants=7,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={"R2": {"A": "REST"}},
-            event_id=event_individual_sprint["id"],
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="",
-            order=3,
-            raceclass="J15",
-            round="R1",
-            index="",
-            heat=3,
-            start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
-            no_of_contestants=7,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={"R2": {"A": "REST"}},
-            event_id=event_individual_sprint["id"],
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="",
-            order=4,
-            raceclass="J15",
-            round="R1",
-            index="",
-            heat=4,
-            start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
-            no_of_contestants=6,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={"R2": {"A": "REST"}},
-            event_id=event_individual_sprint["id"],
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="",
-            order=5,
-            raceclass="J15",
-            round="R2",
-            index="",
-            heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
-            no_of_contestants=7,
-            max_no_of_contestants=competition_format_individual_sprint[
-                "max_no_of_contestants_in_race"
-            ],
-            rule={},
-            event_id=event_individual_sprint["id"],
-            raceplan_id="",
-            start_entries=[],
-            results={},
-        )
-    )
-    races.append(
-        IndividualSprintRace(
-            id="",
-            order=6,
-            raceclass="J15",
-            round="R2",
-            index="",
-            heat=2,
-            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
-            no_of_contestants=7,
+            start_time=datetime.fromisoformat("2021-09-29 09:27:30"),
+            no_of_contestants=2,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
@@ -593,11 +378,11 @@ async def expected_races_individual_sprint_27_contestants(
         IndividualSprintRace(
             id="",
             order=7,
-            raceclass="J15",
-            round="R2",
-            index="",
-            heat=3,
-            start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+            raceclass="J11",
+            round="F",
+            index="B",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:30:00"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -613,12 +398,12 @@ async def expected_races_individual_sprint_27_contestants(
         IndividualSprintRace(
             id="",
             order=8,
-            raceclass="J15",
-            round="R2",
-            index="",
-            heat=4,
-            start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
-            no_of_contestants=6,
+            raceclass="J11",
+            round="F",
+            index="A",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:32:30"),
+            no_of_contestants=8,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
@@ -633,9 +418,241 @@ async def expected_races_individual_sprint_27_contestants(
     return races
 
 
+@pytest.fixture
+async def expected_races_individual_sprint_27_contestants(
+    competition_format_individual_sprint: dict,
+    event_individual_sprint: dict,
+) -> List[IndividualSprintRace]:
+    """Create a mock raceplan object, races - 27 contestants."""
+    races: List[IndividualSprintRace] = []
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=1,
+            raceclass="J15",
+            round="Q",
+            index="",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
+            no_of_contestants=7,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"S": {"A": 4, "C": "REST"}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=2,
+            raceclass="J15",
+            round="Q",
+            index="",
+            heat=2,
+            start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
+            no_of_contestants=7,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"S": {"A": 4, "C": "REST"}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=3,
+            raceclass="J15",
+            round="Q",
+            index="",
+            heat=3,
+            start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
+            no_of_contestants=7,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"S": {"A": 4, "C": "REST"}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=4,
+            raceclass="J15",
+            round="Q",
+            index="",
+            heat=4,
+            start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
+            no_of_contestants=6,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"S": {"A": 4, "C": "REST"}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=5,
+            raceclass="J15",
+            round="S",
+            index="C",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+            no_of_contestants=6,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"F": {"C": 4}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=6,
+            raceclass="J15",
+            round="S",
+            index="C",
+            heat=2,
+            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+            no_of_contestants=5,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"F": {"C": 4}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=7,
+            raceclass="J15",
+            round="S",
+            index="A",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+            no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"F": {"A": 4, "B": "REST"}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=8,
+            raceclass="J15",
+            round="S",
+            index="A",
+            heat=2,
+            start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={"F": {"A": 4, "B": "REST"}},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=9,
+            raceclass="J15",
+            round="F",
+            index="C",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:35:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=10,
+            raceclass="J15",
+            round="F",
+            index="B",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:37:30"),
+            no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+    races.append(
+        IndividualSprintRace(
+            id="",
+            order=11,
+            raceclass="J15",
+            round="F",
+            index="A",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-09-29 09:40:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=competition_format_individual_sprint[
+                "max_no_of_contestants_in_race"
+            ],
+            rule={},
+            event_id=event_individual_sprint["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+        )
+    )
+
+    return races
+
+
+@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
+async def test_calculate_raceplan_individual_sprint_10_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
     raceclasses_individual_sprint_10_contestants: List[dict],
@@ -659,25 +676,33 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
         raceplan.no_of_contestants
         == expected_raceplan_individual_sprint_10_contestants.no_of_contestants
     )
-    # Check that all the contestants have been given a round 1:
+    # Check that all the contestants have been given a Quarterfinal:
     assert (
-        sum(race.no_of_contestants for race in races if race.round == "R1")
+        sum(race.no_of_contestants for race in races if race.round == "Q")
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
-    assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
+    # Check that the sum number of contestants are the same in round Q:
+    assert sum(race.no_of_contestants for race in races if race.round == "Q") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_10_contestants
-        if race.round == "R1"
-    ), "wrong sum no_of_contestants in round R1"
+        if race.round == "Q"
+    ), "wrong sum no_of_contestants in round Q"
 
-    # Check that the sum number of contestants are the same in round 2:
-    assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
+    # Check that the sum number of contestants are the same in round S:
+    assert sum(race.no_of_contestants for race in races if race.round == "S") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_10_contestants
-        if race.round == "R2"
-    ), "wrong sum no_of_contestants in round R2"
+        if race.round == "S"
+    ), "wrong sum no_of_contestants in round S"
+
+    # Check that the sum number of contestants are the same in round F:
+    print_races(races)
+    assert sum(race.no_of_contestants for race in races if race.round == "F") == sum(
+        race.no_of_contestants
+        for race in expected_races_individual_sprint_10_contestants
+        if race.round == "F"
+    ), "wrong sum no_of_contestants in round F"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0
@@ -705,9 +730,10 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
         i += 1
 
 
+@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
+async def test_calculate_raceplan_individual_sprint_27_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
     raceclasses_individual_sprint_27_contestants: List[dict],
@@ -731,25 +757,32 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
         raceplan.no_of_contestants
         == expected_raceplan_individual_sprint_27_contestants.no_of_contestants
     )
-    # Check that all the contestants have been given a round 1:
+    # Check that all the contestants have been given a Quarterfinal:
     assert (
-        sum(race.no_of_contestants for race in races if race.round == "R1")
+        sum(race.no_of_contestants for race in races if race.round == "Q")
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
-    assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
+    # Check that the sum number of contestants are the same in round Q:
+    assert sum(race.no_of_contestants for race in races if race.round == "Q") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_27_contestants
-        if race.round == "R1"
-    ), "wrong sum no_of_contestants in round 1"
+        if race.round == "Q"
+    ), "wrong sum no_of_contestants in round Q"
 
-    # Check that the sum number of contestants are the same in round 2:
-    assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
+    # Check that the sum number of contestants are the same in round S:
+    assert sum(race.no_of_contestants for race in races if race.round == "S") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_27_contestants
-        if race.round == "R2"
-    ), "wrong sum no_of_contestants in round 2"
+        if race.round == "S"
+    ), "wrong sum no_of_contestants in round S"
+
+    # Check that the sum number of contestants are the same in round F:
+    assert sum(race.no_of_contestants for race in races if race.round == "F") == sum(
+        race.no_of_contestants
+        for race in expected_races_individual_sprint_27_contestants
+        if race.round == "F"
+    ), "wrong sum no_of_contestants in round F"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0
@@ -777,9 +810,10 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
         i += 1
 
 
+@pytest.mark.skip(reason="no way of currently testing this")
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
+async def test_calculate_raceplan_individual_sprint_17_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
     raceclasses_individual_sprint_17_contestants: List[dict],
@@ -793,6 +827,8 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
         raceclasses_individual_sprint_17_contestants,
     )
 
+    await _print_raceplan(raceplan, races)
+
     assert type(raceplan) is Raceplan
     assert raceplan.id is None
     assert (
@@ -803,25 +839,32 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
         raceplan.no_of_contestants
         == expected_raceplan_individual_sprint_17_contestants.no_of_contestants
     )
-    # Check that all the contestants have been given a round 1:
+    # Check that all the contestants have been given a Quarterfinal:
     assert (
-        sum(race.no_of_contestants for race in races if race.round == "R1")
+        sum(race.no_of_contestants for race in races if race.round == "Q")
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
-    assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
+    # Check that the sum number of contestants are the same in round Q:
+    assert sum(race.no_of_contestants for race in races if race.round == "Q") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_17_contestants
-        if race.round == "R1"
-    ), "wrong sum no_of_contestants in round R2"
+        if race.round == "Q"
+    ), "wrong sum no_of_contestants in round Q"
 
-    # Check that the sum number of contestants are the same in round 2:
-    assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
+    # Check that the sum number of contestants are the same in round S:
+    assert sum(race.no_of_contestants for race in races if race.round == "S") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_17_contestants
-        if race.round == "R2"
-    ), "wrong sum no_of_contestants in round 2"
+        if race.round == "S"
+    ), "wrong sum no_of_contestants in round S"
+
+    # Check that the sum number of contestants are the same in round F:
+    assert sum(race.no_of_contestants for race in races if race.round == "F") == sum(
+        race.no_of_contestants
+        for race in expected_races_individual_sprint_17_contestants
+        if race.round == "F"
+    ), "wrong sum no_of_contestants in round F"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0
@@ -855,3 +898,30 @@ def print_races(races: List[IndividualSprintRace]) -> None:
     print("--- races ---")
     for race in races:
         print(f"{race.order}: {race}\n")
+
+
+async def _print_raceplan(
+    raceplan: Raceplan, races: List[IndividualSprintRace]
+) -> None:
+    print(f"event_id: {raceplan.event_id}")
+    print(f"no_of_contestants: {raceplan.no_of_contestants}")
+    print("order;start_time;raceclass;round;index;heat;no_of_contestants;rule")
+    for race in races:
+        print(
+            str(race.order)
+            + ";"
+            + str(race.start_time)
+            + ";"
+            + str(race.raceclass)
+            + ";"
+            + str(race.round)
+            + ";"
+            + str(race.index)
+            + ";"
+            + str(race.heat)
+            + ";"
+            + str(race.no_of_contestants)
+            + ";"
+            + str(race.rule)
+        )
+    pass

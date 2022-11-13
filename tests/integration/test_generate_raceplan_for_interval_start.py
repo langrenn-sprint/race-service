@@ -42,8 +42,8 @@ async def event() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def format_configuration() -> Dict[str, Any]:
-    """A format configuration for testing."""
+async def competition_format() -> Dict[str, Any]:
+    """A competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Interval Start",
@@ -108,7 +108,7 @@ async def test_generate_raceplan_for_event(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -147,8 +147,8 @@ async def test_generate_raceplan_for_event(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
