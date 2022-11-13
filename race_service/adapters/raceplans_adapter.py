@@ -1,5 +1,4 @@
 """Module for raceplan adapter."""
-import logging
 from typing import Any, List, Optional
 
 
@@ -13,7 +12,6 @@ class RaceplansAdapter:
         cursor = db.raceplans_collection.find()
         for raceplan in await cursor.to_list(None):
             raceplans.append(raceplan)
-            logging.debug(raceplan)
         return raceplans
 
     @classmethod

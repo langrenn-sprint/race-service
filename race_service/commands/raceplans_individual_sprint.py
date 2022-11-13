@@ -92,133 +92,21 @@ async def calculate_raceplan_individual_sprint(  # noqa: C901
 
     # We need to calculate the number of contestants pr race:
     for raceclasses in raceclasses_grouped:
+        ConfigMatrix.initialize(competition_format, raceclasses)
         for raceclass in raceclasses:
-            if raceclass["ranking"]:
-                await _calculate_number_of_contestants_pr_race_in_raceclass_ranked(
-                    raceclass, races
-                )
-            else:
-                await _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(
-                    raceclass, races
-                )
+            await _calculate_number_of_contestants_pr_race_in_raceclass(
+                raceclass, races
+            )
 
     return raceplan, races
 
 
-async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa: C901
-    raceclass: dict, races: List[IndividualSprintRace]
-) -> None:
-    """Calculate number of contestants pr race in given raceclass."""
-    no_of_contestants_to_Qs = raceclass["no_of_contestants"]
-    no_of_contestants_to_SAs = 0
-    no_of_contestants_to_SCs = 0
-    no_of_contestants_to_FAs = 0
-    no_of_contestants_to_FBs = 0
-    no_of_contestants_to_FCs = 0
-
-    # Calculate number of contestants pr heat in first round and store in race:
-    await _set_number_of_contestants_in_race(
-        round="Q",
-        index="A",
-        no_of_contestants=no_of_contestants_to_Qs,
-        races=races,
-        raceclass=raceclass,
-    )
-
-    # TODO: Figure out if there is a way to make a more generic function for this:
-    # If there is to be a round "S" or "F", calculate number of contestants in SA, SC and FC:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"] and race.round == "Q"
-    ]:
-        if "S" in race.rule:
-            # Then, for each race in round Q, some goes to SA:
-            no_of_contestants_to_SAs += race.rule["S"]["A"]  # type: ignore
-            # rest to SC:
-            if race.rule["S"]["C"] != 0:
-                no_of_contestants_to_SCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
-            # or the rest may in some cases go directly to FC:
-        if "F" in race.rule:
-            if "C" in race.rule["F"]:
-                no_of_contestants_to_FCs += race.no_of_contestants - race.rule["S"]["A"]  # type: ignore
-            if "A" in race.rule["F"]:
-                if race.rule["F"]["A"] == "ALL":
-                    no_of_contestants_to_FAs = race.no_of_contestants
-                else:
-                    no_of_contestants_to_FAs += race.rule["F"]["A"]  # type: ignore
-            # rest to FB:
-            if "B" in race.rule["F"]:
-                if race.rule["F"]["B"] == "REST":
-                    no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
-                else:
-                    no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
-
-    # Calculate number of contestants pr heat in round/index SA:
-    await _set_number_of_contestants_in_race(
-        round="S",
-        index="A",
-        no_of_contestants=no_of_contestants_to_SAs,
-        races=races,
-        raceclass=raceclass,
-    )
-    # Calculate number of contestants in race in round/index SC:
-    await _set_number_of_contestants_in_race(
-        round="S",
-        index="C",
-        no_of_contestants=no_of_contestants_to_SCs,
-        races=races,
-        raceclass=raceclass,
-    )
-
-    # Calculate number of contestants in FA, FB and FC:
-    for race in [
-        race
-        for race in races
-        if race.raceclass == raceclass["name"] and race.round == "S"
-    ]:
-        if "F" in race.rule:
-            if "A" in race.rule["F"]:
-                no_of_contestants_to_FAs += race.rule["F"]["A"]  # type: ignore
-            if "B" in race.rule["F"]:
-                if race.rule["F"]["B"] == "REST":
-                    no_of_contestants_to_FBs += race.no_of_contestants - race.rule["F"]["A"]  # type: ignore
-                else:
-                    no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
-            if "C" in race.rule["F"]:
-                no_of_contestants_to_FCs += race.rule["F"]["C"]  # type: ignore
-
-    # Set number of contestants in race in round/index FA:
-    await _set_number_of_contestants_in_race(
-        round="F",
-        index="A",
-        no_of_contestants=no_of_contestants_to_FAs,
-        races=races,
-        raceclass=raceclass,
-    )
-    # Calculate number of contestants pr heat in round/index FB:
-    await _set_number_of_contestants_in_race(
-        round="F",
-        index="B",
-        no_of_contestants=no_of_contestants_to_FBs,
-        races=races,
-        raceclass=raceclass,
-    )
-    # Calculate number of contestants pr heat in round/index FC:
-    await _set_number_of_contestants_in_race(
-        round="F",
-        index="C",
-        no_of_contestants=no_of_contestants_to_FCs,
-        races=races,
-        raceclass=raceclass,
-    )
-
-
-async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # noqa: C901
+async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
     raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race in given raceclass and store in race."""
     rounds: List[str] = ConfigMatrix.get_rounds_in_raceclass(raceclass)
+
     # Initialize number of contestants pr round/index:
     no_of_contestants: Dict[str, Dict[str, int]] = {}
     for round in rounds:
@@ -226,9 +114,11 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
         for index in ConfigMatrix.get_race_indexes(raceclass, round):
             no_of_contestants[round][index] = 0
 
+    # Calculate number of contestants in first round:
     no_of_contestants[rounds[0]][
         ConfigMatrix.get_race_indexes(raceclass, round)[0]
     ] = raceclass["no_of_contestants"]
+
     # Calculate number of contestants pr race in round/index:
     for round in rounds:
         for index in ConfigMatrix.get_race_indexes(raceclass, round):
@@ -247,21 +137,34 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
             for race in races
             if race.raceclass == raceclass["name"] and race.round == round
         ]:
-            _no_of_contestants_in_race = race.no_of_contestants
+            _no_of_contestants_left_in_race = race.no_of_contestants
             for _round in race.rule.keys():
                 for _index in race.rule[_round]:
-                    match race.rule[_round][_index]:
-                        case "ALL":
-                            no_of_contestants[_round][_index] += race.no_of_contestants
-                        case "REST":
-                            no_of_contestants[_round][
-                                _index
-                            ] = _no_of_contestants_in_race
-                        case _:
-                            no_of_contestants[_round][_index] += int(
-                                race.rule[_round][_index]
-                            )
-                    _no_of_contestants_in_race -= no_of_contestants[_round][_index]
+                    if race.rule[_round][_index] == "ALL":
+                        no_of_contestants[_round][
+                            _index
+                        ] += _no_of_contestants_left_in_race
+                        _no_of_contestants_left_in_race -= no_of_contestants[_round][
+                            _index
+                        ]
+                    elif race.rule[_round][_index] == "REST":
+                        no_of_contestants[_round][
+                            _index
+                        ] += _no_of_contestants_left_in_race
+                        _no_of_contestants_left_in_race -= no_of_contestants[_round][
+                            _index
+                        ]
+                    elif type(race.rule[_round][_index]) is int:
+                        no_of_contestants[_round][_index] += int(
+                            race.rule[_round][_index]
+                        )
+                        _no_of_contestants_left_in_race -= int(
+                            race.rule[_round][_index]
+                        )
+                    else:
+                        raise Exception(
+                            f"Unknown rule: {race.rule[_round][_index]}"
+                        )  # pragma: no cover
 
 
 async def _set_number_of_contestants_in_race(
