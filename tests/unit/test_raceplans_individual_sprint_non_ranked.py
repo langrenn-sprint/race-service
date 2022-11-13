@@ -33,7 +33,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 1},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -44,7 +44,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 2},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -55,7 +55,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 3},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -66,7 +66,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 4},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -77,7 +77,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 6},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -88,7 +88,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 6},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -99,7 +99,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 7},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
         {
@@ -110,7 +110,7 @@ async def race_config() -> List[Dict[str, Any]]:
                 "R2": {"A": 8},
             },
             "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
+                "R1": {"A": {"R2": {"A": "ALL"}}},
             },
         },
     ]
@@ -260,7 +260,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -280,7 +280,7 @@ async def expected_races_individual_sprint_10_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -351,7 +351,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -371,7 +371,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -391,7 +391,7 @@ async def expected_races_individual_sprint_17_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -482,7 +482,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -502,7 +502,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -522,7 +522,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -542,7 +542,7 @@ async def expected_races_individual_sprint_27_contestants(
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -737,19 +737,19 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
+    # Check that the sum number of contestants are the same in round R1:
     assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_27_contestants
         if race.round == "R1"
     ), "wrong sum no_of_contestants in round 1"
 
-    # Check that the sum number of contestants are the same in round 2:
+    # Check that the sum number of contestants are the same in round R2:
     assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_27_contestants
         if race.round == "R2"
-    ), "wrong sum no_of_contestants in round 2"
+    ), "wrong sum no_of_contestants in round R2"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0
@@ -809,19 +809,19 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
+    # Check that the sum number of contestants are the same in round R1:
     assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_17_contestants
         if race.round == "R1"
     ), "wrong sum no_of_contestants in round R2"
 
-    # Check that the sum number of contestants are the same in round 2:
+    # Check that the sum number of contestants are the same in round R2:
     assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_17_contestants
         if race.round == "R2"
-    ), "wrong sum no_of_contestants in round 2"
+    ), "wrong sum no_of_contestants in round R2"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0

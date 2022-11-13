@@ -117,10 +117,10 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
     no_of_contestants_to_FCs = 0
 
     # Calculate number of contestants pr heat in first round and store in race:
-    await _calculate_number_of_contestants_pr_heat_in_round(
+    await _set_number_of_contestants_in_race(
         round="Q",
         index="A",
-        no_of_contestants_to_round=no_of_contestants_to_Qs,
+        no_of_contestants=no_of_contestants_to_Qs,
         races=races,
         raceclass=raceclass,
     )
@@ -154,20 +154,19 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
                 else:
                     no_of_contestants_to_FBs += race.rule["F"]["B"]  # type: ignore
 
-    # Calculate number of contestants pr heat in SA:
-    await _calculate_number_of_contestants_pr_heat_in_round(
+    # Calculate number of contestants pr heat in round/index SA:
+    await _set_number_of_contestants_in_race(
         round="S",
         index="A",
-        no_of_contestants_to_round=no_of_contestants_to_SAs,
+        no_of_contestants=no_of_contestants_to_SAs,
         races=races,
         raceclass=raceclass,
     )
-    # Calculate number of contestants pr heat in SC:
-    # Calculate number of contestants pr heat in SA:
-    await _calculate_number_of_contestants_pr_heat_in_round(
+    # Calculate number of contestants in race in round/index SC:
+    await _set_number_of_contestants_in_race(
         round="S",
         index="C",
-        no_of_contestants_to_round=no_of_contestants_to_SCs,
+        no_of_contestants=no_of_contestants_to_SCs,
         races=races,
         raceclass=raceclass,
     )
@@ -189,29 +188,27 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_ranked(  # noqa:
             if "C" in race.rule["F"]:
                 no_of_contestants_to_FCs += race.rule["F"]["C"]  # type: ignore
 
-    # Calculate number of contestants pr heat in FA:
-    await _calculate_number_of_contestants_pr_heat_in_round(
+    # Set number of contestants in race in round/index FA:
+    await _set_number_of_contestants_in_race(
         round="F",
         index="A",
-        no_of_contestants_to_round=no_of_contestants_to_FAs,
+        no_of_contestants=no_of_contestants_to_FAs,
         races=races,
         raceclass=raceclass,
     )
-
-    # Calculate number of contestants pr heat in FB:
-    await _calculate_number_of_contestants_pr_heat_in_round(
+    # Calculate number of contestants pr heat in round/index FB:
+    await _set_number_of_contestants_in_race(
         round="F",
         index="B",
-        no_of_contestants_to_round=no_of_contestants_to_FBs,
+        no_of_contestants=no_of_contestants_to_FBs,
         races=races,
         raceclass=raceclass,
     )
-
-    # Calculate number of contestants pr heat in FC:
-    await _calculate_number_of_contestants_pr_heat_in_round(
+    # Calculate number of contestants pr heat in round/index FC:
+    await _set_number_of_contestants_in_race(
         round="F",
         index="C",
-        no_of_contestants_to_round=no_of_contestants_to_FCs,
+        no_of_contestants=no_of_contestants_to_FCs,
         races=races,
         raceclass=raceclass,
     )
@@ -221,35 +218,61 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass_non_ranked(  # n
     raceclass: dict, races: List[IndividualSprintRace]
 ) -> None:
     """Calculate number of contestants pr race in given raceclass and store in race."""
-    # Calculate number of contestants pr heat in R1:
-    await _calculate_number_of_contestants_pr_heat_in_round(
-        round="R1",
-        index="A",
-        no_of_contestants_to_round=raceclass["no_of_contestants"],
-        races=races,
-        raceclass=raceclass,
-    )
+    rounds: List[str] = ConfigMatrix.get_rounds_in_raceclass(raceclass)
+    # Initialize number of contestants pr round/index:
+    no_of_contestants: Dict[str, Dict[str, int]] = {}
+    for round in rounds:
+        no_of_contestants[round] = {}
+        for index in ConfigMatrix.get_race_indexes(raceclass, round):
+            no_of_contestants[round][index] = 0
 
-    # Calculate number of contestants pr heat in R2:
-    await _calculate_number_of_contestants_pr_heat_in_round(
-        round="R2",
-        index="A",
-        no_of_contestants_to_round=raceclass["no_of_contestants"],
-        races=races,
-        raceclass=raceclass,
-    )
+    no_of_contestants[rounds[0]][
+        ConfigMatrix.get_race_indexes(raceclass, round)[0]
+    ] = raceclass["no_of_contestants"]
+    # Calculate number of contestants pr race in round/index:
+    for round in rounds:
+        for index in ConfigMatrix.get_race_indexes(raceclass, round):
+            await _set_number_of_contestants_in_race(
+                round=round,
+                index=index,
+                no_of_contestants=no_of_contestants[round][index],
+                races=races,
+                raceclass=raceclass,
+            )
+
+        # Based on rules (from_to) in each race in this round, calculate number of contestants
+        # to next round by summing up:
+        for race in [
+            race
+            for race in races
+            if race.raceclass == raceclass["name"] and race.round == round
+        ]:
+            _no_of_contestants_in_race = race.no_of_contestants
+            for _round in race.rule.keys():
+                for _index in race.rule[_round]:
+                    match race.rule[_round][_index]:
+                        case "ALL":
+                            no_of_contestants[_round][_index] += race.no_of_contestants
+                        case "REST":
+                            no_of_contestants[_round][
+                                _index
+                            ] = _no_of_contestants_in_race
+                        case _:
+                            no_of_contestants[_round][_index] += int(
+                                race.rule[_round][_index]
+                            )
+                    _no_of_contestants_in_race -= no_of_contestants[_round][_index]
 
 
-async def _calculate_number_of_contestants_pr_heat_in_round(
+async def _set_number_of_contestants_in_race(
     raceclass: Dict,
     round: str,
     index: str,
-    no_of_contestants_to_round: int,
+    no_of_contestants: int,
     races: List[IndividualSprintRace],
 ) -> None:
-    # Calculate number of contestants pr heat in round:
-
-    no_of_races_in_round = len(
+    """Calculate and set number of contestants pr heat in round/index."""
+    no_of_races = len(
         [
             race
             for race in races
@@ -268,8 +291,8 @@ async def _calculate_number_of_contestants_pr_heat_in_round(
     ]:
         # We need to "smooth" the contestants across the heats:
         quotient, remainder = divmod(
-            no_of_contestants_to_round,
-            no_of_races_in_round,
+            no_of_contestants,
+            no_of_races,
         )
         if race.heat <= remainder:
             race.no_of_contestants = quotient + 1
