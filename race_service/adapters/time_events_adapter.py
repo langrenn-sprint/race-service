@@ -1,5 +1,4 @@
 """Module for time_event adapter."""
-import logging
 from typing import Any, List, Optional
 
 
@@ -13,7 +12,6 @@ class TimeEventsAdapter:
         cursor = db.time_events_collection.find()
         for time_event in await cursor.to_list(None):
             time_events.append(time_event)
-            logging.debug(time_event)
         return time_events
 
     @classmethod

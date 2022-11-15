@@ -1,9 +1,9 @@
 """Package for all adapters."""
 from .events_adapter import (
+    CompetitionFormatNotFoundException,
     ContestantsNotFoundException,
     EventNotFoundException,
     EventsAdapter,
-    FormatConfigurationNotFoundException,
     RaceclassesNotFoundException,
 )
 from .race_results_adapter import RaceResultsAdapter

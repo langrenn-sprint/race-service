@@ -50,8 +50,8 @@ async def event_individual_sprint() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def format_configuration() -> Dict[str, Any]:
-    """A format configuration for testing."""
+async def competition_format() -> Dict[str, Any]:
+    """A competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Individual Sprint",
@@ -318,7 +318,7 @@ async def test_generate_startlist_for_event(
     mocker: MockFixture,
     token: MockFixture,
     event_individual_sprint: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     raceplan_individual_sprint: dict,
     contestants: List[dict],
@@ -355,8 +355,8 @@ async def test_generate_startlist_for_event(
         return_value=event_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -406,7 +406,7 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
     mocker: MockFixture,
     token: MockFixture,
     event_individual_sprint: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     raceplan_individual_sprint: dict,
     contestants: List[dict],
@@ -448,8 +448,8 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
         return_value=event_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
