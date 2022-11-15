@@ -22,119 +22,166 @@ def event_loop() -> Any:
 
 
 @pytest.fixture
-async def race_config() -> List[Dict[str, Any]]:
-    """A race_config used in format_configuration."""
-    return [
-        {
-            "max_no_of_contestants": 7,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 1},
-                "R2": {"A": 1},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 16,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 2},
-                "R2": {"A": 2},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 24,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 3},
-                "R2": {"A": 3},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 32,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 4},
-                "R2": {"A": 4},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 40,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 6},
-                "R2": {"A": 6},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 48,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 6},
-                "R2": {"A": 6},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 56,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 7},
-                "R2": {"A": 7},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-        {
-            "max_no_of_contestants": 80,
-            "rounds": ["R1", "R2"],
-            "no_of_heats": {
-                "R1": {"A": 8},
-                "R2": {"A": 8},
-            },
-            "from_to": {
-                "R1": {"A": {"R2": {"A": "REST"}}},
-            },
-        },
-    ]
-
-
-@pytest.fixture(scope="function")
-async def competition_format_individual_sprint(
-    race_config: List[Dict[str, Any]]
-) -> dict:
+async def competition_format_individual_sprint() -> dict:
     """A competition_format object for testing."""
     return {
         "name": "Individual Sprint",
         "starting_order": "Draw",
         "start_procedure": "Heat Start",
-        "time_between_groups": "00:15:00",
-        "time_between_rounds": "00:10:00",
+        "time_between_groups": "00:10:00",
+        "time_between_rounds": "00:05:00",
         "time_between_heats": "00:02:30",
         "rounds_ranked_classes": ["Q", "S", "F"],
         "rounds_non_ranked_classes": ["R1", "R2"],
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
-        "race_config_ranked": None,
-        "race_config_non_ranked": race_config,
+        "race_config_non_ranked": [
+            {
+                "max_no_of_contestants": 7,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 1}, "R2": {"A": 1}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 16,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 2}, "R2": {"A": 2}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 24,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 3}, "R2": {"A": 3}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 32,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 4}, "R2": {"A": 4}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 40,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 6}, "R2": {"A": 6}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 48,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 6}, "R2": {"A": 6}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 56,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 7}, "R2": {"A": 7}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+            {
+                "max_no_of_contestants": 80,
+                "rounds": ["R1", "R2"],
+                "no_of_heats": {"R1": {"A": 8}, "R2": {"A": 8}},
+                "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
+            },
+        ],
+        "race_config_ranked": [
+            {
+                "max_no_of_contestants": 7,
+                "rounds": ["Q", "F"],
+                "no_of_heats": {"Q": {"A": 1}, "F": {"A": 1, "B": 0, "C": 0}},
+                "from_to": {
+                    "Q": {"A": {"F": {"A": "ALL", "B": 0}}, "C": {"F": {"C": 0}}}
+                },
+            },
+            {
+                "max_no_of_contestants": 16,
+                "rounds": ["Q", "F"],
+                "no_of_heats": {"Q": {"A": 2}, "F": {"A": 1, "B": 1, "C": 0}},
+                "from_to": {
+                    "Q": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 0}}}
+                },
+            },
+            {
+                "max_no_of_contestants": 24,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 3},
+                    "S": {"A": 2, "C": 0},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 5, "C": 0}, "F": {"C": "REST"}}},
+                    "S": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 0}}},
+                },
+            },
+            {
+                "max_no_of_contestants": 32,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 4},
+                    "S": {"A": 2, "C": 2},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                    "S": {"A": {"F": {"A": 4, "B": "REST"}}, "C": {"F": {"C": 4}}},
+                },
+            },
+            {
+                "max_no_of_contestants": 40,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 6},
+                    "S": {"A": 4, "C": 2},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 4}}},
+                },
+            },
+            {
+                "max_no_of_contestants": 48,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 6},
+                    "S": {"A": 4, "C": 4},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+                },
+            },
+            {
+                "max_no_of_contestants": 56,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 7},
+                    "S": {"A": 4, "C": 4},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+                },
+            },
+            {
+                "max_no_of_contestants": 80,
+                "rounds": ["Q", "S", "F"],
+                "no_of_heats": {
+                    "Q": {"A": 8},
+                    "S": {"A": 4, "C": 4},
+                    "F": {"A": 1, "B": 1, "C": 1},
+                },
+                "from_to": {
+                    "Q": {"A": {"S": {"A": 4, "C": "REST"}}},
+                    "S": {"A": {"F": {"A": 2, "B": 2}}, "C": {"F": {"C": 2}}},
+                },
+            },
+        ],
     }
 
 
@@ -253,14 +300,14 @@ async def expected_races_individual_sprint_10_contestants(
             order=1,
             raceclass="G11",
             round="R1",
-            index="",
+            index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
             no_of_contestants=5,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -273,14 +320,14 @@ async def expected_races_individual_sprint_10_contestants(
             order=2,
             raceclass="G11",
             round="R1",
-            index="",
+            index="A",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
             no_of_contestants=5,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -293,9 +340,9 @@ async def expected_races_individual_sprint_10_contestants(
             order=3,
             raceclass="G11",
             round="R2",
-            index="",
+            index="A",
             heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:12:30"),
+            start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
             no_of_contestants=5,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -313,9 +360,9 @@ async def expected_races_individual_sprint_10_contestants(
             order=4,
             raceclass="G11",
             round="R2",
-            index="",
+            index="A",
             heat=2,
-            start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
+            start_time=datetime.fromisoformat("2021-09-29 09:10:00"),
             no_of_contestants=5,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -344,14 +391,14 @@ async def expected_races_individual_sprint_17_contestants(
             order=1,
             raceclass="J11",
             round="R1",
-            index="",
+            index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
             no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -364,14 +411,14 @@ async def expected_races_individual_sprint_17_contestants(
             order=2,
             raceclass="J11",
             round="R1",
-            index="",
+            index="A",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
             no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -384,14 +431,14 @@ async def expected_races_individual_sprint_17_contestants(
             order=3,
             raceclass="J11",
             round="R1",
-            index="",
+            index="A",
             heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
             no_of_contestants=5,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -404,9 +451,9 @@ async def expected_races_individual_sprint_17_contestants(
             order=4,
             raceclass="J11",
             round="R2",
-            index="",
+            index="A",
             heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
+            start_time=datetime.fromisoformat("2021-09-29 09:10:00"),
             no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -424,9 +471,9 @@ async def expected_races_individual_sprint_17_contestants(
             order=5,
             raceclass="J11",
             round="R2",
-            index="",
+            index="A",
             heat=2,
-            start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+            start_time=datetime.fromisoformat("2021-09-29 09:12:30"),
             no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -444,9 +491,9 @@ async def expected_races_individual_sprint_17_contestants(
             order=6,
             raceclass="J11",
             round="R2",
-            index="",
+            index="A",
             heat=3,
-            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+            start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
             no_of_contestants=5,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -475,14 +522,14 @@ async def expected_races_individual_sprint_27_contestants(
             order=1,
             raceclass="J15",
             round="R1",
-            index="",
+            index="A",
             heat=1,
             start_time=datetime.fromisoformat("2021-09-29 09:00:00"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -495,14 +542,14 @@ async def expected_races_individual_sprint_27_contestants(
             order=2,
             raceclass="J15",
             round="R1",
-            index="",
+            index="A",
             heat=2,
             start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -515,14 +562,14 @@ async def expected_races_individual_sprint_27_contestants(
             order=3,
             raceclass="J15",
             round="R1",
-            index="",
+            index="A",
             heat=3,
             start_time=datetime.fromisoformat("2021-09-29 09:05:00"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -535,14 +582,14 @@ async def expected_races_individual_sprint_27_contestants(
             order=4,
             raceclass="J15",
             round="R1",
-            index="",
+            index="A",
             heat=4,
             start_time=datetime.fromisoformat("2021-09-29 09:07:30"),
             no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
             ],
-            rule={"R2": {"A": "REST"}},
+            rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
             raceplan_id="",
             start_entries=[],
@@ -555,9 +602,9 @@ async def expected_races_individual_sprint_27_contestants(
             order=5,
             raceclass="J15",
             round="R2",
-            index="",
+            index="A",
             heat=1,
-            start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
+            start_time=datetime.fromisoformat("2021-09-29 09:12:30"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -575,9 +622,9 @@ async def expected_races_individual_sprint_27_contestants(
             order=6,
             raceclass="J15",
             round="R2",
-            index="",
+            index="A",
             heat=2,
-            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
+            start_time=datetime.fromisoformat("2021-09-29 09:15:00"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -595,9 +642,9 @@ async def expected_races_individual_sprint_27_contestants(
             order=7,
             raceclass="J15",
             round="R2",
-            index="",
+            index="A",
             heat=3,
-            start_time=datetime.fromisoformat("2021-09-29 09:22:30"),
+            start_time=datetime.fromisoformat("2021-09-29 09:17:30"),
             no_of_contestants=7,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -615,9 +662,9 @@ async def expected_races_individual_sprint_27_contestants(
             order=8,
             raceclass="J15",
             round="R2",
-            index="",
+            index="A",
             heat=4,
-            start_time=datetime.fromisoformat("2021-09-29 09:25:00"),
+            start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
             no_of_contestants=6,
             max_no_of_contestants=competition_format_individual_sprint[
                 "max_no_of_contestants_in_race"
@@ -737,19 +784,19 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
+    # Check that the sum number of contestants are the same in round R1:
     assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_27_contestants
         if race.round == "R1"
     ), "wrong sum no_of_contestants in round 1"
 
-    # Check that the sum number of contestants are the same in round 2:
+    # Check that the sum number of contestants are the same in round R2:
     assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_27_contestants
         if race.round == "R2"
-    ), "wrong sum no_of_contestants in round 2"
+    ), "wrong sum no_of_contestants in round R2"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0
@@ -809,19 +856,19 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
         == raceplan.no_of_contestants
     )
 
-    # Check that the sum number of contestants are the same in round 1:
+    # Check that the sum number of contestants are the same in round R1:
     assert sum(race.no_of_contestants for race in races if race.round == "R1") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_17_contestants
         if race.round == "R1"
     ), "wrong sum no_of_contestants in round R2"
 
-    # Check that the sum number of contestants are the same in round 2:
+    # Check that the sum number of contestants are the same in round R2:
     assert sum(race.no_of_contestants for race in races if race.round == "R2") == sum(
         race.no_of_contestants
         for race in expected_races_individual_sprint_17_contestants
         if race.round == "R2"
-    ), "wrong sum no_of_contestants in round 2"
+    ), "wrong sum no_of_contestants in round R2"
 
     # Check that there are correct number of races:
     assert len(raceplan.races) == 0

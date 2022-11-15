@@ -12,8 +12,8 @@ import pytest
 from pytest_mock import MockFixture
 
 from race_service.adapters import (
+    CompetitionFormatNotFoundException,
     EventNotFoundException,
-    FormatConfigurationNotFoundException,
 )
 
 
@@ -53,7 +53,7 @@ async def event_not_supported_competition_format() -> Dict[str, Any]:
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Oslo Skagen sprint",
-        "competition_format": "Not supported competition format",
+        "competition_format": "Not supported competition-format",
         "date_of_event": "2021-08-31",
         "time_of_event": "09:00:00",
         "organiser": "Lyn Ski",
@@ -77,8 +77,8 @@ async def event_has_no_competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def format_configuration() -> Dict[str, Any]:
-    """An format configuration for testing."""
+async def competition_format() -> Dict[str, Any]:
+    """An competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
         "name": "Interval Start",
@@ -143,7 +143,7 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -182,8 +182,8 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -210,7 +210,7 @@ async def test_generate_raceplan_for_event_create_race_fails(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -249,8 +249,8 @@ async def test_generate_raceplan_for_event_create_race_fails(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -278,7 +278,7 @@ async def test_generate_raceplan_for_event_unauthorized(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -301,8 +301,8 @@ async def test_generate_raceplan_for_event_unauthorized(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -330,7 +330,7 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -353,8 +353,8 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -382,7 +382,7 @@ async def test_generate_raceplan_for_event_event_not_found(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -405,8 +405,8 @@ async def test_generate_raceplan_for_event_event_not_found(
         side_effect=EventNotFoundException("Event {event_id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -428,74 +428,21 @@ async def test_generate_raceplan_for_event_event_not_found(
 
 
 @pytest.mark.integration
-async def test_generate_raceplan_for_event_format_configuration_not_found(
-    client: _TestClient,
-    mocker: MockFixture,
-    token: MockFixture,
-    event: dict,
-    format_configuration: dict,
-    raceclasses: List[dict],
-    request_body: dict,
-) -> None:
-    """Should return 400 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    mocker.patch(
-        "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
-    )
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
-    )
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
-    )
-    mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
-        return_value=event,
-    )
-    mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        side_effect=FormatConfigurationNotFoundException(
-            "Format configuration not found."
-        ),
-    )
-    mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
-        return_value=raceclasses,
-    )
-
-    headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
-
-        resp = await client.post(
-            "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
-        )
-        assert resp.status == 400
-
-
-@pytest.mark.integration
 async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_raceclass(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Not found."""
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    format_configuration_missing_max_no_of_contestants_in_raceclass = deepcopy(
-        format_configuration
+    competition_format_missing_max_no_of_contestants_in_raceclass = deepcopy(
+        competition_format
     )
-    format_configuration_missing_max_no_of_contestants_in_raceclass.pop(
+    competition_format_missing_max_no_of_contestants_in_raceclass.pop(
         "max_no_of_contestants_in_raceclass", None
     )
 
@@ -516,8 +463,8 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration_missing_max_no_of_contestants_in_raceclass,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format_missing_max_no_of_contestants_in_raceclass,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -544,16 +491,16 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Not found."""
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    format_configuration_missing_max_no_of_contestants_in_race = deepcopy(
-        format_configuration
+    competition_format_missing_max_no_of_contestants_in_race = deepcopy(
+        competition_format
     )
-    format_configuration_missing_max_no_of_contestants_in_race.pop(
+    competition_format_missing_max_no_of_contestants_in_race.pop(
         "max_no_of_contestants_in_race", None
     )
 
@@ -574,8 +521,8 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration_missing_max_no_of_contestants_in_race,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format_missing_max_no_of_contestants_in_race,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -602,7 +549,7 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     request_body: dict,
 ) -> None:
     """Should return 404 Not found."""
@@ -624,8 +571,8 @@ async def test_generate_raceplan_for_event_no_raceclasses(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -652,7 +599,7 @@ async def test_generate_raceplan_for_event_no_competition_format(
     mocker: MockFixture,
     token: MockFixture,
     event_has_no_competition_format: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -675,8 +622,8 @@ async def test_generate_raceplan_for_event_no_competition_format(
         return_value=event_has_no_competition_format,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -703,13 +650,13 @@ async def test_generate_raceplan_for_event_missing_intervals(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
-    format_configuration_missing_intervals = deepcopy(format_configuration)
-    format_configuration_missing_intervals.pop("intervals", None)
+    competition_format_missing_intervals = deepcopy(competition_format)
+    competition_format_missing_intervals.pop("intervals", None)
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
@@ -728,8 +675,8 @@ async def test_generate_raceplan_for_event_missing_intervals(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration_missing_intervals,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format_missing_intervals,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -756,7 +703,7 @@ async def test_generate_raceplan_for_event_time_missing(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -781,8 +728,8 @@ async def test_generate_raceplan_for_event_time_missing(
         return_value=event_missing_time,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -809,7 +756,7 @@ async def test_generate_raceplan_for_event_date_missing(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -834,8 +781,8 @@ async def test_generate_raceplan_for_event_date_missing(
         return_value=event_missing_date,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -862,7 +809,7 @@ async def test_generate_raceplan_for_event_invalid_date(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -887,8 +834,8 @@ async def test_generate_raceplan_for_event_invalid_date(
         return_value=event_invalid_date,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -915,7 +862,7 @@ async def test_generate_raceplan_for_event_invalid_time(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -940,8 +887,8 @@ async def test_generate_raceplan_for_event_invalid_time(
         return_value=event_invalid_time,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -968,7 +915,7 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -993,8 +940,8 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1023,7 +970,7 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1048,8 +995,8 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1078,7 +1025,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1103,8 +1050,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1133,7 +1080,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1158,8 +1105,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1188,7 +1135,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1214,8 +1161,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1244,7 +1191,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1269,8 +1216,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1302,7 +1249,7 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
     mocker: MockFixture,
     token: MockFixture,
     event_not_supported_competition_format: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1325,10 +1272,8 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
         return_value=event_not_supported_competition_format,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        side_effect=FormatConfigurationNotFoundException(
-            "FormatConfiguration not found."
-        ),
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        side_effect=CompetitionFormatNotFoundException("CompetitionFormat not found."),
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1355,7 +1300,7 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
     mocker: MockFixture,
     token: MockFixture,
     event_not_supported_competition_format: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1378,8 +1323,8 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
         return_value=event_not_supported_competition_format,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1406,7 +1351,7 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
     request_body: dict,
 ) -> None:
@@ -1447,8 +1392,8 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_format_configuration",
-        return_value=format_configuration,
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",

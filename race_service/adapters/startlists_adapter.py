@@ -1,5 +1,4 @@
 """Module for startlist adapter."""
-import logging
 from typing import Any, List, Optional
 
 
@@ -13,7 +12,6 @@ class StartlistsAdapter:
         cursor = db.startlists_collection.find()
         for startlist in await cursor.to_list(None):
             startlists.append(startlist)
-            logging.debug(startlist)
         return startlists
 
     @classmethod

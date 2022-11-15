@@ -2,7 +2,7 @@
 
 The race service let you administrate the main domain objects race and race plan, startlist and results.
 
-Based on the type of event (competition format), list of race classes and a list of contestants, this service will support:
+Based on the type of event (competition-format), list of race classes and a list of contestants, this service will support:
 
 - generating a race plan, and
 - generating races pr race classes with contestants and start times for each individual race,
@@ -11,7 +11,7 @@ Based on the type of event (competition format), list of race classes and a list
 - create race results, and
 - generate result lists pr ageclass.
 
-The race service will support the following competition formats:
+The race service will support the following competition-formats:
 
 - Interval Start competition,
 - Mass start competition,

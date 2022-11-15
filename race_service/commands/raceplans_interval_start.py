@@ -7,7 +7,7 @@ from race_service.models import IntervalStartRace, Raceplan
 
 async def calculate_raceplan_interval_start(
     event: dict,
-    format_configuration: dict,
+    competition_format: dict,
     raceclasses: List[dict],
 ) -> Tuple[Raceplan, List[IntervalStartRace]]:
     """Calculate raceplan for Interval Start event."""
@@ -15,15 +15,15 @@ async def calculate_raceplan_interval_start(
     races: List[IntervalStartRace] = []
     # get the time_between_groups as timedelta:
     time_between_groups = timedelta(
-        hours=time.fromisoformat(format_configuration["time_between_groups"]).hour,
-        minutes=time.fromisoformat(format_configuration["time_between_groups"]).minute,
-        seconds=time.fromisoformat(format_configuration["time_between_groups"]).second,
+        hours=time.fromisoformat(competition_format["time_between_groups"]).hour,
+        minutes=time.fromisoformat(competition_format["time_between_groups"]).minute,
+        seconds=time.fromisoformat(competition_format["time_between_groups"]).second,
     )
     # get the interval as timedelta:
     intervals = timedelta(
-        hours=time.fromisoformat(format_configuration["intervals"]).hour,
-        minutes=time.fromisoformat(format_configuration["intervals"]).minute,
-        seconds=time.fromisoformat(format_configuration["intervals"]).second,
+        hours=time.fromisoformat(competition_format["intervals"]).hour,
+        minutes=time.fromisoformat(competition_format["intervals"]).minute,
+        seconds=time.fromisoformat(competition_format["intervals"]).second,
     )
     # get the first start_time from the event:
     start_time = datetime.combine(
@@ -48,7 +48,7 @@ async def calculate_raceplan_interval_start(
                 raceclass=raceclass["name"],
                 order=order,
                 start_time=start_time,
-                max_no_of_contestants=format_configuration[
+                max_no_of_contestants=competition_format[
                     "max_no_of_contestants_in_race"
                 ],
                 no_of_contestants=raceclass["no_of_contestants"],

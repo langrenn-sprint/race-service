@@ -20,7 +20,7 @@ class EventNotFoundException(Exception):
     pass
 
 
-class FormatConfigurationNotFoundException(Exception):
+class CompetitionFormatNotFoundException(Exception):
     """Class representing custom exception for get method."""
 
     def __init__(self, message: str) -> None:
@@ -72,20 +72,20 @@ class EventsAdapter:
                     ) from None
 
     @classmethod
-    async def get_format_configuration(
+    async def get_competition_format(
         cls: Any, token: str, event_id: str, competition_format_name: str
     ) -> dict:  # pragma: no cover
-        """Get format_configuration from event-service."""
+        """Get competition_format from event-service."""
         async with ClientSession() as session:
-            # First we try to get the configuration from the event:
+            # First we try to get the competition-format from the event:
             url = (
                 f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
                 f"/events/{event_id}/format"
             )
             async with session.get(url) as response:
                 if response.status == 200:
-                    format_configuration = await response.json()
-                    return format_configuration
+                    competition_format = await response.json()
+                    return competition_format
                 elif response.status == 404:
                     pass  # We will try to get the global config
                 else:
@@ -103,11 +103,11 @@ class EventsAdapter:
             )
             async with session.get(url) as response:
                 if response.status == 200:
-                    format_configurations = await response.json()
-                    return format_configurations[0]
+                    competition_formats = await response.json()
+                    return competition_formats[0]
                 elif response.status == 404:
-                    raise FormatConfigurationNotFoundException(
-                        f'FormatConfiguration "{competition_format_name}" not found.'
+                    raise CompetitionFormatNotFoundException(
+                        f'CompetitionFormat "{competition_format_name}" not found.'
                     ) from None
                 else:
                     raise HTTPInternalServerError(
