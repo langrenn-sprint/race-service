@@ -3,6 +3,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Any, Dict, List, Tuple, Union
 
 from race_service.models import IndividualSprintRace, Raceplan
+from .exceptions import IllegalValueInRaceError
 
 
 async def calculate_raceplan_individual_sprint(  # noqa: C901
@@ -155,14 +156,23 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
                             _index
                         ]
                     elif type(race.rule[_round][_index]) is int:
-                        no_of_contestants[_round][_index] += int(
-                            race.rule[_round][_index]
-                        )
-                        _no_of_contestants_left_in_race -= int(
-                            race.rule[_round][_index]
-                        )
+                        if (
+                            int(race.rule[_round][_index])
+                            > _no_of_contestants_left_in_race
+                        ):
+                            no_of_contestants[_round][
+                                _index
+                            ] += _no_of_contestants_left_in_race
+
+                        else:
+                            no_of_contestants[_round][_index] += int(
+                                race.rule[_round][_index]
+                            )
+                            _no_of_contestants_left_in_race -= int(
+                                race.rule[_round][_index]
+                            )
                     else:
-                        raise Exception(
+                        raise IllegalValueInRaceError(
                             f"Unknown rule: {race.rule[_round][_index]}"
                         )  # pragma: no cover
 
@@ -201,6 +211,12 @@ async def _set_number_of_contestants_in_race(
             race.no_of_contestants = quotient + 1
         else:
             race.no_of_contestants = quotient
+
+        # Check if no_of_contestants is greater than max:
+        if race.no_of_contestants > race.max_no_of_contestants:
+            raise IllegalValueInRaceError(
+                f"Too many contestants in race with order {race.order}: {race.no_of_contestants}."
+            )
 
 
 class ConfigMatrix:
