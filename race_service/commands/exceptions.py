@@ -109,7 +109,7 @@ class CouldNotCreateRaceException(Exception):
         super().__init__(message)
 
 
-class IllegalValueInRaceError(Exception):
+class IllegalValueInRaceError(Exception):  # pragma: no cover
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:

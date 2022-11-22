@@ -668,7 +668,7 @@ async def expected_races_individual_sprint_27_contestants(
     return races
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip("Test not fully implemented.")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint_10_contestants(
@@ -750,7 +750,7 @@ async def test_calculate_raceplan_individual_sprint_10_contestants(
         i += 1
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip("Test not fully implemented.")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint_27_contestants(
@@ -830,7 +830,7 @@ async def test_calculate_raceplan_individual_sprint_27_contestants(
         i += 1
 
 
-# @pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip("Test not fully implemented.")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint_17_contestants(

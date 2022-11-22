@@ -1,5 +1,5 @@
 {
-    "name": "Individual Sprint",
+    "name": "Individual Sprint Multiple Finals 1",
     "starting_order": "Draw",
     "start_procedure": "Heat Start",
     "time_between_groups": "00:10:00",
@@ -441,9 +441,9 @@
                     "A": 1,
                     "B1": 1,
                     "B2": 1,
-                    "B3": 1,
                     "C1": 1,
-                    "C2": 1
+                    "C2": 1,
+                    "C3": 1
                 }
             },
             "from_to": {
@@ -460,14 +460,14 @@
                         "F": {
                             "A": 2,
                             "B1": 2,
-                            "B2": 2,
-                            "B3": "REST"
+                            "B2": "REST"
                         }
                     },
                     "C": {
                         "F": {
-                            "C1": 4,
-                            "C2": "REST"
+                            "C1": 2,
+                            "C2": 2,
+                            "C3": "REST"
                         }
                     }
                 }
@@ -518,8 +518,9 @@
                     },
                     "C": {
                         "F": {
-                            "C1": 3,
-                            "C2": 3,
+                            "B3": 1,
+                            "C1": 2,
+                            "C2": 2,
                             "C3": "REST"
                         }
                     }

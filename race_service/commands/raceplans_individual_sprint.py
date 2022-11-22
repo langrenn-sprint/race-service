@@ -160,7 +160,7 @@ async def _calculate_number_of_contestants_pr_race_in_raceclass(  # noqa: C901
                             int(race.rule[_round][_index])
                             > _no_of_contestants_left_in_race
                         ):
-                            no_of_contestants[_round][
+                            no_of_contestants[_round][  # pragma: no cover
                                 _index
                             ] += _no_of_contestants_left_in_race
 
@@ -214,8 +214,9 @@ async def _set_number_of_contestants_in_race(
 
         # Check if no_of_contestants is greater than max:
         if race.no_of_contestants > race.max_no_of_contestants:
-            raise IllegalValueInRaceError(
-                f"Too many contestants in race with order {race.order}: {race.no_of_contestants}."
+            raise IllegalValueInRaceError(  # pragma: no cover
+                "Too many contestants in race raceclass/round/index "
+                f"{race.raceclass}/{race.round}/{race.index}: {race.no_of_contestants}."
             )
 
 
