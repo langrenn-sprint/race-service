@@ -4,6 +4,7 @@ from .exceptions import (
     CouldNotCreateRaceException,
     CouldNotCreateRaceplanException,
     DuplicateRaceplansInEventException,
+    IllegalValueInRaceError,
     InconsistentInputDataException,
     InconsistentValuesInContestantsException,
     InconsistentValuesInRaceclassesException,

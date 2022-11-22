@@ -1,0 +1,5674 @@
+{
+  "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+  "races": [
+    {
+      "id": "26c192ef-5b62-4c4f-b2df-e60d1697c418",
+      "raceclass": "M19/20",
+      "order": 1,
+      "start_time": "2021-08-31T09:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "36dd4320-2d22-4268-b821-842b011213dc",
+      "raceclass": "M19/20",
+      "order": 2,
+      "start_time": "2021-08-31T09:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "bf1c6eec-55d2-4b8f-8132-3278b08e6787",
+      "raceclass": "K19/20",
+      "order": 3,
+      "start_time": "2021-08-31T09:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": "ALL",
+          "B": 0
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f9e325a3-8e8a-48f6-89fc-8946f1e98413",
+      "raceclass": "M19/20",
+      "order": 4,
+      "start_time": "2021-08-31T09:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 0,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a538d636-c65b-4fb7-a2d6-02c35dcbb685",
+      "raceclass": "M19/20",
+      "order": 5,
+      "start_time": "2021-08-31T09:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "caa8986e-d6b6-403b-ac19-53d9bb41813d",
+      "raceclass": "K19/20",
+      "order": 6,
+      "start_time": "2021-08-31T09:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "bfb372c0-a6a1-47ec-81ba-95903937705a",
+      "raceclass": "M18",
+      "order": 7,
+      "start_time": "2021-08-31T09:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "fbc24969-67c1-4ed0-9769-aa14506eaa99",
+      "raceclass": "M18",
+      "order": 8,
+      "start_time": "2021-08-31T09:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "6e0538c4-6aa4-41d4-86a3-14a61fb61150",
+      "raceclass": "K18",
+      "order": 9,
+      "start_time": "2021-08-31T09:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": "ALL",
+          "B": 0
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "bdb5e6c4-3f11-44d7-b4c2-16a479f1aa77",
+      "raceclass": "M18",
+      "order": 10,
+      "start_time": "2021-08-31T09:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 0,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e006aa2b-69d2-4c3a-b40f-41d630f76723",
+      "raceclass": "M18",
+      "order": 11,
+      "start_time": "2021-08-31T09:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f3478ebe-41c4-4099-988b-f02e127f5e4d",
+      "raceclass": "K18",
+      "order": 12,
+      "start_time": "2021-08-31T09:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7bd547e5-91e9-446f-97bc-8fcf914306dc",
+      "raceclass": "M17",
+      "order": 13,
+      "start_time": "2021-08-31T10:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "af3d26ab-f1a0-433f-b691-1ae4676ea748",
+      "raceclass": "M17",
+      "order": 14,
+      "start_time": "2021-08-31T10:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f7a42662-0c04-4355-af83-c58f14711bd6",
+      "raceclass": "K17",
+      "order": 15,
+      "start_time": "2021-08-31T10:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 5,
+          "C": 0
+        },
+        "F": {
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9cfca8dd-67a8-4af6-8dae-fc0c41804a64",
+      "raceclass": "K17",
+      "order": 16,
+      "start_time": "2021-08-31T10:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 5,
+          "C": 0
+        },
+        "F": {
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "909dbbe0-1455-4291-8f13-5d8af967d5d3",
+      "raceclass": "K17",
+      "order": 17,
+      "start_time": "2021-08-31T10:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 5,
+          "C": 0
+        },
+        "F": {
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "826ee350-4e43-42f2-b9e9-4a7bbccee535",
+      "raceclass": "K17",
+      "order": 18,
+      "start_time": "2021-08-31T10:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "cd1a5599-f417-45ea-87d5-4bf95b7da233",
+      "raceclass": "K17",
+      "order": 19,
+      "start_time": "2021-08-31T10:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f7fa84a2-df97-4c33-9248-e9187d05d58d",
+      "raceclass": "M17",
+      "order": 20,
+      "start_time": "2021-08-31T10:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "facdda23-477d-4471-aa69-8e5cbaed291a",
+      "raceclass": "M17",
+      "order": 21,
+      "start_time": "2021-08-31T10:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "63c948d5-fe3a-4615-875b-cec7fa66ba98",
+      "raceclass": "K17",
+      "order": 22,
+      "start_time": "2021-08-31T10:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "91369603-d864-43ac-94a3-02e14b5b69eb",
+      "raceclass": "K17",
+      "order": 23,
+      "start_time": "2021-08-31T10:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d93fab15-1d5e-4eb2-9f1b-57b6ba42e074",
+      "raceclass": "K17",
+      "order": 24,
+      "start_time": "2021-08-31T10:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "98c7959f-139e-495a-8220-f6d0f69149dc",
+      "raceclass": "G16",
+      "order": 25,
+      "start_time": "2021-08-31T10:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "3c8ac700-1e23-4d8a-a6c9-48227faf6e0e",
+      "raceclass": "G16",
+      "order": 26,
+      "start_time": "2021-08-31T10:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "51928c81-052f-47a4-9a99-90acec0353bd",
+      "raceclass": "G16",
+      "order": 27,
+      "start_time": "2021-08-31T10:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ab71f780-5f3d-49b4-a635-a19c3bbdf0b1",
+      "raceclass": "G16",
+      "order": 28,
+      "start_time": "2021-08-31T10:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2279f11a-9adc-47b0-9085-9b7cda903a7e",
+      "raceclass": "G16",
+      "order": 29,
+      "start_time": "2021-08-31T10:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4d2b99b7-44af-4f30-ad1d-b5029d720c28",
+      "raceclass": "G16",
+      "order": 30,
+      "start_time": "2021-08-31T11:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1b5b593e-257f-4fd3-b74c-6d3c0a292708",
+      "raceclass": "J16",
+      "order": 31,
+      "start_time": "2021-08-31T11:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5f3529fb-7036-4fc8-8335-9e4e19b156f9",
+      "raceclass": "J16",
+      "order": 32,
+      "start_time": "2021-08-31T11:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a4e266f1-e81a-4b9d-b151-6f8a4bed1bbb",
+      "raceclass": "J16",
+      "order": 33,
+      "start_time": "2021-08-31T11:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2c678707-7dd6-4737-8cb1-f24fe2ae9baf",
+      "raceclass": "J16",
+      "order": 34,
+      "start_time": "2021-08-31T11:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "89f10f57-9683-451c-b053-a28526c99bb1",
+      "raceclass": "G15",
+      "order": 35,
+      "start_time": "2021-08-31T11:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8fd4ffdd-ea4f-451f-aaf7-42853e3e886e",
+      "raceclass": "G15",
+      "order": 36,
+      "start_time": "2021-08-31T11:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ee625016-704b-4fca-8a5c-03b9f2264323",
+      "raceclass": "G15",
+      "order": 37,
+      "start_time": "2021-08-31T11:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4b5a4af0-0473-4af3-b77b-c295088b5eda",
+      "raceclass": "G15",
+      "order": 38,
+      "start_time": "2021-08-31T11:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4b890842-9df4-47dd-9332-db1fef755c73",
+      "raceclass": "G15",
+      "order": 39,
+      "start_time": "2021-08-31T11:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c6260326-f9f6-49e0-90a6-a1f64a68499f",
+      "raceclass": "G15",
+      "order": 40,
+      "start_time": "2021-08-31T11:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e8294cef-cc37-489c-ba0e-cdb29c780928",
+      "raceclass": "J15",
+      "order": 41,
+      "start_time": "2021-08-31T11:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "6655bf78-acb3-44f9-bf64-bb3c72bad7e6",
+      "raceclass": "J15",
+      "order": 42,
+      "start_time": "2021-08-31T11:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0c80bdf2-d5cb-481a-a9f8-7f85720561fc",
+      "raceclass": "J15",
+      "order": 43,
+      "start_time": "2021-08-31T11:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9963a8bd-9617-4d6a-ab10-460b8c3b998a",
+      "raceclass": "J15",
+      "order": 44,
+      "start_time": "2021-08-31T11:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f7e9fe2a-f96d-42a7-a458-c46cb45ab488",
+      "raceclass": "G16",
+      "order": 45,
+      "start_time": "2021-08-31T11:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c4dc1b93-7398-463d-88e4-5ecdd375ec45",
+      "raceclass": "G16",
+      "order": 46,
+      "start_time": "2021-08-31T11:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "50dd5ef5-4884-4597-b67f-2dabd11dde9e",
+      "raceclass": "G16",
+      "order": 47,
+      "start_time": "2021-08-31T11:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "eb6917dc-9a48-473e-ae7c-241e8f673aaf",
+      "raceclass": "G16",
+      "order": 48,
+      "start_time": "2021-08-31T11:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ee7d2870-3ae4-46a5-9516-2fc7ef7fe19e",
+      "raceclass": "G16",
+      "order": 49,
+      "start_time": "2021-08-31T11:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ced6bae7-2012-4fe9-bdbe-0cbb5c87e133",
+      "raceclass": "G16",
+      "order": 50,
+      "start_time": "2021-08-31T11:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7415b926-67a7-423e-be60-cb3adb7fdbde",
+      "raceclass": "J16",
+      "order": 51,
+      "start_time": "2021-08-31T11:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "722388e0-0704-45df-b808-ff1cced01e1e",
+      "raceclass": "J16",
+      "order": 52,
+      "start_time": "2021-08-31T11:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "70804703-2c52-4896-9330-fd1fe6e7e704",
+      "raceclass": "J16",
+      "order": 53,
+      "start_time": "2021-08-31T12:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "288f6888-4afe-478c-bdf2-02d59882a5f3",
+      "raceclass": "J16",
+      "order": 54,
+      "start_time": "2021-08-31T12:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "942bc6b0-64dc-40ef-aec0-83880ba713db",
+      "raceclass": "G15",
+      "order": 55,
+      "start_time": "2021-08-31T12:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d2203b3f-0869-4611-b4c1-07d17ee2659a",
+      "raceclass": "G15",
+      "order": 56,
+      "start_time": "2021-08-31T12:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7c5e0573-781f-487e-9e34-188c3e27ac33",
+      "raceclass": "G15",
+      "order": 57,
+      "start_time": "2021-08-31T12:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "cec401b8-f5e6-4f81-93b3-f75ec7c0d48a",
+      "raceclass": "G15",
+      "order": 58,
+      "start_time": "2021-08-31T12:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "3beb77cf-fa9a-4f6f-a394-ec2ddb7f8666",
+      "raceclass": "G15",
+      "order": 59,
+      "start_time": "2021-08-31T12:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "76b2cbca-ee18-4e7c-ad9d-e06186efa19e",
+      "raceclass": "G15",
+      "order": 60,
+      "start_time": "2021-08-31T12:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e1afa43b-dd27-4eeb-9fdb-190db4dacc11",
+      "raceclass": "J15",
+      "order": 61,
+      "start_time": "2021-08-31T12:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "dc9af3f5-e121-4998-a9ad-6b5757c0f50c",
+      "raceclass": "J15",
+      "order": 62,
+      "start_time": "2021-08-31T12:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e26026a3-6f9b-490b-989f-697b039a00db",
+      "raceclass": "J15",
+      "order": 63,
+      "start_time": "2021-08-31T12:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c862cbdc-a24d-4853-b389-aa69f1c63187",
+      "raceclass": "J15",
+      "order": 64,
+      "start_time": "2021-08-31T12:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 4,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a68eb4cb-3a30-4a88-adb7-0a94627e6e1b",
+      "raceclass": "G16",
+      "order": 65,
+      "start_time": "2021-08-31T12:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "bc8c0f3a-324e-4565-8dee-3d8bb93a93e4",
+      "raceclass": "G16",
+      "order": 66,
+      "start_time": "2021-08-31T12:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a17ba1e2-8d0a-4843-aff8-53466141d091",
+      "raceclass": "G16",
+      "order": 67,
+      "start_time": "2021-08-31T12:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "6a64f877-8a9b-488d-9c90-5c7e4813e2c1",
+      "raceclass": "G16",
+      "order": 68,
+      "start_time": "2021-08-31T12:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d9c20d3e-ba0b-4865-95de-38b96eacdb0f",
+      "raceclass": "G16",
+      "order": 69,
+      "start_time": "2021-08-31T12:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e47dff0c-8ab6-43ad-8e80-2cfbc20f4050",
+      "raceclass": "G16",
+      "order": 70,
+      "start_time": "2021-08-31T12:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "26e0d230-899a-4dcf-9793-7d94861be343",
+      "raceclass": "J16",
+      "order": 71,
+      "start_time": "2021-08-31T12:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "13ee4fc2-a5f5-44ba-a791-255e4661535b",
+      "raceclass": "J16",
+      "order": 72,
+      "start_time": "2021-08-31T12:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7aa4c00c-b982-42f8-a92f-3257e78a40d3",
+      "raceclass": "J16",
+      "order": 73,
+      "start_time": "2021-08-31T12:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b9c68cfe-e79f-4b4b-8a3b-649359dc9f5f",
+      "raceclass": "J16",
+      "order": 74,
+      "start_time": "2021-08-31T12:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "567aefb0-7414-47b5-bc74-4f2d99a4be2b",
+      "raceclass": "G15",
+      "order": 75,
+      "start_time": "2021-08-31T12:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "74284521-d993-48ce-91f5-05862d900a25",
+      "raceclass": "G15",
+      "order": 76,
+      "start_time": "2021-08-31T13:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e0259414-8c63-4092-be4b-95bb103552f5",
+      "raceclass": "G15",
+      "order": 77,
+      "start_time": "2021-08-31T13:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "dca47fc7-02be-4c2b-9b7a-efc22d52d80f",
+      "raceclass": "G15",
+      "order": 78,
+      "start_time": "2021-08-31T13:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f3b0b6d6-e0f3-4948-a254-004668bd8a5c",
+      "raceclass": "G15",
+      "order": 79,
+      "start_time": "2021-08-31T13:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f22b51c7-2358-4c6c-ac33-f05356a5aba7",
+      "raceclass": "G15",
+      "order": 80,
+      "start_time": "2021-08-31T13:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b7f2ff87-7fbc-429f-9568-ba8f682f7e89",
+      "raceclass": "J15",
+      "order": 81,
+      "start_time": "2021-08-31T13:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "fa331229-1786-4864-9fea-07e593ca2a58",
+      "raceclass": "J15",
+      "order": 82,
+      "start_time": "2021-08-31T13:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5a420c40-56c0-4358-a095-911b204fabed",
+      "raceclass": "J15",
+      "order": 83,
+      "start_time": "2021-08-31T13:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c604dd3a-86d2-4325-9a86-7a3792813701",
+      "raceclass": "J15",
+      "order": 84,
+      "start_time": "2021-08-31T13:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "49edda1e-5973-427d-a127-8a992c3926d2",
+      "raceclass": "G14",
+      "order": 85,
+      "start_time": "2021-08-31T13:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "344076e6-11b0-4f96-95bc-3be573607fee",
+      "raceclass": "G14",
+      "order": 86,
+      "start_time": "2021-08-31T13:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f5e129b5-d2c8-4029-97aa-77b8a18c9d4f",
+      "raceclass": "G14",
+      "order": 87,
+      "start_time": "2021-08-31T13:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b3878b79-a576-4ec5-8f59-d9f92137e659",
+      "raceclass": "G14",
+      "order": 88,
+      "start_time": "2021-08-31T13:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d833e5b4-7dc3-494f-a45a-58db332b48dd",
+      "raceclass": "G14",
+      "order": 89,
+      "start_time": "2021-08-31T13:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "850ef1e7-99c1-4645-89bc-5bd021d8efe5",
+      "raceclass": "G14",
+      "order": 90,
+      "start_time": "2021-08-31T13:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d8b4129e-544d-42b8-b4b5-4bb1c0341671",
+      "raceclass": "G14",
+      "order": 91,
+      "start_time": "2021-08-31T13:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 7,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "973a7ad6-d1e1-4fc2-a5e8-dcaec9c8bec7",
+      "raceclass": "J14",
+      "order": 92,
+      "start_time": "2021-08-31T13:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "be019fa7-4a7e-4c1e-ae9d-bf417e734b99",
+      "raceclass": "J14",
+      "order": 93,
+      "start_time": "2021-08-31T13:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "56a36c21-5d82-44d9-a493-cd4a563bcac5",
+      "raceclass": "J14",
+      "order": 94,
+      "start_time": "2021-08-31T13:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "dce3cb77-7c0d-461c-a2a2-ae4d8328e5d5",
+      "raceclass": "J14",
+      "order": 95,
+      "start_time": "2021-08-31T14:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "84abae5a-6293-4544-bdd9-77965c6a7813",
+      "raceclass": "J14",
+      "order": 96,
+      "start_time": "2021-08-31T14:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2bf8fdbb-e221-4a10-a7c3-6f1faf563eb5",
+      "raceclass": "J14",
+      "order": 97,
+      "start_time": "2021-08-31T14:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "cd2f2e14-eab0-4eb8-8c0c-e608ebcbaa32",
+      "raceclass": "G13",
+      "order": 98,
+      "start_time": "2021-08-31T14:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "87a3491c-434b-486d-929a-17c7ed82417d",
+      "raceclass": "G13",
+      "order": 99,
+      "start_time": "2021-08-31T14:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ecd3b684-ce48-4930-9257-4acfc2947fb1",
+      "raceclass": "G13",
+      "order": 100,
+      "start_time": "2021-08-31T14:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d4baae33-6e26-4b22-9231-f7406523cf45",
+      "raceclass": "G13",
+      "order": 101,
+      "start_time": "2021-08-31T14:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a5b7b097-4f71-4433-b932-ff286ae56cd7",
+      "raceclass": "G13",
+      "order": 102,
+      "start_time": "2021-08-31T14:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e8d9bff5-50c2-47fa-b1e7-fd92aafb25da",
+      "raceclass": "G13",
+      "order": 103,
+      "start_time": "2021-08-31T14:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "00bbe4a9-aa9d-4c5c-b8ab-48ce4ac8ca42",
+      "raceclass": "G13",
+      "order": 104,
+      "start_time": "2021-08-31T14:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 7,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "fe1ef136-e680-4429-814d-6b89edeffa10",
+      "raceclass": "J13",
+      "order": 105,
+      "start_time": "2021-08-31T14:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "836656f8-0263-4ac8-8cc8-f6bc572c4b23",
+      "raceclass": "J13",
+      "order": 106,
+      "start_time": "2021-08-31T14:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "cfa44e07-6093-4dbb-981f-a6960aa389dc",
+      "raceclass": "J13",
+      "order": 107,
+      "start_time": "2021-08-31T14:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1595f48d-c3db-4fb6-94ed-70bc89d67f4d",
+      "raceclass": "J13",
+      "order": 108,
+      "start_time": "2021-08-31T14:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "709f2731-248f-462d-986c-ccd065c409f8",
+      "raceclass": "J13",
+      "order": 109,
+      "start_time": "2021-08-31T14:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1517ed06-1037-4076-b967-680098a7fba6",
+      "raceclass": "J13",
+      "order": 110,
+      "start_time": "2021-08-31T14:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "589a2617-1697-4375-b734-a7bacfed9b8e",
+      "raceclass": "G14",
+      "order": 111,
+      "start_time": "2021-08-31T14:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e5ab41ed-749f-4bf6-830c-f906757976b1",
+      "raceclass": "G14",
+      "order": 112,
+      "start_time": "2021-08-31T14:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "be1a99cc-139b-4d4e-8796-1488d0ff1068",
+      "raceclass": "G14",
+      "order": 113,
+      "start_time": "2021-08-31T14:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7c2bfe9d-0d6a-49cd-b377-cc4e572d092b",
+      "raceclass": "G14",
+      "order": 114,
+      "start_time": "2021-08-31T14:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "57346af3-b1c9-479a-921b-b9342b476357",
+      "raceclass": "G14",
+      "order": 115,
+      "start_time": "2021-08-31T14:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "02118528-0cd9-4d7d-90e3-22100a90b80c",
+      "raceclass": "G14",
+      "order": 116,
+      "start_time": "2021-08-31T14:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ddfcc2af-c427-47c9-adf4-d2d5eb8c8d81",
+      "raceclass": "G14",
+      "order": 117,
+      "start_time": "2021-08-31T14:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "51f3b19f-7469-4041-a22f-8b9c84c32ceb",
+      "raceclass": "G14",
+      "order": 118,
+      "start_time": "2021-08-31T15:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f37bf5d6-a1ac-47aa-8f43-408cb1837ff0",
+      "raceclass": "J14",
+      "order": 119,
+      "start_time": "2021-08-31T15:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "efb50b39-ec9e-47dc-8a09-e613b5323519",
+      "raceclass": "J14",
+      "order": 120,
+      "start_time": "2021-08-31T15:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4bf1a07e-fce0-49e0-9ef5-c15ab50d0bd0",
+      "raceclass": "J14",
+      "order": 121,
+      "start_time": "2021-08-31T15:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4976a6c2-c9a7-4bdc-9f7b-ef102117efb4",
+      "raceclass": "J14",
+      "order": 122,
+      "start_time": "2021-08-31T15:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2c850580-a74d-4926-8180-cbb87207fc49",
+      "raceclass": "J14",
+      "order": 123,
+      "start_time": "2021-08-31T15:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "36dac856-29b5-4a2d-b86c-3598ea04e07e",
+      "raceclass": "J14",
+      "order": 124,
+      "start_time": "2021-08-31T15:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "606517e9-ecfc-4338-971e-d85dfd0d0c97",
+      "raceclass": "G13",
+      "order": 125,
+      "start_time": "2021-08-31T15:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1df4c85e-0beb-4f24-9a1c-9c1b58e7b0b3",
+      "raceclass": "G13",
+      "order": 126,
+      "start_time": "2021-08-31T15:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d9294165-f943-4cef-86b5-c0b00184a63d",
+      "raceclass": "G13",
+      "order": 127,
+      "start_time": "2021-08-31T15:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e7791d7f-49dc-4ef9-81c8-0a8030cf2072",
+      "raceclass": "G13",
+      "order": 128,
+      "start_time": "2021-08-31T15:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d1557126-e4a2-44ac-bb46-3238f6595766",
+      "raceclass": "G13",
+      "order": 129,
+      "start_time": "2021-08-31T15:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "94fcfc87-c2fa-43ee-b98d-ec3b8c3cae2d",
+      "raceclass": "G13",
+      "order": 130,
+      "start_time": "2021-08-31T15:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "23ac1c76-287c-4608-9eaa-146319961575",
+      "raceclass": "G13",
+      "order": 131,
+      "start_time": "2021-08-31T15:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e2132515-afd6-4550-b33f-b65a4ba9d891",
+      "raceclass": "G13",
+      "order": 132,
+      "start_time": "2021-08-31T15:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "502bbb51-3062-439f-9fb4-2780fe7bbf00",
+      "raceclass": "J13",
+      "order": 133,
+      "start_time": "2021-08-31T15:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ecf9b425-8f6b-4f48-84df-74c3138bc6c2",
+      "raceclass": "J13",
+      "order": 134,
+      "start_time": "2021-08-31T15:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c95b7fba-044e-4703-9129-b0f302ce9328",
+      "raceclass": "J13",
+      "order": 135,
+      "start_time": "2021-08-31T15:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d21a9aff-9864-47e1-913b-e268ebe64dba",
+      "raceclass": "J13",
+      "order": 136,
+      "start_time": "2021-08-31T15:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5f3f010b-24c2-4913-bce0-a1cedfa2e6df",
+      "raceclass": "J13",
+      "order": 137,
+      "start_time": "2021-08-31T15:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0b6be96b-d541-41db-8b27-801e465a2d3b",
+      "raceclass": "J13",
+      "order": 138,
+      "start_time": "2021-08-31T15:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "96503d1c-3340-4f22-804f-399c847a5b7f",
+      "raceclass": "J13",
+      "order": 139,
+      "start_time": "2021-08-31T15:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1c48ed0c-5017-4287-8620-a86618482f07",
+      "raceclass": "J13",
+      "order": 140,
+      "start_time": "2021-08-31T15:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f7458a9b-0a43-44f1-8daf-cfe177597636",
+      "raceclass": "G14",
+      "order": 141,
+      "start_time": "2021-08-31T16:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "de764acb-addd-4fbb-8f59-1c860de1d5da",
+      "raceclass": "G14",
+      "order": 142,
+      "start_time": "2021-08-31T16:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4c3e5c89-82de-4e9d-95cf-adb3f349bf18",
+      "raceclass": "G14",
+      "order": 143,
+      "start_time": "2021-08-31T16:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4f03c875-ef7c-415f-b014-1b4f9c4e2649",
+      "raceclass": "G14",
+      "order": 144,
+      "start_time": "2021-08-31T16:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9addf6ea-2025-4743-8113-9c838e355432",
+      "raceclass": "G14",
+      "order": 145,
+      "start_time": "2021-08-31T16:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "38d5a692-da2d-4afa-9235-1e27b915d31f",
+      "raceclass": "G14",
+      "order": 146,
+      "start_time": "2021-08-31T16:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7b0b12d4-14ae-4c51-805e-40471825c428",
+      "raceclass": "G14",
+      "order": 147,
+      "start_time": "2021-08-31T16:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "70123c17-0756-4564-bbfb-72f7bc29380b",
+      "raceclass": "J14",
+      "order": 148,
+      "start_time": "2021-08-31T16:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f91d97ea-1b97-4045-a7dd-398af9db231c",
+      "raceclass": "J14",
+      "order": 149,
+      "start_time": "2021-08-31T16:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "18c2f3b1-af89-4f99-bf9b-dbe4fe941bf3",
+      "raceclass": "J14",
+      "order": 150,
+      "start_time": "2021-08-31T16:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d4a8f338-c094-4fa1-984b-7c265a4edd41",
+      "raceclass": "J14",
+      "order": 151,
+      "start_time": "2021-08-31T16:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1e4612c6-3ac5-400a-87a3-cb0a77d2dfa3",
+      "raceclass": "J14",
+      "order": 152,
+      "start_time": "2021-08-31T16:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "3e97ed25-8fc9-4ea6-976e-5b1e1ce37435",
+      "raceclass": "J14",
+      "order": 153,
+      "start_time": "2021-08-31T16:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "853302d6-51e8-41db-be10-5572b7949cbc",
+      "raceclass": "G13",
+      "order": 154,
+      "start_time": "2021-08-31T16:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0860de30-0c86-4083-aa32-6f11ab7d8d3b",
+      "raceclass": "G13",
+      "order": 155,
+      "start_time": "2021-08-31T16:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8f3337fe-7906-449b-a9c6-19a658912df3",
+      "raceclass": "G13",
+      "order": 156,
+      "start_time": "2021-08-31T16:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7182b4b7-acde-4307-ba53-0801ccb3a3c1",
+      "raceclass": "G13",
+      "order": 157,
+      "start_time": "2021-08-31T16:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "dbe2d66c-9e7f-4ff5-a5b4-404cd65a7767",
+      "raceclass": "G13",
+      "order": 158,
+      "start_time": "2021-08-31T16:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "767b1fcd-0e21-4a79-a865-e57c99b72107",
+      "raceclass": "G13",
+      "order": 159,
+      "start_time": "2021-08-31T16:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c340859e-4be5-4b25-9f52-33b769cac20e",
+      "raceclass": "G13",
+      "order": 160,
+      "start_time": "2021-08-31T16:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e6307d0f-6a88-4385-9e8a-f5d13a802382",
+      "raceclass": "J13",
+      "order": 161,
+      "start_time": "2021-08-31T16:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "78259a1f-442c-42a8-9322-392782648358",
+      "raceclass": "J13",
+      "order": 162,
+      "start_time": "2021-08-31T16:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "93051115-7380-4939-ba24-ba1eca61b579",
+      "raceclass": "J13",
+      "order": 163,
+      "start_time": "2021-08-31T16:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2bf9a345-6bd0-4881-9dc5-ec73dc50cfbe",
+      "raceclass": "J13",
+      "order": 164,
+      "start_time": "2021-08-31T16:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "91a4ae64-e2a1-49da-b354-a88f0e9bf30f",
+      "raceclass": "J13",
+      "order": 165,
+      "start_time": "2021-08-31T17:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a5be4388-cf5b-4e5c-8c5b-f9ecd6ff2916",
+      "raceclass": "J13",
+      "order": 166,
+      "start_time": "2021-08-31T17:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b3159761-9c95-43fd-9229-8561b577210f",
+      "raceclass": "J13",
+      "order": 167,
+      "start_time": "2021-08-31T17:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "56a14099-1148-4558-8389-18103bc3eb2f",
+      "raceclass": "G12",
+      "order": 168,
+      "start_time": "2021-08-31T17:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d60c0aad-5745-4619-ae3f-792e27c9b365",
+      "raceclass": "G12",
+      "order": 169,
+      "start_time": "2021-08-31T17:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "48d04740-8344-4119-8be5-8129352fbdce",
+      "raceclass": "G12",
+      "order": 170,
+      "start_time": "2021-08-31T17:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7220b72a-c2d5-48bc-bf0e-510347760d6f",
+      "raceclass": "G12",
+      "order": 171,
+      "start_time": "2021-08-31T17:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "fff6037e-d749-41ad-ad60-fa228b7c7eed",
+      "raceclass": "G12",
+      "order": 172,
+      "start_time": "2021-08-31T17:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "1b4cfdf7-8735-42f3-bec3-90b91fe4ab9a",
+      "raceclass": "G12",
+      "order": 173,
+      "start_time": "2021-08-31T17:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c71063d0-fc38-406e-9539-741d85d2fcc5",
+      "raceclass": "J12",
+      "order": 174,
+      "start_time": "2021-08-31T17:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8def3b29-c10f-4096-b5eb-0464a6ac0b1a",
+      "raceclass": "J12",
+      "order": 175,
+      "start_time": "2021-08-31T17:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b95cb9dc-03f7-4a78-83d4-4091d96a8d7f",
+      "raceclass": "J12",
+      "order": 176,
+      "start_time": "2021-08-31T17:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "43bb6c5c-b1d8-4d14-bed6-2130a39a2781",
+      "raceclass": "J12",
+      "order": 177,
+      "start_time": "2021-08-31T17:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a028f78b-2b19-4a87-bc73-4c90c6c1ce7e",
+      "raceclass": "J12",
+      "order": 178,
+      "start_time": "2021-08-31T17:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9b7d0f19-5e52-44fd-be31-8ce6150c0840",
+      "raceclass": "J12",
+      "order": 179,
+      "start_time": "2021-08-31T17:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "46d62bff-3141-41cf-967d-a14366705621",
+      "raceclass": "G11",
+      "order": 180,
+      "start_time": "2021-08-31T17:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f35c912d-0d80-4d3c-aade-643107fedddc",
+      "raceclass": "G11",
+      "order": 181,
+      "start_time": "2021-08-31T17:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f8a6c1ee-31f5-410c-a485-964e49a14945",
+      "raceclass": "G11",
+      "order": 182,
+      "start_time": "2021-08-31T17:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ab0bd855-add4-4c17-a86a-581c8ab7500b",
+      "raceclass": "G11",
+      "order": 183,
+      "start_time": "2021-08-31T17:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0220dec5-7887-4986-8223-528247e94088",
+      "raceclass": "G11",
+      "order": 184,
+      "start_time": "2021-08-31T18:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2740520c-222e-4889-9984-2020db2fb8a0",
+      "raceclass": "G11",
+      "order": 185,
+      "start_time": "2021-08-31T18:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5cf28766-a83b-40c8-8084-74f5021047c8",
+      "raceclass": "J11",
+      "order": 186,
+      "start_time": "2021-08-31T18:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f7c252de-105b-49f8-b819-9674e427ac55",
+      "raceclass": "J11",
+      "order": 187,
+      "start_time": "2021-08-31T18:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "23aeff55-32ed-4949-a115-6595a208227f",
+      "raceclass": "J11",
+      "order": 188,
+      "start_time": "2021-08-31T18:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "afa3ad44-c271-46a2-95b4-89bd984942ab",
+      "raceclass": "J11",
+      "order": 189,
+      "start_time": "2021-08-31T18:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "81b0198e-6668-4fd6-89ca-9fa6b1e6ee0e",
+      "raceclass": "J11",
+      "order": 190,
+      "start_time": "2021-08-31T18:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "ac561c35-901c-4155-9cc4-046772d9fae5",
+      "raceclass": "J11",
+      "order": 191,
+      "start_time": "2021-08-31T18:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "Q",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "S": {
+          "A": 4,
+          "C": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "68bafc42-b701-4e56-be30-6d0fa6728830",
+      "raceclass": "G12",
+      "order": 192,
+      "start_time": "2021-08-31T18:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "6ec196c1-1068-4902-b6a3-b83940f87869",
+      "raceclass": "G12",
+      "order": 193,
+      "start_time": "2021-08-31T18:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5bac3af9-b5a9-47a3-aacc-4191973d6ec4",
+      "raceclass": "G12",
+      "order": 194,
+      "start_time": "2021-08-31T18:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "fd59e8e7-fd85-4ab7-a203-be40ab69a60d",
+      "raceclass": "G12",
+      "order": 195,
+      "start_time": "2021-08-31T18:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "21570ad8-acc8-4b73-9dbe-374fca803b19",
+      "raceclass": "G12",
+      "order": 196,
+      "start_time": "2021-08-31T18:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d67c80af-c31c-4b5b-9f74-03bbe6b467e0",
+      "raceclass": "G12",
+      "order": 197,
+      "start_time": "2021-08-31T18:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "3124f4e8-0443-493e-a575-1a23ccc60762",
+      "raceclass": "J12",
+      "order": 198,
+      "start_time": "2021-08-31T18:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a3557025-cd03-42e6-aead-97602759a06a",
+      "raceclass": "J12",
+      "order": 199,
+      "start_time": "2021-08-31T18:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "00f12438-0edb-4a57-8f1e-8c64bd6d1d72",
+      "raceclass": "J12",
+      "order": 200,
+      "start_time": "2021-08-31T18:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "6a9993de-119a-4c92-b620-7bce0c23d9bd",
+      "raceclass": "J12",
+      "order": 201,
+      "start_time": "2021-08-31T18:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8ead69ae-a86d-4b61-ae6e-709964cdfbf1",
+      "raceclass": "J12",
+      "order": 202,
+      "start_time": "2021-08-31T18:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2ec3e8f7-d435-4db9-8d81-556dbcabd258",
+      "raceclass": "J12",
+      "order": 203,
+      "start_time": "2021-08-31T18:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "090e00f7-6683-44f2-8ae0-ec9145d13d82",
+      "raceclass": "J12",
+      "order": 204,
+      "start_time": "2021-08-31T18:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9315d881-8539-45d1-a592-a03ac0f25ad3",
+      "raceclass": "J12",
+      "order": 205,
+      "start_time": "2021-08-31T18:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "566df2f1-34fc-43ee-a678-3a51e00e5c0e",
+      "raceclass": "G11",
+      "order": 206,
+      "start_time": "2021-08-31T18:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d0f79f1d-c88c-4196-b48e-353a91870d3d",
+      "raceclass": "G11",
+      "order": 207,
+      "start_time": "2021-08-31T19:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "65c68b26-86ce-461e-aa07-b4dc6ee5b425",
+      "raceclass": "G11",
+      "order": 208,
+      "start_time": "2021-08-31T19:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7cbab3ab-e233-4f82-8145-a70cf8390bc5",
+      "raceclass": "G11",
+      "order": 209,
+      "start_time": "2021-08-31T19:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a4fcd105-3390-42ae-aa2d-7207f9d21d83",
+      "raceclass": "G11",
+      "order": 210,
+      "start_time": "2021-08-31T19:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8cea82a7-9f2f-45f4-b960-e03dc15fb800",
+      "raceclass": "G11",
+      "order": 211,
+      "start_time": "2021-08-31T19:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e1f868de-a769-486b-9761-500ed8870650",
+      "raceclass": "J11",
+      "order": 212,
+      "start_time": "2021-08-31T19:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d89062cc-9445-4083-92ed-260525ac0363",
+      "raceclass": "J11",
+      "order": 213,
+      "start_time": "2021-08-31T19:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "49d711d2-f30b-412f-adef-7a6ab3de5096",
+      "raceclass": "J11",
+      "order": 214,
+      "start_time": "2021-08-31T19:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7e742515-4fda-4f5b-9db5-3955b1441052",
+      "raceclass": "J11",
+      "order": 215,
+      "start_time": "2021-08-31T19:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 4,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "C",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "C": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b5288024-f67c-49a9-b474-e1cd0fae940c",
+      "raceclass": "J11",
+      "order": 216,
+      "start_time": "2021-08-31T19:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a11d5894-3d5a-4c15-9fd8-1a9b3aff9d45",
+      "raceclass": "J11",
+      "order": 217,
+      "start_time": "2021-08-31T19:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2cff795d-8e45-4515-b270-4cba4e9fb2fa",
+      "raceclass": "J11",
+      "order": 218,
+      "start_time": "2021-08-31T19:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a57e02e5-30f4-4111-8cc3-c914dcb0306a",
+      "raceclass": "J11",
+      "order": 219,
+      "start_time": "2021-08-31T19:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "S",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "F": {
+          "A": 2,
+          "B": "REST"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "569a3f13-f18b-45d6-a7cf-6199f7d7c19c",
+      "raceclass": "G12",
+      "order": 220,
+      "start_time": "2021-08-31T19:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9e942034-c8b7-4661-9d8c-651d28dbfe41",
+      "raceclass": "G12",
+      "order": 221,
+      "start_time": "2021-08-31T19:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "79f35683-c2bc-4d2e-83a2-aadedc4839bd",
+      "raceclass": "G12",
+      "order": 222,
+      "start_time": "2021-08-31T19:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "69ef55ea-b9f5-4862-aff0-3b25881ce7a5",
+      "raceclass": "G12",
+      "order": 223,
+      "start_time": "2021-08-31T19:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0a03c983-df84-40c3-9a72-ba67390acead",
+      "raceclass": "G12",
+      "order": 224,
+      "start_time": "2021-08-31T19:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9f84651c-22b4-429f-96a1-30aead0d637d",
+      "raceclass": "G12",
+      "order": 225,
+      "start_time": "2021-08-31T19:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9c1faba3-7bdf-42fb-a432-f83921f5951b",
+      "raceclass": "J12",
+      "order": 226,
+      "start_time": "2021-08-31T19:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "6649e061-6052-4d65-b892-275e26a6cc18",
+      "raceclass": "J12",
+      "order": 227,
+      "start_time": "2021-08-31T19:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e429e991-5fe9-4058-b5ca-ffed812f44c0",
+      "raceclass": "J12",
+      "order": 228,
+      "start_time": "2021-08-31T19:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c2b402c7-8af9-41fd-8311-181c006bcc23",
+      "raceclass": "J12",
+      "order": 229,
+      "start_time": "2021-08-31T19:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8478c4da-013d-44c9-9e36-08be8256b834",
+      "raceclass": "J12",
+      "order": 230,
+      "start_time": "2021-08-31T20:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "643c66b5-f107-4ad1-b91b-f6f37efdcb99",
+      "raceclass": "J12",
+      "order": 231,
+      "start_time": "2021-08-31T20:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "34205da3-56f0-4a67-aad3-f1a9439d7c15",
+      "raceclass": "J12",
+      "order": 232,
+      "start_time": "2021-08-31T20:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "f62f42b1-19c9-4a0c-8ad4-9b7d4ad56d88",
+      "raceclass": "G11",
+      "order": 233,
+      "start_time": "2021-08-31T20:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4d7a845e-940a-4630-8707-da28e9d35c76",
+      "raceclass": "G11",
+      "order": 234,
+      "start_time": "2021-08-31T20:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "21fbd19e-108e-4b05-9840-2f2b0d42cd24",
+      "raceclass": "G11",
+      "order": 235,
+      "start_time": "2021-08-31T20:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "25814309-1d8a-43f0-96ab-9b4cb0a4f239",
+      "raceclass": "G11",
+      "order": 236,
+      "start_time": "2021-08-31T20:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a479d8b1-69e9-4c7c-967b-3512f68d03a6",
+      "raceclass": "G11",
+      "order": 237,
+      "start_time": "2021-08-31T20:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "55e39ed4-d504-45b9-965a-78cdb260c8f3",
+      "raceclass": "G11",
+      "order": 238,
+      "start_time": "2021-08-31T20:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5f237669-7eef-4c00-95f1-32e7ee6cb3f5",
+      "raceclass": "J11",
+      "order": 239,
+      "start_time": "2021-08-31T20:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "728f0228-5ead-411c-be43-5b07b31afcec",
+      "raceclass": "J11",
+      "order": 240,
+      "start_time": "2021-08-31T20:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c9a18adf-a484-4344-8475-c3276c9dcbdf",
+      "raceclass": "J11",
+      "order": 241,
+      "start_time": "2021-08-31T20:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "C",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "22b17080-d8f7-48bf-a921-9a10a34ca598",
+      "raceclass": "J11",
+      "order": 242,
+      "start_time": "2021-08-31T20:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7f5bca26-1cb4-45e9-a49c-f60633ad9dfe",
+      "raceclass": "J11",
+      "order": 243,
+      "start_time": "2021-08-31T20:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "51d25c0e-5ad7-442f-be15-d234b919f24e",
+      "raceclass": "J11",
+      "order": 244,
+      "start_time": "2021-08-31T20:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 5,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "B",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "539fc9bc-3fdb-47c3-9e89-ecbcfcb708bc",
+      "raceclass": "J11",
+      "order": 245,
+      "start_time": "2021-08-31T20:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "F",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4551f02d-a200-4c31-a78d-b69873d2c7e6",
+      "raceclass": "G10",
+      "order": 246,
+      "start_time": "2021-08-31T20:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "523d6455-e69d-41f4-b6e2-0835df96708c",
+      "raceclass": "G10",
+      "order": 247,
+      "start_time": "2021-08-31T20:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "dfcc10e2-6e6f-443a-a777-b91ca3dd0bb0",
+      "raceclass": "G10",
+      "order": 248,
+      "start_time": "2021-08-31T20:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0a30b0cb-3119-40ed-96c8-063c554f4ed0",
+      "raceclass": "G10",
+      "order": 249,
+      "start_time": "2021-08-31T21:00:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "904c71d2-a4ec-4980-91a6-19bc2eefa3d6",
+      "raceclass": "G10",
+      "order": 250,
+      "start_time": "2021-08-31T21:02:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b00b1a4f-5b0b-495b-9de9-c4d7e90b034f",
+      "raceclass": "G10",
+      "order": 251,
+      "start_time": "2021-08-31T21:05:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2515aa08-a27a-495f-aca8-488423b7ceee",
+      "raceclass": "G10",
+      "order": 252,
+      "start_time": "2021-08-31T21:07:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 7,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5a18d656-a64f-4244-9a08-7ad89b92f78c",
+      "raceclass": "J10",
+      "order": 253,
+      "start_time": "2021-08-31T21:10:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c47d0495-4c8b-4d9c-afe5-b92bb737abaf",
+      "raceclass": "J10",
+      "order": 254,
+      "start_time": "2021-08-31T21:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "409032a6-1051-4bd4-b9fa-7572b6c9ef57",
+      "raceclass": "J10",
+      "order": 255,
+      "start_time": "2021-08-31T21:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4cd924d7-5e45-4aab-80cc-507af2612e61",
+      "raceclass": "J10",
+      "order": 256,
+      "start_time": "2021-08-31T21:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "7519f0d4-6922-4c12-aadb-56bf45e4a534",
+      "raceclass": "J10",
+      "order": 257,
+      "start_time": "2021-08-31T21:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 5,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "533a57fb-0aab-431b-b7ed-3570ef8050d3",
+      "raceclass": "J10",
+      "order": 258,
+      "start_time": "2021-08-31T21:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 6,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "95386ae7-9b60-4e50-b9d4-38e10e35b9ef",
+      "raceclass": "G10",
+      "order": 259,
+      "start_time": "2021-08-31T21:27:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "65f1c773-d0fa-443b-957a-2c0c96076122",
+      "raceclass": "G10",
+      "order": 260,
+      "start_time": "2021-08-31T21:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "00f40e70-af53-443b-b567-f4a4e1f5d4c5",
+      "raceclass": "G10",
+      "order": 261,
+      "start_time": "2021-08-31T21:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b9c6306a-df11-45f5-85a3-0b96eab409da",
+      "raceclass": "G10",
+      "order": 262,
+      "start_time": "2021-08-31T21:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 4,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "88bfd35c-4686-486a-8b02-b7c3d1c5f0b4",
+      "raceclass": "G10",
+      "order": 263,
+      "start_time": "2021-08-31T21:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 5,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "b592b2e6-b255-4d7a-b886-b67a7a0dcbeb",
+      "raceclass": "G10",
+      "order": 264,
+      "start_time": "2021-08-31T21:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 6,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "8e9d59f5-b674-4cbf-9253-726c4d9a15d5",
+      "raceclass": "G10",
+      "order": 265,
+      "start_time": "2021-08-31T21:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 7,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "23a25307-84db-4169-86fd-3420814a7ab5",
+      "raceclass": "J10",
+      "order": 266,
+      "start_time": "2021-08-31T21:45:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "e2543817-b406-47d5-8c68-ac62886d55da",
+      "raceclass": "J10",
+      "order": 267,
+      "start_time": "2021-08-31T21:47:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c8437d59-2d4f-4d80-8249-6daf4cfb4a5c",
+      "raceclass": "J10",
+      "order": 268,
+      "start_time": "2021-08-31T21:50:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "c98c01bc-a508-4451-9e49-dc4ebc7035ed",
+      "raceclass": "J10",
+      "order": 269,
+      "start_time": "2021-08-31T21:52:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 4,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d4de5480-e145-4194-90c1-227d1550d66d",
+      "raceclass": "J10",
+      "order": 270,
+      "start_time": "2021-08-31T21:55:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 5,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "fb4c4865-e4f7-4a54-b599-1a0ff7dee61f",
+      "raceclass": "J10",
+      "order": 271,
+      "start_time": "2021-08-31T21:57:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 6,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "9f99f3fe-bec8-4e3b-aaa7-a28c6958c972",
+      "raceclass": "G9",
+      "order": 272,
+      "start_time": "2021-08-31T22:12:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2e5e9236-5b10-4b15-8e07-f4e7d06a9e2c",
+      "raceclass": "G9",
+      "order": 273,
+      "start_time": "2021-08-31T22:15:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d4f2f3ac-3e45-461d-92eb-78995e9e04b4",
+      "raceclass": "G9",
+      "order": 274,
+      "start_time": "2021-08-31T22:17:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 3,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "0196219f-cba6-472b-844c-15792d171056",
+      "raceclass": "G9",
+      "order": 275,
+      "start_time": "2021-08-31T22:20:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 4,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5c92fb2e-3750-462e-8388-5ec1b60560c7",
+      "raceclass": "J9",
+      "order": 276,
+      "start_time": "2021-08-31T22:22:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 1,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "65d3ec48-a95f-4164-b00b-9a06c9ef3f37",
+      "raceclass": "J9",
+      "order": 277,
+      "start_time": "2021-08-31T22:25:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R1",
+      "index": "A",
+      "heat": 2,
+      "rule": {
+        "R2": {
+          "A": "ALL"
+        }
+      },
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "5901eba9-4077-4ffd-b914-f497105fd9b3",
+      "raceclass": "G9",
+      "order": 278,
+      "start_time": "2021-08-31T22:30:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "a1a2e74e-d003-4a59-93d0-5e8b53dd0025",
+      "raceclass": "G9",
+      "order": 279,
+      "start_time": "2021-08-31T22:32:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "2c77ee62-2773-47ef-828d-c54e4d92310b",
+      "raceclass": "G9",
+      "order": 280,
+      "start_time": "2021-08-31T22:35:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 3,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "631b605c-c618-4076-a68f-49be7fd47543",
+      "raceclass": "G9",
+      "order": 281,
+      "start_time": "2021-08-31T22:37:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 8,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 4,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "4ac680cb-4835-4025-9f63-f0a585218702",
+      "raceclass": "J9",
+      "order": 282,
+      "start_time": "2021-08-31T22:40:00",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 7,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 1,
+      "rule": {},
+      "datatype": "individual_sprint"
+    },
+    {
+      "id": "d661120a-bed8-44c8-a503-47e406974516",
+      "raceclass": "J9",
+      "order": 283,
+      "start_time": "2021-08-31T22:42:30",
+      "max_no_of_contestants": 10,
+      "no_of_contestants": 6,
+      "event_id": "05f866f7-54db-4de8-a4f1-c4054eb7f68c",
+      "raceplan_id": "8be98b61-9e33-4848-a118-26c6229b3cce",
+      "start_entries": [],
+      "results": {},
+      "round": "R2",
+      "index": "A",
+      "heat": 2,
+      "rule": {},
+      "datatype": "individual_sprint"
+    }
+  ],
+  "no_of_contestants": 668,
+  "id": "8be98b61-9e33-4848-a118-26c6229b3cce"
+}

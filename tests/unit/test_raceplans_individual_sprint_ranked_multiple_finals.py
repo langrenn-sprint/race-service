@@ -17,16 +17,35 @@ async def race_config() -> List[Dict[str, Any]]:
     """A race_config used in competition_format."""
     return [
         {
+            "max_no_of_contestants": 7,
+            "rounds": ["Q", "S", "F"],
+            "no_of_heats": {
+                "Q": {"A": 3},
+                "S": {"A": 2, "C": 0},
+                "F": {"A": 1, "B1": 1, "B2": 1, "C": 1},
+            },
+            "from_to": {
+                "Q": {"A": {"S": {"A": 5, "C": 0}}},
+                "S": {
+                    "A": {"F": {"A": 4, "B1": 2, "B2": "REST"}},
+                    "C": {"F": {"C": 0}},
+                },
+            },
+        },
+        {
             "max_no_of_contestants": 80,
             "rounds": ["Q", "S", "F"],
             "no_of_heats": {
                 "Q": {"A": 3},
                 "S": {"A": 2, "C": 0},
-                "F": {"A": 1, "B": 2, "C": 1},
+                "F": {"A": 1, "B1": 1, "B2": 1, "C": 1},
             },
             "from_to": {
                 "Q": {"A": {"S": {"A": 5, "C": 0}}},
-                "S": {"A": {"F": {"A": 4, "B": 2}}, "C": {"F": {"C": 0}}},
+                "S": {
+                    "A": {"F": {"A": 4, "B1": 2, "B2": "REST"}},
+                    "C": {"F": {"C": 0}},
+                },
             },
         },
     ]
@@ -649,7 +668,7 @@ async def expected_races_individual_sprint_27_contestants(
     return races
 
 
-@pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip("Test not fully implemented.")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint_10_contestants(
@@ -665,6 +684,7 @@ async def test_calculate_raceplan_individual_sprint_10_contestants(
         competition_format_individual_sprint,
         raceclasses_individual_sprint_10_contestants,
     )
+    await _print_raceplan(raceplan, races)
 
     assert type(raceplan) is Raceplan
     assert raceplan.id is None
@@ -730,7 +750,7 @@ async def test_calculate_raceplan_individual_sprint_10_contestants(
         i += 1
 
 
-@pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip("Test not fully implemented.")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint_27_contestants(
@@ -810,7 +830,7 @@ async def test_calculate_raceplan_individual_sprint_27_contestants(
         i += 1
 
 
-@pytest.mark.skip(reason="no way of currently testing this")
+@pytest.mark.skip("Test not fully implemented.")
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_calculate_raceplan_individual_sprint_17_contestants(
