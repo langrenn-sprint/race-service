@@ -171,6 +171,7 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
     for races_in_raceclass in races_grouped_by_raceclass:
         # We find the actual ageclasses in this raceclass:
         ageclasses: List[str] = []
+        ranking: bool = True
         for raceclass in raceclasses:
             if raceclass["name"] == races_in_raceclass[0].raceclass:
                 ranking = raceclass["ranking"]
@@ -200,6 +201,20 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
             for contestant in contestants
             if contestant["ageclass"] in ageclasses
         ]:
+            # Get the actual relevant races and set up control variables:
+            if ranking:
+                target_races = [
+                    race
+                    for race in races
+                    if race.round == competition_format["rounds_ranked_classes"][0]
+                ]
+            else:
+                target_races = [
+                    race
+                    for race in races
+                    if race.round
+                    in [competition_format["rounds_non_ranked_classes"][0]]
+                ]  # pragma: no cover
 
             # Create the start-entry:
             start_entry = StartEntry(
@@ -224,17 +239,6 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
                 no_of_contestants_in_race = 0
 
         # For not ranked ageclasses we generate round 2 also:
-        # TODO: Base this on the races in first round, not contestants:
-        target_races = [
-            race
-            for race in races
-        # TODO: This should be based on the races in first round, not contestants.
-        # Consequently, we should move it out of this module into a separate one: generate_round_n_startlist
-        target_races = [
-            race
-            for race in races_in_raceclass
-            if race.round in [competition_format["rounds_non_ranked_classes"][1]]
-        ]
         race_index = 0
         starting_position = 1
         no_of_contestants_in_race = 0
@@ -244,6 +248,12 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
                 for contestant in contestants
                 if contestant["ageclass"] in ageclasses
             ]:
+                target_races = [
+                    race
+                    for race in races
+                    if race.round
+                    in [competition_format["rounds_non_ranked_classes"][1]]
+                ]
 
                 # Create the start-entry:
                 start_entry = StartEntry(
