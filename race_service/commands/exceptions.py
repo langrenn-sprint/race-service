@@ -116,3 +116,11 @@ class IllegalValueInRaceError(Exception):  # pragma: no cover
         """Initialize the error."""
         # Call the base class constructor with the parameters it needs
         super().__init__(message)
+
+
+class StartlistNotFoundError(Exception):  # pragma: no cover
+    """Class representing custom exception for command."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor
