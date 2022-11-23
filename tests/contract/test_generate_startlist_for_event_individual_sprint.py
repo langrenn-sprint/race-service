@@ -404,6 +404,20 @@ async def test_generate_startlist_for_individual_sprint_event(
                     len(race["start_entries"]) > 0
                 ), f'race with round/order {race["order"]}/{race["round"]} does not have start_entries'
                 no_of_contestants += len(race["start_entries"])
+
+                # We also check that the start_entries are sorted by starting_position:
+                url = f'{http_service}/races/{race["id"]}/start-entries'
+                async with session.get(url) as response:
+                    assert response.status == 200
+                    start_entries = await response.json()
+                _starting_position: List[int] = [
+                    start_entry["starting_position"] for start_entry in start_entries
+                ]
+                assert all(
+                    _starting_position[i] <= _starting_position[i + 1]
+                    for i in range(len(_starting_position) - 1)
+                )
+
                 assert len(race["start_entries"]) <= race["max_no_of_contestants"]
                 assert race["no_of_contestants"] <= race["max_no_of_contestants"]
             assert no_of_contestants == startlist["no_of_contestants"]

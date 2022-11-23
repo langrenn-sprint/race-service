@@ -152,6 +152,13 @@ async def get_start_entries(db: Any, start_entry_ids: list) -> List[StartEntry]:
             db, start_entry_id
         )
         start_entries.append(start_entry)
+
+    # We sort the start-entries on starting_position:
+    start_entries.sort(
+        key=lambda k: (k.starting_position,),
+        reverse=False,
+    )
+
     return start_entries
 
 
