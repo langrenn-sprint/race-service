@@ -60,6 +60,8 @@ async def competition_format() -> Dict[str, Any]:
         "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
+        "rounds_ranked_classes": ["Q", "S", "F"],
+        "rounds_non_ranked_classes": ["R1", "R2"],
         "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
         "max_no_of_contestants_in_race": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "datatype": "individual_sprint",
