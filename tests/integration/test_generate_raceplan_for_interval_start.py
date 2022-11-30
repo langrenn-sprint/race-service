@@ -154,6 +154,10 @@ async def test_generate_raceplan_for_event(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=races,
+    )
 
     headers = {
         hdrs.CONTENT_TYPE: "application/json",
@@ -168,3 +172,59 @@ async def test_generate_raceplan_for_event(
         )
         assert resp.status == 201
         assert f"/raceplans/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+
+
+races = [
+    {
+        "id": "",
+        "raceclass": "G16",
+        "order": 1,
+        "start_time": "2021-08-31T09:00:00",
+        "max_no_of_contestants": 10000,
+        "no_of_contestants": 16,
+        "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "raceplan_id": "",
+        "start_entries": [],
+        "results": {},
+        "datatype": "interval_start",
+    },
+    {
+        "id": "",
+        "raceclass": "J16",
+        "order": 2,
+        "start_time": "2021-08-31T09:08:00",
+        "max_no_of_contestants": 10000,
+        "no_of_contestants": 18,
+        "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "raceplan_id": "",
+        "start_entries": [],
+        "results": {},
+        "datatype": "interval_start",
+    },
+    {
+        "id": "",
+        "raceclass": "G15",
+        "order": 3,
+        "start_time": "2021-08-31T09:27:00",
+        "max_no_of_contestants": 10000,
+        "no_of_contestants": 15,
+        "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "raceplan_id": "",
+        "start_entries": [],
+        "results": {},
+        "datatype": "interval_start",
+    },
+    {
+        "id": "",
+        "raceclass": "J15",
+        "order": 4,
+        "start_time": "2021-08-31T09:34:30",
+        "max_no_of_contestants": 10000,
+        "no_of_contestants": 17,
+        "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "raceplan_id": "",
+        "start_entries": [],
+        "results": {},
+        "datatype": "interval_start",
+    },
+]

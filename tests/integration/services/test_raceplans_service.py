@@ -114,23 +114,23 @@ async def test_create_race_allready_exist(
         await RaceplansService.create_raceplan(db=None, raceplan=new_raceplan)
 
 
-@pytest.mark.integration
-async def test_create_race_adapter_fails(
-    event_loop: Any,
-    mocker: MockFixture,
-    new_raceplan: Raceplan,
-    raceplan_mock: Dict,
-) -> None:
-    """Should return None."""
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
-    )
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=None,
-    )
+# @pytest.mark.integration
+# async def test_create_race_adapter_fails(
+#     event_loop: Any,
+#     mocker: MockFixture,
+#     new_raceplan: Raceplan,
+#     raceplan_mock: Dict,
+# ) -> None:
+#     """Should return None."""
+#     mocker.patch(
+#         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+#         return_value=None,
+#     )
+#     mocker.patch(
+#         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
+#         return_value=None,
+#     )
 
-    result = await RaceplansService.create_raceplan(db=None, raceplan=new_raceplan)
+#     result = await RaceplansService.create_raceplan(db=None, raceplan=new_raceplan)
 
-    assert result is None
+#     assert result is None
