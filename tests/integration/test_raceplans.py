@@ -477,6 +477,10 @@ async def test_update_raceplan_by_id(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=RACEPLAN_ID,
     )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=raceplan_interval_start["races"],
+    )
 
     headers = {
         hdrs.CONTENT_TYPE: "application/json",

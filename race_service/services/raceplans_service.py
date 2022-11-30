@@ -3,7 +3,7 @@ import logging
 from typing import Any, List, Optional
 import uuid
 
-from race_service.adapters import RaceplansAdapter
+from race_service.adapters import RaceplansAdapter, RacesAdapter
 from race_service.models import Raceplan
 from .exceptions import IllegalValueException
 
@@ -85,10 +85,10 @@ class RaceplansService:
             raise RaceplanAllreadyExistException(
                 f'Event "{raceplan.event_id}" already has a raceplan.'
             )
-        # Validation:
-        await validate_raceplan(db, raceplan)
         if raceplan.id:
             raise IllegalValueException("Cannot create raceplan with input id.")
+        # Validation:
+        await validate_raceplan(db, raceplan)
         # create ids:
         id = create_id()
         raceplan.id = id
@@ -121,6 +121,9 @@ class RaceplansService:
         if old_raceplan:
             if raceplan.id != old_raceplan["id"]:
                 raise IllegalValueException("Cannot change id for raceplan.")
+            # Validation:
+            await validate_raceplan(db, raceplan)
+
             new_raceplan = raceplan.to_dict()
             result = await RaceplansAdapter.update_raceplan(db, id, new_raceplan)
             return result
@@ -141,7 +144,18 @@ class RaceplansService:
 
 
 #   Validation:
-async def validate_raceplan(db: Any, raceplan: Raceplan) -> None:
+async def validate_raceplan(db: Any, raceplan: Raceplan) -> None:  # pragma: no cover
     """Validate the raceplan."""
-    # TODO: validate raceplan-properties.
-    pass
+    # Check that all races sorted on order has increasing start-time:
+    races: List[dict] = []
+    for race_id in raceplan.races:
+        race = await RacesAdapter.get_race_by_id(db, race_id)
+        races.append(race)
+
+    races.sort(key=lambda x: x["order"])
+
+    if not all(
+        races[i]["start_time"] <= races[i + 1]["start_time"]
+        for i in range(len(races) - 1)
+    ):
+        raise IllegalValueException("Races in raceplan not sorted on start-time.")
