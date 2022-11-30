@@ -1,6 +1,5 @@
 """Module for raceplan commands."""
 from datetime import date, time
-import json
 from typing import Any, Dict, List
 
 from race_service.adapters import (
@@ -9,7 +8,6 @@ from race_service.adapters import (
     EventsAdapter,
     RaceplansAdapter,
 )
-from race_service.models import IndividualSprintRace
 from race_service.services import (
     RaceplanAllreadyExistException,
     RaceplansService,
@@ -73,7 +71,6 @@ class RaceplansCommands:
             )
         # Finally we store the races and the raceplan and return the id to the plan:
         raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
-        await _dump_races_to_json(races)
         if raceplan_id:
             for race in races:
                 race.raceplan_id = raceplan_id
@@ -255,17 +252,3 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C90
                 f'Ranking-value differs in group {raceclass["group"]}.'
             )
     return raceclasses
-
-
-async def _dump_races_to_json(races: List[IndividualSprintRace]) -> None:
-    _races = []
-    for _race in races:
-        _race_dict = _race.to_dict()
-        _races.append(_race_dict)
-
-    with open(
-        "tests/files/tmp_races.json",
-        "w",
-    ) as file:
-        json.dump(_races, file)
-    pass
