@@ -36,7 +36,7 @@ def unit_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m unit",
-        "-rA",
+        "-ra",
         *args,
     )
 
@@ -59,7 +59,7 @@ def integration_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m integration",
-        "-rA",
+        "-ra",
         *args,
         env={
             "CONFIG": "test",
