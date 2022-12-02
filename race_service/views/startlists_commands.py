@@ -21,13 +21,13 @@ from race_service.adapters import (
 from race_service.commands import (
     CompetitionFormatNotSupportedException,
     DuplicateRaceplansInEventException,
+    generate_startlist_for_event,
     InconsistentInputDataException,
     InconsistentValuesInContestantsException,
     InvalidDateFormatException,
     MissingPropertyException,
     NoRaceplanInEventException,
     NoRacesInRaceplanException,
-    StartlistsCommands,
 )
 from race_service.services import StartlistAllreadyExistException
 from .utils import extract_token_from_request
@@ -60,9 +60,7 @@ class GenerateStartlistForEventView(View):
 
         event_id = request_body["event_id"]
         try:
-            startlist_id = await StartlistsCommands.generate_startlist_for_event(
-                db, token, event_id
-            )
+            startlist_id = await generate_startlist_for_event(db, token, event_id)
         except EventNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
         except (

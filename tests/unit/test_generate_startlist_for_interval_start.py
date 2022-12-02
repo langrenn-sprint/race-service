@@ -19,7 +19,6 @@ async def test_generate_startlist_for_interval_start(
     event_interval_start: dict,
     competition_format_interval_start: dict,
     raceclasses: List[dict],
-    raceplan_interval_start: Raceplan,
     races_interval_start: List[IntervalStartRace],
     contestants: List[dict],
     expected_startlist_interval_start: Startlist,
@@ -30,7 +29,6 @@ async def test_generate_startlist_for_interval_start(
         event_interval_start,
         competition_format_interval_start,
         raceclasses,
-        raceplan_interval_start,
         races_interval_start,
         contestants,
     )

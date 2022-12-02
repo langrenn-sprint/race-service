@@ -30,7 +30,6 @@ async def test_generate_startlist_for_individual_sprint(
         event_individual_sprint,
         competition_format_individual_sprint,
         raceclasses,
-        raceplan_individual_sprint,
         races_individual_sprint,
         contestants,
     )

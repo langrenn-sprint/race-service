@@ -19,7 +19,6 @@ async def test_generate_startlist_for_individual_sprint_not_ranked(
     event_individual_sprint: dict,
     competition_format_individual_sprint: dict,
     raceclasses: List[dict],
-    raceplan_individual_sprint: Raceplan,
     races_individual_sprint: List[IndividualSprintRace],
     contestants: List[dict],
     expected_startlist_individual_sprint: Startlist,
@@ -30,7 +29,6 @@ async def test_generate_startlist_for_individual_sprint_not_ranked(
         event_individual_sprint,
         competition_format_individual_sprint,
         raceclasses,
-        raceplan_individual_sprint,
         races_individual_sprint,
         contestants,
     )
