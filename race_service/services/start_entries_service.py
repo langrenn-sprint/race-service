@@ -35,10 +35,14 @@ class StartEntriesService:
     """Class representing a service for start_entries."""
 
     @classmethod
-    async def get_start_entries_by_bib(cls: Any, db: Any, bib: int) -> List[StartEntry]:
+    async def get_start_entries_by_bib(
+        cls: Any, db: Any, race_id: str, bib: int
+    ) -> List[StartEntry]:
         """Get all start_entries by race_id function."""
         start_entries: List[StartEntry] = []
-        _start_entries = await StartEntriesAdapter.get_start_entries_by_bib(db, bib)
+        _start_entries = await StartEntriesAdapter.get_start_entries_by_bib(
+            db, race_id, bib
+        )
 
         if _start_entries:
             for _start_entry in _start_entries:
