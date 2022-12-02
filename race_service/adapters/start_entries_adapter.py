@@ -7,11 +7,18 @@ class StartEntriesAdapter:
 
     @classmethod
     async def get_start_entries_by_bib(
-        cls: Any, db: Any, bib: int
+        cls: Any, db: Any, race_id: str, bib: int
     ) -> List[dict]:  # pragma: no cover
         """Get start_entries by race_id function."""
         start_entries: List = []
-        cursor = db.start_entries_collection.find({"bib": bib})
+        cursor = db.start_entries_collection.find(
+            {
+                "$and": [
+                    {"race_id": race_id},
+                    {"bib": bib},
+                ]
+            }
+        )
         for start_entry in await cursor.to_list(None):
             start_entries.append(start_entry)
         return start_entries
