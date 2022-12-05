@@ -58,6 +58,11 @@ def clean(session: Session) -> None:
         ".mypy_cache",
         external=True,
     )
+    session.run(
+        "rm",
+        ".coverage",
+        external=True,
+    )
 
 
 @session(python="3.10")
