@@ -228,7 +228,7 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
         # TODO: Base this on the races in first round, not contestants:
         target_races = [
             race
-            for race in races
+            for race in races_in_raceclass
             if race.round in [competition_format["rounds_non_ranked_classes"][1]]
         ]
         race_index = 0
