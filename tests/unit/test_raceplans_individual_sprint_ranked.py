@@ -29,7 +29,7 @@ async def competition_format_individual_sprint() -> dict:
         "datatype": "individual_sprint",
         "race_config_non_ranked": [
             {
-                "max_no_of_contestants": 7,
+                "max_no_of_contestants": 8,
                 "rounds": ["R1", "R2"],
                 "no_of_heats": {"R1": {"A": 1}, "R2": {"A": 1}},
                 "from_to": {"R1": {"A": {"R2": {"A": "ALL"}}}},
@@ -79,7 +79,7 @@ async def competition_format_individual_sprint() -> dict:
         ],
         "race_config_ranked": [
             {
-                "max_no_of_contestants": 7,
+                "max_no_of_contestants": 8,
                 "rounds": ["Q", "F"],
                 "no_of_heats": {"Q": {"A": 1}, "F": {"A": 1, "B": 0, "C": 0}},
                 "from_to": {
