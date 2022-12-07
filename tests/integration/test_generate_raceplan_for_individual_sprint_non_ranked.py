@@ -46,7 +46,7 @@ async def race_config() -> List[Dict[str, Any]]:
     """A race_config used in competition_format."""
     return [
         {
-            "max_no_of_contestants": 7,
+            "max_no_of_contestants": 8,
             "rounds": ["R1", "R2"],
             "no_of_heats": {
                 "R1": {"A": 1},
