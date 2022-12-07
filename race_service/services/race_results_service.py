@@ -147,9 +147,15 @@ class RaceResultsService:
             start_entries: List[
                 StartEntry
             ] = await StartEntriesService.get_start_entries_by_race_id(db, race.id)
-            if time_event.bib not in [start_entry.bib for start_entry in start_entries]:
+            # For "Template" timing-point, we don't check if bib is in start-entries:
+            if (
+                time_event.timing_point.lower() != "Template".lower()
+                and time_event.bib
+                not in [start_entry.bib for start_entry in start_entries]
+            ):
                 raise ContestantNotInStartEntriesException(
-                    f"Contestant with bib {time_event.bib} is not in race start-entries"
+                    f'Error in time-event "{time_event.timing_point}": '
+                    f"Contestant with bib {time_event.bib} is not in race start-entries."
                 )
             # Check if race_result exist for this timing-point:
             race_results = (
