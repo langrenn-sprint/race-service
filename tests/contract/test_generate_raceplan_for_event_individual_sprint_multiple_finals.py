@@ -340,7 +340,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all_1(
             assert raceplan["event_id"] == request_body["event_id"]
 
             await _print_raceplan(raceplan)
-            await _dump_raceplan_to_json("all", raceplan)
+            await _dump_raceplan_to_json("all_1", raceplan)
 
             with open(
                 "tests/files/expected_raceplan_individual_sprint_multiple_finals_1.json",
@@ -523,7 +523,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all_2(
             assert raceplan["event_id"] == request_body["event_id"]
 
             await _print_raceplan(raceplan)
-            await _dump_raceplan_to_json("all", raceplan)
+            await _dump_raceplan_to_json("all_2", raceplan)
 
             with open(
                 "tests/files/expected_raceplan_individual_sprint_multiple_finals_2.json",
