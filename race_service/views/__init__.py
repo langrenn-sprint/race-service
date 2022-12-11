@@ -2,7 +2,7 @@
 from .liveness import Ping, Ready
 from .race_results import RaceResultsView, RaceResultView
 from .raceplans import RaceplansView, RaceplanView
-from .raceplans_commands import GenerateRaceplanForEventView
+from .raceplans_commands import GenerateRaceplanForEventView, ValidateRaceplanView
 from .races import RacesView, RaceView
 from .start_entries import StartEntriesView, StartEntryView
 from .startlists import StartlistsView, StartlistView
