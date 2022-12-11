@@ -4,7 +4,8 @@ import os
 from typing import Any
 
 from aiohttp import web
-from aiohttp_middlewares import cors_middleware, error_middleware
+from aiohttp_middlewares.cors import cors_middleware
+from aiohttp_middlewares.error import error_middleware
 import motor.motor_asyncio
 
 from .views import (
@@ -24,6 +25,7 @@ from .views import (
     StartlistView,
     TimeEventsView,
     TimeEventView,
+    ValidateRaceplanView,
 )
 
 
@@ -53,6 +55,7 @@ async def create_app() -> web.Application:
                 "/raceplans/generate-raceplan-for-event", GenerateRaceplanForEventView
             ),
             web.view("/raceplans/{raceplanId}", RaceplanView),
+            web.view("/raceplans/{raceplanId}/validate", ValidateRaceplanView),
             web.view("/races", RacesView),
             web.view("/races/{raceId}", RaceView),
             web.view("/races/{raceId}/race-results", RaceResultsView),
@@ -91,6 +94,6 @@ async def create_app() -> web.Application:
 
         mongo.close()
 
-    app.cleanup_ctx.append(mongo_context)
+    app.cleanup_ctx.append(mongo_context)  # type: ignore
 
     return app
