@@ -397,6 +397,29 @@ async def test_get_raceplan(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_validate_raceplan(
+    http_service: Any, token: MockFixture, context: dict
+) -> None:
+    """Should return 200 OK and and a body with a list of results."""
+    raceplan_id = context["id"]
+    url = f"{http_service}/raceplans/{raceplan_id}/validate"
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    session = ClientSession()
+    async with session.post(url, headers=headers) as response:
+        status = response.status
+        results = await response.json()
+    await session.close()
+
+    assert status == 200
+    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert type(results) is dict
+    assert len(results) == 0
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_update_race(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:

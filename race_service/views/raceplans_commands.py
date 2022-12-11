@@ -1,4 +1,5 @@
 """Resource module for raceplan command resources."""
+import json
 import os
 
 from aiohttp import hdrs
@@ -26,7 +27,11 @@ from race_service.commands import (
     NoRaceclassesInEventException,
     RaceplansCommands,
 )
-from race_service.services import RaceplanAllreadyExistException
+from race_service.services import (
+    RaceplanAllreadyExistException,
+    RaceplanNotFoundException,
+    RaceplansService,
+)
 from .utils import extract_token_from_request
 
 load_dotenv()
@@ -73,3 +78,33 @@ class GenerateRaceplanForEventView(View):
             raise HTTPBadRequest(reason=str(e)) from e
         headers = MultiDict([(hdrs.LOCATION, f"{BASE_URL}/raceplans/{raceplan_id}")])
         return Response(status=201, headers=headers)
+
+
+class ValidateRaceplanView(View):
+    """Class representing the validation of a given raceplan."""
+
+    async def post(self) -> Response:
+        """Post route function."""
+        # Authorize:
+        db = self.request.app["db"]
+        token = extract_token_from_request(self.request)
+        assert token  # noqa: S101
+        try:
+            await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
+        except Exception as e:  # pragma: no cover
+            raise e
+
+        raceplan_id = self.request.match_info["raceplanId"]
+
+        # Fetch the raceplan:
+        try:
+            raceplan = await RaceplansService.get_raceplan_by_id(db, raceplan_id)
+        except RaceplanNotFoundException as e:  # pragma: no cover
+            raise HTTPNotFound(reason=str(e)) from e
+
+        # Validate
+        result = await RaceplansCommands.validate_raceplan(db, token, raceplan)
+        headers = MultiDict([(hdrs.CONTENT_TYPE, "application/json")])
+        body = json.dumps(result, default=str, ensure_ascii=False)
+
+        return Response(status=200, headers=headers, body=body)

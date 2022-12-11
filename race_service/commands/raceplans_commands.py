@@ -7,7 +7,9 @@ from race_service.adapters import (
     EventNotFoundException,
     EventsAdapter,
     RaceplansAdapter,
+    RacesAdapter,
 )
+from race_service.models import Raceplan
 from race_service.services import (
     RaceplanAllreadyExistException,
     RaceplansService,
@@ -86,6 +88,93 @@ class RaceplansCommands:
         raise CouldNotCreateRaceplanException(
             "Something went wrong when creating raceplan."
         ) from None
+
+    @classmethod
+    async def validate_raceplan(  # noqa: C901
+        cls: Any, db: Any, token: str, raceplan: Raceplan
+    ) -> Dict[int, List[str]]:
+        """Validate a given raceplan and return validation results."""
+        # First we get the event from the event-service:
+        try:
+            event = await get_event(token, raceplan.event_id)
+        except EventNotFoundException as e:  # pragma: no cover
+            raise e from e
+        # We fetch the competition-format:
+        try:
+            competition_format = await get_competition_format(
+                token, raceplan.event_id, event["competition_format"]
+            )
+        except CompetitionFormatNotFoundException as e:  # pragma: no cover
+            raise CompetitionFormatNotSupportedException(
+                f'Competition-format {event["competition_format"]} is not supported.'
+            ) from e
+        # Then we fetch the raceclasses:
+        raceclasses = await get_raceclasses(token, raceplan.event_id)
+
+        results: Dict[int, List[str]] = {}
+
+        races: List[Dict] = []
+        for race_id in raceplan.races:
+            race = await RacesAdapter.get_race_by_id(db, race_id)
+            races.append(race)
+
+        races.sort(key=lambda x: x["order"])
+
+        # Check if races are in chronological order:
+        for i in range(0, len(races) - 1):
+            if races[i]["start_time"] >= races[i + 1]["start_time"]:
+                results[races[i + 1]["order"]] = [
+                    "Start time is not in chronological order."
+                ]
+
+        # Check each race and sum up the number of contestants:
+        sum_no_of_contestants = 0
+        for race in races:
+            # Check if race has contestants:
+            if race["no_of_contestants"] == 0:
+                if race["order"] in results:
+                    results[race["order"]].append("Race has no contestants.")
+                else:
+                    results[race["order"]] = [("Race has no contestants.")]
+
+            # Sum up the number of contestants in first rounds:
+            if race["round"] in [
+                competition_format["rounds_ranked_classes"][0],
+                competition_format["rounds_non_ranked_classes"][0],
+            ]:
+                sum_no_of_contestants += race["no_of_contestants"]
+
+        # Check if the sum of contestants in races is equal to the number of contestants in the raceplan:
+        if sum_no_of_contestants != raceplan.no_of_contestants:
+            results[0] = [
+                f"The sum of contestants in races ({sum_no_of_contestants})"
+                f" is not equal to the number of contestants in the raceplan ({raceplan.no_of_contestants})."
+            ]
+
+        # Check if the number of contestants in the plan is equal to
+        # the number of contestants in the raceclasses:
+        no_of_contestants_in_raceclasses = sum(
+            raceclass["no_of_contestants"] for raceclass in raceclasses
+        )
+        if raceplan.no_of_contestants != no_of_contestants_in_raceclasses:
+            if 0 in results:
+                results[0].append(
+                    (
+                        f"Number of contestants in raceplan ({raceplan.no_of_contestants})"
+                        " is not equal to the number of contestants"
+                        f" in the raceclasses ({no_of_contestants_in_raceclasses})."
+                    )
+                )
+            else:  # pragma: no cover
+                results[0] = [
+                    (
+                        f"Number of contestants in raceplan ({raceplan.no_of_contestants})"
+                        f" is not equal to the number of contestants"
+                        f"in the raceclasses ({no_of_contestants_in_raceclasses})."
+                    )
+                ]
+
+        return results
 
 
 # helpers
@@ -249,6 +338,6 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C90
     for _raceclasses in raceclasses_grouped:
         if len(set([r["ranking"] for r in _raceclasses])) > 1:
             raise InconsistentValuesInRaceclassesException(
-                f'Ranking-value differs in group {raceclass["group"]}.'
+                f'Ranking-value differs in group {_raceclasses[0]["group"]}.'
             )
     return raceclasses
