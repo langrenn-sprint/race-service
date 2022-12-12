@@ -166,23 +166,26 @@ async def get_race_results(db: Any, race_results: dict) -> Dict[str, RaceResult]
     """Get the race results in sorted order."""
     results: Dict[str, RaceResult] = {}
     for key in race_results:
-        race_result: RaceResult = await RaceResultsService.get_race_result_by_id(
-            db, race_results[key]
-        )
-        ranking_sequence: List[TimeEvent] = []
-        for time_event_id in race_result.ranking_sequence:
-            time_event = await TimeEventsService.get_time_event_by_id(db, time_event_id)
-            ranking_sequence.append(time_event)
-        # We sort the time-events on rank:
-        ranking_sequence_sorted = sorted(
-            ranking_sequence,
-            key=lambda k: (
-                k.rank is not None,
-                k.rank != "",
-                k.rank,
-            ),
-            reverse=False,
-        )
-        race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore
-        results[key] = race_result
+        if key.lower() != "Template".lower():  # We skip the template
+            race_result: RaceResult = await RaceResultsService.get_race_result_by_id(
+                db, race_results[key]
+            )
+            ranking_sequence: List[TimeEvent] = []
+            for time_event_id in race_result.ranking_sequence:
+                time_event = await TimeEventsService.get_time_event_by_id(
+                    db, time_event_id
+                )
+                ranking_sequence.append(time_event)
+            # We sort the time-events on rank:
+            ranking_sequence_sorted = sorted(
+                ranking_sequence,
+                key=lambda k: (
+                    k.rank is not None,
+                    k.rank != "",
+                    k.rank,
+                ),
+                reverse=False,
+            )
+            race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore
+            results[key] = race_result
     return results
