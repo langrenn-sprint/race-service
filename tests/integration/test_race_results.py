@@ -105,6 +105,29 @@ TIME_EVENTS: List[dict] = [
             }
         ],
     },
+    {
+        "id": "time_event_3",
+        "bib": 2,
+        "event_id": "event_1",
+        "name": "Petter Propell",
+        "club": "Barnehagen",
+        "race": "race_name",
+        "race_id": "race_1",
+        "timing_point": "Template",
+        "rank": 2,
+        "registration_time": "12:02:02",
+        "next_race": "semi_name1",
+        "next_race_id": "semi_1",
+        "next_race_position": 1,
+        "status": "OK",
+        "changelog": [
+            {
+                "timestamp": "2021-11-08T22:06:30",
+                "user_id": "test",
+                "comment": "hello",
+            }
+        ],
+    },
 ]
 
 
@@ -202,6 +225,9 @@ async def test_get_race_result_by_id(
         assert body["no_of_contestants"] == race_result["no_of_contestants"]
         assert "ranking_sequence" in body
         assert type(body["ranking_sequence"]) is list
+        assert (
+            len(body["ranking_sequence"]) == len(TIME_EVENTS) - 1
+        )  # Template should not be included
         for time_event in body["ranking_sequence"]:
             assert type(time_event) is dict
             expected_time_event = get_time_event_by_id(db=None, id=time_event["id"])
