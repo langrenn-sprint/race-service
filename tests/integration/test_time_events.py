@@ -175,6 +175,10 @@ async def test_create_time_event(
         return_value=TIME_EVENT_ID,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
         return_value=TIME_EVENT_ID,
     )
@@ -243,6 +247,10 @@ async def test_create_time_event_race_result_not_found(
     mocker.patch(
         "race_service.services.time_events_service.create_id",
         return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
@@ -320,6 +328,10 @@ async def test_create_time_event_contestant_not_in_race(
     mocker.patch(
         "race_service.services.time_events_service.create_id",
         return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
@@ -593,6 +605,10 @@ async def test_create_time_event_with_input_id(
         return_value=TIME_EVENT_ID,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=None,
     )
@@ -625,6 +641,10 @@ async def test_create_time_event_race_not_found(
     mocker.patch(
         "race_service.services.time_events_service.create_id",
         return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
@@ -698,6 +718,10 @@ async def test_create_time_event_does_not_reference_race(
         return_value=TIME_EVENT_ID,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=None,
     )
@@ -767,6 +791,10 @@ async def test_create_time_event_is_not_identifiable(
         return_value=TIME_EVENT_ID,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=None,
     )
@@ -821,6 +849,10 @@ async def test_create_time_event_adapter_fails(
         return_value=None,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
         return_value=None,
     )
@@ -853,6 +885,10 @@ async def test_create_time_event_mandatory_property(
         return_value=time_event,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
         return_value=TIME_EVENT_ID,
     )
@@ -873,6 +909,77 @@ async def test_create_time_event_mandatory_property(
 
         resp = await client.post("/time-events", headers=headers, json=request_body)
         assert resp.status == 422
+
+
+@pytest.mark.integration
+async def test_create_time_event_bib_timing_point_exist(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    start_entry: dict,
+    race: dict,
+    race_result: dict,
+    new_time_event: dict,
+    time_event: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    TIME_EVENT_ID = time_event["id"]
+    mocker.patch(
+        "race_service.services.time_events_service.create_id",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[time_event],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        return_value=[race_result],
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[start_entry],
+    )
+
+    request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8080/authorize", status=204)
+        resp = await client.post("/time-events", headers=headers, data=request_body)
+        assert resp.status == 400
 
 
 @pytest.mark.integration
@@ -1005,6 +1112,10 @@ async def test_create_time_event_no_authorization(
         return_value=TIME_EVENT_ID,
     )
     mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
+    )
+    mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
         return_value=TIME_EVENT_ID,
     )
@@ -1032,6 +1143,10 @@ async def test_update_time_event_by_id_no_authorization(
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -1091,6 +1206,10 @@ async def test_create_time_event_insufficient_role(
     mocker.patch(
         "race_service.services.time_events_service.create_id",
         return_value=TIME_EVENT_ID,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",

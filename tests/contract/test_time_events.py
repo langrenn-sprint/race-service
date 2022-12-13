@@ -450,6 +450,25 @@ async def test_create_time_event(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_create_same_time_event(
+    http_service: Any, token: MockFixture, new_time_event: dict
+) -> None:
+    """Should return 400 Bad request."""
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    request_body = json.dumps(new_time_event, indent=4, sort_keys=True, default=str)
+    async with ClientSession() as session:
+        url = f"{http_service}/time-events"
+        async with session.post(url, headers=headers, data=request_body) as response:
+            assert (
+                response.status == 400
+            ), "POST of new_time_event succeeded, should have failed."
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_get_all_time_events(http_service: Any, token: MockFixture) -> None:
     """Should return OK and a list of time_events as json."""
     url = f"{http_service}/time-events"
