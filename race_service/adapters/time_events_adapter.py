@@ -48,7 +48,7 @@ class TimeEventsAdapter:
         """Get time_events by event_id function."""
         time_events: List = []
         cursor = db.time_events_collection.find(
-            {"event_id": event_id, "timing_point": timing_point}
+            {"$and": [{"event_id": event_id, "timing_point": timing_point}]}
         )
         for time_event in await cursor.to_list(None):
             time_events.append(time_event)
