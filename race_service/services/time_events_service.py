@@ -31,6 +31,15 @@ class TimeEventNotFoundException(Exception):
         super().__init__(message)
 
 
+class TimeEventAllreadyExistException(Exception):
+    """Class representing custom exception for fetch method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class TimeEventsService:
     """Class representing a service for time_events."""
 
@@ -94,12 +103,24 @@ class TimeEventsService:
         Raises:
             CouldNotCreateTimeEventException: creation failed
             IllegalValueException: input object has illegal values
+            TimeEventAllreadyExistException: time_event for bib and given timing-point already exists
         """
         logging.debug(f"trying to insert time_event: {time_event}")
         # Validation:
         await validate_time_event(db, time_event)
         if time_event.id:
             raise IllegalValueException("Cannot create time_event with input id.")
+        # If time-event for bib and given timing-point already exists, throw error:
+        _time_events = (
+            await TimeEventsAdapter.get_time_events_by_event_id_and_timing_point(
+                db, time_event.event_id, time_event.timing_point
+            )
+        )
+        for _time_event in _time_events:
+            if _time_event["bib"] == time_event.bib:
+                raise TimeEventAllreadyExistException(
+                    f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point} already exists."  # noqa: B950
+                )
         # create ids:
         id = create_id()
         time_event.id = id

@@ -30,6 +30,7 @@ from .startlists_service import (
 )
 from .time_events_service import (
     CouldNotCreateTimeEventException,
+    TimeEventAllreadyExistException,
     TimeEventNotFoundException,
     TimeEventsService,
 )
