@@ -52,6 +52,7 @@ async def competition_format() -> Dict[str, Any]:
         "intervals": "00:00:30",
         "max_no_of_contestants_in_raceclass": 10000,
         "max_no_of_contestants_in_race": 10000,
+        "timezone": "Europe/Oslo",
     }
 
 

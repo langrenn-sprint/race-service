@@ -62,6 +62,7 @@ async def competition_format() -> Dict[str, Any]:
         "time_between_heats": "00:02:30",
         "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
         "max_no_of_contestants_in_race": MAX_NO_OF_CONTESTANTS_IN_RACE,
+        "timezone": "Europe/Oslo",
         "datatype": "individual_sprint",
     }
 
