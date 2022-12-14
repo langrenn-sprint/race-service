@@ -372,7 +372,7 @@ async def get_races(
 async def get_event(token: str, event_id: str) -> dict:
     """Get the event and validate."""
     try:
-        event = await EventsAdapter.get_event_by_id(token, event_id)
+        event = await EventsAdapter.get_event_by_id(event_id=event_id)
     except EventNotFoundException as e:
         raise e from e
     # Check if the event has a competition-format:
@@ -423,7 +423,7 @@ async def get_competition_format(
     """Get the competition-format."""
     try:
         competition_format = await EventsAdapter.get_competition_format(
-            token, event_id, competition_format_name
+            event_id, competition_format_name
         )
     except CompetitionFormatNotFoundException as e:
         raise e from e
@@ -443,7 +443,7 @@ async def get_competition_format(
 async def get_raceclasses(token: str, event_id: str) -> List[dict]:
     """Get the raceclasses in the event."""
     try:
-        raceclasses = await EventsAdapter.get_raceclasses(token, event_id)
+        raceclasses = await EventsAdapter.get_raceclasses(event_id)
     except RaceclassesNotFoundException as e:
         raise e from e
     if not raceclasses or len(raceclasses) == 0:
@@ -459,7 +459,7 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:
 async def get_contestants(token: str, event_id: str) -> List[dict]:
     """Get the contestants in the event."""
     try:
-        contestants = await EventsAdapter.get_contestants(token, event_id)
+        contestants = await EventsAdapter.get_contestants(event_id)
     except ContestantsNotFoundException as e:
         raise e from e
     if not contestants or len(contestants) == 0:

@@ -51,9 +51,7 @@ class EventsAdapter:
     """Class representing an adapter for events."""
 
     @classmethod
-    async def get_event_by_id(
-        cls: Any, token: str, event_id: str
-    ) -> dict:  # pragma: no cover
+    async def get_event_by_id(cls: Any, event_id: str) -> dict:  # pragma: no cover
         """Get event from event-service."""
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}"
 
@@ -73,7 +71,7 @@ class EventsAdapter:
 
     @classmethod
     async def get_competition_format(
-        cls: Any, token: str, event_id: str, competition_format_name: str
+        cls: Any, event_id: str, competition_format_name: str
     ) -> dict:  # pragma: no cover
         """Get competition_format from event-service."""
         async with ClientSession() as session:
@@ -120,7 +118,7 @@ class EventsAdapter:
 
     @classmethod
     async def get_raceclasses(
-        cls: Any, token: str, event_id: str
+        cls: Any, event_id: str
     ) -> List[dict]:  # pragma: no cover
         """Get raceclasses from event-service."""
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/raceclasses"
@@ -145,7 +143,7 @@ class EventsAdapter:
 
     @classmethod
     async def get_contestants(
-        cls: Any, token: str, event_id: str
+        cls: Any, event_id: str
     ) -> List[dict]:  # pragma: no cover
         """Get contestants from event-service."""
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
