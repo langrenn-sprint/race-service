@@ -6,5 +6,6 @@
   "intervals": "00:00:30",
   "max_no_of_contestants_in_raceclass": 1000,
   "max_no_of_contestants_in_race": 10000,
+  "timezone": "Europe/Oslo",
   "datatype": "interval_start"
 }
