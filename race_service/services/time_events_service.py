@@ -117,10 +117,11 @@ class TimeEventsService:
             )
         )
         for _time_event in _time_events:
-            if _time_event["bib"] == time_event.bib:
-                raise TimeEventAllreadyExistException(
-                    f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point} already exists."  # noqa: B950
-                )
+            if _time_event["timing_point"] != "Template":
+                if _time_event["bib"] == time_event.bib:
+                    raise TimeEventAllreadyExistException(
+                        f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point} already exists."  # noqa: B950
+                    )
         # create ids:
         id = create_id()
         time_event.id = id
