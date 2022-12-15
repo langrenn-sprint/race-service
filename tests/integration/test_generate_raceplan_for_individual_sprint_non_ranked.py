@@ -151,7 +151,6 @@ async def competition_format(race_config: Dict) -> Dict[str, Any]:
         "rounds_non_ranked_classes": ["R1", "R2"],
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
-        "timezone": "Europe/Oslo",
         "datatype": "individual_sprint",
         "race_config_non_ranked": race_config,
         "race_config_ranked": None,

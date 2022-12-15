@@ -36,7 +36,6 @@ async def competition_format_individual_sprint() -> dict:
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
         "datatype": "individual_sprint",
-        "timezone": "Europe/Oslo",
         "race_config_non_ranked": [
             {
                 "max_no_of_contestants": 8,
