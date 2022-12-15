@@ -85,7 +85,6 @@ async def competition_format_individual_sprint() -> dict:
         "time_between_heats": "00:02:30",
         "max_no_of_contestants_in_raceclass": 80,
         "max_no_of_contestants_in_race": 10,
-        "timezone": "Europe/Oslo",
         "datatype": "individual_sprint",
     }
 
