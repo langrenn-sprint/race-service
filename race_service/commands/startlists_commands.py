@@ -86,7 +86,7 @@ class StartlistsCommands:
         if len(contestants) != raceplan.no_of_contestants:
             raise InconsistentInputDataException(
                 "len(contestants) does not match number of contestants in raceplan:"
-                f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
+                f"{len(contestants)} != {raceplan.no_of_contestants}."
             )
 
         # We are ready to generate the startlist:
