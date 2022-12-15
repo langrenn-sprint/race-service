@@ -2,7 +2,7 @@
 from copy import deepcopy
 from json import dumps
 import os
-from typing import List
+from typing import Any, Dict, List
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -28,6 +28,22 @@ def token_unsufficient_role() -> str:
     algorithm = "HS256"
     payload = {"identity": "user", "roles": ["user"]}
     return jwt.encode(payload, secret, algorithm)  # type: ignore
+
+
+@pytest.fixture
+async def event() -> Dict[str, Any]:
+    """An event object for testing."""
+    return {
+        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "name": "Oslo Skagen sprint",
+        "competition_format": "Interval Start",
+        "date_of_event": "2021-08-31",
+        "time_of_event": "09:00:00",
+        "timezone": "Europe/Oslo",
+        "organiser": "Lyn Ski",
+        "webpage": "https://example.com",
+        "information": "Testarr for å teste den nye løysinga.",
+    }
 
 
 @pytest.fixture
@@ -314,6 +330,7 @@ async def test_create_time_event_contestant_not_in_race(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    event: dict,
     start_entry: dict,
     race: dict,
     race_result: dict,
@@ -368,6 +385,10 @@ async def test_create_time_event_contestant_not_in_race(
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=[start_entry_wrong_bib],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
     )
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
@@ -631,6 +652,7 @@ async def test_create_time_event_race_not_found(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    event: dict,
     race: dict,
     race_result: dict,
     new_time_event: dict,
@@ -678,6 +700,10 @@ async def test_create_time_event_race_not_found(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
         return_value=True,
     )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
 
     request_body = dumps(new_time_event, indent=4, sort_keys=True, default=str)
 
@@ -700,6 +726,7 @@ async def test_create_time_event_does_not_reference_race(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    event: dict,
     race: dict,
     race_result: dict,
     new_time_event: dict,
@@ -749,6 +776,10 @@ async def test_create_time_event_does_not_reference_race(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
         return_value=True,
     )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
 
     request_body = dumps(
         time_event_with_no_race_reference, indent=4, sort_keys=True, default=str
@@ -773,6 +804,7 @@ async def test_create_time_event_is_not_identifiable(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
+    event: dict,
     race: dict,
     race_result: dict,
     new_time_event: dict,
@@ -821,6 +853,10 @@ async def test_create_time_event_is_not_identifiable(
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
         return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
     )
 
     request_body = dumps(time_event_with_no_id, indent=4, sort_keys=True, default=str)

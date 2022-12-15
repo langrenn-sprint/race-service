@@ -13,8 +13,9 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
-from race_service.adapters import UsersAdapter
+from race_service.adapters import EventsAdapter, UsersAdapter
 from race_service.models import Changelog, TimeEvent
 from race_service.models.race_model import RaceResult
 from race_service.services import (
@@ -105,9 +106,12 @@ class TimeEventsView(View):
                 time_event.status = "Error"
                 if not time_event.changelog:
                     time_event.changelog = []
+                event = await EventsAdapter.get_event_by_id(
+                    token=token, event_id=time_event.event_id  # type: ignore
+                )
                 time_event.changelog.append(
                     Changelog(
-                        timestamp=datetime.now(),
+                        timestamp=datetime.now(ZoneInfo(event["timezone"])),
                         user_id="race_service",
                         comment=str(e),
                     )
