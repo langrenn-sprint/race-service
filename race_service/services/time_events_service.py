@@ -110,17 +110,21 @@ class TimeEventsService:
         await validate_time_event(db, time_event)
         if time_event.id:
             raise IllegalValueException("Cannot create time_event with input id.")
-        # If time-event for bib and given timing-point already exists, throw error:
-        _time_events = (
-            await TimeEventsAdapter.get_time_events_by_event_id_and_timing_point(
-                db, time_event.event_id, time_event.timing_point
-            )
+        # If time-event for bib and given timing-point already exists in the race, throw error:
+        _time_events = await TimeEventsAdapter.get_time_events_by_race_id(
+            db, time_event.race_id  # type: ignore
         )
         for _time_event in _time_events:
             if _time_event["timing_point"] != "Template":
-                if _time_event["bib"] == time_event.bib:
+                if (
+                    _time_event["bib"] == time_event.bib
+                    and _time_event["timing_point"] == time_event.timing_point
+                ):
                     raise TimeEventAllreadyExistException(
-                        f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point} already exists."  # noqa: B950
+                        (
+                            f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point}"
+                            f" already exists in race {time_event.race_id}."
+                        )
                     )
         # create ids:
         id = create_id()
