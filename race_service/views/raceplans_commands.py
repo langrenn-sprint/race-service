@@ -103,7 +103,10 @@ class ValidateRaceplanView(View):
             raise HTTPNotFound(reason=str(e)) from e
 
         # Validate
-        result = await RaceplansCommands.validate_raceplan(db, token, raceplan)
+        try:
+            result = await RaceplansCommands.validate_raceplan(db, token, raceplan)
+        except NoRaceclassesInEventException as e:
+            raise HTTPBadRequest(reason=str(e)) from e
         headers = MultiDict([(hdrs.CONTENT_TYPE, "application/json")])
         body = json.dumps(result, default=str, ensure_ascii=False)
 

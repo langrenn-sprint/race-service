@@ -6,6 +6,7 @@ from race_service.adapters import (
     CompetitionFormatNotFoundException,
     EventNotFoundException,
     EventsAdapter,
+    RaceclassesNotFoundException,
     RaceplansAdapter,
     RacesAdapter,
 )
@@ -56,7 +57,10 @@ class RaceplansCommands:
                 f'Competition-format {event["competition_format"]} is not supported.'
             ) from e
         # Then we fetch the raceclasses:
-        raceclasses = await get_raceclasses(token, event_id)
+        try:
+            raceclasses = await get_raceclasses(token, event_id)
+        except NoRaceclassesInEventException as e:
+            raise e from e
 
         # Calculate the raceplan:
         if event["competition_format"] == "Individual Sprint":
@@ -109,7 +113,10 @@ class RaceplansCommands:
                 f'Competition-format {event["competition_format"]} is not supported.'
             ) from e
         # Then we fetch the raceclasses:
-        raceclasses = await get_raceclasses(token, raceplan.event_id)
+        try:
+            raceclasses = await get_raceclasses(token, raceplan.event_id)
+        except NoRaceclassesInEventException as e:  # pragma: no cover
+            raise e from e
 
         results: Dict[int, List[str]] = {}
 
@@ -170,7 +177,7 @@ class RaceplansCommands:
                     (
                         f"Number of contestants in raceplan ({raceplan.no_of_contestants})"
                         f" is not equal to the number of contestants"
-                        f"in the raceclasses ({no_of_contestants_in_raceclasses})."
+                        f" in the raceclasses ({no_of_contestants_in_raceclasses})."
                     )
                 ]
 
@@ -272,7 +279,11 @@ async def get_competition_format(
 
 async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C901
     """Get the raceclasses."""
-    raceclasses = await EventsAdapter.get_raceclasses(token, event_id)
+    raceclasses = []
+    try:
+        raceclasses = await EventsAdapter.get_raceclasses(token, event_id)
+    except RaceclassesNotFoundException:
+        pass
     # Validate:
     # Check if there in fact _are_ raceclasses in the list:
     if len(raceclasses) == 0:
