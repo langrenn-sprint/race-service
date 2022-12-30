@@ -12,6 +12,8 @@ import jwt
 import pytest
 from pytest_mock import MockFixture
 
+from race_service.adapters import RaceclassesNotFoundException
+
 
 @pytest.fixture
 def token() -> str:
@@ -1010,6 +1012,57 @@ async def test_delete_raceplan_by_id(
 
 
 # Bad cases
+
+
+@pytest.mark.integration
+async def test_validate_raceplan_has_no_raceclasses(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    competition_format: dict,
+    raceclasses: dict,
+    raceplan_individual_sprint: dict,
+) -> None:
+    """Should return 400 Bad request."""
+    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value=raceplan_individual_sprint,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=raceplan_individual_sprint["races"],
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        side_effect=RaceclassesNotFoundException(
+            f'No raceclasses found for event {event["id"]}.'
+        ),
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8080/authorize", status=204)
+
+        resp = await client.post(f"/raceplans/{RACEPLAN_ID}/validate", headers=headers)
+        assert resp.status == 400
 
 
 @pytest.mark.integration
