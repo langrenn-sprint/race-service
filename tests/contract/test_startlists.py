@@ -56,6 +56,7 @@ async def token(http_service: Any) -> str:
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
+    await delete_start_entries(http_service, token)
     await delete_startlists(http_service, token)
     await delete_raceplans(http_service, token)
     await delete_contestants(token)
@@ -399,6 +400,12 @@ async def test_add_start_entry_to_race(
             assert response.status == 200
             startlist = await response.json()
 
+        # We need to get the raceplan:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan = await response.json()
+
         # ACT
 
         # We add the new start-entry to the race:
@@ -453,6 +460,16 @@ async def test_add_start_entry_to_race(
                 start_entry["id"] for start_entry in startlist_updated["start_entries"]
             ]
 
+        # Check that raceplan's no_of_contestants is updated:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan_updated = await response.json()
+            assert (
+                raceplan_updated["no_of_contestants"]
+                == raceplan["no_of_contestants"] + 1
+            )
+
 
 @pytest.mark.contract
 @pytest.mark.asyncio
@@ -494,6 +511,12 @@ async def test_remove_start_entry_from_race(
             assert response.status == 200
             startlist = await response.json()
 
+        # We need to get the raceplan:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan = await response.json()
+
         # ACT
 
         # We remove the start-entry from the race:
@@ -523,6 +546,16 @@ async def test_remove_start_entry_from_race(
                 == startlist["no_of_contestants"] - 1
             )
             assert start_entry_id not in startlist_updated["start_entries"]
+
+        # Check that raceplan's no_of_contestants is updated:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan_updated = await response.json()
+            assert (
+                raceplan_updated["no_of_contestants"]
+                == raceplan["no_of_contestants"] - 1
+            )
 
 
 @pytest.mark.contract
