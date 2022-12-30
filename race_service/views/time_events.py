@@ -207,13 +207,16 @@ class TimeEventView(View):
                     db, time_event.race_id, time_event.timing_point
                 )
                 for race_result in race_results:
-                    # Remove time-event and subtract counter:
-                    race_result.ranking_sequence.remove(time_event_id)
-                    race_result.no_of_contestants -= 1
-                    # Update race-result:
-                    await RaceResultsService.update_race_result(
-                        db, race_result.id, race_result
-                    )
+                    # We try to remove time-event and subtract counter:
+                    try:
+                        race_result.ranking_sequence.remove(time_event_id)
+                        race_result.no_of_contestants -= 1
+                        # Update race-result:
+                        await RaceResultsService.update_race_result(
+                            db, race_result.id, race_result
+                        )
+                    except ValueError:  # pragma: no cover
+                        pass  # We do not care if it is not there
             # We are ready to remove the time-event
             await TimeEventsService.delete_time_event(db, time_event_id)
         except TimeEventNotFoundException as e:
