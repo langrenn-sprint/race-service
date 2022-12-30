@@ -14,6 +14,7 @@ from pytest_mock import MockFixture
 from race_service.adapters import (
     CompetitionFormatNotFoundException,
     EventNotFoundException,
+    RaceclassesNotFoundException,
 )
 
 
@@ -552,7 +553,7 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     competition_format: dict,
     request_body: dict,
 ) -> None:
-    """Should return 404 Not found."""
+    """Should return 400 Bad request."""
     RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
@@ -576,7 +577,9 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
-        return_value=[],
+        side_effect=RaceclassesNotFoundException(
+            f'No raceclasses found for event {event["id"]}.'
+        ),
     )
 
     headers = {
