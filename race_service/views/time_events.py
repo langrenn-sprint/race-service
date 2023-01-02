@@ -4,6 +4,7 @@ import json
 import logging
 import os
 from typing import List
+from zoneinfo import ZoneInfo
 
 from aiohttp.web import (
     HTTPBadRequest,
@@ -13,7 +14,6 @@ from aiohttp.web import (
     View,
 )
 from dotenv import load_dotenv
-from zoneinfo import ZoneInfo
 
 from race_service.adapters import EventsAdapter, UsersAdapter
 from race_service.models import Changelog, TimeEvent
