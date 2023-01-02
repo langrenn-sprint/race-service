@@ -137,6 +137,7 @@ class StartEntriesView(View):
 
             # We need to add the start-entry to the race:
             race.start_entries.append(start_entry_id)
+            race.no_of_contestants += 1
             await RacesService.update_race(db, race.id, race)
 
             # We need to add to the raceplan's no_of_contestants:
@@ -266,6 +267,7 @@ class StartEntryView(View):
                 if start_entry_id != start_entry_for_deletion_id
             ]
             race.start_entries = new_start_entries
+            race.no_of_contestants -= 1
             await RacesService.update_race(db, race.id, race)
 
             # We need to subtract from the raceplan's no_of_contestants:
