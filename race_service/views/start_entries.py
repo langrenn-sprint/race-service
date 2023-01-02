@@ -24,6 +24,7 @@ from race_service.models.race_model import IndividualSprintRace, IntervalStartRa
 from race_service.services import (
     CouldNotCreateStartEntryException,
     IllegalValueException,
+    RaceplansService,
     RacesService,
     StartEntriesService,
     StartEntryNotFoundException,
@@ -136,7 +137,13 @@ class StartEntriesView(View):
 
             # We need to add the start-entry to the race:
             race.start_entries.append(start_entry_id)
+            race.no_of_contestants += 1
             await RacesService.update_race(db, race.id, race)
+
+            # We need to add to the raceplan's no_of_contestants:
+            raceplan = await RaceplansService.get_raceplan_by_id(db, race.raceplan_id)
+            raceplan.no_of_contestants += 1
+            await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
 
             # We also need to add the start-entry to the startlist
             # and add the start_entry to it's no_of_contestants
@@ -260,7 +267,13 @@ class StartEntryView(View):
                 if start_entry_id != start_entry_for_deletion_id
             ]
             race.start_entries = new_start_entries
+            race.no_of_contestants -= 1
             await RacesService.update_race(db, race.id, race)
+
+            # We need to subtract from the raceplan's no_of_contestants:
+            raceplan = await RaceplansService.get_raceplan_by_id(db, race.raceplan_id)
+            raceplan.no_of_contestants -= 1
+            await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
 
             # We also need to remove the start-entry from the startlist,
             # and subtract the start_entry from it's no_of_contestants

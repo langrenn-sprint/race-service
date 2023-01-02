@@ -153,7 +153,7 @@ def contract_tests(session: Session) -> None:
             "DB_USER": "event-service",
             "DB_PASSWORD": "password",
             "LOGGING_LEVEL": "DEBUG",
-            "JWT_EXP_DELTA_SECONDS": "60",
+            "JWT_EXP_DELTA_SECONDS": "3600",
             "JWT_SECRET": "secret",
         },
     )
