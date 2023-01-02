@@ -16,6 +16,7 @@ services:
       - USERS_HOST_PORT=8080
       - DB_HOST=mongodb
       - DB_PORT=27017
+      - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - LOGGING_LEVEL=${LOGGING_LEVEL}
@@ -37,6 +38,7 @@ services:
       - USERS_HOST_PORT=8080
       - DB_HOST=mongodb
       - DB_PORT=27017
+      - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - LOGGING_LEVEL=${LOGGING_LEVEL}
@@ -55,6 +57,7 @@ services:
       - USERS_HOST_PORT=8080
       - DB_HOST=mongodb
       - DB_PORT=27017
+      - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - LOGGING_LEVEL=${LOGGING_LEVEL}
@@ -73,6 +76,7 @@ services:
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - DB_HOST=mongodb
       - DB_PORT=27017
+      - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
     depends_on:

@@ -5,7 +5,8 @@ import logging
 import os
 from typing import Any, AsyncGenerator, Dict, List, Tuple, Union
 
-from aiohttp import ClientSession, hdrs
+from aiohttp import ClientSession, ContentTypeError, hdrs
+import motor.motor_asyncio
 import pytest
 from pytest_mock import MockFixture
 
@@ -15,9 +16,14 @@ COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
 COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
 USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = int(os.getenv("DB_PORT", 27017))
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 def event_loop(request: Any) -> Any:
     """Redefine the event_loop fixture to have the same scope."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
@@ -28,7 +34,7 @@ def event_loop(request: Any) -> Any:
 # ARRANGE
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 @pytest.mark.asyncio
 async def token(http_service: Any) -> str:
     """Create a valid token."""
@@ -56,30 +62,31 @@ async def token(http_service: Any) -> str:
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_start_entries(http_service, token)
-    await delete_startlists(http_service, token)
-    await delete_raceplans(http_service, token)
-    await delete_contestants(token)
-    await delete_raceclasses(token)
-    await delete_events(token)
-    await delete_competition_formats(token)
+    mongo = motor.motor_asyncio.AsyncIOMotorClient(
+        host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
+    )
+    try:
+        await mongo.drop_database(f"{DB_NAME}")
+    except Exception as error:
+        logging.error(f"Failed to drop database {DB_NAME}: {error}")
+        raise error
     logging.info(" --- Testing starts. ---")
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_start_entries(http_service, token)
-    await delete_startlists(http_service, token)
-    await delete_raceplans(http_service, token)
-    await delete_contestants(token)
-    await delete_raceclasses(token)
-    await delete_events(token)
-    await delete_competition_formats(token)
+    try:
+        await mongo.drop_database(f"{DB_NAME}")
+    except Exception as error:
+        logging.error(f"Failed to drop database {DB_NAME}: {error}")
+        raise error
     logging.info(" --- Cleaning db done. ---")
 
 
 @pytest.fixture(scope="module", autouse=True)
 @pytest.mark.asyncio
-async def context(http_service: Any, token: MockFixture) -> Dict[str, Union[str, List]]:
+async def context(
+    http_service: Any, token: MockFixture, clear_db: Any
+) -> Dict[str, Union[str, List]]:
     """Arrange and create startlist to do tests on."""
     event_id = ""
     async with ClientSession() as session:
@@ -425,12 +432,15 @@ async def test_add_start_entry_to_race(
 
         url = f'{http_service}/races/{race["id"]}/start-entries'
         async with session.post(url, headers=headers, data=request_body) as response:
-            if response.status != 201:
+            try:
                 body = await response.json()
+            except ContentTypeError:
+                body = None
+                pass
 
         # ASSERT
 
-        assert response.status == 201, f"Reason: {body}"
+        assert response.status == 201, f"body:{body}" if body else ""
         assert f'/races/{race["id"]}/start-entries/' in response.headers[hdrs.LOCATION]
 
         # Check that the start-entry is in the list of start-entries of the race:

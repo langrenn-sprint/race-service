@@ -138,7 +138,7 @@ def contract_tests(session: Session) -> None:
     session.run(
         "pytest",
         "-m contract",
-        "-rA",
+        "-rfE",
         *args,
         env={
             "CONFIG": "test",
@@ -150,11 +150,12 @@ def contract_tests(session: Session) -> None:
             "COMPETITION_FORMAT_HOST_PORT": "8082",
             "USERS_HOST_SERVER": "localhost",
             "USERS_HOST_PORT": "8083",
-            "DB_USER": "event-service",
-            "DB_PASSWORD": "password",
             "LOGGING_LEVEL": "DEBUG",
             "JWT_EXP_DELTA_SECONDS": "3600",
             "JWT_SECRET": "secret",
+            "DB_NAME": "races_test",
+            "DB_USER": "admin",
+            "DB_PASSWORD": "admin",
         },
     )
 
