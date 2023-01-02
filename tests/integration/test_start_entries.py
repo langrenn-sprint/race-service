@@ -137,6 +137,14 @@ async def test_create_start_entry(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
         return_value=True,
     )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value={"id": "raceplan_id", "event_id": "event_id", "races": []},
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        return_value=True,
+    )
 
     request_body = dumps(new_start_entry, indent=4, sort_keys=True, default=str)
 
@@ -343,6 +351,14 @@ async def test_delete_start_entry(
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value={"id": "raceplan_id", "event_id": "event_id", "races": []},
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
     )
 
@@ -858,6 +874,14 @@ async def test_delete_start_entry_startlist_not_found(
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value={"id": "raceplan_id", "event_id": "event_id", "races": []},
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
     )
 
