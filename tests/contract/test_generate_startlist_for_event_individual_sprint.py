@@ -6,6 +6,7 @@ import os
 from typing import Any, AsyncGenerator, List, Tuple
 
 from aiohttp import ClientSession, hdrs
+import motor.motor_asyncio
 import pytest
 from pytest_mock import MockFixture
 
@@ -15,9 +16,14 @@ COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
 COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
 USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_PORT = int(os.getenv("DB_PORT", 27017))
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 def event_loop(request: Any) -> Any:
     """Redefine the event_loop fixture to have the same scope."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
@@ -25,7 +31,7 @@ def event_loop(request: Any) -> Any:
     loop.close()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="module", autouse=True)
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
@@ -45,151 +51,29 @@ async def token(http_service: Any) -> str:
     return body["token"]
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(autouse=True)
 @pytest.mark.asyncio
 async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    await delete_startlists(http_service, token)
-    await delete_raceplans(http_service, token)
-    await delete_contestants(token)
-    await delete_raceclasses(token)
-    await delete_events(token)
-    await delete_competition_formats(token)
+    mongo = motor.motor_asyncio.AsyncIOMotorClient(
+        host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
+    )
+    try:
+        await mongo.drop_database(f"{DB_NAME}")
+    except Exception as error:
+        logging.error(f"Failed to drop database {DB_NAME}: {error}")
+        raise error
     logging.info(" --- Testing starts. ---")
     yield
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
-    await delete_startlists(http_service, token)
-    await delete_raceplans(http_service, token)
-    await delete_contestants(token)
-    await delete_raceclasses(token)
-    await delete_events(token)
-    await delete_competition_formats(token)
+    try:
+        await mongo.drop_database(f"{DB_NAME}")
+    except Exception as error:
+        logging.error(f"Failed to drop database {DB_NAME}: {error}")
+        raise error
     logging.info(" --- Cleaning db done. ---")
-
-
-async def delete_competition_formats(token: MockFixture) -> None:
-    """Delete all competition_formats."""
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
-        async with session.get(url) as response:
-            assert response.status == 200
-            competition_formats = await response.json()
-            for competition_format in competition_formats:
-                async with session.delete(
-                    f'{url}/{competition_format["id"]}', headers=headers
-                ) as response:
-                    assert response.status == 204
-    logging.info("Clear_db: Deleted all competition_formats.")
-
-
-async def delete_events(token: MockFixture) -> None:
-    """Delete all events."""
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url) as response:
-            assert response.status == 200
-            events = await response.json()
-            for event in events:
-                async with session.delete(
-                    f'{url}/{event["id"]}', headers=headers
-                ) as response:
-                    assert response.status == 204
-    logging.info("Clear_db: Deleted all events.")
-
-
-async def delete_contestants(token: MockFixture) -> None:
-    """Delete all contestants."""
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url) as response:
-            assert response.status == 200
-            events = await response.json()
-            for event in events:
-                async with session.delete(
-                    f'{url}/{event["id"]}/contestants', headers=headers
-                ) as response:
-                    assert response.status == 204
-    logging.info("Clear_db: Deleted all contestants.")
-
-
-async def delete_raceclasses(token: MockFixture) -> None:
-    """Delete all raceclasses."""
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
-        async with session.get(url) as response:
-            assert response.status == 200
-            events = await response.json()
-            for event in events:
-                async with session.get(
-                    f'{url}/{event["id"]}/raceclasses', headers=headers
-                ) as response:
-                    assert response.status == 200
-                    raceclasses = await response.json()
-                    for raceclass in raceclasses:
-                        async with session.delete(
-                            f'{url}/{event["id"]}/raceclasses/{raceclass["id"]}',
-                            headers=headers,
-                        ) as response:
-                            assert response.status == 204
-    logging.info("Clear_db: Deleted all raceclasses.")
-
-
-async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
-    """Delete all raceplans before we start."""
-    url = f"{http_service}/raceplans"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        async with session.get(url) as response:
-            assert response.status == 200
-            raceplans = await response.json()
-            for raceplan in raceplans:
-                raceplan_id = raceplan["id"]
-                async with session.delete(
-                    f"{url}/{raceplan_id}", headers=headers
-                ) as response:
-                    assert response.status == 204
-    logging.info("Clear_db: Deleted all raceplans.")
-
-
-async def delete_startlists(http_service: Any, token: MockFixture) -> None:
-    """Delete all startlists before we start."""
-    url = f"{http_service}/startlists"
-    headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
-    }
-
-    async with ClientSession() as session:
-        async with session.get(url) as response:
-            assert response.status == 200
-            startlists = await response.json()
-            for startlist in startlists:
-                startlist_id = startlist["id"]
-                async with session.delete(
-                    f"{url}/{startlist_id}", headers=headers
-                ) as response:
-                    assert response.status == 204
-    logging.info("Clear_db: Deleted all startlists.")
 
 
 @pytest.fixture(scope="module")
@@ -208,6 +92,7 @@ async def test_generate_startlist_for_individual_sprint_event(
     http_service: Any,
     token: MockFixture,
     expected_startlist: dict,
+    clear_db: Any,
 ) -> None:
     """Should return 201 created and a location header with url to startlist."""
     event_id = ""
