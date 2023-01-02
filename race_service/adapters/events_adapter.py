@@ -1,6 +1,6 @@
 """Module for events adapter."""
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 
 from aiohttp import ClientSession
 from aiohttp.web import (
@@ -73,7 +73,10 @@ class EventsAdapter:
 
     @classmethod
     async def get_competition_format(
-        cls: Any, token: str, event_id: str, competition_format_name: str
+        cls: Any,
+        token: str,
+        event_id: str,
+        competition_format_name: Optional[str] = None,
     ) -> dict:  # pragma: no cover
         """Get competition_format from event-service."""
         async with ClientSession() as session:
@@ -97,6 +100,9 @@ class EventsAdapter:
                         )
                     ) from None
             # We have not found event specific format, get the global config:
+            if not competition_format_name:
+                event = await cls.get_event_by_id(token, event_id)
+                competition_format_name = event["competition_format"]
             url = (
                 f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}"
                 f"/competition-formats?name={competition_format_name}"

@@ -366,12 +366,12 @@ async def test_get_startlist(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_add_start_entry_to_race(
+async def test_add_start_entry_to_race_first_round(
     http_service: Any,
     token: MockFixture,
     context: dict,
 ) -> None:
-    """Should return 204 No content and remove start_entry from the race and the startlist."""
+    """Should return 204 No content and add start_entry to the race, raceplan and the startlist."""
     # ARRANGE
 
     startlist_id = context["startlist_url"].split("/")[-1]
@@ -469,7 +469,7 @@ async def test_add_start_entry_to_race(
                 start_entry["id"] for start_entry in startlist_updated["start_entries"]
             ]
 
-        # Check that raceplan's no_of_contestants is updated:
+        # Since the race is in first round, check that raceplan's no_of_contestants is updated:
         url = f"{http_service}/raceplans/{race['raceplan_id']}"
         async with session.get(url) as response:
             assert response.status == 200
@@ -482,12 +482,127 @@ async def test_add_start_entry_to_race(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
-async def test_remove_start_entry_from_race(
+async def test_add_start_entry_to_race_not_first_round(
     http_service: Any,
     token: MockFixture,
     context: dict,
 ) -> None:
-    """Should return 204 No content and remove start_entry from the race and the startlist."""
+    """Should return 204 No content and add start_entry to the race and the startlist."""
+    # ARRANGE
+
+    startlist_id = context["startlist_url"].split("/")[-1]
+
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    async with ClientSession() as session:
+        # Need to get to a race to be the new start-entry in:
+        url = f'{http_service}/races?eventId={context["event_id"]}'
+        async with session.get(url) as response:
+            assert response.status == 200
+            races = await response.json()
+            assert len(races) > 0
+
+            # We add the new contestant to the last race:
+            race = races[-1]
+
+        # Existing start-entries:
+        url = f'{http_service}/races/{race["id"]}/start-entries'
+        async with session.get(url) as response:
+            assert response.status == 200
+            existing_start_entries = await response.json()
+
+        startlist_id = context["startlist_url"].split("/")[-1]
+
+        # We need to get the startlist:
+        url = f"{http_service}/startlists/{startlist_id}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            startlist = await response.json()
+
+        # We need to get the raceplan:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan = await response.json()
+
+        # ACT
+
+        # We add the new start-entry to the race:
+        new_start_entry = {
+            "startlist_id": startlist["id"],
+            "race_id": race["id"],
+            "bib": 9999,
+            "starting_position": len(existing_start_entries) + 1,
+            "scheduled_start_time": race["start_time"],
+            "name": "New Contestant",
+            "club": "The always late to attend club",
+        }
+        headers = {
+            hdrs.CONTENT_TYPE: "application/json",
+            hdrs.AUTHORIZATION: f"Bearer {token}",
+        }
+        request_body = json.dumps(
+            new_start_entry, indent=4, sort_keys=True, default=str
+        )
+
+        url = f'{http_service}/races/{race["id"]}/start-entries'
+        async with session.post(url, headers=headers, data=request_body) as response:
+            try:
+                body = await response.json()
+            except ContentTypeError:
+                body = None
+                pass
+
+        # ASSERT
+
+        assert response.status == 201, f"body:{body}" if body else ""
+        assert f'/races/{race["id"]}/start-entries/' in response.headers[hdrs.LOCATION]
+
+        # Check that the start-entry is in the list of start-entries of the race:
+        new_start_entry_id = response.headers[hdrs.LOCATION].split("/")[-1]
+
+        url = f'{http_service}/races/{race["id"]}'
+        async with session.get(url) as response:
+            assert response.status == 200
+            race_updated = await response.json()
+            assert race["no_of_contestants"] + 1 == race_updated["no_of_contestants"]
+            assert len(race["start_entries"]) + 1 == len(race_updated["start_entries"])
+            assert new_start_entry_id in [
+                start_entry["id"] for start_entry in race_updated["start_entries"]
+            ]
+
+        # Check that the start-entry is in the list of start-entries of the startlist:
+        url = f"{http_service}/startlists/{startlist_id}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            startlist_updated = await response.json()
+            assert (
+                startlist_updated["no_of_contestants"]
+                == startlist["no_of_contestants"] + 1
+            )
+            assert new_start_entry_id in [
+                start_entry["id"] for start_entry in startlist_updated["start_entries"]
+            ]
+
+        # Since the race is in not first round, check that raceplan's no_of_contestants is not updated:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan_updated = await response.json()
+            assert (
+                raceplan_updated["no_of_contestants"] == raceplan["no_of_contestants"]
+            )
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_remove_start_entry_from_race_first_round(
+    http_service: Any,
+    token: MockFixture,
+    context: dict,
+) -> None:
+    """Should return 204 No content and remove start_entry from the race, raceplan and the startlist."""
     # ARRANGE
 
     startlist_id = context["startlist_url"].split("/")[-1]
@@ -502,6 +617,7 @@ async def test_remove_start_entry_from_race(
             assert response.status == 200
             races = await response.json()
             assert len(races) > 0
+            # Pick the first race, which is in the first round:
             race = races[0]
             assert len(race["start_entries"]) > 0
 
@@ -566,6 +682,95 @@ async def test_remove_start_entry_from_race(
             assert (
                 raceplan_updated["no_of_contestants"]
                 == raceplan["no_of_contestants"] - 1
+            )
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
+async def test_remove_start_entry_from_race_not_first_round(
+    http_service: Any,
+    token: MockFixture,
+    context: dict,
+) -> None:
+    """Should return 204 No content and remove start_entry from the race and the startlist."""
+    # ARRANGE
+
+    startlist_id = context["startlist_url"].split("/")[-1]
+
+    headers = {
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+    async with ClientSession() as session:
+        # Need to get to a race:
+        url = f"{http_service}/races"
+        async with session.get(url) as response:
+            assert response.status == 200
+            races = await response.json()
+            assert len(races) > 0
+            # We pick the last race, which is not in the first round:
+            race = races[-1]
+            assert len(race["start_entries"]) > 0
+
+        url = f'{http_service}/races/{race["id"]}/start-entries'
+        async with session.get(url) as response:
+            assert response.status == 200
+            start_entries = await response.json()
+            assert len(start_entries) > 0
+            start_entry_to_be_removed = start_entries[0]
+
+        assert startlist_id == start_entry_to_be_removed["startlist_id"]
+
+        # We need to get the startlist:
+        url = f"{http_service}/startlists/{startlist_id}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            startlist = await response.json()
+
+        # We need to get the raceplan:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan = await response.json()
+
+        # ACT
+
+        # We remove the start-entry from the race:
+        start_entry_id = start_entry_to_be_removed["id"]
+        url = f'{http_service}/races/{race["id"]}/start-entries/{start_entry_id}'
+        async with session.delete(url, headers=headers) as response:
+            pass
+
+        # ASSERT
+
+        assert response.status == 204
+
+        # Check that the start-entry is no longer in the list of start-entries of the race:
+        url = f'{http_service}/races/{race["id"]}'
+        async with session.get(url) as response:
+            assert response.status == 200
+            race_updated = await response.json()
+            assert race["no_of_contestants"] - 1 == race_updated["no_of_contestants"]
+            assert len(race["start_entries"]) - 1 == len(race_updated["start_entries"])
+            assert start_entry_id not in race_updated["start_entries"]
+
+        # Check that the start-entry is no longer in the list of start-entries of the startlist:
+        url = f"{http_service}/startlists/{startlist_id}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            startlist_updated = await response.json()
+            assert (
+                startlist_updated["no_of_contestants"]
+                == startlist["no_of_contestants"] - 1
+            )
+            assert start_entry_id not in startlist_updated["start_entries"]
+
+        # Check that raceplan's no_of_contestants is not updated:
+        url = f"{http_service}/raceplans/{race['raceplan_id']}"
+        async with session.get(url) as response:
+            assert response.status == 200
+            raceplan_updated = await response.json()
+            assert (
+                raceplan_updated["no_of_contestants"] == raceplan["no_of_contestants"]
             )
 
 
