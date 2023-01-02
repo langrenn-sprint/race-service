@@ -380,17 +380,14 @@ async def test_add_start_entry_to_race(
             races = await response.json()
             assert len(races) > 0
 
-            # Find the first race that is not a quarter-final:
-            race = next(race for race in races if race["round"] != "Q")
-
-            assert len(race["start_entries"]) == 0
+            # We add the new contestant to the first race:
+            race = races[0]
 
         # Existing start-entries:
         url = f'{http_service}/races/{race["id"]}/start-entries'
         async with session.get(url) as response:
             assert response.status == 200
             existing_start_entries = await response.json()
-            assert len(existing_start_entries) == 0
 
         startlist_id = context["startlist_url"].split("/")[-1]
 
@@ -412,8 +409,8 @@ async def test_add_start_entry_to_race(
         new_start_entry = {
             "startlist_id": startlist["id"],
             "race_id": race["id"],
-            "bib": 1,
-            "starting_position": 1,
+            "bib": 9999,
+            "starting_position": len(existing_start_entries) + 1,
             "scheduled_start_time": race["start_time"],
             "name": "New Contestant",
             "club": "The always late to attend club",
@@ -443,6 +440,8 @@ async def test_add_start_entry_to_race(
         async with session.get(url) as response:
             assert response.status == 200
             race_updated = await response.json()
+            assert race["no_of_contestants"] + 1 == race_updated["no_of_contestants"]
+            assert len(race["start_entries"]) + 1 == len(race_updated["start_entries"])
             assert new_start_entry_id in [
                 start_entry["id"] for start_entry in race_updated["start_entries"]
             ]
@@ -534,6 +533,8 @@ async def test_remove_start_entry_from_race(
         async with session.get(url) as response:
             assert response.status == 200
             race_updated = await response.json()
+            assert race["no_of_contestants"] - 1 == race_updated["no_of_contestants"]
+            assert len(race["start_entries"]) - 1 == len(race_updated["start_entries"])
             assert start_entry_id not in race_updated["start_entries"]
 
         # Check that the start-entry is no longer in the list of start-entries of the startlist:
