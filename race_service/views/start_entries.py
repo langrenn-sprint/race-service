@@ -15,7 +15,7 @@ from aiohttp.web import (
 from dotenv import load_dotenv
 from multidict import MultiDict
 
-from race_service.adapters import UsersAdapter
+from race_service.adapters import EventsAdapter, UsersAdapter
 from race_service.models import (
     StartEntry,
     Startlist,
@@ -140,10 +140,23 @@ class StartEntriesView(View):
             race.no_of_contestants += 1
             await RacesService.update_race(db, race.id, race)
 
-            # We need to add to the raceplan's no_of_contestants:
-            raceplan = await RaceplansService.get_raceplan_by_id(db, race.raceplan_id)
-            raceplan.no_of_contestants += 1
-            await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
+            # If the race is in first round, we need to add to the raceplan's no_of_contestants:
+            competition_format = await EventsAdapter.get_competition_format(
+                token=token, event_id=race.event_id  # type: ignore
+            )
+            first_rounds = [
+                competition_format["rounds_ranked_classes"][0],
+                competition_format["rounds_non_ranked_classes"][0],
+            ]
+            if (
+                type(race) == IndividualSprintRace
+                and race.round in first_rounds  # type: ignore
+            ):
+                raceplan = await RaceplansService.get_raceplan_by_id(
+                    db, race.raceplan_id
+                )
+                raceplan.no_of_contestants += 1
+                await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
 
             # We also need to add the start-entry to the startlist
             # and add the start_entry to it's no_of_contestants
@@ -270,10 +283,23 @@ class StartEntryView(View):
             race.no_of_contestants -= 1
             await RacesService.update_race(db, race.id, race)
 
-            # We need to subtract from the raceplan's no_of_contestants:
-            raceplan = await RaceplansService.get_raceplan_by_id(db, race.raceplan_id)
-            raceplan.no_of_contestants -= 1
-            await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
+            # If the race is in first round, we need to subract from the raceplan's no_of_contestants:
+            competition_format = await EventsAdapter.get_competition_format(
+                token=token, event_id=race.event_id  # type: ignore
+            )
+            first_rounds = [
+                competition_format["rounds_ranked_classes"][0],
+                competition_format["rounds_non_ranked_classes"][0],
+            ]
+            if (
+                type(race) == IndividualSprintRace
+                and race.round in first_rounds  # type: ignore
+            ):
+                raceplan = await RaceplansService.get_raceplan_by_id(
+                    db, race.raceplan_id
+                )
+                raceplan.no_of_contestants -= 1
+                await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
 
             # We also need to remove the start-entry from the startlist,
             # and subtract the start_entry from it's no_of_contestants
