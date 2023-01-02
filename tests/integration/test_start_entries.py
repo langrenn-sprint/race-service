@@ -2,6 +2,7 @@
 from copy import deepcopy
 from json import dumps
 import os
+from typing import Any, Dict
 
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
@@ -27,6 +28,42 @@ def token_unsufficient_role() -> str:
     algorithm = "HS256"
     payload = {"identity": "user", "roles": ["user"]}
     return jwt.encode(payload, secret, algorithm)  # type: ignore
+
+
+@pytest.fixture
+async def event() -> Dict[str, Any]:
+    """An event object for testing."""
+    return {
+        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "name": "Oslo Skagen sprint",
+        "competition_format": "Interval Start",
+        "date_of_event": "2021-08-31",
+        "time_of_event": "09:00:00",
+        "organiser": "Lyn Ski",
+        "webpage": "https://example.com",
+        "information": "Testarr for å teste den nye løysinga.",
+    }
+
+
+@pytest.fixture
+async def competition_format() -> Dict[str, Any]:
+    """A competition-format for testing."""
+    return {
+        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "name": "Individual Sprint",
+        "starting_order": "Draw",
+        "start_procedure": "Heat Start",
+        "time_between_groups": "00:15:00",
+        "time_between_rounds": "00:10:00",
+        "time_between_heats": "00:02:30",
+        "rounds_ranked_classes": ["Q", "S", "F"],
+        "rounds_non_ranked_classes": ["R1", "R2"],
+        "max_no_of_contestants_in_raceclass": 80,
+        "max_no_of_contestants_in_race": 10,
+        "datatype": "individual_sprint",
+        "race_config_non_ranked": None,
+        "race_config_ranked": None,
+    }
 
 
 @pytest.fixture
@@ -102,6 +139,7 @@ async def test_create_start_entry(
     startlist: dict,
     new_start_entry: dict,
     start_entry: dict,
+    competition_format: dict,
 ) -> None:
     """Should return Created, location header."""
     START_ENTRY_ID = start_entry["id"]
@@ -144,6 +182,10 @@ async def test_create_start_entry(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
 
     request_body = dumps(new_start_entry, indent=4, sort_keys=True, default=str)
@@ -326,6 +368,7 @@ async def test_delete_start_entry(
     race: dict,
     startlist: dict,
     start_entry: dict,
+    competition_format: dict,
 ) -> None:
     """Should return No Content."""
     START_ENTRY_ID = start_entry["id"]
@@ -360,6 +403,10 @@ async def test_delete_start_entry(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
@@ -800,6 +847,7 @@ async def test_delete_start_entry_race_not_found(
     race: dict,
     startlist: dict,
     start_entry: dict,
+    competition_format: dict,
 ) -> None:
     """Should return 404 Not found."""
     START_ENTRY_ID = start_entry["id"]
@@ -827,6 +875,10 @@ async def test_delete_start_entry_race_not_found(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
         return_value=True,
     )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
+    )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
@@ -849,6 +901,7 @@ async def test_delete_start_entry_startlist_not_found(
     race: dict,
     startlist: dict,
     start_entry: dict,
+    competition_format: dict,
 ) -> None:
     """Should return 404 Not found."""
     START_ENTRY_ID = start_entry["id"]
@@ -883,6 +936,10 @@ async def test_delete_start_entry_startlist_not_found(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format,
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
