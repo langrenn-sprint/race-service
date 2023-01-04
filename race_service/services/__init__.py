@@ -11,7 +11,6 @@ from .raceplans_service import (
     RaceplanAllreadyExistException,
     RaceplanNotFoundException,
     RaceplansService,
-    validate_raceplan,
 )
 from .races_service import (
     RaceNotFoundException,
