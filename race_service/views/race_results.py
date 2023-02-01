@@ -27,7 +27,7 @@ from race_service.services import (
     RacesService,
     TimeEventsService,
 )
-from .utils import extract_token_from_request
+from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
@@ -71,15 +71,15 @@ class RaceResultsView(View):
                     )
                     time_events.append(time_event)
                     # We sort the time-events on rank:
-                    time_events_sorted = sorted(
-                        time_events,
-                        key=lambda k: (
-                            k.rank is not None,
-                            k.rank != "",
-                            k.rank,
-                        ),
-                        reverse=False,
-                    )
+                time_events_sorted = sorted(
+                    time_events,
+                    key=lambda k: (
+                        k.rank is not None,
+                        k.rank != "",
+                        k.rank,
+                    ),
+                    reverse=False,
+                )
 
                 race_result.ranking_sequence = time_events_sorted  # type: ignore
 
@@ -113,15 +113,15 @@ class RaceResultView(View):
                 )
                 time_events.append(time_event)
                 # We sort the time-events on rank:
-                time_events_sorted = sorted(
-                    time_events,
-                    key=lambda k: (
-                        k.rank is not None,
-                        k.rank != "",
-                        k.rank,
-                    ),
-                    reverse=False,
-                )
+            time_events_sorted = sorted(
+                time_events,
+                key=lambda k: (
+                    k.rank is not None,
+                    k.rank != "",
+                    k.rank,
+                ),
+                reverse=False,
+            )
 
             race_result.ranking_sequence = time_events_sorted  # type: ignore
         except RaceResultNotFoundException as e:

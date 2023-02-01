@@ -32,7 +32,7 @@ class RacesAdapter:
     ) -> List[dict]:  # pragma: no cover
         """Get races by event_id function."""
         races: List = []
-        cursor = db.races_collection.find({"event_id": event_id})
+        cursor = db.races_collection.find({"event_id": event_id}).sort([("order", 1)])
         for race in await cursor.to_list(None):
             races.append(race)
         return races
@@ -46,11 +46,11 @@ class RacesAdapter:
         cursor = db.races_collection.find(
             {
                 "$and": [
-                    {"raceclass": raceclass},
                     {"event_id": event_id},
+                    {"raceclass": raceclass},
                 ]
             }
-        )
+        ).sort([("order", 1)])
         for race in await cursor.to_list(None):
             races.append(race)
         return races
@@ -61,7 +61,9 @@ class RacesAdapter:
     ) -> List[dict]:  # pragma: no cover
         """Get races by raceplan_id function."""
         races: List = []
-        cursor = db.races_collection.find({"raceplan_id": raceplan_id})
+        cursor = db.races_collection.find({"raceplan_id": raceplan_id}).sort(
+            [("order", 1)]
+        )
         for race in await cursor.to_list(None):
             races.append(race)
         return races
