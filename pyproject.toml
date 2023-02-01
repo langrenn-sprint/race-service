@@ -67,6 +67,7 @@ source = ["race_service", "*/site-packages"]
 branch = false
 omit = [
   "*gunicorn_config.py",
+  "*db_utils.py",
 ]
 source = ["race_service"]
 

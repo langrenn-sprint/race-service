@@ -32,7 +32,7 @@ from race_service.services import (
 )
 from race_service.services.races_service import RaceNotFoundException
 from race_service.services.startlists_service import StartlistNotFoundException
-from .utils import extract_token_from_request
+from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
@@ -58,8 +58,10 @@ class StartEntriesView(View):
             )
         elif "bib" in self.request.rel_url.query:
             bib = int(self.request.rel_url.query["bib"])
-            start_entries = await StartEntriesService.get_start_entries_by_bib(
-                db, race_id, bib
+            start_entries = (
+                await StartEntriesService.get_start_entries_by_race_id_and_bib(
+                    db, race_id, bib
+                )
             )
         else:
             start_entries = await StartEntriesService.get_start_entries_by_race_id(

@@ -141,7 +141,7 @@ def contract_tests(session: Session) -> None:
         "-rfE",
         *args,
         env={
-            "CONFIG": "test",
+            "CONFIG": "production",
             "ADMIN_USERNAME": "admin",
             "ADMIN_PASSWORD": "password",
             "EVENTS_HOST_SERVER": "localhost",

@@ -49,7 +49,7 @@ class TimeEventsAdapter:
         time_events: List = []
         cursor = db.time_events_collection.find(
             {"$and": [{"event_id": event_id, "timing_point": timing_point}]}
-        )
+        ).sort([("rank", 1)])
         for time_event in await cursor.to_list(None):
             time_events.append(time_event)
         return time_events

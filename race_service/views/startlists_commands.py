@@ -30,7 +30,7 @@ from race_service.commands import (
     StartlistsCommands,
 )
 from race_service.services import StartlistAllreadyExistException
-from .utils import extract_token_from_request
+from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
