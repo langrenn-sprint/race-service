@@ -21,7 +21,7 @@ from race_service.services import (
     RaceplansService,
     RacesService,
 )
-from .utils import extract_token_from_request
+from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
@@ -66,6 +66,10 @@ class RaceplanView(View):
             for race_id in raceplan.races:
                 race = await RacesService.get_race_by_id(db, race_id)
                 races.append(race)
+            races.sort(
+                key=lambda k: (k.order,),
+                reverse=False,
+            )
             raceplan.races = races  # type: ignore
         except RaceplanNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e

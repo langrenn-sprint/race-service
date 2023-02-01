@@ -8,6 +8,7 @@ from aiohttp_middlewares.cors import cors_middleware
 from aiohttp_middlewares.error import error_middleware
 import motor.motor_asyncio
 
+from .utils import db_utils
 from .views import (
     GenerateRaceplanForEventView,
     GenerateStartlistForEventView,
@@ -28,7 +29,7 @@ from .views import (
     ValidateRaceplanView,
 )
 
-
+CONFIG = os.getenv("CONFIG", "production")
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 27017))
@@ -90,6 +91,13 @@ async def create_app() -> web.Application:
         db = mongo[f"{DB_NAME}"]
         app["db"] = db
 
+        if CONFIG == "production":  # pragma: no cover
+            # Create indexes:
+            try:
+                await db_utils.create_indexes(db)
+
+            except Exception as e:
+                logging.error(f"Could not create index on race_collection: {e}")
         yield
 
         mongo.close()

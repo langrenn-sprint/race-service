@@ -152,7 +152,7 @@ async def test_create_start_entry(
         return_value=START_ENTRY_ID,
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_bib",
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_bib",
         return_value=None,
     )
     mocker.patch(
@@ -280,7 +280,7 @@ async def test_update_start_entry_by_id(
 
 
 @pytest.mark.integration
-async def test_get_start_entries_by_bib(
+async def test_get_start_entries_by_race_id_and_bib(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -290,7 +290,7 @@ async def test_get_start_entries_by_bib(
     """Should return OK and a valid json body."""
     START_ENTRY_ID = start_entry["id"]
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_bib",
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_bib",
         return_value=[start_entry],
     )
 

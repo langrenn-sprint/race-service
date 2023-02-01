@@ -10,6 +10,8 @@ import motor.motor_asyncio
 import pytest
 from pytest_mock import MockFixture
 
+from race_service.utils import db_utils
+
 EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
 EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
 COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
@@ -18,7 +20,7 @@ USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
 USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", 27017))
-DB_NAME = os.getenv("DB_NAME")
+DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
@@ -53,14 +55,14 @@ async def token(http_service: Any) -> str:
 
 @pytest.fixture(autouse=True)
 @pytest.mark.asyncio
-async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
+async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
-        await mongo.drop_database(f"{DB_NAME}")
+        await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
     except Exception as error:
         logging.error(f"Failed to drop database {DB_NAME}: {error}")
         raise error
@@ -69,7 +71,7 @@ async def clear_db(http_service: Any, token: MockFixture) -> AsyncGenerator:
     logging.info(" --- Testing finished. ---")
     logging.info(" --- Cleaning db after testing. ---")
     try:
-        await mongo.drop_database(f"{DB_NAME}")
+        await db_utils.drop_db(mongo, DB_NAME)
     except Exception as error:
         logging.error(f"Failed to drop database {DB_NAME}: {error}")
         raise error
