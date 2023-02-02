@@ -54,12 +54,12 @@ class StartlistsService:
         return startlists
 
     @classmethod
-    async def get_startlist_by_event_id(
+    async def get_startlists_by_event_id(
         cls: Any, db: Any, event_id: str
     ) -> List[Startlist]:
         """Get all startlists by event_id function."""
         startlists: List[Startlist] = []
-        _startlists = await StartlistsAdapter.get_startlist_by_event_id(db, event_id)
+        _startlists = await StartlistsAdapter.get_startlists_by_event_id(db, event_id)
         if _startlists:
             for _s in _startlists:
                 startlists.append(Startlist.from_dict(_s))
@@ -83,7 +83,7 @@ class StartlistsService:
         """
         logging.debug(f"trying to insert startlist: {startlist}")
         # Event can have one, and only, one startlist:
-        existing_sl = await StartlistsAdapter.get_startlist_by_event_id(
+        existing_sl = await StartlistsAdapter.get_startlists_by_event_id(
             db, startlist.event_id
         )
         if existing_sl and len(existing_sl) > 0:
