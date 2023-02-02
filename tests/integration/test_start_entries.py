@@ -152,10 +152,6 @@ async def test_create_start_entry(
         return_value=START_ENTRY_ID,
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_bib",
-        return_value=None,
-    )
-    mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=None,
     )
@@ -277,32 +273,6 @@ async def test_update_start_entry_by_id(
             data=request_body,
         )
         assert resp.status == 204
-
-
-@pytest.mark.integration
-async def test_get_start_entries_by_race_id_and_bib(
-    client: _TestClient,
-    mocker: MockFixture,
-    token: MockFixture,
-    race: dict,
-    start_entry: dict,
-) -> None:
-    """Should return OK and a valid json body."""
-    START_ENTRY_ID = start_entry["id"]
-    mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_bib",
-        return_value=[start_entry],
-    )
-
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
-        resp = await client.get(f"races/all/start-entries?bib={start_entry['bib']}")
-        assert resp.status == 200
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        start_entries = await resp.json()
-        assert type(start_entries) is list
-        assert len(start_entries) > 0
-        assert START_ENTRY_ID == start_entries[0]["id"]
 
 
 @pytest.mark.integration
