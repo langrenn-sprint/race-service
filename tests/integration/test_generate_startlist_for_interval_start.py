@@ -319,7 +319,7 @@ async def test_generate_startlist_for_event(
         side_effect=str(uuid.uuid4()),
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(

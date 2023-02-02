@@ -335,7 +335,7 @@ async def test_generate_startlist_for_event(
         return_value=STARTLIST_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -428,7 +428,7 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
         return_value=STARTLIST_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(

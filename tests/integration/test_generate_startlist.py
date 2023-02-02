@@ -341,7 +341,7 @@ async def test_generate_startlist_for_event_no_request_body(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -406,7 +406,7 @@ async def test_generate_startlist_for_event_no_races_in_plan(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -475,7 +475,7 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -544,7 +544,7 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -611,7 +611,7 @@ async def test_generate_startlist_for_event_no_contestants(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -678,7 +678,7 @@ async def test_generate_startlist_for_event_no_contestants_exception(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -745,7 +745,7 @@ async def test_generate_startlist_for_event_no_raceplan(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -814,7 +814,7 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -883,7 +883,7 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -954,7 +954,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceclass
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1028,7 +1028,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1104,7 +1104,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1177,7 +1177,7 @@ async def test_generate_startlist_for_event_unauthorized(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1245,7 +1245,7 @@ async def test_generate_startlist_for_event_already_has_startlist(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[{"id": "blabladibla"}],
     )
     mocker.patch(
@@ -1313,7 +1313,7 @@ async def test_generate_startlist_for_event_event_not_found(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1380,7 +1380,7 @@ async def test_generate_startlist_for_event_competition_format_not_found(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1447,7 +1447,7 @@ async def test_generate_startlist_for_event_no_raceclasses(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1514,7 +1514,7 @@ async def test_generate_startlist_for_event_no_competition_format(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1583,7 +1583,7 @@ async def test_generate_startlist_for_event_missing_intervals(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1652,7 +1652,7 @@ async def test_generate_startlist_for_event_time_missing(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1721,7 +1721,7 @@ async def test_generate_startlist_for_event_date_missing(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1790,7 +1790,7 @@ async def test_generate_startlist_for_event_invalid_date(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1859,7 +1859,7 @@ async def test_generate_startlist_for_event_invalid_time(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -1929,7 +1929,7 @@ async def test_generate_startlist_for_event_competition_format_not_supported(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
