@@ -56,7 +56,7 @@ async def test_create_startlist_input_id(
 ) -> None:
     """Should raise IllegalValueException."""
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -77,7 +77,7 @@ async def test_create_startlist_allready_exist(
 ) -> None:
     """Should raise IllegalValueException."""
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=startlist_mock,
     )
     mocker.patch(
@@ -98,7 +98,7 @@ async def test_create_startlist_adapter_fails(
 ) -> None:
     """Should raise IllegalValueException."""
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[],
     )
     mocker.patch(

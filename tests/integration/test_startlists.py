@@ -312,7 +312,7 @@ async def test_create_startlist(
         return_value=STARTLIST_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
 
@@ -343,7 +343,7 @@ async def test_get_startlist_by_id(
         return_value=startlist,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -370,7 +370,7 @@ async def test_get_startlist_by_id(
 
 
 @pytest.mark.integration
-async def test_get_startlist_by_event_id(
+async def test_get_startlists_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
@@ -384,7 +384,7 @@ async def test_get_startlist_by_event_id(
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[startlist],
     )
     mocker.patch(
@@ -412,6 +412,51 @@ async def test_get_startlist_by_event_id(
 
 
 @pytest.mark.integration
+async def test_get_startlists_by_event_id_and_bib(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    startlist: dict,
+) -> None:
+    """Should return OK, and a body containing one startlist with start_entries where bib == BIB."""
+    EVENT_ID = startlist["event_id"]
+    STARTLIST_ID = startlist["id"]
+    BIB = START_ENTRIES[0]["bib"]
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value=None,
+    )
+    mocker.patch(
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
+        return_value=[startlist],
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8080/authorize", status=204)
+
+        resp = await client.get(f"/startlists?eventId={EVENT_ID}&bib={BIB}")
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["id"] == STARTLIST_ID
+        assert body[0]["event_id"] == startlist["event_id"]
+        assert len(body[0]["start_entries"]) == len(
+            [se for se in START_ENTRIES if se["bib"] == BIB]
+        )
+        for start_entry in body[0]["start_entries"]:
+            assert start_entry["race_id"]
+            assert start_entry["bib"] == BIB
+            assert start_entry["starting_position"]
+            assert start_entry["scheduled_start_time"]
+
+
+@pytest.mark.integration
 async def test_update_startlist_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: dict
 ) -> None:
@@ -422,7 +467,7 @@ async def test_update_startlist_by_id(
         return_value=startlist,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -457,7 +502,7 @@ async def test_get_all_startlists(
         return_value=[startlist],
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
 
@@ -492,7 +537,7 @@ async def test_delete_startlist_by_id(
         return_value=STARTLIST_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
     mocker.patch(
@@ -546,7 +591,7 @@ async def test_delete_startlist_by_id_no_authorization(
         return_value=STARTLIST_ID,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
 
@@ -571,7 +616,7 @@ async def test_get_startlist_not_found(
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
 
@@ -597,7 +642,7 @@ async def test_delete_startlist_not_found(
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_event_id",
+        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=None,
     )
 

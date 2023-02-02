@@ -336,7 +336,7 @@ async def generate_startlist_for_interval_start(
 # helpers
 async def get_startlist(db: Any, token: str, event_id: str) -> None:
     """Check if the event already has a startlist."""
-    _startlist = await StartlistsAdapter.get_startlist_by_event_id(db, event_id)
+    _startlist = await StartlistsAdapter.get_startlists_by_event_id(db, event_id)
     if _startlist:
         raise StartlistAllreadyExistException(
             f'Event "{event_id}" already has a startlist.'

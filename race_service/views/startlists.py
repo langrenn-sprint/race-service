@@ -37,14 +37,20 @@ class StartlistsView(View):
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
-            startlists = await StartlistsService.get_startlist_by_event_id(db, event_id)
+            startlists = await StartlistsService.get_startlists_by_event_id(
+                db, event_id
+            )
             for startlist in startlists:
                 start_entries: List[StartEntry] = []
                 for start_entry_id in startlist.start_entries:
                     start_entry = await StartEntriesService.get_start_entry_by_id(
                         db, start_entry_id
                     )
-                    start_entries.append(start_entry)
+                    if "bib" in self.request.rel_url.query:
+                        if start_entry.bib == int(self.request.rel_url.query["bib"]):
+                            start_entries.append(start_entry)
+                    else:
+                        start_entries.append(start_entry)
                 startlist.start_entries = start_entries  # type: ignore
 
         else:

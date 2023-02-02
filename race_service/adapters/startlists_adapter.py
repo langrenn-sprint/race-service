@@ -1,5 +1,5 @@
 """Module for startlist adapter."""
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class StartlistsAdapter:
@@ -16,7 +16,7 @@ class StartlistsAdapter:
 
     @classmethod
     async def create_startlist(
-        cls: Any, db: Any, startlist: dict
+        cls: Any, db: Any, startlist: Dict
     ) -> str:  # pragma: no cover
         """Create startlist function."""
         result = await db.startlists_collection.insert_one(startlist)
@@ -25,15 +25,15 @@ class StartlistsAdapter:
     @classmethod
     async def get_startlist_by_id(
         cls: Any, db: Any, id: str
-    ) -> dict:  # pragma: no cover
+    ) -> Dict:  # pragma: no cover
         """Get startlist function."""
         result = await db.startlists_collection.find_one({"id": id})
         return result
 
     @classmethod
-    async def get_startlist_by_event_id(
+    async def get_startlists_by_event_id(
         cls: Any, db: Any, event_id: str
-    ) -> List[dict]:  # pragma: no cover
+    ) -> List[Dict]:  # pragma: no cover
         """Get startlist by event_id function."""
         startlists: List = []
         result = await db.startlists_collection.find_one({"event_id": event_id})
@@ -43,7 +43,7 @@ class StartlistsAdapter:
 
     @classmethod
     async def update_startlist(
-        cls: Any, db: Any, id: str, startlist: dict
+        cls: Any, db: Any, id: str, startlist: Dict
     ) -> Optional[str]:  # pragma: no cover
         """Get startlist function."""
         result = await db.startlists_collection.replace_one({"id": id}, startlist)
