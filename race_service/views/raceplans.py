@@ -12,12 +12,16 @@ from aiohttp.web import (
 )
 from dotenv import load_dotenv
 
-from race_service.adapters import UsersAdapter
+from race_service.adapters import (
+    RaceNotFoundException,
+    RaceplanNotFoundException,
+    RaceplansAdapter,
+    RacesAdapter,
+    UsersAdapter,
+)
 from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
 from race_service.services import (
     IllegalValueException,
-    RaceNotFoundException,
-    RaceplanNotFoundException,
     RaceplansService,
     RacesService,
 )
@@ -38,9 +42,9 @@ class RaceplansView(View):
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
-            raceplans = await RaceplansService.get_raceplan_by_event_id(db, event_id)
+            raceplans = await RaceplansAdapter.get_raceplans_by_event_id(db, event_id)
         else:
-            raceplans = await RaceplansService.get_all_raceplans(db)
+            raceplans = await RaceplansAdapter.get_all_raceplans(db)
         list = []
         for _e in raceplans:
             list.append(_e.to_dict())
@@ -60,11 +64,11 @@ class RaceplanView(View):
         logging.debug(f"Got get request for raceplan {raceplan_id}")
 
         try:
-            raceplan = await RaceplansService.get_raceplan_by_id(db, raceplan_id)
+            raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)
             races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
             # Replace list of race-ids with corresponding races:
             for race_id in raceplan.races:
-                race = await RacesService.get_race_by_id(db, race_id)
+                race = await RacesAdapter.get_race_by_id(db, race_id)
                 races.append(race)
             races.sort(
                 key=lambda k: (k.order,),
@@ -119,7 +123,7 @@ class RaceplanView(View):
         logging.debug(f"Got delete request for raceplan {raceplan_id}")
 
         try:
-            raceplan = await RaceplansService.get_raceplan_by_id(db, raceplan_id)
+            raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)
             for race_id in raceplan.races:
                 await RacesService.delete_race(db, race_id)
             await RaceplansService.delete_raceplan(db, raceplan_id)

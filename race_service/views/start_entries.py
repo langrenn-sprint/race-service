@@ -15,7 +15,16 @@ from aiohttp.web import (
 from dotenv import load_dotenv
 from multidict import MultiDict
 
-from race_service.adapters import EventsAdapter, UsersAdapter
+from race_service.adapters import (
+    EventsAdapter,
+    RaceNotFoundException,
+    RaceplansAdapter,
+    RacesAdapter,
+    StartEntriesAdapter,
+    StartEntryNotFoundException,
+    StartlistsAdapter,
+    UsersAdapter,
+)
 from race_service.models import (
     StartEntry,
     Startlist,
@@ -27,10 +36,8 @@ from race_service.services import (
     RaceplansService,
     RacesService,
     StartEntriesService,
-    StartEntryNotFoundException,
     StartlistsService,
 )
-from race_service.services.races_service import RaceNotFoundException
 from race_service.services.startlists_service import StartlistNotFoundException
 from race_service.utils.jwt_utils import extract_token_from_request
 
@@ -52,12 +59,12 @@ class StartEntriesView(View):
         if "startlistId" in self.request.rel_url.query:
             startlist_id = self.request.rel_url.query["startlistId"]
             start_entries = (
-                await StartEntriesService.get_start_entries_by_race_id_and_startlist_id(
+                await StartEntriesAdapter.get_start_entries_by_race_id_and_startlist_id(
                     db, race_id, startlist_id
                 )
             )
         else:
-            start_entries = await StartEntriesService.get_start_entries_by_race_id(
+            start_entries = await StartEntriesAdapter.get_start_entries_by_race_id(
                 db, race_id
             )
         list = []
@@ -81,8 +88,6 @@ class StartEntriesView(View):
         body = await self.request.json()
         logging.debug(f"Got create request for start_entry {body} of type {type(body)}")
         try:
-            if "id" not in body:
-                body["id"] = ""  # create dummy id property
             new_start_entry = StartEntry.from_dict(body)
         except KeyError as e:
             raise HTTPUnprocessableEntity(
@@ -91,7 +96,7 @@ class StartEntriesView(View):
 
         try:
             # First we need to get to the startlist the new start-entry is part of:
-            startlist = await StartlistsService.get_startlist_by_id(
+            startlist = await StartlistsAdapter.get_startlist_by_id(
                 db, new_start_entry.startlist_id
             )
             # We need to check if the bib is already in the race, and
@@ -99,9 +104,9 @@ class StartEntriesView(View):
             # if there open starting-positions:
             race: Union[
                 IndividualSprintRace, IntervalStartRace
-            ] = await RacesService.get_race_by_id(db, new_start_entry.race_id)
+            ] = await RacesAdapter.get_race_by_id(db, new_start_entry.race_id)
             start_entries_in_race = (
-                await StartEntriesService.get_start_entries_by_race_id(db, race.id)
+                await StartEntriesAdapter.get_start_entries_by_race_id(db, race.id)
             )
             bibs_in_race = [start_entry.bib for start_entry in start_entries_in_race]
             starting_positions_in_race = [
@@ -147,7 +152,7 @@ class StartEntriesView(View):
                 type(race) == IndividualSprintRace
                 and race.round in first_rounds  # type: ignore
             ):
-                raceplan = await RaceplansService.get_raceplan_by_id(
+                raceplan = await RaceplansAdapter.get_raceplan_by_id(
                     db, race.raceplan_id
                 )
                 raceplan.no_of_contestants += 1
@@ -192,7 +197,7 @@ class StartEntryView(View):
         logging.debug(f"Got get request for start_entry {start_entry_id}")
 
         try:
-            start_entry = await StartEntriesService.get_start_entry_by_id(
+            start_entry = await StartEntriesAdapter.get_start_entry_by_id(
                 db, start_entry_id
             )
         except StartEntryNotFoundException as e:
@@ -253,14 +258,14 @@ class StartEntryView(View):
         )
 
         try:
-            start_entry: StartEntry = await StartEntriesService.get_start_entry_by_id(
+            start_entry: StartEntry = await StartEntriesAdapter.get_start_entry_by_id(
                 db, start_entry_for_deletion_id
             )
             # We need to remove the start-entry from the race containing the start-entry:
             try:
                 race: Union[
                     IndividualSprintRace, IntervalStartRace
-                ] = await RacesService.get_race_by_id(db, start_entry.race_id)
+                ] = await RacesAdapter.get_race_by_id(db, start_entry.race_id)
             except RaceNotFoundException as e:
                 raise HTTPNotFound(
                     reason=(
@@ -290,7 +295,7 @@ class StartEntryView(View):
                 type(race) == IndividualSprintRace
                 and race.round in first_rounds  # type: ignore
             ):
-                raceplan = await RaceplansService.get_raceplan_by_id(
+                raceplan = await RaceplansAdapter.get_raceplan_by_id(
                     db, race.raceplan_id
                 )
                 raceplan.no_of_contestants -= 1
@@ -299,7 +304,7 @@ class StartEntryView(View):
             # We also need to remove the start-entry from the startlist,
             # and subtract the start_entry from it's no_of_contestants
             try:
-                startlist: Startlist = await StartlistsService.get_startlist_by_id(
+                startlist: Startlist = await StartlistsAdapter.get_startlist_by_id(
                     db, start_entry.startlist_id
                 )
             except StartlistNotFoundException as e:

@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 from datetime import time
 from typing import List, Optional
 
-from dataclasses_json import DataClassJsonMixin
+from dataclasses_json import config, DataClassJsonMixin
+from marshmallow.fields import Time
 
 from .changelog import Changelog
 
@@ -15,7 +16,13 @@ class TimeEvent(DataClassJsonMixin):
     bib: int
     event_id: str
     timing_point: str
-    registration_time: time
+    registration_time: time = field(
+        metadata=config(
+            encoder=time.isoformat,
+            decoder=time.fromisoformat,
+            mm_field=Time(format="iso"),
+        )
+    )
     name: Optional[str] = field(default=None)
     club: Optional[str] = field(default=None)
     race: Optional[str] = field(default=None)

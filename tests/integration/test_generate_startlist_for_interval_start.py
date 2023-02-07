@@ -11,6 +11,8 @@ import jwt
 import pytest
 from pytest_mock import MockFixture
 
+from race_service.models import IntervalStartRace, Raceplan, Startlist
+
 MAX_NO_OF_CONTESTANTS_IN_RACECLASS = 80
 MAX_NO_OF_CONTESTANTS_IN_RACE = 10
 
@@ -105,78 +107,78 @@ async def raceclasses() -> List[Dict[str, Any]]:
     ]
 
 
-RACES: List[dict] = [
-    {
-        "id": "1",
-        "raceclass": "J15",
-        "order": 1,
-        "start_time": datetime.fromisoformat("2021-08-31 09:00:00"),
-        "no_of_contestants": 2,
-        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
-        "event_id": EVENT["id"],
-        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
-        "results": {},
-        "datatype": "interval_start",
-    },
-    {
-        "id": "2",
-        "raceclass": "G15",
-        "order": 2,
-        "start_time": datetime.fromisoformat("2021-08-31 09:01:00"),
-        "no_of_contestants": 2,
-        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
-        "event_id": EVENT["id"],
-        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
-        "results": {},
-        "datatype": "interval_start",
-    },
-    {
-        "id": "3",
-        "raceclass": "J16",
-        "order": 3,
-        "start_time": datetime.fromisoformat("2021-08-31 09:02:00"),
-        "no_of_contestants": 2,
-        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
-        "event_id": EVENT["id"],
-        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
-        "results": {},
-        "datatype": "interval_start",
-    },
-    {
-        "id": "4",
-        "raceclass": "G16",
-        "order": 4,
-        "start_time": datetime.fromisoformat("2021-08-31 09:03:00"),
-        "no_of_contestants": 2,
-        "max_no_of_contestants": MAX_NO_OF_CONTESTANTS_IN_RACE,
-        "event_id": EVENT["id"],
-        "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "start_entries": [],
-        "results": {},
-        "datatype": "interval_start",
-    },
+RACES: List[IntervalStartRace] = [
+    IntervalStartRace(
+        id="1",
+        raceclass="J15",
+        order=1,
+        start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="interval_start",
+    ),
+    IntervalStartRace(
+        id="2",
+        raceclass="G15",
+        order=2,
+        start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="interval_start",
+    ),
+    IntervalStartRace(
+        id="3",
+        raceclass="J16",
+        order=3,
+        start_time=datetime.fromisoformat("2021-08-31 09:02:00"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="interval_start",
+    ),
+    IntervalStartRace(
+        id="4",
+        raceclass="G16",
+        order=4,
+        start_time=datetime.fromisoformat("2021-08-31 09:03:00"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="interval_start",
+    ),
 ]
 
-RACEPLAN = {
-    "event_id": EVENT["id"],
-    "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-    "no_of_contestants": 8,
-    "races": RACES,
-}
+RACEPLAN = Raceplan(
+    event_id=EVENT["id"],
+    id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+    no_of_contestants=8,
+    races=[race.id for race in RACES],
+)
 
 
 @pytest.fixture
-async def raceplan_interval_start(event_interval_start: dict) -> dict:
+async def raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     """Create a mock raceplan object."""
     return RACEPLAN
 
 
 @pytest.fixture
 async def contestants(
-    event_interval_start: dict, raceplan_interval_start: dict
+    event_interval_start: dict, raceplan_interval_start: Raceplan
 ) -> List[dict]:
     """Create a mock contestant list object."""
     return [
@@ -287,9 +289,9 @@ async def contestants(
     ]
 
 
-def get_race_by_id(db: Any, id: str) -> dict:
+def get_race_by_id(db: Any, id: str) -> IntervalStartRace:
     """Mock function to look up correct race from list."""
-    return next(race for race in RACES if race["id"] == id)
+    return next(race for race in RACES if race.id == id)
 
 
 @pytest.mark.integration
@@ -300,7 +302,7 @@ async def test_generate_startlist_for_event(
     event_interval_start: dict,
     competition_format: dict,
     raceclasses: List[dict],
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
     contestants: List[dict],
     request_body: dict,
 ) -> None:
@@ -320,11 +322,16 @@ async def test_generate_startlist_for_event(
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
-        return_value=None,
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value={"id": STARTLIST_ID},
+        return_value=Startlist(
+            id=STARTLIST_ID,
+            event_id=event_interval_start["id"],
+            start_entries=[],
+            no_of_contestants=0,
+        ),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
@@ -343,12 +350,12 @@ async def test_generate_startlist_for_event(
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
-        return_value=raceplan_interval_start["races"],
+        return_value=RACES,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",

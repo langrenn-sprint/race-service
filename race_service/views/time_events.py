@@ -15,14 +15,19 @@ from aiohttp.web import (
 )
 from dotenv import load_dotenv
 
-from race_service.adapters import EventsAdapter, UsersAdapter
+from race_service.adapters import (
+    EventsAdapter,
+    RaceNotFoundException,
+    RaceResultsAdapter,
+    TimeEventsAdapter,
+    UsersAdapter,
+)
 from race_service.models import Changelog, TimeEvent
 from race_service.models.race_model import RaceResult
 from race_service.services import (
     ContestantNotInStartEntriesException,
     CouldNotCreateTimeEventException,
     IllegalValueException,
-    RaceNotFoundException,
     RaceResultsService,
     TimeEventAllreadyExistException,
     TimeEventDoesNotReferenceRaceException,
@@ -49,20 +54,20 @@ class TimeEventsView(View):
             event_id = self.request.rel_url.query["eventId"]
             if "timingPoint" in self.request.rel_url.query:
                 timing_point = self.request.rel_url.query["timingPoint"]
-                time_events = await TimeEventsService.get_time_events_by_event_id_and_timing_point(
+                time_events = await TimeEventsAdapter.get_time_events_by_event_id_and_timing_point(
                     db, event_id, timing_point
                 )
             else:
-                time_events = await TimeEventsService.get_time_events_by_event_id(
+                time_events = await TimeEventsAdapter.get_time_events_by_event_id(
                     db, event_id
                 )
         elif "raceId" in self.request.rel_url.query:
             race_id = self.request.rel_url.query["raceId"]
-            time_events = await TimeEventsService.get_time_events_by_race_id(
+            time_events = await TimeEventsAdapter.get_time_events_by_race_id(
                 db, race_id
             )
         else:
-            time_events = await TimeEventsService.get_all_time_events(db)
+            time_events = await TimeEventsAdapter.get_all_time_events(db)
         list = []
         for _e in time_events:
             list.append(_e.to_dict())
@@ -141,7 +146,7 @@ class TimeEventView(View):
         logging.debug(f"Got get request for time_event {time_event_id}")
 
         try:
-            time_event = await TimeEventsService.get_time_event_by_id(db, time_event_id)
+            time_event = await TimeEventsAdapter.get_time_event_by_id(db, time_event_id)
         except TimeEventNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got time_event: {time_event}")
@@ -196,14 +201,14 @@ class TimeEventView(View):
         logging.debug(f"Got delete request for time_event {time_event_id}")
 
         try:
-            time_event: TimeEvent = await TimeEventsService.get_time_event_by_id(
+            time_event: TimeEvent = await TimeEventsAdapter.get_time_event_by_id(
                 db, time_event_id
             )
             # First we try to remove time-event from race-result's ranking-sequence:
             if time_event.race_id:
                 race_results: List[
                     RaceResult
-                ] = await RaceResultsService.get_race_results_by_race_id_and_timing_point(
+                ] = await RaceResultsAdapter.get_race_results_by_race_id_and_timing_point(
                     db, time_event.race_id, time_event.timing_point
                 )
                 for race_result in race_results:

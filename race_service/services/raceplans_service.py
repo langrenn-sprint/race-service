@@ -3,7 +3,7 @@ import logging
 from typing import Any, List, Optional
 import uuid
 
-from race_service.adapters import RaceplansAdapter
+from race_service.adapters import RaceplanNotFoundException, RaceplansAdapter
 from race_service.models import Raceplan
 from .exceptions import IllegalValueException
 
@@ -11,15 +11,6 @@ from .exceptions import IllegalValueException
 def create_id() -> str:  # pragma: no cover
     """Creates an uuid."""
     return str(uuid.uuid4())
-
-
-class RaceplanNotFoundException(Exception):
-    """Class representing custom exception for fetch method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
 
 
 class RaceplanAllreadyExistException(Exception):
@@ -33,32 +24,6 @@ class RaceplanAllreadyExistException(Exception):
 
 class RaceplansService:
     """Class representing a service for raceplans."""
-
-    @classmethod
-    async def get_all_raceplans(cls: Any, db: Any) -> List[Raceplan]:
-        """Get all raceplans function."""
-        raceplans: List[Raceplan] = []
-        _raceplans = await RaceplansAdapter.get_all_raceplans(db)
-
-        if _raceplans:
-            for _raceplan in _raceplans:
-                raceplan = Raceplan.from_dict(_raceplan)
-                raceplans.append(raceplan)
-        return raceplans
-
-    @classmethod
-    async def get_raceplan_by_event_id(
-        cls: Any, db: Any, event_id: str
-    ) -> List[Raceplan]:
-        """Get all raceplans by event_id function."""
-        raceplans: List[Raceplan] = []
-        _raceplans = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
-
-        if _raceplans:
-            for _raceplan in _raceplans:
-                raceplan = Raceplan.from_dict(_raceplan)
-                raceplans.append(raceplan)
-        return raceplans
 
     @classmethod
     async def create_raceplan(cls: Any, db: Any, raceplan: Raceplan) -> Optional[str]:
@@ -77,11 +42,12 @@ class RaceplansService:
         """
         logging.debug(f"trying to insert raceplan: {raceplan}")
         # Event can have one, and only, one raceplan:
-        existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(
+        existing_rps: List[Raceplan] = []
+        existing_rps = await RaceplansAdapter.get_raceplans_by_event_id(
             db, raceplan.event_id
         )
-        logging.debug(f"existing_rp: {existing_rp}")
-        if existing_rp and len(existing_rp) > 0:
+        logging.debug(f"existing_rps: {existing_rps}")
+        if len(existing_rps) > 0:
             raise RaceplanAllreadyExistException(
                 f'Event "{raceplan.event_id}" already has a raceplan.'
             )
@@ -91,22 +57,12 @@ class RaceplansService:
         id = create_id()
         raceplan.id = id
         # insert new raceplan
-        new_raceplan = raceplan.to_dict()
-        logging.debug(f"new_raceplan: {new_raceplan}")
-        result = await RaceplansAdapter.create_raceplan(db, new_raceplan)
+        logging.debug(f"new_raceplan: {raceplan}")
+        result = await RaceplansAdapter.create_raceplan(db, raceplan)
         logging.debug(f"inserted raceplan with id: {id}")
         if result:
             return id
         return None
-
-    @classmethod
-    async def get_raceplan_by_id(cls: Any, db: Any, id: str) -> Raceplan:
-        """Get raceplan function."""
-        raceplan = await RaceplansAdapter.get_raceplan_by_id(db, id)
-        # return the document if found:
-        if raceplan:
-            return Raceplan.from_dict(raceplan)
-        raise RaceplanNotFoundException(f"Raceplan with id {id} not found")
 
     @classmethod
     async def update_raceplan(
@@ -114,26 +70,25 @@ class RaceplansService:
     ) -> Optional[str]:
         """Update raceplan function."""
         # get old document
-        old_raceplan = await RaceplansAdapter.get_raceplan_by_id(db, id)
+        try:
+            old_raceplan = await RaceplansAdapter.get_raceplan_by_id(db, id)
+        except RaceplanNotFoundException as e:
+            raise e
         # update the raceplan if found:
-        if old_raceplan:
-            if raceplan.id != old_raceplan["id"]:
-                raise IllegalValueException("Cannot change id for raceplan.")
+        if raceplan.id != old_raceplan.id:
+            raise IllegalValueException("Cannot change id for raceplan.")
 
-            new_raceplan = raceplan.to_dict()
-            result = await RaceplansAdapter.update_raceplan(db, id, new_raceplan)
-            return result
-        raise RaceplanNotFoundException(f"Raceplan with id {id} not found.")
+        result = await RaceplansAdapter.update_raceplan(db, id, raceplan)
+        return result
 
     @classmethod
     async def delete_raceplan(cls: Any, db: Any, id: str) -> Optional[str]:
         """Delete raceplan function."""
         # get old document
-        raceplan = await RaceplansAdapter.get_raceplan_by_id(db, id)
+        try:
+            await RaceplansAdapter.get_raceplan_by_id(db, id)
+        except RaceplanNotFoundException as e:
+            raise e
         # delete the document if found:
-        if raceplan:
-            result = await RaceplansAdapter.delete_raceplan(db, id)
-            return result
-        raise RaceplanNotFoundException(
-            f"Raceplan with id {id} not found"
-        )  # pragma: no cover
+        result = await RaceplansAdapter.delete_raceplan(db, id)
+        return result

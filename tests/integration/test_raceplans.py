@@ -12,7 +12,11 @@ import jwt
 import pytest
 from pytest_mock import MockFixture
 
-from race_service.adapters import RaceclassesNotFoundException
+from race_service.adapters import (
+    RaceclassesNotFoundException,
+    RaceplanNotFoundException,
+)
+from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
 
 
 @pytest.fixture
@@ -70,6 +74,20 @@ async def competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
+async def competition_format_interval_start() -> Dict[str, Any]:
+    """A competition-format for testing."""
+    return {
+        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        "name": "Interval Start",
+        "start_procedure": "Interval Start",
+        "time_between_groups": "00:10:00",
+        "intervals": "00:00:30",
+        "max_no_of_contestants_in_raceclass": 1000,
+        "max_no_of_contestants_in_race": 1000,
+    }
+
+
+@pytest.fixture
 async def raceclasses() -> List[Dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
@@ -117,278 +135,184 @@ async def raceclasses() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-async def new_raceplan_interval_start() -> dict:
+async def interval_start_races(event: dict) -> List[IntervalStartRace]:
+    """Create a a list of interval-start races."""
+    return [
+        IntervalStartRace(
+            id="race_1",
+            raceclass="G16",
+            order=1,
+            start_time=datetime.fromisoformat("2021-08-31 12:00:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="interval_start",
+        ),
+        IntervalStartRace(
+            id="race_2",
+            raceclass="G16",
+            order=2,
+            start_time=datetime.fromisoformat("2021-08-31 12:15:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="interval_start",
+        ),
+        IntervalStartRace(
+            id="race_3",
+            raceclass="G16",
+            order=3,
+            start_time=datetime.fromisoformat("2021-08-31 12:30:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="interval_start",
+        ),
+        IntervalStartRace(
+            id="race_4",
+            raceclass="G16",
+            order=4,
+            start_time=datetime.fromisoformat("2021-08-31 12:45:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="interval_start",
+        ),
+    ]
+
+
+@pytest.fixture
+async def new_raceplan_interval_start(
+    event: dict, interval_start_races: List[IntervalStartRace]
+) -> Raceplan:
     """Create a raceplan object."""
-    return {
-        "event_id": "event_1",
-        "no_of_contestants": 32,
-        "races": [
-            {
-                "raceclass": "G16",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-            {
-                "raceclass": "G16",
-                "order": 2,
-                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-            {
-                "raceclass": "G16",
-                "order": 3,
-                "start_time": datetime.fromisoformat("2021-08-31 12:03:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-            {
-                "raceclass": "G16",
-                "order": 4,
-                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-        ],
-    }
+    return Raceplan(
+        id="raceplan_1",
+        event_id=event["id"],
+        no_of_contestants=32,
+        races=[race.id for race in interval_start_races],
+    )
 
 
 @pytest.fixture
-async def raceplan_interval_start() -> dict:
+async def raceplan_interval_start(
+    event: dict, interval_start_races: List[IntervalStartRace]
+) -> Raceplan:
     """Create a mock raceplan object."""
-    return {
-        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "event_id": "event_1",
-        "no_of_contestants": 32,
-        "races": [
-            {
-                "raceclass": "G16",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-            {
-                "raceclass": "G16",
-                "order": 2,
-                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-            {
-                "raceclass": "G16",
-                "order": 3,
-                "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-            {
-                "raceclass": "G16",
-                "order": 4,
-                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "results": {},
-                "datatype": "interval_start",
-            },
-        ],
-    }
+    return Raceplan(
+        id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        event_id=event["id"],
+        no_of_contestants=32,
+        races=[race.id for race in interval_start_races],
+    )
 
 
 @pytest.fixture
-async def new_raceplan_individual_sprint() -> dict:
+async def individual_sprint_races(event: dict) -> List[IndividualSprintRace]:
+    """Create a a list of individual sprint races."""
+    return [
+        IndividualSprintRace(
+            id="race_1",
+            raceclass="G16",
+            order=1,
+            round="Q",
+            index="A",
+            heat=1,
+            start_time=datetime.fromisoformat("2021-08-31 12:00:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="individual_sprint",
+        ),
+        IndividualSprintRace(
+            id="race_2",
+            raceclass="G16",
+            order=2,
+            round="Q",
+            index="A",
+            heat=2,
+            start_time=datetime.fromisoformat("2021-08-31 12:15:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="individual_sprint",
+        ),
+        IndividualSprintRace(
+            id="race_3",
+            raceclass="G16",
+            order=3,
+            round="Q",
+            index="A",
+            heat=3,
+            start_time=datetime.fromisoformat("2021-08-31 12:30:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="individual_sprint",
+        ),
+        IndividualSprintRace(
+            id="race_4",
+            raceclass="G16",
+            order=4,
+            round="Q",
+            index="A",
+            heat=4,
+            start_time=datetime.fromisoformat("2021-08-31 12:45:00"),
+            no_of_contestants=8,
+            max_no_of_contestants=10,
+            event_id=event["id"],
+            raceplan_id="",
+            start_entries=[],
+            results={},
+            datatype="individual_sprint",
+        ),
+    ]
+
+
+@pytest.fixture
+async def new_raceplan_individual_sprint(
+    event: dict, individual_sprint_races: List[IndividualSprintRace]
+) -> Raceplan:
     """Create a mock raceplan object."""
-    return {
-        "event_id": "event_1",
-        "no_of_contestants": 32,
-        "races": [
-            {
-                "raceclass": "G16",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "individual_sprint",
-            },
-            {
-                "raceclass": "G16",
-                "order": 2,
-                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "individual_sprint",
-            },
-            {
-                "raceclass": "G16",
-                "order": 3,
-                "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "individual_sprint",
-            },
-            {
-                "raceclass": "G16",
-                "order": 4,
-                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "event_id": "event_1",
-                "raceplan_id": "",
-                "start_entries": [],
-                "results": {},
-                "datatype": "individual_sprint",
-            },
-        ],
-    }
+    return Raceplan(
+        event_id=event["id"],
+        no_of_contestants=32,
+        races=[race.id for race in individual_sprint_races],
+    )
 
 
 @pytest.fixture
-async def raceplan_individual_sprint() -> dict:
+async def raceplan_individual_sprint(
+    event: dict, individual_sprint_races: List[IndividualSprintRace]
+) -> Raceplan:
     """Create a mock raceplan object."""
-    return {
-        "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        "event_id": "event_1",
-        "no_of_contestants": 32,
-        "races": [
-            {
-                "raceclass": "G16",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "datatype": "individual_sprint",
-                "id": "190e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "round": "Q",
-                "index": "A",
-                "heat": 1,
-            },
-            {
-                "raceclass": "G16",
-                "order": 2,
-                "start_time": datetime.fromisoformat("2021-08-31 12:15:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "datatype": "individual_sprint",
-                "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "round": "Q",
-                "index": "A",
-                "heat": 1,
-            },
-            {
-                "raceclass": "G16",
-                "order": 3,
-                "start_time": datetime.fromisoformat("2021-08-31 12:30:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "datatype": "individual_sprint",
-                "id": "390e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "round": "Q",
-                "index": "A",
-                "heat": 1,
-            },
-            {
-                "raceclass": "G16",
-                "order": 4,
-                "start_time": datetime.fromisoformat("2021-08-31 12:45:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "datatype": "individual_sprint",
-                "id": "490e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "event_id": "event_1",
-                "raceplan_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
-                "start_entries": [],
-                "round": "Q",
-                "index": "A",
-                "heat": 1,
-            },
-        ],
-    }
-
-
-@pytest.fixture
-async def new_raceplan_unsupported_datatype() -> dict:
-    """Create a raceplan object."""
-    return {
-        "event_id": "event_1",
-        "no_of_contestants": 8,
-        "races": [
-            {
-                "raceclass": "G16",
-                "order": 1,
-                "start_time": datetime.fromisoformat("2021-08-31 12:00:00"),
-                "no_of_contestants": 8,
-                "max_no_of_contestants": 10,
-                "start_entries": [],
-                "results": {},
-                "datatype": "unsupported",
-            },
-        ],
-    }
+    return Raceplan(
+        id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        event_id=event["id"],
+        no_of_contestants=32,
+        races=[race.id for race in individual_sprint_races],
+    )
 
 
 @pytest.mark.integration
@@ -396,11 +320,12 @@ async def test_create_raceplan(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    new_raceplan_interval_start: dict,
-    raceplan_interval_start: dict,
+    new_raceplan_interval_start: Raceplan,
+    raceplan_interval_start: Raceplan,
+    interval_start_races: List[IntervalStartRace],
 ) -> None:
     """Should return 405 Method Not Allowed."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
         return_value=RACEPLAN_ID,
@@ -410,8 +335,8 @@ async def test_create_raceplan(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
@@ -423,7 +348,7 @@ async def test_create_raceplan(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.create_race",
-        side_effect=raceplan_interval_start["races"],
+        side_effect=interval_start_races,
     )
 
     request_body = dumps(
@@ -446,21 +371,22 @@ async def test_get_raceplan_by_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
+    interval_start_races: List[IntervalStartRace],
 ) -> None:
     """Should return OK, and a body containing one raceplan."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_interval_start["races"],
+        side_effect=interval_start_races,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -472,8 +398,8 @@ async def test_get_raceplan_by_id(
         body = await resp.json()
         assert type(body) is dict
         assert body["id"] == RACEPLAN_ID
-        assert body["event_id"] == raceplan_interval_start["event_id"]
-        assert len(body["races"]) == len(raceplan_interval_start["races"])
+        assert body["event_id"] == raceplan_interval_start.event_id
+        assert len(body["races"]) == len(raceplan_interval_start.races)
         for race in body["races"]:
             assert race["raceclass"]
             assert race["order"]
@@ -488,21 +414,22 @@ async def test_validate_raceplan(
     event: dict,
     competition_format: dict,
     raceclasses: dict,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
+    individual_sprint_races: List[IndividualSprintRace],
 ) -> None:
     """Should return OK, and an empty list."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    RACEPLAN_ID = raceplan_individual_sprint.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint["races"],
+        side_effect=individual_sprint_races,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -534,6 +461,60 @@ async def test_validate_raceplan(
 
 
 @pytest.mark.integration
+async def test_validate_raceplan_interval_start(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    event: dict,
+    competition_format_interval_start: dict,
+    raceclasses: dict,
+    raceplan_interval_start: Raceplan,
+    interval_start_races: List[IntervalStartRace],
+) -> None:
+    """Should return OK, and an empty list."""
+    RACEPLAN_ID = raceplan_interval_start.id
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        return_value=raceplan_interval_start,
+    )
+    mocker.patch(
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
+    )
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        side_effect=interval_start_races,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        return_value=raceclasses,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        return_value=event,
+    )
+    mocker.patch(
+        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        return_value=competition_format_interval_start,
+    )
+
+    headers = {
+        hdrs.CONTENT_TYPE: "application/json",
+        hdrs.AUTHORIZATION: f"Bearer {token}",
+    }
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8080/authorize", status=204)
+
+        resp = await client.post(f"/raceplans/{RACEPLAN_ID}/validate", headers=headers)
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is dict
+        assert len(body) == 0
+
+
+@pytest.mark.integration
 async def test_validate_raceplan_race_has_no_contestants(
     client: _TestClient,
     mocker: MockFixture,
@@ -541,26 +522,25 @@ async def test_validate_raceplan_race_has_no_contestants(
     event: dict,
     competition_format: dict,
     raceclasses: dict,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
+    individual_sprint_races: List[IndividualSprintRace],
 ) -> None:
     """Should return OK, and an empty list."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
-    raceplan_individual_sprint_with_no_contestants = deepcopy(
-        raceplan_individual_sprint
-    )
-    raceplan_individual_sprint_with_no_contestants["races"][0]["no_of_contestants"] = 0
+    RACEPLAN_ID = raceplan_individual_sprint.id
+    races = deepcopy(individual_sprint_races)
+    races[0].no_of_contestants = 0
 
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint_with_no_contestants["races"],
+        side_effect=races,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -607,28 +587,25 @@ async def test_validate_raceplan_race_no_chronological_time(
     event: dict,
     competition_format: dict,
     raceclasses: dict,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
+    individual_sprint_races: List[IndividualSprintRace],
 ) -> None:
     """Should return OK, and an empty list."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
-    raceplan_individual_sprint_with_no_contestants = deepcopy(
-        raceplan_individual_sprint
-    )
-    raceplan_individual_sprint_with_no_contestants["races"][-1][
-        "start_time"
-    ] = raceplan_individual_sprint_with_no_contestants["races"][0]["start_time"]
+    RACEPLAN_ID = raceplan_individual_sprint.id
+    races = deepcopy(individual_sprint_races)
+    races[-1].start_time = races[0].start_time
 
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint_with_no_contestants["races"],
+        side_effect=races,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -670,29 +647,26 @@ async def test_validate_raceplan_race_has_no_contestants_and_faulty_time(
     event: dict,
     competition_format: dict,
     raceclasses: dict,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
+    individual_sprint_races: List[IndividualSprintRace],
 ) -> None:
     """Should return OK, and an empty list."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
-    raceplan_individual_sprint_with_no_contestants = deepcopy(
-        raceplan_individual_sprint
-    )
-    raceplan_individual_sprint_with_no_contestants["races"][-1]["no_of_contestants"] = 0
-    raceplan_individual_sprint_with_no_contestants["races"][-1][
-        "start_time"
-    ] = raceplan_individual_sprint_with_no_contestants["races"][0]["start_time"]
+    RACEPLAN_ID = raceplan_individual_sprint.id
+    races = deepcopy(individual_sprint_races)
+    races[-1].no_of_contestants = 0
+    races[-1].start_time = races[0].start_time
 
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint_with_no_contestants["races"],
+        side_effect=races,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -742,26 +716,27 @@ async def test_validate_raceplan_contestants_not_equal_no_of_contestants_in_race
     event: dict,
     competition_format: dict,
     raceclasses: dict,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
+    individual_sprint_races: List[IndividualSprintRace],
 ) -> None:
     """Should return OK, and an empty list."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    RACEPLAN_ID = raceplan_individual_sprint.id
     raceplan_individual_sprint_with_faulty_contestants = deepcopy(
         raceplan_individual_sprint
     )
-    raceplan_individual_sprint_with_faulty_contestants["no_of_contestants"] = 30
+    raceplan_individual_sprint_with_faulty_contestants.no_of_contestants = 30
 
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint_with_faulty_contestants,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint_with_faulty_contestants["races"],
+        side_effect=individual_sprint_races,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -799,21 +774,21 @@ async def test_validate_raceplan_contestants_not_equal_no_of_contestants_in_race
 
 
 @pytest.mark.integration
-async def test_get_raceplan_by_event_id(
+async def test_get_raceplans_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return OK, and a body containing one raceplan."""
-    EVENT_ID = raceplan_interval_start["event_id"]
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    EVENT_ID = raceplan_interval_start.event_id
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value=None,
+        side_effect=RaceplanNotFoundException(f"Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_interval_start],
     )
 
@@ -827,30 +802,28 @@ async def test_get_raceplan_by_event_id(
         assert type(body) is list
         assert len(body) == 1
         assert body[0]["id"] == RACEPLAN_ID
-        assert body[0]["event_id"] == raceplan_interval_start["event_id"]
-        assert len(body[0]["races"]) == len(raceplan_interval_start["races"])
-        for race in body[0]["races"]:
-            assert race["raceclass"]
-            assert race["order"]
-            assert race["start_time"]
+        assert body[0]["event_id"] == raceplan_interval_start.event_id
+        assert len(body[0]["races"]) == len(raceplan_interval_start.races)
+        for race_id in body[0]["races"]:
+            assert race_id
 
 
 @pytest.mark.integration
-async def test_get_raceplan_by_event_id_individual_sprint(
+async def test_get_raceplans_by_event_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
 ) -> None:
     """Should return OK, and a body containing one raceplan."""
-    EVENT_ID = raceplan_individual_sprint["event_id"]
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    EVENT_ID = raceplan_individual_sprint.event_id
+    RACEPLAN_ID = raceplan_individual_sprint.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value=None,
+        side_effect=RaceplanNotFoundException(f"Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_individual_sprint],
     )
 
@@ -864,12 +837,10 @@ async def test_get_raceplan_by_event_id_individual_sprint(
         assert type(body) is list
         assert len(body) == 1
         assert body[0]["id"] == RACEPLAN_ID
-        assert body[0]["event_id"] == raceplan_individual_sprint["event_id"]
-        assert len(body[0]["races"]) == len(raceplan_individual_sprint["races"])
-        for race in body[0]["races"]:
-            assert race["raceclass"]
-            assert race["order"]
-            assert race["start_time"]
+        assert body[0]["event_id"] == raceplan_individual_sprint.event_id
+        assert len(body[0]["races"]) == len(raceplan_individual_sprint.races)
+        for race_id in body[0]["races"]:
+            assert race_id
 
 
 @pytest.mark.integration
@@ -877,17 +848,18 @@ async def test_update_raceplan_by_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
+    interval_start_races: List[IntervalStartRace],
 ) -> None:
     """Should return No Content."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
@@ -895,7 +867,7 @@ async def test_update_raceplan_by_id(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_interval_start["races"],
+        side_effect=interval_start_races,
     )
 
     headers = {
@@ -903,7 +875,9 @@ async def test_update_raceplan_by_id(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
+    request_body = dumps(
+        raceplan_interval_start.to_dict(), indent=4, sort_keys=True, default=str
+    )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8080/authorize", status=204)
@@ -919,17 +893,17 @@ async def test_get_all_raceplans(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return OK and a valid json body."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -948,17 +922,17 @@ async def test_get_all_raceplans_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
 ) -> None:
     """Should return OK and a valid json body."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    RACEPLAN_ID = raceplan_individual_sprint.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
         return_value=[raceplan_individual_sprint],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -977,10 +951,10 @@ async def test_delete_raceplan_by_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return No Content."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
@@ -990,12 +964,12 @@ async def test_delete_raceplan_by_id(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_interval_start["races"],
+        side_effect=raceplan_interval_start.races,
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.delete_race",
@@ -1022,21 +996,22 @@ async def test_validate_raceplan_has_no_raceclasses(
     event: dict,
     competition_format: dict,
     raceclasses: dict,
-    raceplan_individual_sprint: dict,
+    raceplan_individual_sprint: Raceplan,
+    individual_sprint_races: List[IndividualSprintRace],
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = raceplan_individual_sprint["id"]
+    RACEPLAN_ID = raceplan_individual_sprint.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=raceplan_individual_sprint["races"],
+        side_effect=individual_sprint_races,
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1070,10 +1045,10 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
@@ -1083,8 +1058,8 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     headers = {
@@ -1108,10 +1083,10 @@ async def test_update_raceplan_by_id_different_id_in_body(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
@@ -1121,8 +1096,8 @@ async def test_update_raceplan_by_id_different_id_in_body(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     headers = {
@@ -1131,8 +1106,8 @@ async def test_update_raceplan_by_id_different_id_in_body(
     }
 
     update_body = deepcopy(raceplan_interval_start)
-    update_body["id"] = "different_id"
-    request_body = dumps(update_body, indent=4, sort_keys=True, default=str)
+    update_body.id = "different_id"
+    request_body = dumps(update_body.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8080/authorize", status=204)
@@ -1148,10 +1123,12 @@ async def test_update_raceplan_by_id_different_id_in_body(
 
 @pytest.mark.integration
 async def test_update_raceplan_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, raceplan_interval_start: dict
+    client: _TestClient,
+    mocker: MockFixture,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 401 Unauthorized."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
@@ -1161,8 +1138,8 @@ async def test_update_raceplan_by_id_no_authorization(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     headers = {
@@ -1170,7 +1147,9 @@ async def test_update_raceplan_by_id_no_authorization(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
+    request_body = dumps(
+        raceplan_interval_start.to_dict(), indent=4, sort_keys=True, default=str
+    )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8080/authorize", status=401)
@@ -1183,17 +1162,19 @@ async def test_update_raceplan_by_id_no_authorization(
 
 @pytest.mark.integration
 async def test_delete_raceplan_by_id_no_authorization(
-    client: _TestClient, mocker: MockFixture, raceplan_interval_start: dict
+    client: _TestClient,
+    mocker: MockFixture,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 401 Unauthorized."""
-    RACEPLAN_ID = raceplan_interval_start["id"]
+    RACEPLAN_ID = raceplan_interval_start.id
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -1211,7 +1192,7 @@ async def test_update_raceplan_insufficient_role(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 403 Forbidden."""
     RACEPLAN_ID = "does-not-exist"
@@ -1224,7 +1205,7 @@ async def test_update_raceplan_insufficient_role(
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_interval_start],
     )
 
@@ -1254,11 +1235,11 @@ async def test_get_raceplan_not_found(
     RACEPLAN_ID = "does-not-exist"
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value=None,
+        side_effect=RaceplanNotFoundException("Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
@@ -1273,21 +1254,23 @@ async def test_update_raceplan_not_found(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    raceplan_interval_start: dict,
+    raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 404 Not found."""
     RACEPLAN_ID = "does-not-exist"
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value=None,
+        side_effect=RaceplanNotFoundException(
+            f"Raceplan with id {raceplan_interval_start.id} not found."
+        ),
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     headers = {
@@ -1295,7 +1278,9 @@ async def test_update_raceplan_not_found(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
+    request_body = dumps(
+        raceplan_interval_start.to_dict(), indent=4, sort_keys=True, default=str
+    )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
         m.post("http://users.example.com:8080/authorize", status=204)
@@ -1313,15 +1298,15 @@ async def test_delete_raceplan_not_found(
     RACEPLAN_ID = "does-not-exist"
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value=None,
+        side_effect=RaceplanNotFoundException("Raceplan with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
 
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}

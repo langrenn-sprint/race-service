@@ -150,7 +150,7 @@ def contract_tests(session: Session) -> None:
             "COMPETITION_FORMAT_HOST_PORT": "8082",
             "USERS_HOST_SERVER": "localhost",
             "USERS_HOST_PORT": "8083",
-            "LOGGING_LEVEL": "DEBUG",
+            "LOGGING_LEVEL": "INFO",
             "JWT_EXP_DELTA_SECONDS": "3600",
             "JWT_SECRET": "secret",
             "DB_NAME": "races_test",
