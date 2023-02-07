@@ -8,6 +8,8 @@ from race_service.adapters import (
     EventNotFoundException,
     EventsAdapter,
     RaceclassesNotFoundException,
+    RaceplansAdapter,
+    RacesAdapter,
     StartlistsAdapter,
 )
 from race_service.models import (
@@ -18,7 +20,6 @@ from race_service.models import (
     Startlist,
 )
 from race_service.services import (
-    RaceplansService,
     RacesService,
     StartEntriesService,
     StartlistAllreadyExistException,
@@ -123,7 +124,7 @@ class StartlistsCommands:
             startlist.start_entries.append(start_entry_id)
 
             # We add the start-entry to the respective race:
-            race = await RacesService.get_race_by_id(db, start_entry.race_id)
+            race = await RacesAdapter.get_race_by_id(db, start_entry.race_id)
             race.start_entries.append(start_entry_id)
             await RacesService.update_race(db, race.id, race)
         await StartlistsService.update_startlist(db, startlist_id, startlist)
@@ -173,6 +174,7 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
     for races in races_grouped_by_raceclass:
         # We find the actual ageclasses in this raceclass:
         ageclasses: List[str] = []
+        ranking = False
         for raceclass in raceclasses:
             if raceclass["name"] == races[0].raceclass:
                 ranking = raceclass["ranking"]
@@ -345,7 +347,7 @@ async def get_startlist(db: Any, token: str, event_id: str) -> None:
 
 async def get_raceplan(db: Any, token: str, event_id: str) -> Raceplan:
     """Check if the event has a raceplan."""
-    raceplans = await RaceplansService.get_raceplan_by_event_id(db, event_id)
+    raceplans = await RaceplansAdapter.get_raceplans_by_event_id(db, event_id)
     if len(raceplans) == 0:
         raise NoRaceplanInEventException(
             f"No raceplan for event {event_id}. Cannot proceed."
@@ -361,7 +363,7 @@ async def get_races(
     db: Any, token: str, raceplan_id: str
 ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
     """Check if the event has a races."""
-    races = await RacesService.get_races_by_raceplan_id(db, raceplan_id)
+    races = await RacesAdapter.get_races_by_raceplan_id(db, raceplan_id)
     if len(races) == 0:
         raise NoRacesInRaceplanException(
             f"No races in raceplan {raceplan_id}. Cannot proceed."

@@ -10,6 +10,8 @@ import jwt
 import pytest
 from pytest_mock import MockFixture
 
+from race_service.models import Raceplan
+
 
 @pytest.fixture
 def token() -> str:
@@ -123,12 +125,14 @@ async def test_generate_raceplan_for_event(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value={"id": RACEPLAN_ID},
+        return_value=Raceplan(
+            id=RACEPLAN_ID, event_id=event["id"], races=[], no_of_contestants=0
+        ),
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",

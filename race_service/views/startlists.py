@@ -11,7 +11,12 @@ from aiohttp.web import (
 )
 from dotenv import load_dotenv
 
-from race_service.adapters import UsersAdapter
+from race_service.adapters import (
+    RacesAdapter,
+    StartEntriesAdapter,
+    StartlistsAdapter,
+    UsersAdapter,
+)
 from race_service.models import StartEntry, Startlist
 from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
 from race_service.services import (
@@ -37,13 +42,13 @@ class StartlistsView(View):
 
         if "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
-            startlists = await StartlistsService.get_startlists_by_event_id(
+            startlists = await StartlistsAdapter.get_startlists_by_event_id(
                 db, event_id
             )
             for startlist in startlists:
                 start_entries: List[StartEntry] = []
                 for start_entry_id in startlist.start_entries:
-                    start_entry = await StartEntriesService.get_start_entry_by_id(
+                    start_entry = await StartEntriesAdapter.get_start_entry_by_id(
                         db, start_entry_id
                     )
                     if "bib" in self.request.rel_url.query:
@@ -54,7 +59,7 @@ class StartlistsView(View):
                 startlist.start_entries = start_entries  # type: ignore
 
         else:
-            startlists = await StartlistsService.get_all_startlists(db)
+            startlists = await StartlistsAdapter.get_all_startlists(db)
         list = []
         for _e in startlists:
             list.append(_e.to_dict())
@@ -74,12 +79,12 @@ class StartlistView(View):
         logging.debug(f"Got get request for startlist {startlist_id}")
 
         try:
-            startlist: Startlist = await StartlistsService.get_startlist_by_id(
+            startlist: Startlist = await StartlistsAdapter.get_startlist_by_id(
                 db, startlist_id
             )
             start_entries: List[StartEntry] = []
             for start_entry_id in startlist.start_entries:
-                start_entry = await StartEntriesService.get_start_entry_by_id(
+                start_entry = await StartEntriesAdapter.get_start_entry_by_id(
                     db, start_entry_id
                 )
                 start_entries.append(start_entry)
@@ -104,7 +109,7 @@ class StartlistView(View):
 
         try:
             startlist_to_be_deleted: Startlist = (
-                await StartlistsService.get_startlist_by_id(db, startlist_id)
+                await StartlistsAdapter.get_startlist_by_id(db, startlist_id)
             )
 
             # First we need to remove all the start-entries:
@@ -112,7 +117,7 @@ class StartlistView(View):
                 await StartEntriesService.delete_start_entry(db, start_entry_id)
 
             # We also need to remove all start-entries in the event's races:
-            races = await RacesService.get_races_by_event_id(
+            races = await RacesAdapter.get_races_by_event_id(
                 db, startlist_to_be_deleted.event_id
             )
             race: Union[IndividualSprintRace, IntervalStartRace]

@@ -1,9 +1,9 @@
 """Module for start_entries service."""
 import logging
-from typing import Any, List, Optional
+from typing import Any, Optional
 import uuid
 
-from race_service.adapters import StartEntriesAdapter
+from race_service.adapters import StartEntriesAdapter, StartEntryNotFoundException
 from race_service.models import StartEntry
 from .exceptions import IllegalValueException
 
@@ -22,49 +22,8 @@ class CouldNotCreateStartEntryException(Exception):
         super().__init__(message)
 
 
-class StartEntryNotFoundException(Exception):
-    """Class representing custom exception for fetch method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
 class StartEntriesService:
     """Class representing a service for start_entries."""
-
-    @classmethod
-    async def get_start_entries_by_race_id(
-        cls: Any, db: Any, race_id: str
-    ) -> List[StartEntry]:
-        """Get all start_entries by race_id function."""
-        start_entries: List[StartEntry] = []
-        _start_entries = await StartEntriesAdapter.get_start_entries_by_race_id(
-            db, race_id
-        )
-
-        if _start_entries:
-            for _start_entry in _start_entries:
-                start_entries.append(StartEntry.from_dict(_start_entry))
-        return start_entries
-
-    @classmethod
-    async def get_start_entries_by_race_id_and_startlist_id(
-        cls: Any, db: Any, race_id: str, startlist_id: str
-    ) -> List[StartEntry]:
-        """Get all start_entries by startlist_id function."""
-        start_entries: List[StartEntry] = []
-        _start_entries = (
-            await StartEntriesAdapter.get_start_entries_by_race_id_and_startlist_id(
-                db, race_id, startlist_id
-            )
-        )
-
-        if _start_entries:
-            for _start_entry in _start_entries:
-                start_entries.append(StartEntry.from_dict(_start_entry))
-        return start_entries
 
     @classmethod
     async def create_start_entry(cls: Any, db: Any, start_entry: StartEntry) -> str:
@@ -90,9 +49,8 @@ class StartEntriesService:
         id = create_id()
         start_entry.id = id
         # insert new start_entry
-        new_start_entry = start_entry.to_dict()
-        logging.debug(f"new_start_entry: {new_start_entry}")
-        result = await StartEntriesAdapter.create_start_entry(db, new_start_entry)
+        logging.debug(f"new start_entry: {start_entry}")
+        result = await StartEntriesAdapter.create_start_entry(db, start_entry)
         logging.debug(f"inserted start_entry with id: {id}")
         if result:
             return id
@@ -101,42 +59,32 @@ class StartEntriesService:
         ) from None
 
     @classmethod
-    async def get_start_entry_by_id(cls: Any, db: Any, id: str) -> StartEntry:
-        """Get start_entry by id function."""
-        start_entry = await StartEntriesAdapter.get_start_entry_by_id(db, id)
-        # return the document if found:
-        if start_entry:
-            return StartEntry.from_dict(start_entry)
-        raise StartEntryNotFoundException(f"StartEntry with id {id} not found")
-
-    @classmethod
     async def update_start_entry(
         cls: Any, db: Any, id: str, start_entry: StartEntry
     ) -> Optional[str]:
         """Update start_entry function."""
         # get old document
-        old_start_entry = await StartEntriesAdapter.get_start_entry_by_id(db, id)
+        try:
+            old_start_entry = await StartEntriesAdapter.get_start_entry_by_id(db, id)
+        except StartEntryNotFoundException as e:
+            raise e
         # update the start_entry if found:
-        if old_start_entry:
-            if start_entry.id != old_start_entry["id"]:
-                raise IllegalValueException("Cannot change id for start_entry.")
-            new_start_entry = start_entry.to_dict()
-            result = await StartEntriesAdapter.update_start_entry(
-                db, id, new_start_entry
-            )
-            return result
-        raise StartEntryNotFoundException(f"StartEntry with id {id} not found.")
+        if start_entry.id != old_start_entry.id:
+            raise IllegalValueException("Cannot change id for start_entry.")
+        result = await StartEntriesAdapter.update_start_entry(db, id, start_entry)
+        return result
 
     @classmethod
     async def delete_start_entry(cls: Any, db: Any, id: str) -> Optional[str]:
         """Delete start_entry function."""
         # get old document
-        start_entry = await StartEntriesAdapter.get_start_entry_by_id(db, id)
+        try:
+            await StartEntriesAdapter.get_start_entry_by_id(db, id)
+        except StartEntryNotFoundException as e:
+            raise e
         # delete the document if found:
-        if start_entry:
-            result = await StartEntriesAdapter.delete_start_entry(db, id)
-            return result
-        raise StartEntryNotFoundException(f"StartEntry with id {id} not found")
+        result = await StartEntriesAdapter.delete_start_entry(db, id)
+        return result
 
 
 #   Validation:

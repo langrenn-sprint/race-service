@@ -159,8 +159,8 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
@@ -226,8 +226,8 @@ async def test_generate_raceplan_for_event_create_race_fails(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
@@ -294,8 +294,8 @@ async def test_generate_raceplan_for_event_unauthorized(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -346,7 +346,7 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value={"id": "blabladibla"},
     )
     mocker.patch(
@@ -398,8 +398,8 @@ async def test_generate_raceplan_for_event_event_not_found(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -456,8 +456,8 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -514,8 +514,8 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -564,8 +564,8 @@ async def test_generate_raceplan_for_event_no_raceclasses(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -617,8 +617,8 @@ async def test_generate_raceplan_for_event_no_competition_format(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -670,8 +670,8 @@ async def test_generate_raceplan_for_event_missing_intervals(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -723,8 +723,8 @@ async def test_generate_raceplan_for_event_time_missing(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -776,8 +776,8 @@ async def test_generate_raceplan_for_event_date_missing(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -829,8 +829,8 @@ async def test_generate_raceplan_for_event_invalid_date(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -882,8 +882,8 @@ async def test_generate_raceplan_for_event_invalid_time(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -935,8 +935,8 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -990,8 +990,8 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1045,8 +1045,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1100,8 +1100,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1156,8 +1156,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1211,8 +1211,8 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1267,8 +1267,8 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1318,8 +1318,8 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
@@ -1371,8 +1371,8 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
         return_value=RACEPLAN_ID,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_event_id",
-        return_value=None,
+        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
