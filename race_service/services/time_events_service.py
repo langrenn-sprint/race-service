@@ -1,9 +1,9 @@
 """Module for time_events service."""
 import logging
-from typing import Any, List, Optional
+from typing import Any, Optional
 import uuid
 
-from race_service.adapters import TimeEventsAdapter
+from race_service.adapters import TimeEventNotFoundException, TimeEventsAdapter
 from race_service.models import TimeEvent
 from .exceptions import IllegalValueException
 
@@ -22,15 +22,6 @@ class CouldNotCreateTimeEventException(Exception):
         super().__init__(message)
 
 
-class TimeEventNotFoundException(Exception):
-    """Class representing custom exception for fetch method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
 class TimeEventAllreadyExistException(Exception):
     """Class representing custom exception for fetch method."""
 
@@ -42,52 +33,6 @@ class TimeEventAllreadyExistException(Exception):
 
 class TimeEventsService:
     """Class representing a service for time_events."""
-
-    @classmethod
-    async def get_all_time_events(cls: Any, db: Any) -> List[TimeEvent]:
-        """Get all time_events function."""
-        time_events: List[TimeEvent] = []
-        _time_events = await TimeEventsAdapter.get_all_time_events(db)
-        for e in _time_events:
-            time_events.append(TimeEvent.from_dict(e))
-        return time_events
-
-    @classmethod
-    async def get_time_events_by_event_id(
-        cls: Any, db: Any, event_id: str
-    ) -> List[TimeEvent]:
-        """Get all time_events by event_id function."""
-        time_events: List[TimeEvent] = []
-        _time_events = await TimeEventsAdapter.get_time_events_by_event_id(db, event_id)
-        for e in _time_events:
-            time_events.append(TimeEvent.from_dict(e))
-        return time_events
-
-    @classmethod
-    async def get_time_events_by_event_id_and_timing_point(
-        cls: Any, db: Any, event_id: str, timing_point: str
-    ) -> List[TimeEvent]:
-        """Get all time_events by event_id and timing_point function."""
-        time_events: List[TimeEvent] = []
-        _time_events = (
-            await TimeEventsAdapter.get_time_events_by_event_id_and_timing_point(
-                db, event_id, timing_point
-            )
-        )
-        for e in _time_events:
-            time_events.append(TimeEvent.from_dict(e))
-        return time_events
-
-    @classmethod
-    async def get_time_events_by_race_id(
-        cls: Any, db: Any, race_id: str
-    ) -> List[TimeEvent]:
-        """Get all time_events by race_id function."""
-        time_events: List[TimeEvent] = []
-        _time_events = await TimeEventsAdapter.get_time_events_by_race_id(db, race_id)
-        for e in _time_events:
-            time_events.append(TimeEvent.from_dict(e))
-        return time_events
 
     @classmethod
     async def create_time_event(cls: Any, db: Any, time_event: TimeEvent) -> str:
@@ -115,10 +60,10 @@ class TimeEventsService:
             db, time_event.race_id  # type: ignore
         )
         for _time_event in _time_events:
-            if _time_event["timing_point"] != "Template":
+            if _time_event.timing_point != "Template":
                 if (
-                    _time_event["bib"] == time_event.bib
-                    and _time_event["timing_point"] == time_event.timing_point
+                    _time_event.bib == time_event.bib
+                    and _time_event.timing_point == time_event.timing_point
                 ):
                     raise TimeEventAllreadyExistException(
                         (
@@ -130,9 +75,8 @@ class TimeEventsService:
         id = create_id()
         time_event.id = id
         # insert new time_event
-        new_time_event = time_event.to_dict()
-        logging.debug(f"new_time_event: {new_time_event}")
-        result = await TimeEventsAdapter.create_time_event(db, new_time_event)
+        logging.debug(f"new time_event: {time_event}")
+        result = await TimeEventsAdapter.create_time_event(db, time_event)
         logging.debug(f"inserted time_event with id: {id}")
         if result:
             return id
@@ -141,35 +85,33 @@ class TimeEventsService:
         ) from None
 
     @classmethod
-    async def get_time_event_by_id(cls: Any, db: Any, id: str) -> TimeEvent:
-        """Get time_event function."""
-        time_event = await TimeEventsAdapter.get_time_event_by_id(db, id)
-        # return the document if found:
-        if time_event:
-            return TimeEvent.from_dict(time_event)
-        raise TimeEventNotFoundException(f"TimeEvent with id {id} not found")
-
-    @classmethod
     async def update_time_event(
         cls: Any, db: Any, id: str, time_event: TimeEvent
     ) -> Optional[str]:
         """Get time_event function."""
         # get old document
-        old_time_event = await TimeEventsAdapter.get_time_event_by_id(db, id)
+        try:
+            old_time_event = await TimeEventsAdapter.get_time_event_by_id(db, id)
+        except TimeEventNotFoundException as e:
+            raise TimeEventNotFoundException(
+                f"TimeEvent with id {id} not found."
+            ) from e
         # update the time_event if found:
-        if old_time_event:
-            if time_event.id != old_time_event["id"]:
-                raise IllegalValueException("Cannot change id for time_event.")
-            new_time_event = time_event.to_dict()
-            result = await TimeEventsAdapter.update_time_event(db, id, new_time_event)
-            return result
-        raise TimeEventNotFoundException(f"TimeEvent with id {id} not found.")
+        if time_event.id != old_time_event.id:
+            raise IllegalValueException("Cannot change id for time_event.")
+        result = await TimeEventsAdapter.update_time_event(db, id, time_event)
+        return result
 
     @classmethod
     async def delete_time_event(cls: Any, db: Any, id: str) -> Optional[str]:
         """Get time_event function."""
         # check if time-event exist:
-        await TimeEventsAdapter.get_time_event_by_id(db, id)
+        try:
+            await TimeEventsAdapter.get_time_event_by_id(db, id)
+        except TimeEventNotFoundException as e:
+            raise TimeEventNotFoundException(
+                f"TimeEvent with id {id} not found."
+            ) from e
         # delete the document if found:
         result = await TimeEventsAdapter.delete_time_event(db, id)
         return result

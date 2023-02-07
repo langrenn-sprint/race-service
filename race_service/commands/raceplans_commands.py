@@ -1,6 +1,6 @@
 """Module for raceplan commands."""
 from datetime import date, time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from race_service.adapters import (
     CompetitionFormatNotFoundException,
@@ -10,7 +10,7 @@ from race_service.adapters import (
     RaceplansAdapter,
     RacesAdapter,
 )
-from race_service.models import Raceplan
+from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
 from race_service.services import (
     RaceplanAllreadyExistException,
     RaceplansService,
@@ -120,17 +120,17 @@ class RaceplansCommands:
 
         results: Dict[int, List[str]] = {}
 
-        races: List[Dict] = []
+        races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
         for race_id in raceplan.races:
             race = await RacesAdapter.get_race_by_id(db, race_id)
             races.append(race)
 
-        races.sort(key=lambda x: x["order"])
+        races.sort(key=lambda x: x.order)
 
         # Check if races are in chronological order:
         for i in range(0, len(races) - 1):
-            if races[i]["start_time"] >= races[i + 1]["start_time"]:
-                results[races[i + 1]["order"]] = [
+            if races[i].start_time >= races[i + 1].start_time:
+                results[races[i + 1].order] = [
                     "Start time is not in chronological order."
                 ]
 
@@ -138,18 +138,21 @@ class RaceplansCommands:
         sum_no_of_contestants = 0
         for race in races:
             # Check if race has contestants:
-            if race["no_of_contestants"] == 0:
-                if race["order"] in results:
-                    results[race["order"]].append("Race has no contestants.")
+            if race.no_of_contestants == 0:
+                if race.order in results:
+                    results[race.order].append("Race has no contestants.")
                 else:
-                    results[race["order"]] = [("Race has no contestants.")]
+                    results[race.order] = [("Race has no contestants.")]
 
-            # Sum up the number of contestants in first rounds:
-            if race["round"] in [
-                competition_format["rounds_ranked_classes"][0],
-                competition_format["rounds_non_ranked_classes"][0],
-            ]:
-                sum_no_of_contestants += race["no_of_contestants"]
+            # Sum up the number of contestants in races:
+            if type(race) == IndividualSprintRace:
+                if race.round in [  # type: ignore
+                    competition_format["rounds_ranked_classes"][0],
+                    competition_format["rounds_non_ranked_classes"][0],
+                ]:
+                    sum_no_of_contestants += race.no_of_contestants
+            else:
+                sum_no_of_contestants += race.no_of_contestants
 
         # Check if the sum of contestants in races is equal to the number of contestants in the raceplan:
         if sum_no_of_contestants != raceplan.no_of_contestants:
@@ -187,7 +190,7 @@ class RaceplansCommands:
 # helpers
 async def get_raceplan(db: Any, token: str, event_id: str) -> None:
     """Check if the event already has a raceplan."""
-    existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
+    existing_rp = await RaceplansAdapter.get_raceplans_by_event_id(db, event_id)
     if existing_rp:
         raise RaceplanAllreadyExistException(
             f'Event "{event_id}" already has a raceplan.'

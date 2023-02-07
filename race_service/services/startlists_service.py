@@ -1,9 +1,9 @@
 """Module for startlists service."""
 import logging
-from typing import Any, List, Optional
+from typing import Any, Optional
 import uuid
 
-from race_service.adapters import StartlistsAdapter
+from race_service.adapters import StartlistNotFoundException, StartlistsAdapter
 from race_service.models import Startlist
 from .exceptions import IllegalValueException
 
@@ -22,15 +22,6 @@ class CouldNotCreateStartlistException(Exception):
         super().__init__(message)
 
 
-class StartlistNotFoundException(Exception):
-    """Class representing custom exception for fetch method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
 class StartlistAllreadyExistException(Exception):
     """Class representing custom exception for fetch method."""
 
@@ -42,28 +33,6 @@ class StartlistAllreadyExistException(Exception):
 
 class StartlistsService:
     """Class representing a service for startlists."""
-
-    @classmethod
-    async def get_all_startlists(cls: Any, db: Any) -> List[Startlist]:
-        """Get all startlists function."""
-        startlists: List[Startlist] = []
-        _startlists = await StartlistsAdapter.get_all_startlists(db)
-        if _startlists:
-            for _s in _startlists:
-                startlists.append(Startlist.from_dict(_s))
-        return startlists
-
-    @classmethod
-    async def get_startlists_by_event_id(
-        cls: Any, db: Any, event_id: str
-    ) -> List[Startlist]:
-        """Get all startlists by event_id function."""
-        startlists: List[Startlist] = []
-        _startlists = await StartlistsAdapter.get_startlists_by_event_id(db, event_id)
-        if _startlists:
-            for _s in _startlists:
-                startlists.append(Startlist.from_dict(_s))
-        return startlists
 
     @classmethod
     async def create_startlist(cls: Any, db: Any, startlist: Startlist) -> str:
@@ -98,9 +67,8 @@ class StartlistsService:
         id = create_id()
         startlist.id = id
         # insert new startlist
-        new_startlist = startlist.to_dict()
-        logging.debug(f"new_startlist: {new_startlist}")
-        result = await StartlistsAdapter.create_startlist(db, new_startlist)
+        logging.debug(f"new startlist: {startlist}")
+        result = await StartlistsAdapter.create_startlist(db, startlist)
         logging.debug(f"inserted startlist with id: {id}")
         if result:
             return id
@@ -109,40 +77,32 @@ class StartlistsService:
         ) from None
 
     @classmethod
-    async def get_startlist_by_id(cls: Any, db: Any, id: str) -> Startlist:
-        """Get startlist function."""
-        startlist = await StartlistsAdapter.get_startlist_by_id(db, id)
-        # return the document if found:
-        if startlist:
-            return Startlist.from_dict(startlist)
-        raise StartlistNotFoundException(f"Startlist with id {id} not found")
-
-    @classmethod
     async def update_startlist(
         cls: Any, db: Any, id: str, startlist: Startlist
     ) -> Optional[str]:
         """Get startlist function."""
         # get old document
-        old_startlist = await StartlistsAdapter.get_startlist_by_id(db, id)
+        try:
+            old_startlist = await StartlistsAdapter.get_startlist_by_id(db, id)
+        except StartlistNotFoundException as e:
+            raise e
         # update the startlist if found:
-        if old_startlist:
-            if startlist.id != old_startlist["id"]:
-                raise IllegalValueException("Cannot change id for startlist.")
-            new_startlist = startlist.to_dict()
-            result = await StartlistsAdapter.update_startlist(db, id, new_startlist)
-            return result
-        raise StartlistNotFoundException(f"Startlist with id {id} not found.")
+        if startlist.id != old_startlist.id:
+            raise IllegalValueException("Cannot change id for startlist.")
+        result = await StartlistsAdapter.update_startlist(db, id, startlist)
+        return result
 
     @classmethod
     async def delete_startlist(cls: Any, db: Any, id: str) -> Optional[str]:
         """Get startlist function."""
         # get old document
-        startlist = await StartlistsAdapter.get_startlist_by_id(db, id)
+        try:
+            await StartlistsAdapter.get_startlist_by_id(db, id)
+        except StartlistNotFoundException as e:
+            raise e
         # delete the document if found:
-        if startlist:
-            result = await StartlistsAdapter.delete_startlist(db, id)
-            return result
-        raise StartlistNotFoundException(f"Startlist with id {id} not found")
+        result = await StartlistsAdapter.delete_startlist(db, id)
+        return result
 
 
 #   Validation:

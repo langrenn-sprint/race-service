@@ -3,7 +3,13 @@ import logging
 from typing import Any, List, Optional
 import uuid
 
-from race_service.adapters import RaceResultsAdapter
+from race_service.adapters import (
+    RaceNotFoundException,
+    RaceResultNotFoundException,
+    RaceResultsAdapter,
+    RacesAdapter,
+    StartEntriesAdapter,
+)
 from race_service.models import (
     RaceResult,
     RaceResultStatus,
@@ -12,21 +18,11 @@ from race_service.models import (
 )
 from .exceptions import IllegalValueException
 from .races_service import RacesService
-from .start_entries_service import StartEntriesService
 
 
 def create_id() -> str:  # pragma: no cover
     """Creates an uuid."""
     return str(uuid.uuid4())
-
-
-class RaceResultNotFoundException(Exception):
-    """Class representing custom exception for fetch method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
 
 
 class TimeEventIsNotIdentifiableException(Exception):
@@ -60,75 +56,32 @@ class RaceResultsService:
     """Class representing a service for race_results."""
 
     @classmethod
-    async def get_race_results_by_race_id(
-        cls: Any, db: Any, race_id: str
-    ) -> List[RaceResult]:
-        """Get all race-results by race-id function."""
-        race_results: List[RaceResult] = []
-        _race_results = await RaceResultsAdapter.get_race_results_by_race_id(
-            db, race_id
-        )
-        if _race_results:
-            for _race_result in _race_results:
-                race_results.append(RaceResult.from_dict(_race_result))
-        return race_results
-
-    @classmethod
-    async def get_race_results_by_race_id_and_timing_point(
-        cls: Any,
-        db: Any,
-        race_id: str,
-        timing_point: str,
-    ) -> List[RaceResult]:
-        """Get race-result by id function."""
-        race_results: List[RaceResult] = []
-        _race_results = (
-            await RaceResultsAdapter.get_race_results_by_race_id_and_timing_point(
-                db, race_id, timing_point
-            )
-        )
-        if _race_results:
-            for _race_result in _race_results:
-                race_results.append(RaceResult.from_dict(_race_result))
-        return race_results
-
-    @classmethod
-    async def get_race_result_by_id(cls: Any, db: Any, id: str) -> RaceResult:
-        """Get race-result by id function."""
-        race_result = await RaceResultsAdapter.get_race_result_by_id(db, id)
-        # return the document if found:
-        if race_result:
-            return RaceResult.from_dict(race_result)
-        raise RaceResultNotFoundException(f"Race-result with id {id} not found")
-
-    @classmethod
     async def update_race_result(
         cls: Any, db: Any, id: str, race_result: RaceResult
     ) -> Optional[str]:
         """Update race-result function."""
         # get old document
-        old_race_result = await RaceResultsAdapter.get_race_result_by_id(db, id)
+        try:
+            old_race_result = await RaceResultsAdapter.get_race_result_by_id(db, id)
+        except RaceResultNotFoundException as e:
+            raise e from e
         # update the race_result if found:
-        if old_race_result:
-            if race_result.id != old_race_result["id"]:
-                raise IllegalValueException("Cannot change id for race_result.")
-            new_race_result = race_result.to_dict()
-            result = await RaceResultsAdapter.update_race_result(
-                db, id, new_race_result
-            )
-            return result
-        raise RaceResultNotFoundException(f"ResultList with id {id} not found.")
+        if race_result.id != old_race_result.id:
+            raise IllegalValueException("Cannot change id for race_result.")
+        result = await RaceResultsAdapter.update_race_result(db, id, race_result)
+        return result
 
     @classmethod
     async def delete_race_result(cls: Any, db: Any, id: str) -> Optional[str]:
         """Delete race-result function."""
         # get old document
-        race_result = await RaceResultsAdapter.get_race_result_by_id(db, id)
+        try:
+            await RaceResultsAdapter.get_race_result_by_id(db, id)
+        except RaceResultNotFoundException as e:
+            raise e from e
         # delete the document if found:
-        if race_result:
-            result = await RaceResultsAdapter.delete_race_result(db, id)
-            return result
-        raise RaceResultNotFoundException(f"ResultList with id {id} not found")
+        result = await RaceResultsAdapter.delete_race_result(db, id)
+        return result
 
     @classmethod
     async def add_time_event_to_race_result(
@@ -142,11 +95,14 @@ class RaceResultsService:
 
         if time_event.race_id and len(time_event.race_id) > 0:
             # Check if race exist:
-            race = await RacesService.get_race_by_id(db, time_event.race_id)
+            try:
+                race = await RacesAdapter.get_race_by_id(db, time_event.race_id)
+            except RaceNotFoundException as e:
+                raise e from e
             # Check if bib is in race's start-entries.
             start_entries: List[
                 StartEntry
-            ] = await StartEntriesService.get_start_entries_by_race_id(db, race.id)
+            ] = await StartEntriesAdapter.get_start_entries_by_race_id(db, race.id)
             # For "Template" timing-point, we don't check if bib is in start-entries:
             if (
                 time_event.timing_point.lower() != "Template".lower()
@@ -159,7 +115,7 @@ class RaceResultsService:
                 )
             # Check if race_result exist for this timing-point:
             race_results = (
-                await RaceResultsService.get_race_results_by_race_id_and_timing_point(
+                await RaceResultsAdapter.get_race_results_by_race_id_and_timing_point(
                     db, time_event.race_id, time_event.timing_point
                 )
             )
@@ -173,18 +129,16 @@ class RaceResultsService:
                     ranking_sequence=[],
                     status=RaceResultStatus.UNOFFICIAL.value,
                 )
-                new_race_result = race_result.to_dict()
-                logging.debug(f"Create race result for {new_race_result}")
-                await RaceResultsAdapter.create_race_result(db, new_race_result)
+                logging.debug(f"Create race result for {race_result}")
+                await RaceResultsAdapter.create_race_result(db, race_result)
             else:
                 race_result = race_results[0]
             # Add the time-event to the race-result's ranking-sequence:
             if time_event.id not in race_result.ranking_sequence:
                 race_result.ranking_sequence.append(time_event.id)
                 race_result.no_of_contestants += 1
-                updated_race_result = race_result.to_dict()
                 await RaceResultsAdapter.update_race_result(
-                    db, race_result.id, updated_race_result
+                    db, race_result.id, race_result
                 )
             # Add the race_result_id to the race's results if it is not there already:
             if time_event.timing_point not in race.results:

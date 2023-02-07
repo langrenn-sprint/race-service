@@ -2,14 +2,12 @@
 from .exceptions import IllegalValueException
 from .race_results_service import (
     ContestantNotInStartEntriesException,
-    RaceResultNotFoundException,
     RaceResultsService,
     TimeEventDoesNotReferenceRaceException,
     TimeEventIsNotIdentifiableException,
 )
 from .raceplans_service import (
     RaceplanAllreadyExistException,
-    RaceplanNotFoundException,
     RaceplansService,
 )
 from .races_service import (
@@ -19,7 +17,6 @@ from .races_service import (
 from .start_entries_service import (
     CouldNotCreateStartEntryException,
     StartEntriesService,
-    StartEntryNotFoundException,
 )
 from .startlists_service import (
     CouldNotCreateStartlistException,

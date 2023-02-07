@@ -5,6 +5,7 @@ import os
 from typing import Any, Dict, List, Union
 
 from aiohttp.web import (
+    HTTPInternalServerError,
     HTTPNotFound,
     HTTPUnprocessableEntity,
     Response,
@@ -12,7 +13,14 @@ from aiohttp.web import (
 )
 from dotenv import load_dotenv
 
-from race_service.adapters import UsersAdapter
+from race_service.adapters import (
+    NotSupportedRaceDatatype,
+    RaceResultsAdapter,
+    RacesAdapter,
+    StartEntriesAdapter,
+    TimeEventsAdapter,
+    UsersAdapter,
+)
 from race_service.models import (
     StartEntry,
     TimeEvent,
@@ -25,10 +33,7 @@ from race_service.models.race_model import (
 from race_service.services import (
     IllegalValueException,
     RaceNotFoundException,
-    RaceResultsService,
     RacesService,
-    StartEntriesService,
-    TimeEventsService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
@@ -49,7 +54,7 @@ class RacesView(View):
             event_id = self.request.rel_url.query["eventId"]
             if "raceclass" in self.request.rel_url.query:
                 raceclass = self.request.rel_url.query["raceclass"]
-                races = await RacesService.get_races_by_event_id_and_raceclass(
+                races = await RacesAdapter.get_races_by_event_id_and_raceclass(
                     db, event_id, raceclass
                 )
                 if races:
@@ -59,14 +64,13 @@ class RacesView(View):
                         # Get the race_results:
                         race.results = await get_race_results(db, race.results)  # type: ignore
             else:
-                races = await RacesService.get_races_by_event_id(db, event_id)
+                races = await RacesAdapter.get_races_by_event_id(db, event_id)
         else:
-            races = await RacesService.get_all_races(db)
-        list = []
+            races = await RacesAdapter.get_all_races(db)
+        _races = []
         for race in races:
-            list.append(race.to_dict())
-
-        body = json.dumps(list, default=str, ensure_ascii=False)
+            _races.append(race.to_dict())
+        body = json.dumps(_races, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
 
@@ -81,13 +85,15 @@ class RaceView(View):
         logging.debug(f"Got get request for race {race_id}")
 
         try:
-            race = await RacesService.get_race_by_id(db, race_id)
+            race = await RacesAdapter.get_race_by_id(db, race_id)
             # Get the start_entries:
             race.start_entries = await get_start_entries(db, race.start_entries)  # type: ignore
             # Get the race_results:
             race.results = await get_race_results(db, race.results)  # type: ignore
         except RaceNotFoundException as e:
             raise HTTPNotFound(reason=str(e)) from e
+        except NotSupportedRaceDatatype as e:
+            raise HTTPInternalServerError(reason=str(e)) from e
         logging.debug(f"Got race: {race}")
         body = race.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -112,6 +118,10 @@ class RaceView(View):
                 race = IndividualSprintRace.from_dict(body)
             elif body["datatype"] == "interval_start":
                 race = IntervalStartRace.from_dict(body)
+            else:
+                raise HTTPUnprocessableEntity(
+                    reason=f"Unknown datatype {body['datatype']}"
+                )
         except KeyError as e:
             raise HTTPUnprocessableEntity(
                 reason=f"Mandatory property {e.args[0]} is missing."
@@ -148,7 +158,7 @@ async def get_start_entries(db: Any, start_entry_ids: list) -> List[StartEntry]:
     """Get the start entries."""
     start_entries: List[StartEntry] = []
     for start_entry_id in start_entry_ids:
-        start_entry: StartEntry = await StartEntriesService.get_start_entry_by_id(
+        start_entry: StartEntry = await StartEntriesAdapter.get_start_entry_by_id(
             db, start_entry_id
         )
         start_entries.append(start_entry)
@@ -167,12 +177,12 @@ async def get_race_results(db: Any, race_results: dict) -> Dict[str, RaceResult]
     results: Dict[str, RaceResult] = {}
     for key in race_results:
         if key.lower() != "Template".lower():  # We skip the template
-            race_result: RaceResult = await RaceResultsService.get_race_result_by_id(
+            race_result: RaceResult = await RaceResultsAdapter().get_race_result_by_id(
                 db, race_results[key]
             )
             ranking_sequence: List[TimeEvent] = []
             for time_event_id in race_result.ranking_sequence:
-                time_event = await TimeEventsService.get_time_event_by_id(
+                time_event = await TimeEventsAdapter.get_time_event_by_id(
                     db, time_event_id
                 )
                 ranking_sequence.append(time_event)

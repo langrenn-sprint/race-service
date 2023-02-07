@@ -14,6 +14,8 @@ from multidict import MultiDict
 
 from race_service.adapters import (
     EventNotFoundException,
+    RaceplanNotFoundException,
+    RaceplansAdapter,
     UsersAdapter,
 )
 from race_service.commands import (
@@ -29,8 +31,6 @@ from race_service.commands import (
 )
 from race_service.services import (
     RaceplanAllreadyExistException,
-    RaceplanNotFoundException,
-    RaceplansService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
@@ -98,7 +98,7 @@ class ValidateRaceplanView(View):
 
         # Fetch the raceplan:
         try:
-            raceplan = await RaceplansService.get_raceplan_by_id(db, raceplan_id)
+            raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)
         except RaceplanNotFoundException as e:  # pragma: no cover
             raise HTTPNotFound(reason=str(e)) from e
 
