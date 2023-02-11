@@ -1,6 +1,6 @@
 """Integration test cases for the time_events route."""
 from copy import deepcopy
-from datetime import datetime, time
+from datetime import datetime
 from json import dumps
 import os
 from typing import Any, Dict, List
@@ -120,7 +120,7 @@ async def new_time_event() -> TimeEvent:
         race_id="race_1",
         timing_point="Finish",
         rank=0,
-        registration_time=time.fromisoformat("12:01:02"),
+        registration_time=datetime.fromisoformat("2023-02-11T12:01:02"),
         next_race="semi_name1",
         next_race_id="semi_1",
         next_race_position=1,
@@ -142,7 +142,7 @@ async def time_event() -> TimeEvent:
         race_id="race_1",
         timing_point="Finish",
         rank=0,
-        registration_time=time.fromisoformat("12:01:02"),
+        registration_time=datetime.fromisoformat("2023-02-11T12:01:02"),
         next_race="semi_name1",
         next_race_id="semi_1",
         next_race_position=1,
@@ -171,7 +171,7 @@ async def time_events() -> List[TimeEvent]:
             race_id="race_1",
             timing_point="Finish",
             rank=0,
-            registration_time=time.fromisoformat("12:01:02"),
+            registration_time=datetime.fromisoformat("2023-02-11T12:01:02"),
             next_race="semi_name1",
             next_race_id="semi_1",
             next_race_position=1,

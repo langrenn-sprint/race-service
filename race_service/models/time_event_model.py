@@ -1,10 +1,10 @@
 """TimeEvent data class module."""
 from dataclasses import dataclass, field
-from datetime import time
+from datetime import datetime
 from typing import List, Optional
 
 from dataclasses_json import config, DataClassJsonMixin
-from marshmallow.fields import Time
+from marshmallow.fields import DateTime
 
 from .changelog import Changelog
 
@@ -16,11 +16,11 @@ class TimeEvent(DataClassJsonMixin):
     bib: int
     event_id: str
     timing_point: str
-    registration_time: time = field(
+    registration_time: datetime = field(
         metadata=config(
-            encoder=time.isoformat,
-            decoder=time.fromisoformat,
-            mm_field=Time(format="iso"),
+            encoder=datetime.isoformat,
+            decoder=datetime.fromisoformat,
+            mm_field=DateTime(format="iso"),
         )
     )
     name: Optional[str] = field(default=None)
