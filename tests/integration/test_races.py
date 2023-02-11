@@ -1,6 +1,6 @@
 """Integration test cases for the races route."""
 from copy import deepcopy
-from datetime import datetime, time
+from datetime import datetime
 from json import dumps
 import os
 from typing import Any, List
@@ -231,7 +231,7 @@ TIME_EVENTS: List[TimeEvent] = [
         name="Petter Propell",
         club="Barnehagen",
         timing_point="Finish",
-        registration_time=time.fromisoformat("12:33:30"),
+        registration_time=datetime.fromisoformat("2023-02-11T12:33:30"),
         race_id="190e70d5-0933-4af0-bb53-1d705ba7eb95",
         rank=1,
         status="OK",
@@ -248,7 +248,7 @@ TIME_EVENTS: List[TimeEvent] = [
         name="Petter Propell",
         club="Barnehagen",
         timing_point="Finish",
-        registration_time=time.fromisoformat("12:34:30"),
+        registration_time=datetime.fromisoformat("2023-02-11T12:34:30"),
         race_id="190e70d5-0933-4af0-bb53-1d705ba7eb95",
         rank=2,
         status="OK",
