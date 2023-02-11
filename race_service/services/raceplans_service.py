@@ -49,7 +49,7 @@ class RaceplansService:
         logging.debug(f"existing_rps: {existing_rps}")
         if len(existing_rps) > 0:
             raise RaceplanAllreadyExistException(
-                f'Event "{raceplan.event_id}" already has a raceplan.'
+                f'Event "{raceplan.event_id}!r" already has a raceplan.'
             )
         if raceplan.id:
             raise IllegalValueException("Cannot create raceplan with input id.")

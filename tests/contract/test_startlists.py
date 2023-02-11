@@ -280,7 +280,8 @@ async def test_generate_startlist_when_event_already_has_one(
     # ASSERT
     assert response.status == 400
     assert (
-        f'Event "{context["event_id"]}" already has a startlist.' == startlist["detail"]
+        f'Event "{context["event_id"]!r}" already has a startlist.'
+        == startlist["detail"]
     )
 
 

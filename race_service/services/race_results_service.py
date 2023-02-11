@@ -110,7 +110,7 @@ class RaceResultsService:
                 not in [start_entry.bib for start_entry in start_entries]
             ):
                 raise ContestantNotInStartEntriesException(
-                    f'Error in time-event "{time_event.timing_point}": '
+                    f'Error in time-event "{time_event.timing_point!r}": '
                     f"Contestant with bib {time_event.bib} is not in race start-entries."
                 )
             # Check if race_result exist for this timing-point:

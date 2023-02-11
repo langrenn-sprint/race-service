@@ -111,7 +111,7 @@ class StartlistsCommands:
             )
         else:
             raise CompetitionFormatNotSupportedException(
-                f'Competition-format "{event["competition_format"]}" not supported.'
+                f'Competition-format "{event["competition_format"]!r}" not supported.'
             )
         # Finally we store the new startlist and return the id:
         startlist_id = await StartlistsService.create_startlist(db, startlist)
@@ -341,7 +341,7 @@ async def get_startlist(db: Any, token: str, event_id: str) -> None:
     _startlist = await StartlistsAdapter.get_startlists_by_event_id(db, event_id)
     if _startlist:
         raise StartlistAllreadyExistException(
-            f'Event "{event_id}" already has a startlist.'
+            f'Event "{event_id!r}" already has a startlist.'
         )
 
 
@@ -407,7 +407,7 @@ async def check_date(date_str: str) -> None:
         date.fromisoformat(date_str)
     except ValueError as e:
         raise InvalidDateFormatException(
-            f'Date "{date_str}" has invalid format".'
+            f'Date "{date_str!r}" has invalid format".'
         ) from e
 
 
@@ -433,7 +433,7 @@ async def get_competition_format(
     if competition_format["name"] == "Interval Start":
         if "intervals" not in competition_format:
             raise MissingPropertyException(
-                f'Competition format "{competition_format_name}" '
+                f'Competition format "{competition_format_name!r}" '
                 'is missing the "intervals" property.'
             ) from None
         # We do have intervals, check if valid format:
