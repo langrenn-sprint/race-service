@@ -235,7 +235,7 @@ async def new_time_event(
         "race": "race_name",
         "timing_point": "Finish",
         "rank": 1,
-        "registration_time": "12:01:02",
+        "registration_time": "2023-02-11T12:01:02",
         "next_race_id": "semi_1",
         "next_race_position": 1,
         "status": "",

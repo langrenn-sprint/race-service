@@ -1,5 +1,5 @@
 """Integration test cases for the race_results service."""
-from datetime import time
+from datetime import datetime
 from typing import Any
 
 import pytest
@@ -20,7 +20,7 @@ async def time_event_mock() -> TimeEvent:
         name="Petter Propell",
         club="Barnehagen",
         timing_point="Finish",
-        registration_time=time.fromisoformat("12:01:02"),
+        registration_time=datetime.fromisoformat("2023-02-11T12:01:02"),
         race_id="race_1",
         race="race_name",
         rank=1,
