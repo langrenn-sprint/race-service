@@ -107,7 +107,7 @@ class EventsAdapter:
                     return competition_formats[0]
                 elif response.status == 404:
                     raise CompetitionFormatNotFoundException(
-                        f'CompetitionFormat "{competition_format_name}" not found.'
+                        f'CompetitionFormat "{competition_format_name!r}" not found.'
                     ) from None
                 else:
                     raise HTTPInternalServerError(

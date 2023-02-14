@@ -114,7 +114,7 @@ class TimeEventsView(View):
             await TimeEventsService.update_time_event(db, time_event.id, time_event)
         except IllegalValueException as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except (CouldNotCreateTimeEventException) as e:
+        except CouldNotCreateTimeEventException as e:
             raise HTTPBadRequest(reason=str(e)) from e
         logging.debug(f"inserted document with time_event_id {time_event_id}")
 

@@ -88,7 +88,7 @@ class StartlistsService:
         )
         if existing_sl and len(existing_sl) > 0:
             raise StartlistAllreadyExistException(
-                f'Event "{startlist.event_id}" already has a startlist.'
+                f'Event "{startlist.event_id!r}" already has a startlist.'
             )
         # Validation:
         await validate_startlist(db, startlist)
