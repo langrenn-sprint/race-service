@@ -67,7 +67,7 @@ class RaceplansCommands:
             )
         else:
             raise CompetitionFormatNotSupportedException(
-                f'Competition-format "{event["competition_format"]}" not supported.'
+                f'Competition-format "{event["competition_format"]!r}" not supported.'
             )
         # Finally we store the races and the raceplan and return the id to the plan:
         raceplan_id = await RaceplansService.create_raceplan(db, raceplan)
@@ -94,7 +94,7 @@ async def get_raceplan(db: Any, token: str, event_id: str) -> None:
     existing_rp = await RaceplansAdapter.get_raceplan_by_event_id(db, event_id)
     if existing_rp:
         raise RaceplanAllreadyExistException(
-            f'Event "{event_id}" already has a raceplan.'
+            f'Event "{event_id!r}" already has a raceplan.'
         )
 
 
@@ -134,7 +134,7 @@ async def check_date(date_str: str) -> None:
         date.fromisoformat(date_str)
     except ValueError as e:
         raise InvalidDateFormatException(
-            f'Date "{date_str}" has invalid format".'
+            f'Date "{date_str!r}" has invalid format".'
         ) from e
 
 
@@ -159,20 +159,20 @@ async def get_competition_format(
     # Validate:
     if "max_no_of_contestants_in_raceclass" not in competition_format:
         raise MissingPropertyException(
-            f'Competition format "{competition_format_name}" '
+            f'Competition format "{competition_format_name!r}" '
             'is missing the "max_no_of_contestants_in_raceclass" property.'
         )
 
     if "max_no_of_contestants_in_race" not in competition_format:
         raise MissingPropertyException(
-            f'Competition format "{competition_format_name}" '
+            f'Competition format "{competition_format_name!r}" '
             'is missing the "max_no_of_contestants_in_race" property.'
         )
 
     if competition_format["name"] == "Interval Start":
         if "intervals" not in competition_format:
             raise MissingPropertyException(
-                f'Competition format "{competition_format_name}" '
+                f'Competition format "{competition_format_name!r}" '
                 'is missing the "intervals" property.'
             )
         # We do have intervals, check if valid format:
@@ -249,6 +249,6 @@ async def get_raceclasses(token: str, event_id: str) -> List[dict]:  # noqa: C90
     for _raceclasses in raceclasses_grouped:
         if len(set([r["ranking"] for r in _raceclasses])) > 1:
             raise InconsistentValuesInRaceclassesException(
-                f'Ranking-value differs in group {raceclass["group"]}.'
+                f'Ranking-value differs in group {_raceclasses[0]["group"]}.'
             )
     return raceclasses

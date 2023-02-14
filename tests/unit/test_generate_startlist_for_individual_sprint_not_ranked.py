@@ -6,7 +6,7 @@ from typing import List
 import pytest
 
 from race_service.commands.startlists_commands import (
-    generate_startlist_for_individual_sprint,
+    generate_start_entries_for_individual_sprint,
 )
 from race_service.models import IndividualSprintRace, Raceplan, StartEntry, Startlist
 
@@ -25,45 +25,31 @@ async def test_generate_startlist_for_individual_sprint_not_ranked(
     expected_start_entries_individual_sprint: List[Startlist],
 ) -> None:
     """Should return an instance of Startlist equal to the expected startlist."""
-    startlist, start_entries = await generate_startlist_for_individual_sprint(
-        event_individual_sprint,
+    start_entries = await generate_start_entries_for_individual_sprint(
         competition_format_individual_sprint,
         raceclasses,
         races_individual_sprint,
         contestants,
     )
 
-    assert type(startlist) is Startlist
-    assert startlist.id is None
-    assert startlist.event_id == expected_startlist_individual_sprint.event_id
-    assert (
-        startlist.no_of_contestants
-        == expected_startlist_individual_sprint.no_of_contestants
-    )
-    assert startlist.no_of_contestants == sum(
-        rc["no_of_contestants"] for rc in raceclasses
-    )
     assert len(start_entries) == len(expected_start_entries_individual_sprint)
     no_of_start_entries = 0
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
         no_of_start_entries += 1
-    assert (
-        no_of_start_entries == startlist.no_of_contestants * 2
-    )  # for non ranked there are twice as many
 
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
         map(
             lambda p, q: p == q,
-            startlist.start_entries,
+            start_entries,
             expected_startlist_individual_sprint.start_entries,
         ),
         True,
     ):
         print("Calculated startlist:")
-        print(*startlist.start_entries, sep="\n")
+        print(*start_entries, sep="\n")
         print("----")
         print("Expected startlist:")
         print(*expected_startlist_individual_sprint.start_entries, sep="\n")

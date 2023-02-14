@@ -1,6 +1,6 @@
 """Module for startlist commands."""
 from datetime import date, time, timedelta
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Union
 
 from race_service.adapters import (
     CompetitionFormatNotFoundException,
@@ -62,10 +62,15 @@ async def generate_startlist_for_event(  # noqa: C901
     # Then we fetch the raceclasses:
     raceclasses = await get_raceclasses(token, event_id)
     # Then we fetch the raceplan:
-    raceplan = await get_raceplan(db, token, event_id)
+    try:
+        raceplan = await get_raceplan(db, token, event_id)
+    except NoRaceplanInEventException as e:
+        raise e from e
     # and the races:
-    if raceplan.id:
-        races = await get_races(db, token, raceplan.id)
+    try:
+        races = await get_races(db, raceplan.id)  # type: ignore
+    except NoRacesInRaceplanException as e:
+        raise e from e
     # And finally we get the list of contestants:
     contestants = await get_contestants(token, event_id)
 
@@ -86,17 +91,24 @@ async def generate_startlist_for_event(  # noqa: C901
         )
 
     # We are ready to generate the startlist:
+    startlist = Startlist(
+        event_id=event["id"],
+        no_of_contestants=len(contestants),
+        start_entries=[],
+    )
+    startlist_id = await StartlistsService.create_startlist(db, startlist)
+
+    # And then generate the list of start-entries:
     if event["competition_format"] == "Individual Sprint":
-        startlist, start_entries = await generate_startlist_for_individual_sprint(
-            event,
+        start_entries = await generate_start_entries_for_individual_sprint(
             competition_format,
             raceclasses,
             races,  # type: ignore
             contestants,
         )
+
     elif event["competition_format"] == "Interval Start":
-        startlist, start_entries = await generate_startlist_for_interval_start(
-            event,
+        start_entries = await generate_start_entries_for_interval_start(
             competition_format,
             raceclasses,
             races,  # type: ignore
@@ -104,11 +116,10 @@ async def generate_startlist_for_event(  # noqa: C901
         )
     else:
         raise CompetitionFormatNotSupportedException(
-            f'Competition-format "{event["competition_format"]}" not supported.'
+            f'Competition-format "{event["competition_format"]!r}" not supported.'
         )
-    # Finally we store the new startlist and return the id:
-    startlist_id = await StartlistsService.create_startlist(db, startlist)
-    # We create each start_entry:
+
+    # We create each start_entry and add it to the startlist:
     for start_entry in start_entries:
         start_entry.startlist_id = startlist_id
         start_entry_id = await StartEntriesService.create_start_entry(db, start_entry)
@@ -123,22 +134,15 @@ async def generate_startlist_for_event(  # noqa: C901
     return startlist_id
 
 
-async def generate_startlist_for_individual_sprint(  # noqa: C901
-    event: Dict,
+async def generate_start_entries_for_individual_sprint(  # noqa: C901
     competition_format: Dict,
     raceclasses: List[Dict],
     races: List[IndividualSprintRace],
     contestants: List[Dict],
-) -> Tuple[Startlist, List[StartEntry]]:
+) -> List[StartEntry]:
     """Generate a startlist for an individual sprint event."""
-    no_of_contestants = len(contestants)
     start_entries: List[StartEntry] = []
-    startlist = Startlist(
-        event_id=event["id"],
-        no_of_contestants=no_of_contestants,
-        start_entries=[],
-    )
-    #
+    # Check that the number of contestants in the races matches the number of contestants
     no_of_contestants_in_races = sum(
         race.no_of_contestants
         for race in races
@@ -153,7 +157,6 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
             "Number of contestants in event does not match sum of contestants in races:"
             f"{len(contestants)} != {no_of_contestants_in_races}."
         )
-
     #
     # For every race in first rounds (ranked classes) or all rounds (non ranked classes)
     # in raceplan grouped by raceclass,
@@ -190,7 +193,7 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
             target_races = [
                 race
                 for race in races_in_raceclass
-                if race.round in [competition_format["rounds_non_ranked_classes"][0]]
+                if race.round == competition_format["rounds_non_ranked_classes"][0]
             ]
         race_index = 0
         starting_position = 1
@@ -201,7 +204,6 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
             for contestant in contestants
             if contestant["ageclass"] in ageclasses
         ]:
-
             # Create the start-entry:
             start_entry = StartEntry(
                 id="",
@@ -229,7 +231,7 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
         target_races = [
             race
             for race in races_in_raceclass
-            if race.round in [competition_format["rounds_non_ranked_classes"][1]]
+            if race.round == competition_format["rounds_non_ranked_classes"][1]
         ]
         race_index = 0
         starting_position = 1
@@ -240,7 +242,6 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
                 for contestant in contestants
                 if contestant["ageclass"] in ageclasses
             ]:
-
                 # Create the start-entry:
                 start_entry = StartEntry(
                     id="",
@@ -266,32 +267,25 @@ async def generate_startlist_for_individual_sprint(  # noqa: C901
                     starting_position = 1
                     no_of_contestants_in_race = 0
 
-    return startlist, start_entries
+    return start_entries
 
 
-async def generate_startlist_for_interval_start(
-    event: Dict,
+async def generate_start_entries_for_interval_start(
     competition_format: Dict,
     raceclasses: List[Dict],
     races: List[IntervalStartRace],
     contestants: List[Dict],
-) -> Tuple[Startlist, List[StartEntry]]:
+) -> List[StartEntry]:
     """Generate a startlist for an interval start event."""
-    no_of_contestants = len(contestants)
-
+    start_entries: List[StartEntry] = []
+    # Check that the number of contestants in the races matches the number of contestants
     no_of_contestants_in_races = sum(race.no_of_contestants for race in races)
     if len(contestants) != no_of_contestants_in_races:
         raise InconsistentInputDataException(
             "len(contestants) does not match sum of contestants in races:"
             f"{len(contestants)} != {no_of_contestants_in_races}."
         )
-
-    start_entries: List[StartEntry] = []
-    startlist = Startlist(
-        event_id=event["id"],
-        no_of_contestants=no_of_contestants,
-        start_entries=[],
-    )
+    #
     interval = timedelta(
         hours=time.fromisoformat(competition_format["intervals"]).hour,
         minutes=time.fromisoformat(competition_format["intervals"]).minute,
@@ -306,11 +300,11 @@ async def generate_startlist_for_interval_start(
     d: Dict[str, list] = {}
     for _race in races:
         d.setdefault(_race.raceclass, []).append(_race)
-    races_grouped = list(d.values())
+    races_grouped_by_raceclass = list(d.values())
 
-    for races_in_raceclass in races_grouped:
+    for races_in_raceclass in races_grouped_by_raceclass:
         for race in races_in_raceclass:
-            starting_position = 0
+            starting_position = 1
             # Get the correponding ageclasses:
             ageclasses: List[str] = []
             for raceclass in raceclasses:
@@ -323,14 +317,11 @@ async def generate_startlist_for_interval_start(
                 for contestant in contestants
                 if contestant["ageclass"] in ageclasses
             ]:
-                bib = contestant["bib"]
-                starting_position += 1
-
                 start_entry = StartEntry(
                     id="",
                     startlist_id="",
                     race_id=race.id,
-                    bib=bib,
+                    bib=contestant["bib"],
                     name=f'{contestant["first_name"]} {contestant["last_name"]}',
                     club=contestant["club"],
                     starting_position=starting_position,
@@ -339,7 +330,9 @@ async def generate_startlist_for_interval_start(
                 scheduled_start_time = scheduled_start_time + interval
                 start_entries.append(start_entry)
 
-    return startlist, start_entries
+                starting_position += 1
+
+    return start_entries
 
 
 # helpers
@@ -348,7 +341,7 @@ async def get_startlist(db: Any, token: str, event_id: str) -> None:
     _startlist = await StartlistsAdapter.get_startlist_by_event_id(db, event_id)
     if _startlist:
         raise StartlistAllreadyExistException(
-            f'Event "{event_id}" already has a startlist.'
+            f'Event "{event_id!r}" already has a startlist.'
         )
 
 
@@ -367,7 +360,7 @@ async def get_raceplan(db: Any, token: str, event_id: str) -> Raceplan:
 
 
 async def get_races(
-    db: Any, token: str, raceplan_id: str
+    db: Any, raceplan_id: str
 ) -> List[Union[IndividualSprintRace, IntervalStartRace]]:
     """Check if the event has a races."""
     races = await RacesService.get_races_by_raceplan_id(db, raceplan_id)
@@ -414,7 +407,7 @@ async def check_date(date_str: str) -> None:
         date.fromisoformat(date_str)
     except ValueError as e:
         raise InvalidDateFormatException(
-            f'Date "{date_str}" has invalid format".'
+            f'Date "{date_str!r}" has invalid format".'
         ) from e
 
 
@@ -440,7 +433,7 @@ async def get_competition_format(
     if competition_format["name"] == "Interval Start":
         if "intervals" not in competition_format:
             raise MissingPropertyException(
-                f'Competition format "{competition_format_name}" '
+                f'Competition format "{competition_format_name!r}" '
                 'is missing the "intervals" property.'
             ) from None
         # We do have intervals, check if valid format:
