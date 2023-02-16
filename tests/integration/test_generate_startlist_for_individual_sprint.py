@@ -62,6 +62,8 @@ async def competition_format() -> Dict[str, Any]:
         "time_between_groups": "00:15:00",
         "time_between_rounds": "00:10:00",
         "time_between_heats": "00:02:30",
+        "rounds_ranked_classes": ["Q", "S", "F"],
+        "rounds_non_ranked_classes": ["R1", "R2"],
         "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
         "max_no_of_contestants_in_race": MAX_NO_OF_CONTESTANTS_IN_RACE,
         "datatype": "individual_sprint",
@@ -78,7 +80,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
             "ageclasses": ["G 15 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 2,
-            "ranking": True,
+            "ranking": False,
             "group": 2,
             "order": 1,
         },
@@ -98,7 +100,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
             "ageclasses": ["J 15 år"],
             "event_id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
             "no_of_contestants": 2,
-            "ranking": True,
+            "ranking": False,
             "group": 2,
             "order": 2,
         },
@@ -119,11 +121,11 @@ RACES: List[IndividualSprintRace] = [
     IndividualSprintRace(
         id="1",
         order=1,
-        raceclass="J15",
+        raceclass="G16",
         round="Q",
         index="",
         heat=1,
-        start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
+        start_time=datetime.fromisoformat("2021-08-31 09:07:30"),
         no_of_contestants=2,
         max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
         event_id=EVENT["id"],
@@ -135,22 +137,6 @@ RACES: List[IndividualSprintRace] = [
     IndividualSprintRace(
         id="2",
         order=2,
-        raceclass="G15",
-        round="Q",
-        index="",
-        heat=1,
-        start_time=datetime.fromisoformat("2021-08-31 09:02:30"),
-        no_of_contestants=2,
-        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
-        event_id=EVENT["id"],
-        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
-        start_entries=[],
-        results={},
-        datatype="individual_sprint",
-    ),
-    IndividualSprintRace(
-        id="3",
-        order=3,
         raceclass="J16",
         round="Q",
         index="",
@@ -165,13 +151,61 @@ RACES: List[IndividualSprintRace] = [
         datatype="individual_sprint",
     ),
     IndividualSprintRace(
-        id="4",
-        order=4,
-        raceclass="G16",
-        round="Q",
+        id="3",
+        order=3,
+        raceclass="G15",
+        round="R1",
         index="",
         heat=1,
-        start_time=datetime.fromisoformat("2021-08-31 09:07:30"),
+        start_time=datetime.fromisoformat("2021-08-31 09:02:30"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="individual_sprint",
+    ),
+    IndividualSprintRace(
+        id="4",
+        order=4,
+        raceclass="J15",
+        round="R1",
+        index="",
+        heat=1,
+        start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="individual_sprint",
+    ),
+    IndividualSprintRace(
+        id="5",
+        order=5,
+        raceclass="G15",
+        round="R2",
+        index="",
+        heat=1,
+        start_time=datetime.fromisoformat("2021-08-31 09:02:30"),
+        no_of_contestants=2,
+        max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
+        event_id=EVENT["id"],
+        raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
+        start_entries=[],
+        results={},
+        datatype="individual_sprint",
+    ),
+    IndividualSprintRace(
+        id="6",
+        order=6,
+        raceclass="J15",
+        round="R2",
+        index="",
+        heat=1,
+        start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
         no_of_contestants=2,
         max_no_of_contestants=MAX_NO_OF_CONTESTANTS_IN_RACE,
         event_id=EVENT["id"],
@@ -423,10 +457,10 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
     STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan_races_with_wrong_no_of_contestants = deepcopy(raceplan_individual_sprint)
     races = deepcopy(RACES)
-    race_with_wrong_number_of_contestants = races[-1]
+    race_with_wrong_number_of_contestants = races[0]
     race_with_wrong_number_of_contestants.no_of_contestants = 100000
     raceplan_races_with_wrong_no_of_contestants.races[
-        -1
+        0
     ] = race_with_wrong_number_of_contestants.id
 
     mocker.patch(
@@ -447,7 +481,12 @@ async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value={"id": STARTLIST_ID},
+        return_value=Startlist(
+            id=STARTLIST_ID,
+            event_id=event_individual_sprint["id"],
+            start_entries=[],
+            no_of_contestants=0,
+        ),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
