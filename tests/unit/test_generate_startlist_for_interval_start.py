@@ -6,7 +6,7 @@ from typing import List
 import pytest
 
 from race_service.commands.startlists_commands import (
-    generate_startlist_for_interval_start,
+    generate_start_entries_for_interval_start,
 )
 from race_service.models import IntervalStartRace, Raceplan, StartEntry, Startlist
 
@@ -15,7 +15,7 @@ from race_service.models import IntervalStartRace, Raceplan, StartEntry, Startli
 
 @pytest.mark.unit
 @pytest.mark.asyncio
-async def test_generate_startlist_for_interval_start(
+async def test_generate_start_entries_for_interval_start(
     event_interval_start: dict,
     competition_format_interval_start: dict,
     raceclasses: List[dict],
@@ -26,44 +26,31 @@ async def test_generate_startlist_for_interval_start(
     expected_start_entries_interval_start: List[StartEntry],
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
-    startlist, start_entries = await generate_startlist_for_interval_start(
-        event_interval_start,
+    start_entries = await generate_start_entries_for_interval_start(
         competition_format_interval_start,
         raceclasses,
-        raceplan_interval_start,
         races_interval_start,
         contestants,
     )
 
-    assert type(startlist) is Startlist
-    assert startlist.id is None
-    assert startlist.event_id == expected_startlist_interval_start.event_id
-    assert (
-        startlist.no_of_contestants
-        == expected_startlist_interval_start.no_of_contestants
-    )
-    assert startlist.no_of_contestants == sum(
-        rc["no_of_contestants"] for rc in raceclasses
-    )
     assert len(start_entries) == len(expected_start_entries_interval_start)
     no_of_start_entries = 0
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
         no_of_start_entries += 1
-    assert no_of_start_entries == startlist.no_of_contestants
 
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
         map(
             lambda p, q: p == q,
-            startlist.start_entries,
+            start_entries,
             expected_startlist_interval_start.start_entries,
         ),
         True,
     ):
         print("Calculated startlist:")
-        print(*startlist.start_entries, sep="\n")
+        print(*start_entries, sep="\n")
         print("----")
         print("Expected startlist:")
         print(*expected_startlist_interval_start.start_entries, sep="\n")
