@@ -60,6 +60,7 @@ def clean(session: Session) -> None:
     )
     session.run(
         "rm",
+        "-f",
         ".coverage",
         external=True,
     )
