@@ -99,8 +99,8 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 ```shell
 % git clone https://github.com/langrenn-sprint/race-service.git
 % cd race-service
-% pyenv install 3.10.6
-% pyenv local 3.10.6
+% pyenv install 3.11.2
+% pyenv local 3.11.2 3.10.9
 % poetry install
 ```
 
