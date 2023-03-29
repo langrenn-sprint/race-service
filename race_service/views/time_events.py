@@ -70,7 +70,11 @@ class TimeEventsView(View):
             time_events = await TimeEventsAdapter.get_all_time_events(db)
         list = []
         for _e in time_events:
-            list.append(_e.to_dict())
+            if "bib" in self.request.rel_url.query:
+                if _e.bib == int(self.request.rel_url.query["bib"]):
+                    list.append(_e.to_dict())
+            else:
+                list.append(_e.to_dict())
 
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
