@@ -72,6 +72,19 @@ class TimeEventsAdapter:
         return time_events
 
     @classmethod
+    async def get_time_events_by_event_id_and_bib(
+        cls: Any, db: Any, event_id: str, bib: int
+    ) -> List[TimeEvent]:  # pragma: no cover
+        """Get time_events by event_id function."""
+        time_events: List[TimeEvent] = []
+        cursor = db.time_events_collection.find(
+            {"$and": [{"event_id": event_id, "bib": bib}]}
+        ).sort([("id", 1)])
+        for time_event in await cursor.to_list(None):
+            time_events.append(TimeEvent.from_dict(time_event))
+        return time_events
+
+    @classmethod
     async def get_time_events_by_race_id(
         cls: Any, db: Any, race_id: str
     ) -> List[TimeEvent]:  # pragma: no cover

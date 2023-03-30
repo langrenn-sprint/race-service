@@ -477,6 +477,36 @@ async def test_get_time_events_by_event_id(
 
 
 @pytest.mark.integration
+async def test_get_time_events_by_event_id_and_bib(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    time_events: List[TimeEvent],
+) -> None:
+    """Should return OK, and a body containing one time_event."""
+    BIB = time_events[0].bib
+    EVENT_ID = time_events[0].event_id
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_bib",
+        return_value=[
+            time_event for time_event in time_events if time_event.bib == BIB
+        ],
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post("http://users.example.com:8080/authorize", status=204)
+
+        resp = await client.get(f"/time-events?eventId={EVENT_ID}&bib={BIB}")
+        assert resp.status == 200
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["event_id"] == time_events[0].event_id
+        assert body[0]["bib"] == time_events[0].bib
+
+
+@pytest.mark.integration
 async def test_get_time_events_by_event_id_and_timing_point(
     client: _TestClient,
     mocker: MockFixture,

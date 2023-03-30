@@ -39,6 +39,9 @@ async def create_indexes(db: Any) -> None:
         [("event_id", 1), ("id", 1)], unique=True
     )
     await db.time_events_collection.create_index(
+        [("event_id", 1), ("bib", 1), ("id", 1)], unique=True
+    )
+    await db.time_events_collection.create_index(
         [("event_id", 1), ("timing_point", 1), ("id", 1)], unique=True
     )
     await db.time_events_collection.create_index(
