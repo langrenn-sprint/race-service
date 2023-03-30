@@ -344,6 +344,28 @@ async def test_get_all_time_events_by_event_id(
 
 @pytest.mark.contract
 @pytest.mark.asyncio
+async def test_get_all_time_events_by_event_id_and_bib(
+    http_service: Any, token: MockFixture, new_time_event: dict
+) -> None:
+    """Should return OK and a list with one time_event as json."""
+    event_id = new_time_event["event_id"]
+    bib = new_time_event["bib"]
+    url = f"{http_service}/time-events?eventId={event_id}&bib={bib}"
+
+    async with ClientSession() as session:
+        async with session.get(url) as response:
+            assert response.status == 200
+            assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+            time_events = await response.json()
+
+        assert type(time_events) is list
+        assert len(time_events) == 1
+        assert time_events[0]["event_id"] == event_id
+        assert time_events[0]["bib"] == bib
+
+
+@pytest.mark.contract
+@pytest.mark.asyncio
 async def test_get_time_event(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
