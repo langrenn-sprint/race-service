@@ -57,6 +57,13 @@ class TimeEventsView(View):
                 time_events = await TimeEventsAdapter.get_time_events_by_event_id_and_timing_point(
                     db, event_id, timing_point
                 )
+            elif "bib" in self.request.rel_url.query:
+                bib = int(self.request.rel_url.query["bib"])
+                time_events = (
+                    await TimeEventsAdapter.get_time_events_by_event_id_and_bib(
+                        db, event_id, bib
+                    )
+                )
             else:
                 time_events = await TimeEventsAdapter.get_time_events_by_event_id(
                     db, event_id
@@ -70,11 +77,7 @@ class TimeEventsView(View):
             time_events = await TimeEventsAdapter.get_all_time_events(db)
         list = []
         for _e in time_events:
-            if "bib" in self.request.rel_url.query:
-                if _e.bib == int(self.request.rel_url.query["bib"]):
-                    list.append(_e.to_dict())
-            else:
-                list.append(_e.to_dict())
+            list.append(_e.to_dict())
 
         body = json.dumps(list, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
