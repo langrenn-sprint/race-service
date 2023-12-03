@@ -1,7 +1,6 @@
 """Integration test cases for the start_entries service."""
 from copy import deepcopy
 from datetime import datetime
-from typing import Any
 
 import pytest
 from pytest_mock import MockFixture
@@ -49,8 +48,8 @@ async def start_entry_mock() -> StartEntry:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry(
-    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: StartEntry,
@@ -72,8 +71,8 @@ async def test_create_start_entry(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry(
-    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: StartEntry,
@@ -97,8 +96,8 @@ async def test_update_start_entry(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry(
-    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: StartEntry,
 ) -> None:
@@ -122,8 +121,8 @@ async def test_delete_start_entry(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_input_id(
-    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: StartEntry,
@@ -147,8 +146,8 @@ async def test_create_start_entry_input_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_adapter_fails(
-    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: StartEntry,
@@ -170,8 +169,8 @@ async def test_create_start_entry_adapter_fails(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: StartEntry,
@@ -192,8 +191,8 @@ async def test_update_start_entry_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_wrong_id(
-    event_loop: Any,
     mocker: MockFixture,
     new_start_entry: StartEntry,
     start_entry_mock: StartEntry,
@@ -214,8 +213,8 @@ async def test_update_start_entry_wrong_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     start_entry_mock: StartEntry,
 ) -> None:

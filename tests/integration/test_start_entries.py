@@ -139,6 +139,7 @@ async def start_entry() -> StartEntry:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry(
     client: _TestClient,
     mocker: MockFixture,
@@ -216,6 +217,7 @@ async def test_create_start_entry(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_start_entry_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -253,6 +255,7 @@ async def test_get_start_entry_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -290,6 +293,7 @@ async def test_update_start_entry_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_start_entries_by_race_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -316,6 +320,7 @@ async def test_get_start_entries_by_race_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_start_entries_by_race_id_and_startlist_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -345,6 +350,7 @@ async def test_get_start_entries_by_race_id_and_startlist_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry(
     client: _TestClient,
     mocker: MockFixture,
@@ -411,6 +417,7 @@ async def test_delete_start_entry(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_race_is_full(
     client: _TestClient,
     mocker: MockFixture,
@@ -472,6 +479,7 @@ async def test_create_start_entry_race_is_full(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_race_bib_already_in_race(
     client: _TestClient,
     mocker: MockFixture,
@@ -530,6 +538,7 @@ async def test_create_start_entry_race_bib_already_in_race(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_race_position_is_taken(
     client: _TestClient,
     mocker: MockFixture,
@@ -590,6 +599,7 @@ async def test_create_start_entry_race_position_is_taken(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_with_input_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -645,6 +655,7 @@ async def test_create_start_entry_with_input_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_adapter_fails(
     client: _TestClient,
     mocker: MockFixture,
@@ -703,6 +714,7 @@ async def test_create_start_entry_adapter_fails(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_mandatory_property(
     client: _TestClient,
     mocker: MockFixture,
@@ -758,6 +770,7 @@ async def test_create_start_entry_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_by_id_missing_mandatory_property(
     client: _TestClient,
     mocker: MockFixture,
@@ -795,6 +808,7 @@ async def test_update_start_entry_by_id_missing_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_by_id_different_id_in_body(
     client: _TestClient,
     mocker: MockFixture,
@@ -834,6 +848,7 @@ async def test_update_start_entry_by_id_different_id_in_body(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry_race_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -888,6 +903,7 @@ async def test_delete_start_entry_race_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry_startlist_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -956,6 +972,7 @@ async def test_delete_start_entry_startlist_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -989,6 +1006,7 @@ async def test_create_start_entry_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_by_id_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -1022,6 +1040,7 @@ async def test_update_start_entry_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry_by_id_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -1048,6 +1067,7 @@ async def test_delete_start_entry_by_id_no_authorization(
 
 # Forbidden:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_start_entry_insufficient_role(
     client: _TestClient,
     mocker: MockFixture,
@@ -1088,6 +1108,7 @@ async def test_create_start_entry_insufficient_role(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_start_entry_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1109,6 +1130,7 @@ async def test_get_start_entry_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_start_entry_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1145,6 +1167,7 @@ async def test_update_start_entry_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry_not_found(
     client: _TestClient,
     mocker: MockFixture,

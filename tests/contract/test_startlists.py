@@ -1,5 +1,4 @@
 """Contract test cases for startlists."""
-import asyncio
 import json
 import logging
 import os
@@ -24,20 +23,11 @@ DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
-
-@pytest.fixture(scope="module", autouse=True)
-def event_loop(request: Any) -> Any:
-    """Redefine the event_loop fixture to have the same scope."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 # ARRANGE
 
 
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
@@ -60,11 +50,11 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    mongo = motor.motor_asyncio.AsyncIOMotorClient(
+    mongo = motor.motor_asyncio.AsyncIOMotorClient(  # type: ignore
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
@@ -85,7 +75,7 @@ async def clear_db() -> AsyncGenerator:
 
 
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def context(
     http_service: Any, token: MockFixture, clear_db: Any
 ) -> Dict[str, Union[str, List]]:
@@ -232,7 +222,7 @@ async def context(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_create_startlist_should_fail(
     http_service: Any,
     token: MockFixture,
@@ -257,7 +247,7 @@ async def test_create_startlist_should_fail(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_generate_startlist_when_event_already_has_one(
     http_service: Any,
     token: MockFixture,
@@ -286,7 +276,7 @@ async def test_generate_startlist_when_event_already_has_one(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_startlists(
     http_service: Any,
     token: MockFixture,
@@ -310,7 +300,7 @@ async def test_get_all_startlists(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_startlist_by_event_id(
     http_service: Any,
     token: MockFixture,
@@ -337,7 +327,7 @@ async def test_get_all_startlist_by_event_id(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_startlist(
     http_service: Any,
     token: MockFixture,
@@ -368,7 +358,7 @@ async def test_get_startlist(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_add_start_entry_to_race_first_round(
     http_service: Any,
     token: MockFixture,
@@ -484,7 +474,7 @@ async def test_add_start_entry_to_race_first_round(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_add_start_entry_to_race_not_first_round(
     http_service: Any,
     token: MockFixture,
@@ -599,7 +589,7 @@ async def test_add_start_entry_to_race_not_first_round(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_remove_start_entry_from_race_first_round(
     http_service: Any,
     token: MockFixture,
@@ -689,7 +679,7 @@ async def test_remove_start_entry_from_race_first_round(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_remove_start_entry_from_race_not_first_round(
     http_service: Any,
     token: MockFixture,
@@ -778,7 +768,7 @@ async def test_remove_start_entry_from_race_not_first_round(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_update_startlist(
     http_service: Any,
     token: MockFixture,
@@ -818,7 +808,7 @@ async def test_update_startlist(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_delete_startlist(
     http_service: Any,
     token: MockFixture,
@@ -853,7 +843,7 @@ async def test_delete_startlist(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_startlists_by_event_id_when_event_does_not_exist(
     http_service: Any,
     token: MockFixture,

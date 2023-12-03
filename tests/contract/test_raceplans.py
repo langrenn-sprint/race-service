@@ -1,5 +1,4 @@
 """Contract test cases for raceplans."""
-import asyncio
 from copy import deepcopy
 import json
 import logging
@@ -27,15 +26,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 
 @pytest.fixture(scope="module", autouse=True)
-def event_loop(request: Any) -> Any:
-    """Redefine the event_loop fixture to have the same scope."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
@@ -54,11 +45,11 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    mongo = motor.motor_asyncio.AsyncIOMotorClient(
+    mongo = motor.motor_asyncio.AsyncIOMotorClient(  # type: ignore
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
@@ -80,7 +71,7 @@ async def clear_db() -> AsyncGenerator:
 
 # We create a context in which to test the RUD-functins
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def context(
     http_service: Any,
     token: MockFixture,
@@ -216,7 +207,7 @@ async def context(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_create_raceplan(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
@@ -237,7 +228,7 @@ async def test_create_raceplan(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_raceplans(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
@@ -256,7 +247,7 @@ async def test_get_all_raceplans(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_raceplan_by_event_id(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
@@ -277,7 +268,7 @@ async def test_get_all_raceplan_by_event_id(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_raceplan(
     http_service: Any,
     token: MockFixture,
@@ -305,7 +296,7 @@ async def test_get_raceplan(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_validate_raceplan(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
@@ -328,7 +319,7 @@ async def test_validate_raceplan(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_update_race(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
@@ -364,7 +355,7 @@ async def test_update_race(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_update_raceplan(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
@@ -388,7 +379,7 @@ async def test_update_raceplan(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_delete_raceplan(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
     url = f"{http_service}/raceplans"
@@ -408,7 +399,7 @@ async def test_delete_raceplan(http_service: Any, token: MockFixture) -> None:
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_raceplan_by_event_id_when_event_does_not_exist(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:

@@ -1,5 +1,4 @@
 """Unit test cases for the event-service module."""
-import asyncio
 from datetime import datetime
 from typing import Any, Dict, List
 
@@ -11,14 +10,6 @@ from race_service.commands.raceplans_individual_sprint import (
 from race_service.models import IndividualSprintRace, Raceplan
 
 # --- Individual Sprint ---
-
-
-@pytest.fixture(scope="function")
-def event_loop() -> Any:
-    """Redefine the event_loop fixture to have the same scope."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
 
 
 @pytest.fixture

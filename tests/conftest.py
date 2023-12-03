@@ -18,6 +18,7 @@ HOST_PORT = int(env.get("HOST_PORT", "8080"))
 
 @pytest.mark.integration
 @pytest.fixture
+@pytest.mark.asyncio
 async def client(aiohttp_client: Any) -> _TestClient:
     """Instantiate server and start it."""
     app = await create_app()

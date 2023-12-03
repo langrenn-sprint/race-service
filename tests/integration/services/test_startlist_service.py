@@ -1,6 +1,5 @@
 """Integration test cases for the startlist service."""
 from copy import deepcopy
-from typing import Any
 
 import pytest
 from pytest_mock import MockFixture
@@ -48,8 +47,8 @@ async def startlist_mock() -> Startlist:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_startlist_input_id(
-    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Startlist,
@@ -69,8 +68,8 @@ async def test_create_startlist_input_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_startlist_allready_exist(
-    event_loop: Any,
     mocker: MockFixture,
     new_startlist: Startlist,
     startlist_mock: Startlist,
@@ -90,8 +89,8 @@ async def test_create_startlist_allready_exist(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_startlist_adapter_fails(
-    event_loop: Any,
     mocker: MockFixture,
     new_startlist: Startlist,
     startlist_mock: Startlist,
@@ -111,8 +110,8 @@ async def test_create_startlist_adapter_fails(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_startlist_change_id(
-    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Startlist,
@@ -136,8 +135,8 @@ async def test_update_startlist_change_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_startlist_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Startlist,
@@ -160,8 +159,8 @@ async def test_update_startlist_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_startlist_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     startlist: Startlist,
     startlist_mock: Startlist,

@@ -145,7 +145,7 @@ class RaceplansCommands:
                     results[race.order] = [("Race has no contestants.")]
 
             # Sum up the number of contestants in races:
-            if type(race) == IndividualSprintRace:
+            if isinstance(race, IndividualSprintRace):
                 if race.round in [  # type: ignore
                     competition_format["rounds_ranked_classes"][0],
                     competition_format["rounds_non_ranked_classes"][0],

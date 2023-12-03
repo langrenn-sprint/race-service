@@ -1,5 +1,5 @@
 """Integration test cases for the raceplan service."""
-from typing import Any, Dict
+from typing import Dict
 
 import pytest
 from pytest_mock import MockFixture
@@ -73,8 +73,8 @@ async def raceplan_mock() -> Raceplan:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_race_input_id(
-    event_loop: Any,
     mocker: MockFixture,
     raceplan: Raceplan,
     raceplan_mock: Dict,
@@ -94,8 +94,8 @@ async def test_create_race_input_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_raceplan_allready_exist(
-    event_loop: Any,
     mocker: MockFixture,
     new_raceplan: Raceplan,
     raceplan_mock: Raceplan,
@@ -115,8 +115,8 @@ async def test_create_raceplan_allready_exist(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_raceplan_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     new_raceplan: Raceplan,
     raceplan_mock: Raceplan,
@@ -143,8 +143,8 @@ async def test_delete_raceplan_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_race_adapter_fails(
-    event_loop: Any,
     mocker: MockFixture,
     new_raceplan: Raceplan,
     raceplan_mock: Dict,
