@@ -349,6 +349,7 @@ def get_race_by_id(db: Any, id: str) -> IndividualSprintRace:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event(
     client: _TestClient,
     mocker: MockFixture,
@@ -442,6 +443,7 @@ async def test_generate_startlist_for_event(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_wrong_no_of_contestants_in_races(
     client: _TestClient,
     mocker: MockFixture,

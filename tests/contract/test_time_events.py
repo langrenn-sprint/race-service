@@ -1,5 +1,4 @@
 """Contract test cases for time-events."""
-import asyncio
 from copy import deepcopy
 import json
 import logging
@@ -27,15 +26,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 
 @pytest.fixture(scope="module", autouse=True)
-def event_loop(request: Any) -> Any:
-    """Redefine the event_loop fixture to have the same scope."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-@pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
@@ -54,11 +45,11 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
     logging.info(" --- Cleaning db at startup. ---")
-    mongo = motor.motor_asyncio.AsyncIOMotorClient(
+    mongo = motor.motor_asyncio.AsyncIOMotorClient(  # type: ignore
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
@@ -79,7 +70,7 @@ async def clear_db() -> AsyncGenerator:
 
 
 @pytest.fixture(scope="module", autouse=True)
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def set_up_context(http_service: Any, token: MockFixture, clear_db: Any) -> dict:
     """Create context and return event_id."""
     event_id = ""
@@ -244,7 +235,7 @@ async def new_time_event(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_create_time_event(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
@@ -289,7 +280,7 @@ async def test_create_time_event(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_create_same_time_event(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
@@ -308,7 +299,7 @@ async def test_create_same_time_event(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_time_events(http_service: Any, token: MockFixture) -> None:
     """Should return OK and a list of time_events as json."""
     url = f"{http_service}/time-events"
@@ -323,7 +314,7 @@ async def test_get_all_time_events(http_service: Any, token: MockFixture) -> Non
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_time_events_by_event_id(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
@@ -343,7 +334,7 @@ async def test_get_all_time_events_by_event_id(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_time_events_by_event_id_and_bib(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
@@ -365,7 +356,7 @@ async def test_get_all_time_events_by_event_id_and_bib(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_time_event(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
@@ -397,7 +388,7 @@ async def test_get_time_event(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_update_time_event(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
     url = f"{http_service}/time-events"
@@ -423,7 +414,7 @@ async def test_update_time_event(http_service: Any, token: MockFixture) -> None:
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_delete_time_event(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:
@@ -454,7 +445,7 @@ async def test_delete_time_event(
 
 
 @pytest.mark.contract
-@pytest.mark.asyncio
+@pytest.mark.asyncio(scope="module")
 async def test_get_all_time_event_by_event_id_when_event_does_not_exist(
     http_service: Any, token: MockFixture, new_time_event: dict
 ) -> None:

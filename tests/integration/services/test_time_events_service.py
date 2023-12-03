@@ -1,6 +1,5 @@
 """Integration test cases for the race_results service."""
 from datetime import datetime
-from typing import Any
 
 import pytest
 from pytest_mock import MockFixture
@@ -33,8 +32,8 @@ async def time_event_mock() -> TimeEvent:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_time_event_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     time_event_mock: TimeEvent,
 ) -> None:

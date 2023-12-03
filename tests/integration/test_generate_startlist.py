@@ -320,6 +320,7 @@ async def contestants(event: dict, raceplan_interval_start: Raceplan) -> List[di
 
 # bad cases
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_request_body(
     client: _TestClient,
     mocker: MockFixture,
@@ -386,6 +387,7 @@ async def test_generate_startlist_for_event_no_request_body(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_races_in_plan(
     client: _TestClient,
     mocker: MockFixture,
@@ -453,6 +455,7 @@ async def test_generate_startlist_for_event_no_races_in_plan(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_contestants_bib_not_int(
     client: _TestClient,
     mocker: MockFixture,
@@ -523,6 +526,7 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_contestants_bib_not_unique(
     client: _TestClient,
     mocker: MockFixture,
@@ -593,6 +597,7 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_contestants(
     client: _TestClient,
     mocker: MockFixture,
@@ -661,6 +666,7 @@ async def test_generate_startlist_for_event_no_contestants(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_contestants_exception(
     client: _TestClient,
     mocker: MockFixture,
@@ -729,6 +735,7 @@ async def test_generate_startlist_for_event_no_contestants_exception(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_raceplan(
     client: _TestClient,
     mocker: MockFixture,
@@ -798,6 +805,7 @@ async def test_generate_startlist_for_event_no_raceplan(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_raceclasses_exception(
     client: _TestClient,
     mocker: MockFixture,
@@ -868,6 +876,7 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_duplicate_raceplans(
     client: _TestClient,
     mocker: MockFixture,
@@ -938,6 +947,7 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_contestants_differ_from_raceclasses(
     client: _TestClient,
     mocker: MockFixture,
@@ -1013,6 +1023,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceclass
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
     client: _TestClient,
     mocker: MockFixture,
@@ -1088,6 +1099,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_contestants_differ_from_races(
     client: _TestClient,
     mocker: MockFixture,
@@ -1169,6 +1181,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
 
 # Not authenticated
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_unauthorized(
     client: _TestClient,
     mocker: MockFixture,
@@ -1238,6 +1251,7 @@ async def test_generate_startlist_for_event_unauthorized(
 
 # Not found cases:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_already_has_startlist(
     client: _TestClient,
     mocker: MockFixture,
@@ -1307,6 +1321,7 @@ async def test_generate_startlist_for_event_already_has_startlist(
 
 # Not found cases:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_event_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1375,6 +1390,7 @@ async def test_generate_startlist_for_event_event_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_competition_format_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1443,6 +1459,7 @@ async def test_generate_startlist_for_event_competition_format_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_raceclasses(
     client: _TestClient,
     mocker: MockFixture,
@@ -1511,6 +1528,7 @@ async def test_generate_startlist_for_event_no_raceclasses(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_no_competition_format(
     client: _TestClient,
     mocker: MockFixture,
@@ -1579,6 +1597,7 @@ async def test_generate_startlist_for_event_no_competition_format(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_missing_intervals(
     client: _TestClient,
     mocker: MockFixture,
@@ -1649,6 +1668,7 @@ async def test_generate_startlist_for_event_missing_intervals(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_time_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -1719,6 +1739,7 @@ async def test_generate_startlist_for_event_time_missing(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_date_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -1789,6 +1810,7 @@ async def test_generate_startlist_for_event_date_missing(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_invalid_date(
     client: _TestClient,
     mocker: MockFixture,
@@ -1859,6 +1881,7 @@ async def test_generate_startlist_for_event_invalid_date(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_invalid_time(
     client: _TestClient,
     mocker: MockFixture,
@@ -1932,6 +1955,7 @@ async def test_generate_startlist_for_event_invalid_time(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event_competition_format_not_supported(
     client: _TestClient,
     mocker: MockFixture,

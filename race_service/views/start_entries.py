@@ -149,7 +149,7 @@ class StartEntriesView(View):
                 competition_format["rounds_non_ranked_classes"][0],
             ]
             if (
-                type(race) == IndividualSprintRace
+                isinstance(race, IndividualSprintRace)
                 and race.round in first_rounds  # type: ignore
             ):
                 raceplan = await RaceplansAdapter.get_raceplan_by_id(
@@ -292,7 +292,7 @@ class StartEntryView(View):
                 competition_format["rounds_non_ranked_classes"][0],
             ]
             if (
-                type(race) == IndividualSprintRace
+                isinstance(race, IndividualSprintRace)
                 and race.round in first_rounds  # type: ignore
             ):
                 raceplan = await RaceplansAdapter.get_raceplan_by_id(

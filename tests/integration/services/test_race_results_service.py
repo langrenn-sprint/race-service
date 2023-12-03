@@ -1,6 +1,5 @@
 """Integration test cases for the race_results service."""
 from datetime import datetime
-from typing import Any
 
 import pytest
 from pytest_mock import MockFixture
@@ -165,8 +164,8 @@ async def race_result_empty_ranking_sequence_mock() -> RaceResult:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_add_time_event_to_race_result(
-    event_loop: Any,
     mocker: MockFixture,
     time_event: TimeEvent,
     race_mock: IndividualSprintRace,
@@ -210,8 +209,8 @@ async def test_add_time_event_to_race_result(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_add_time_event_to_race_result_race_does_not_have_any_results(
-    event_loop: Any,
     mocker: MockFixture,
     time_event: TimeEvent,
     race_mock_without_results: IndividualSprintRace,
@@ -255,8 +254,8 @@ async def test_add_time_event_to_race_result_race_does_not_have_any_results(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_add_time_event_to_race_result_no_ranking_sequence(
-    event_loop: Any,
     mocker: MockFixture,
     time_event: TimeEvent,
     start_entry_mock: StartEntry,
@@ -300,8 +299,8 @@ async def test_add_time_event_to_race_result_no_ranking_sequence(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_add_time_event_to_race_result_no_id(
-    event_loop: Any,
     mocker: MockFixture,
     time_event_with_no_id: TimeEvent,
     race_mock: IndividualSprintRace,
@@ -340,8 +339,8 @@ async def test_add_time_event_to_race_result_no_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_add_time_event_to_race_race_does_not_exist(
-    event_loop: Any,
     mocker: MockFixture,
     time_event_with_no_race_id: TimeEvent,
     race_mock: IndividualSprintRace,
@@ -380,8 +379,8 @@ async def test_add_time_event_to_race_race_does_not_exist(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_result_race_result_not_found(
-    event_loop: Any,
     mocker: MockFixture,
     race_mock: IndividualSprintRace,
     race_result_mock: RaceResult,

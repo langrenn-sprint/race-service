@@ -304,6 +304,7 @@ async def new_race_unsupported_datatype() -> dict:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_race_interval_start(
     client: _TestClient,
     mocker: MockFixture,
@@ -338,6 +339,7 @@ async def test_create_race_interval_start(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_by_id_interval_start(
     client: _TestClient,
     mocker: MockFixture,
@@ -410,6 +412,7 @@ async def test_get_race_by_id_interval_start(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_by_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -481,6 +484,7 @@ async def test_get_race_by_id_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_races_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -516,6 +520,7 @@ async def test_get_races_by_event_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_races_by_event_id_and_raceclass(
     client: _TestClient,
     mocker: MockFixture,
@@ -566,6 +571,7 @@ async def test_get_races_by_event_id_and_raceclass(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_races_by_event_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -604,6 +610,7 @@ async def test_get_races_by_event_id_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_races_by_event_id_and_raceclass_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -656,6 +663,7 @@ async def test_get_races_by_event_id_and_raceclass_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_by_id_interval_start(
     client: _TestClient,
     mocker: MockFixture,
@@ -690,6 +698,7 @@ async def test_update_race_by_id_interval_start(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_by_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -724,6 +733,7 @@ async def test_update_race_by_id_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_all_races(
     client: _TestClient,
     mocker: MockFixture,
@@ -749,6 +759,7 @@ async def test_get_all_races(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_all_races_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -774,6 +785,7 @@ async def test_get_all_races_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -804,6 +816,7 @@ async def test_delete_race_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_by_id_missing_mandatory_property(
     client: _TestClient,
     mocker: MockFixture,
@@ -836,6 +849,7 @@ async def test_update_race_by_id_missing_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_by_id_different_id_in_body(
     client: _TestClient,
     mocker: MockFixture,
@@ -870,6 +884,7 @@ async def test_update_race_by_id_different_id_in_body(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_by_id_unsupported_datatype(
     client: _TestClient,
     mocker: MockFixture,
@@ -912,6 +927,7 @@ async def test_get_race_by_id_unsupported_datatype(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, race_interval_start: IntervalStartRace
 ) -> None:
@@ -938,6 +954,7 @@ async def test_update_race_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, race_interval_start: IntervalStartRace
 ) -> None:
@@ -963,6 +980,7 @@ async def test_delete_race_by_id_no_authorization(
 
 # Forbidden:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_unauthorized(
     client: _TestClient,
     mocker: MockFixture,
@@ -997,6 +1015,7 @@ async def test_update_race_unauthorized(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
@@ -1015,6 +1034,7 @@ async def test_get_race_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1050,6 +1070,7 @@ async def test_update_race_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_unknown_datatype(
     client: _TestClient,
     mocker: MockFixture,
@@ -1088,6 +1109,7 @@ async def test_update_race_unknown_datatype(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:

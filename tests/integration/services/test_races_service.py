@@ -1,6 +1,6 @@
 """Integration test cases for the race service."""
 from datetime import datetime
-from typing import Any, Dict
+from typing import Dict
 
 import pytest
 from pytest_mock import MockFixture
@@ -69,8 +69,8 @@ async def race_mock() -> Dict:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_race_input_id(
-    event_loop: Any,
     mocker: MockFixture,
     race: Race,
     race_mock: Dict,
@@ -86,8 +86,8 @@ async def test_create_race_input_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_race_adapter_fails(
-    event_loop: Any,
     mocker: MockFixture,
     new_race: Race,
     race_mock: Dict,

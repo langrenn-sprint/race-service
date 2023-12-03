@@ -316,6 +316,7 @@ async def raceplan_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_raceplan(
     client: _TestClient,
     mocker: MockFixture,
@@ -367,6 +368,7 @@ async def test_create_raceplan(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_raceplan_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -407,6 +409,7 @@ async def test_get_raceplan_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan(
     client: _TestClient,
     mocker: MockFixture,
@@ -461,6 +464,7 @@ async def test_validate_raceplan(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan_interval_start(
     client: _TestClient,
     mocker: MockFixture,
@@ -515,6 +519,7 @@ async def test_validate_raceplan_interval_start(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan_race_has_no_contestants(
     client: _TestClient,
     mocker: MockFixture,
@@ -580,6 +585,7 @@ async def test_validate_raceplan_race_has_no_contestants(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan_race_no_chronological_time(
     client: _TestClient,
     mocker: MockFixture,
@@ -640,6 +646,7 @@ async def test_validate_raceplan_race_no_chronological_time(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan_race_has_no_contestants_and_faulty_time(
     client: _TestClient,
     mocker: MockFixture,
@@ -709,6 +716,7 @@ async def test_validate_raceplan_race_has_no_contestants_and_faulty_time(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan_contestants_not_equal_no_of_contestants_in_raceclasses(
     client: _TestClient,
     mocker: MockFixture,
@@ -774,6 +782,7 @@ async def test_validate_raceplan_contestants_not_equal_no_of_contestants_in_race
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_raceplans_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -809,6 +818,7 @@ async def test_get_raceplans_by_event_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_raceplans_by_event_id_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -844,6 +854,7 @@ async def test_get_raceplans_by_event_id_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_raceplan_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -889,6 +900,7 @@ async def test_update_raceplan_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_all_raceplans(
     client: _TestClient,
     mocker: MockFixture,
@@ -918,6 +930,7 @@ async def test_get_all_raceplans(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_all_raceplans_individual_sprint(
     client: _TestClient,
     mocker: MockFixture,
@@ -947,6 +960,7 @@ async def test_get_all_raceplans_individual_sprint(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_raceplan_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -989,6 +1003,7 @@ async def test_delete_raceplan_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_validate_raceplan_has_no_raceclasses(
     client: _TestClient,
     mocker: MockFixture,
@@ -1041,6 +1056,7 @@ async def test_validate_raceplan_has_no_raceclasses(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_raceplan_by_id_missing_mandatory_property(
     client: _TestClient,
     mocker: MockFixture,
@@ -1079,6 +1095,7 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_raceplan_by_id_different_id_in_body(
     client: _TestClient,
     mocker: MockFixture,
@@ -1122,6 +1139,7 @@ async def test_update_raceplan_by_id_different_id_in_body(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_raceplan_by_id_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -1161,6 +1179,7 @@ async def test_update_raceplan_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_raceplan_by_id_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -1188,6 +1207,7 @@ async def test_delete_raceplan_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_raceplan_insufficient_role(
     client: _TestClient,
     mocker: MockFixture,
@@ -1228,6 +1248,7 @@ async def test_update_raceplan_insufficient_role(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_raceplan_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
@@ -1250,6 +1271,7 @@ async def test_get_raceplan_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_raceplan_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1291,6 +1313,7 @@ async def test_update_raceplan_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_raceplan_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:

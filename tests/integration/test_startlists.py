@@ -224,6 +224,7 @@ async def startlist(start_entries: List[StartEntry]) -> Startlist:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_startlist(
     client: _TestClient,
     mocker: MockFixture,
@@ -260,6 +261,7 @@ async def test_create_startlist(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_startlist_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -300,6 +302,7 @@ async def test_get_startlist_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_startlists_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -342,6 +345,7 @@ async def test_get_startlists_by_event_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_startlists_by_event_id_and_bib(
     client: _TestClient,
     mocker: MockFixture,
@@ -387,6 +391,7 @@ async def test_get_startlists_by_event_id_and_bib(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_startlist_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: Startlist
 ) -> None:
@@ -422,6 +427,7 @@ async def test_update_startlist_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_all_startlists(
     client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: Startlist
 ) -> None:
@@ -448,6 +454,7 @@ async def test_get_all_startlists(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_startlist_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -511,6 +518,7 @@ async def test_delete_startlist_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_startlist_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, startlist: Startlist
 ) -> None:
@@ -536,6 +544,7 @@ async def test_delete_startlist_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_startlist_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
@@ -558,6 +567,7 @@ async def test_get_startlist_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_startlist_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:

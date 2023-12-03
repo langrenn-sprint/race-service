@@ -139,6 +139,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_create_raceplan_fails(
     client: _TestClient,
     mocker: MockFixture,
@@ -206,6 +207,7 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_create_race_fails(
     client: _TestClient,
     mocker: MockFixture,
@@ -274,6 +276,7 @@ async def test_generate_raceplan_for_event_create_race_fails(
 
 # Not authenticated
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_unauthorized(
     client: _TestClient,
     mocker: MockFixture,
@@ -326,6 +329,7 @@ async def test_generate_raceplan_for_event_unauthorized(
 
 # Not found cases:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_already_has_raceplan(
     client: _TestClient,
     mocker: MockFixture,
@@ -378,6 +382,7 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
 
 # Not found cases:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_event_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -429,6 +434,7 @@ async def test_generate_raceplan_for_event_event_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_raceclass(
     client: _TestClient,
     mocker: MockFixture,
@@ -487,6 +493,7 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race(
     client: _TestClient,
     mocker: MockFixture,
@@ -545,6 +552,7 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_no_raceclasses(
     client: _TestClient,
     mocker: MockFixture,
@@ -597,6 +605,7 @@ async def test_generate_raceplan_for_event_no_raceclasses(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_no_competition_format(
     client: _TestClient,
     mocker: MockFixture,
@@ -648,6 +657,7 @@ async def test_generate_raceplan_for_event_no_competition_format(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_missing_intervals(
     client: _TestClient,
     mocker: MockFixture,
@@ -701,6 +711,7 @@ async def test_generate_raceplan_for_event_missing_intervals(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_time_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -754,6 +765,7 @@ async def test_generate_raceplan_for_event_time_missing(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_date_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -807,6 +819,7 @@ async def test_generate_raceplan_for_event_date_missing(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_invalid_date(
     client: _TestClient,
     mocker: MockFixture,
@@ -860,6 +873,7 @@ async def test_generate_raceplan_for_event_invalid_date(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_invalid_time(
     client: _TestClient,
     mocker: MockFixture,
@@ -913,6 +927,7 @@ async def test_generate_raceplan_for_event_invalid_time(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -968,6 +983,7 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
     client: _TestClient,
     mocker: MockFixture,
@@ -1023,6 +1039,7 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
     client: _TestClient,
     mocker: MockFixture,
@@ -1078,6 +1095,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
     client: _TestClient,
     mocker: MockFixture,
@@ -1133,6 +1151,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
     client: _TestClient,
     mocker: MockFixture,
@@ -1189,6 +1208,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecutive(
     client: _TestClient,
     mocker: MockFixture,
@@ -1247,6 +1267,7 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_competition_format_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1298,6 +1319,7 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_competition_format_not_supported(
     client: _TestClient,
     mocker: MockFixture,
@@ -1349,6 +1371,7 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     client: _TestClient,
     mocker: MockFixture,
