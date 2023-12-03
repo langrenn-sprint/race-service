@@ -295,6 +295,7 @@ def get_race_by_id(db: Any, id: str) -> IntervalStartRace:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_startlist_for_event(
     client: _TestClient,
     mocker: MockFixture,

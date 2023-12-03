@@ -188,6 +188,7 @@ async def time_events() -> List[TimeEvent]:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event(
     client: _TestClient,
     mocker: MockFixture,
@@ -264,6 +265,7 @@ async def test_create_time_event(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_race_result_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -344,6 +346,7 @@ async def test_create_time_event_race_result_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_contestant_not_in_race(
     client: _TestClient,
     mocker: MockFixture,
@@ -428,6 +431,7 @@ async def test_create_time_event_contestant_not_in_race(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_time_event_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -451,6 +455,7 @@ async def test_get_time_event_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_time_events_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -477,6 +482,7 @@ async def test_get_time_events_by_event_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_time_events_by_event_id_and_bib(
     client: _TestClient,
     mocker: MockFixture,
@@ -507,6 +513,7 @@ async def test_get_time_events_by_event_id_and_bib(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_time_events_by_event_id_and_timing_point(
     client: _TestClient,
     mocker: MockFixture,
@@ -537,6 +544,7 @@ async def test_get_time_events_by_event_id_and_timing_point(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_time_events_by_race_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -563,6 +571,7 @@ async def test_get_time_events_by_race_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_time_event_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -598,6 +607,7 @@ async def test_update_time_event_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_all_time_events(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -624,6 +634,7 @@ async def test_get_all_time_events(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_time_event_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -671,6 +682,7 @@ async def test_delete_time_event_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_with_input_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -707,6 +719,7 @@ async def test_create_time_event_with_input_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_race_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -783,6 +796,7 @@ async def test_create_time_event_race_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_does_not_reference_race(
     client: _TestClient,
     mocker: MockFixture,
@@ -864,6 +878,7 @@ async def test_create_time_event_does_not_reference_race(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_is_not_identifiable(
     client: _TestClient,
     mocker: MockFixture,
@@ -942,6 +957,7 @@ async def test_create_time_event_is_not_identifiable(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_adapter_fails(
     client: _TestClient,
     mocker: MockFixture,
@@ -982,6 +998,7 @@ async def test_create_time_event_adapter_fails(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_mandatory_property(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -1019,6 +1036,7 @@ async def test_create_time_event_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_bib_timing_point_exist(
     client: _TestClient,
     mocker: MockFixture,
@@ -1092,6 +1110,7 @@ async def test_create_time_event_bib_timing_point_exist(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_time_event_by_id_missing_mandatory_property(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -1127,6 +1146,7 @@ async def test_update_time_event_by_id_missing_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_time_event_by_id_different_id_in_body(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -1164,6 +1184,7 @@ async def test_update_time_event_by_id_different_id_in_body(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_time_event_by_id_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -1213,6 +1234,7 @@ async def test_delete_time_event_by_id_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_no_authorization(
     client: _TestClient, mocker: MockFixture, new_time_event: TimeEvent
 ) -> None:
@@ -1248,6 +1270,7 @@ async def test_create_time_event_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_time_event_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -1284,6 +1307,7 @@ async def test_update_time_event_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_time_event_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -1307,6 +1331,7 @@ async def test_delete_time_event_by_id_no_authorization(
 
 # Forbidden:
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_time_event_insufficient_role(
     client: _TestClient,
     mocker: MockFixture,
@@ -1351,6 +1376,7 @@ async def test_create_time_event_insufficient_role(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_time_event_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
@@ -1375,6 +1401,7 @@ async def test_get_time_event_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_time_event_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
@@ -1411,6 +1438,7 @@ async def test_update_time_event_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_time_event_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:

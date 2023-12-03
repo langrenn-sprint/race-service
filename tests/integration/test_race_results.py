@@ -148,6 +148,7 @@ def get_time_event_by_id(db: Any, id: str) -> TimeEvent:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_create_race_result(
     client: _TestClient,
     token: MockFixture,
@@ -169,6 +170,7 @@ async def test_create_race_result(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_result_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -211,6 +213,7 @@ async def test_get_race_result_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_result_by_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -248,6 +251,7 @@ async def test_update_race_result_by_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_results_by_race_id(
     client: _TestClient,
     mocker: MockFixture,
@@ -282,6 +286,7 @@ async def test_get_race_results_by_race_id(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_results_by_race_id_idsonly(
     client: _TestClient,
     mocker: MockFixture,
@@ -316,6 +321,7 @@ async def test_get_race_results_by_race_id_idsonly(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_results_by_race_id_and_timing_point(
     client: _TestClient,
     mocker: MockFixture,
@@ -351,6 +357,7 @@ async def test_get_race_results_by_race_id_and_timing_point(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_result(
     client: _TestClient,
     mocker: MockFixture,
@@ -392,6 +399,7 @@ async def test_delete_race_result(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_result_by_id_missing_mandatory_property(
     client: _TestClient,
     mocker: MockFixture,
@@ -429,6 +437,7 @@ async def test_update_race_result_by_id_missing_mandatory_property(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_result_by_id_different_id_in_body(
     client: _TestClient,
     mocker: MockFixture,
@@ -468,6 +477,7 @@ async def test_update_race_result_by_id_different_id_in_body(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_result_race_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -511,6 +521,7 @@ async def test_delete_race_result_race_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_result_by_id_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -544,6 +555,7 @@ async def test_update_race_result_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_result_by_id_no_authorization(
     client: _TestClient,
     mocker: MockFixture,
@@ -575,6 +587,7 @@ async def test_delete_race_result_by_id_no_authorization(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_get_race_result_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -596,6 +609,7 @@ async def test_get_race_result_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_result_not_found(
     client: _TestClient,
     mocker: MockFixture,
@@ -632,6 +646,7 @@ async def test_update_race_result_not_found(
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_race_result_not_found(
     client: _TestClient,
     mocker: MockFixture,

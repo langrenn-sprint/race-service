@@ -105,6 +105,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event(
     client: _TestClient,
     mocker: MockFixture,

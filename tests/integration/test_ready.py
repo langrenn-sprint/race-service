@@ -4,6 +4,7 @@ import pytest
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_ready(client: _TestClient) -> None:
     """Should return OK."""
     resp = await client.get("/ready")

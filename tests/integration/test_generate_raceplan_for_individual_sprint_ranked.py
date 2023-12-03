@@ -259,6 +259,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event(
     client: _TestClient,
     mocker: MockFixture,
@@ -351,6 +352,7 @@ async def raceclass_with_more_than_max_contestants() -> List[Dict[str, Any]]:
 
 
 @pytest.mark.integration
+@pytest.mark.asyncio
 async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_raceclass(
     client: _TestClient,
     mocker: MockFixture,
