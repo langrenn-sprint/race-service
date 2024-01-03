@@ -239,10 +239,14 @@ async def test_generate_raceplan_for_interval_start_entry(
 async def _decide_group_order_and_ranking(  # noqa: C901
     raceclass: dict,
 ) -> Tuple[int, int, bool]:
-    if raceclass["name"] == "M19/20":
+    if raceclass["name"] == "MS":
         return (1, 1, True)
-    elif raceclass["name"] == "K19/20":
+    elif raceclass["name"] == "KS":
         return (1, 2, True)
+    elif raceclass["name"] == "M19-20":
+        return (1, 3, True)
+    elif raceclass["name"] == "K19-20":
+        return (1, 4, True)
     elif raceclass["name"] == "M18":
         return (2, 1, True)
     elif raceclass["name"] == "K18":

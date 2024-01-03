@@ -312,10 +312,14 @@ async def test_generate_startlist_for_interval_start_entry(
 async def _decide_group_order_and_ranking(  # noqa: C901
     raceclass: dict,
 ) -> Tuple[int, int, bool]:
-    if raceclass["name"] == "M19/20":
+    if raceclass["name"] == "MS":
         return (1, 1, True)
-    elif raceclass["name"] == "K19/20":
+    elif raceclass["name"] == "KS":
         return (1, 2, True)
+    elif raceclass["name"] == "M19-20":
+        return (1, 3, True)
+    elif raceclass["name"] == "K19-20":
+        return (1, 4, True)
     elif raceclass["name"] == "M18":
         return (2, 1, True)
     elif raceclass["name"] == "K18":
@@ -427,6 +431,6 @@ async def _print_startlist(startlist: dict) -> None:
 
 
 async def _dump_startlist_to_json(startlist: dict) -> None:
-    # with open("tests/files/tmp_startlist_interval_start.json", "w") as file:
-    #     json.dump(startlist, file)
+    with open("tests/files/tmp_startlist_interval_start.json", "w") as file:
+        json.dump(startlist, file)
     pass

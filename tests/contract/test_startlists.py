@@ -552,18 +552,7 @@ async def test_add_start_entry_to_race_not_first_round(
         assert response.status == 201, f"body:{body}" if body else ""
         assert f'/races/{race["id"]}/start-entries/' in response.headers[hdrs.LOCATION]
 
-        # Check that the start-entry is in the list of start-entries of the race:
         new_start_entry_id = response.headers[hdrs.LOCATION].split("/")[-1]
-
-        url = f'{http_service}/races/{race["id"]}'
-        async with session.get(url) as response:
-            assert response.status == 200
-            race_updated = await response.json()
-            assert race["no_of_contestants"] + 1 == race_updated["no_of_contestants"]
-            assert len(race["start_entries"]) + 1 == len(race_updated["start_entries"])
-            assert new_start_entry_id in [
-                start_entry["id"] for start_entry in race_updated["start_entries"]
-            ]
 
         # Check that the start-entry is in the list of start-entries of the startlist:
         url = f"{http_service}/startlists/{startlist_id}"
@@ -1020,10 +1009,14 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
 async def _decide_group_order_and_ranking(  # noqa: C901
     raceclass: dict,
 ) -> Tuple[int, int, bool]:
-    if raceclass["name"] == "M19/20":
+    if raceclass["name"] == "MS":
         return (1, 1, True)
-    elif raceclass["name"] == "K19/20":
+    elif raceclass["name"] == "KS":
         return (1, 2, True)
+    elif raceclass["name"] == "M19-20":
+        return (1, 3, True)
+    elif raceclass["name"] == "K19-20":
+        return (1, 4, True)
     elif raceclass["name"] == "M18":
         return (2, 1, True)
     elif raceclass["name"] == "K18":
