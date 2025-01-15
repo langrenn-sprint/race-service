@@ -1,7 +1,7 @@
 """Unit test cases for the startlist_commands module."""
+
 from datetime import datetime
 from functools import reduce
-from typing import List
 
 import pytest
 
@@ -16,14 +16,12 @@ from race_service.models import IntervalStartRace, Raceplan, StartEntry, Startli
 @pytest.mark.unit
 @pytest.mark.asyncio
 async def test_generate_start_entries_for_interval_start(
-    event_interval_start: dict,
     competition_format_interval_start: dict,
-    raceclasses: List[dict],
-    raceplan_interval_start: Raceplan,
-    races_interval_start: List[IntervalStartRace],
-    contestants: List[dict],
+    raceclasses: list[dict],
+    races_interval_start: list[IntervalStartRace],
+    contestants: list[dict],
     expected_startlist_interval_start: Startlist,
-    expected_start_entries_interval_start: List[StartEntry],
+    expected_start_entries_interval_start: list[StartEntry],
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
     start_entries = await generate_start_entries_for_interval_start(
@@ -34,10 +32,8 @@ async def test_generate_start_entries_for_interval_start(
     )
 
     assert len(start_entries) == len(expected_start_entries_interval_start)
-    no_of_start_entries = 0
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
-        no_of_start_entries += 1
 
     # Check that the two race lists match:
     if not reduce(
@@ -54,9 +50,8 @@ async def test_generate_start_entries_for_interval_start(
         print("----")
         print("Expected startlist:")
         print(*expected_startlist_interval_start.start_entries, sep="\n")
-        raise AssertionError("Startlist does not match expected.")
-    else:
-        assert 1 == 1
+        msg = "Startlist does not match expected."
+        raise AssertionError(msg)
 
 
 @pytest.fixture
@@ -89,10 +84,10 @@ async def event_interval_start() -> dict:
 
 @pytest.fixture
 async def raceclasses(
-    event_interval_start: dict, contestants: List[dict]
-) -> List[dict]:
+    event_interval_start: dict,
+) -> list[dict]:
     """Create a mock raceclasses object."""
-    raceclasses: List[dict] = []
+    raceclasses: list[dict] = []
     raceclasses.append(
         {
             "name": "J15",
@@ -143,12 +138,12 @@ async def raceclasses(
 @pytest.fixture
 async def raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     """Create a mock raceplan object."""
-    raceplan = Raceplan(event_id=event_interval_start["id"], races=list())
+    raceplan = Raceplan(event_id=event_interval_start["id"], races=[])
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 8
     # Add list of race_ids:
-    for id in range(1, 6):
-        raceplan.races.append(str(id))
+    for race_id in range(1, 6):
+        raceplan.races.append(str(race_id))
     return raceplan
 
 
@@ -156,9 +151,9 @@ async def raceplan_interval_start(event_interval_start: dict) -> Raceplan:
 async def races_interval_start(
     competition_format_interval_start: dict,
     raceplan_interval_start: Raceplan,
-) -> List[IntervalStartRace]:
+) -> list[IntervalStartRace]:
     """Create a mock raceplan object."""
-    races: List[IntervalStartRace] = []
+    races: list[IntervalStartRace] = []
     races.append(
         IntervalStartRace(
             id="1",
@@ -228,8 +223,8 @@ async def races_interval_start(
 
 @pytest.fixture
 async def contestants(
-    event_interval_start: dict, raceplan_interval_start: Raceplan
-) -> List[dict]:
+    event_interval_start: dict,
+) -> list[dict]:
     """Create a mock contestant list object."""
     return [
         {
@@ -344,20 +339,17 @@ async def expected_startlist_interval_start(
     event_interval_start: dict, raceplan_interval_start: Raceplan
 ) -> Startlist:
     """Create a mock startlist object."""
-    startlist = Startlist(
+    return Startlist(
         event_id=event_interval_start["id"],
         no_of_contestants=raceplan_interval_start.no_of_contestants,
-        start_entries=list(),
+        start_entries=[],
     )
-    return startlist
 
 
 @pytest.fixture
-async def expected_start_entries_interval_start(
-    event_interval_start: dict, raceplan_interval_start: Raceplan
-) -> List[StartEntry]:
+async def expected_start_entries_interval_start() -> list[StartEntry]:
     """Create a mock list of start_entries object."""
-    start_entries: List[StartEntry] = []
+    start_entries: list[StartEntry] = []
     start_entries.append(
         StartEntry(
             id="",

@@ -1,13 +1,14 @@
 """Gunicorn module for hosting an aiohttp server."""
+
 import logging
 import multiprocessing
-from os import environ as env
 import sys
+from os import environ as env
 from typing import Any
 
 from dotenv import load_dotenv
 from gunicorn import glogging
-from pythonjsonlogger import jsonlogger
+from pythonjsonlogger.json import JsonFormatter
 
 load_dotenv()
 
@@ -25,19 +26,25 @@ accesslog = "-"
 # Need to override the logger to remove healthcheck (ping) form accesslog
 
 
-class StackdriverJsonFormatter(jsonlogger.JsonFormatter, object):
+class StackdriverJsonFormatter(JsonFormatter):
     """json log formatter."""
 
-    def __init__(  # noqa
-        self, fmt="%(levelname) %(message)", style="%", *args, **kwargs  # noqa
-    ):  # noqa
-        jsonlogger.JsonFormatter.__init__(self, *args, **kwargs, fmt=fmt)
+    def __init__(
+        self,
+        fmt: str = "%(levelname) %(message)",
+        style: str = "%",
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        """Init function."""
+        JsonFormatter.__init__(self, *args, **kwargs, fmt=fmt, style=style)
 
-    def process_log_record(self, log_record):  # noqa
+    def process_log_record(self, log_record: dict) -> dict:
+        """Process log record."""
         log_record["severity"] = log_record["levelname"]
         del log_record["levelname"]
         log_record["serviceContext"] = {"service": "race-service"}
-        return super(StackdriverJsonFormatter, self).process_log_record(log_record)
+        return super().process_log_record(log_record)
 
 
 # Override the logger to remove healthcheck (ping) from the access log and format logs as json

@@ -1,7 +1,7 @@
 """Unit test cases for the startlist_commands module."""
+
 from datetime import datetime
 from functools import reduce
-from typing import List
 
 import pytest
 
@@ -14,16 +14,13 @@ from race_service.models import IndividualSprintRace, Raceplan, StartEntry, Star
 
 
 @pytest.mark.unit
-@pytest.mark.asyncio
 async def test_generate_startlist_for_individual_sprint(
-    event_individual_sprint: dict,
     competition_format_individual_sprint: dict,
-    raceclasses: List[dict],
-    raceplan_individual_sprint: Raceplan,
-    races_individual_sprint: List[IndividualSprintRace],
-    contestants: List[dict],
+    raceclasses: list[dict],
+    races_individual_sprint: list[IndividualSprintRace],
+    contestants: list[dict],
     expected_startlist_individual_sprint: Startlist,
-    expected_start_entries_individual_sprint: List[Startlist],
+    expected_start_entries_individual_sprint: list[Startlist],
 ) -> None:
     """Should return an instance of Startlist equal to the expected startlist."""
     start_entries = await generate_start_entries_for_individual_sprint(
@@ -34,10 +31,8 @@ async def test_generate_startlist_for_individual_sprint(
     )
 
     assert len(start_entries) == len(expected_start_entries_individual_sprint)
-    no_of_start_entries = 0
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
-        no_of_start_entries += 1
 
     # Check that the two race lists match:
     if not reduce(
@@ -54,9 +49,8 @@ async def test_generate_startlist_for_individual_sprint(
         print("----")
         print("Expected startlist:")
         print(*expected_startlist_individual_sprint.start_entries, sep="\n")
-        raise AssertionError("Startlist does not match expected.")
-    else:
-        assert 1 == 1
+        msg = "Startlist does not match expected."
+        raise AssertionError(msg)
 
 
 # Fixtures:
@@ -95,10 +89,10 @@ async def event_individual_sprint() -> dict:
 
 @pytest.fixture
 async def raceclasses(
-    event_individual_sprint: dict, contestants: List[dict]
-) -> List[dict]:
+    event_individual_sprint: dict,
+) -> list[dict]:
     """Create a mock raceclasses object."""
-    raceclasses: List[dict] = []
+    raceclasses: list[dict] = []
     raceclasses.append(
         {
             "name": "J15",
@@ -117,12 +111,12 @@ async def raceclasses(
 @pytest.fixture
 async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
     """Create a mock raceplan object."""
-    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
+    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 27
     # Add list of race_ids:
-    for id in range(1, 12):
-        raceplan.races.append(str(id))
+    for race_id in range(1, 12):
+        raceplan.races.append(str(race_id))
 
     return raceplan
 
@@ -131,9 +125,9 @@ async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
 async def races_individual_sprint(
     competition_format_individual_sprint: dict,
     raceplan_individual_sprint: Raceplan,
-) -> List[IndividualSprintRace]:
+) -> list[IndividualSprintRace]:
     """Create a mock raceplan object."""
-    races: List[IndividualSprintRace] = []
+    races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
             id="1",
@@ -363,9 +357,7 @@ async def races_individual_sprint(
 
 
 @pytest.fixture
-async def contestants(
-    event_individual_sprint: dict, raceplan_individual_sprint: Raceplan
-) -> List[dict]:
+async def contestants(event_individual_sprint: dict) -> list[dict]:
     """Create a mock contestant list object."""
     return [
         {
@@ -592,20 +584,17 @@ async def expected_startlist_individual_sprint(
     event_individual_sprint: dict, raceplan_individual_sprint: Raceplan
 ) -> Startlist:
     """Create a mock startlist object."""
-    startlist = Startlist(
+    return Startlist(
         event_id=event_individual_sprint["id"],
         no_of_contestants=raceplan_individual_sprint.no_of_contestants,
-        start_entries=list(),
+        start_entries=[],
     )
-    return startlist
 
 
 @pytest.fixture
-async def expected_start_entries_individual_sprint(
-    event_individual_sprint: dict, raceplan_individual_sprint: Raceplan
-) -> List[StartEntry]:
+async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     """Create a mock list of start_entries object."""
-    start_entries: List[StartEntry] = []
+    start_entries: list[StartEntry] = []
     start_entries.append(
         StartEntry(
             id="",

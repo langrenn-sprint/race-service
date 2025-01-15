@@ -1,7 +1,7 @@
 """Module for raceplan exceptions."""
 
 
-class CompetitionFormatNotSupportedException(Exception):
+class CompetitionFormatNotSupportedError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -10,7 +10,7 @@ class CompetitionFormatNotSupportedException(Exception):
         super().__init__(message)
 
 
-class NoRaceclassesInEventException(Exception):
+class NoRaceclassesInEventError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -19,7 +19,7 @@ class NoRaceclassesInEventException(Exception):
         super().__init__(message)
 
 
-class InconsistentValuesInContestantsException(Exception):
+class InconsistentValuesInContestantsError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -28,7 +28,7 @@ class InconsistentValuesInContestantsException(Exception):
         super().__init__(message)
 
 
-class InconsistentValuesInRaceclassesException(Exception):
+class InconsistentValuesInRaceclassesError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -37,7 +37,7 @@ class InconsistentValuesInRaceclassesException(Exception):
         super().__init__(message)
 
 
-class MissingPropertyException(Exception):
+class MissingPropertyError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -46,7 +46,7 @@ class MissingPropertyException(Exception):
         super().__init__(message)
 
 
-class InvalidDateFormatException(Exception):
+class InvalidDateFormatError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -55,7 +55,7 @@ class InvalidDateFormatException(Exception):
         super().__init__(message)
 
 
-class NoRaceplanInEventException(Exception):
+class NoRaceplanInEventError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -64,7 +64,7 @@ class NoRaceplanInEventException(Exception):
         super().__init__(message)
 
 
-class DuplicateRaceplansInEventException(Exception):
+class DuplicateRaceplansInEventError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -73,7 +73,7 @@ class DuplicateRaceplansInEventException(Exception):
         super().__init__(message)
 
 
-class InconsistentInputDataException(Exception):  # pragma: no cover
+class InconsistentInputDataError(Exception):  # pragma: no cover
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -82,7 +82,7 @@ class InconsistentInputDataException(Exception):  # pragma: no cover
         super().__init__(message)
 
 
-class NoRacesInRaceplanException(Exception):
+class NoRacesInRaceplanError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -91,7 +91,7 @@ class NoRacesInRaceplanException(Exception):
         super().__init__(message)
 
 
-class CouldNotCreateRaceplanException(Exception):
+class CouldNotCreateRaceplanError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -100,7 +100,7 @@ class CouldNotCreateRaceplanException(Exception):
         super().__init__(message)
 
 
-class CouldNotCreateRaceException(Exception):
+class CouldNotCreateRaceError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:

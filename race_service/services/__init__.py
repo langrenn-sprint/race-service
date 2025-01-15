@@ -1,32 +1,53 @@
 """Package for all services."""
-from .exceptions import IllegalValueException
+
+from .exceptions import IllegalValueError
 from .race_results_service import (
-    ContestantNotInStartEntriesException,
+    ContestantNotInStartEntriesError,
     RaceResultsService,
-    TimeEventDoesNotReferenceRaceException,
-    TimeEventIsNotIdentifiableException,
+    TimeEventDoesNotReferenceRaceError,
+    TimeEventIsNotIdentifiableError,
 )
 from .raceplans_service import (
-    RaceplanAllreadyExistException,
+    RaceplanAllreadyExistError,
     RaceplansService,
 )
 from .races_service import (
-    RaceNotFoundException,
+    RaceNotFoundError,
     RacesService,
 )
 from .start_entries_service import (
-    CouldNotCreateStartEntryException,
+    CouldNotCreateStartEntryError,
     StartEntriesService,
 )
 from .startlists_service import (
-    CouldNotCreateStartlistException,
-    StartlistAllreadyExistException,
-    StartlistNotFoundException,
+    CouldNotCreateStartlistError,
+    StartlistAllreadyExistError,
     StartlistsService,
 )
 from .time_events_service import (
-    CouldNotCreateTimeEventException,
-    TimeEventAllreadyExistException,
-    TimeEventNotFoundException,
+    CouldNotCreateTimeEventError,
+    TimeEventAllreadyExistError,
+    TimeEventNotFoundError,
     TimeEventsService,
 )
+
+__all__ = [
+    "ContestantNotInStartEntriesError",
+    "CouldNotCreateStartEntryError",
+    "CouldNotCreateStartlistError",
+    "CouldNotCreateTimeEventError",
+    "IllegalValueError",
+    "RaceNotFoundError",
+    "RaceResultsService",
+    "RaceplanAllreadyExistError",
+    "RaceplansService",
+    "RacesService",
+    "StartEntriesService",
+    "StartlistAllreadyExistError",
+    "StartlistsService",
+    "TimeEventAllreadyExistError",
+    "TimeEventDoesNotReferenceRaceError",
+    "TimeEventIsNotIdentifiableError",
+    "TimeEventNotFoundError",
+    "TimeEventsService",
+]

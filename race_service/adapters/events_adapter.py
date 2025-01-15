@@ -1,35 +1,30 @@
 """Module for events adapter."""
+
 import os
-from typing import Any, List, Optional
+from http import HTTPStatus
+from typing import Any
 
 from aiohttp import ClientSession
 from aiohttp.web import (
     HTTPInternalServerError,
 )
+from dotenv import load_dotenv
+
+load_dotenv()
+
+EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER", "events.example.com")
+EVENTS_HOST_PORT = int(os.getenv("EVENTS_HOST_PORT", "8080"))
+COMPETITION_FORMAT_HOST_SERVER = os.getenv(
+    "COMPETITION_FORMAT_HOST_SERVER", "competition-format.example.com"
+)
+COMPETITION_FORMAT_HOST_PORT = int(os.getenv("COMPETITION_FORMAT_HOST_PORT", "8080"))
 
 
-EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
-EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
-COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
-COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
-
-
-class EventNotFoundException(Exception):
+class EventNotFoundError(Exception):
     """Class representing custom exception for get method."""
 
-    pass
 
-
-class CompetitionFormatNotFoundException(Exception):
-    """Class representing custom exception for get method."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize the error."""
-        # Call the base class constructor with the parameters it needs
-        super().__init__(message)
-
-
-class RaceclassesNotFoundException(Exception):
+class CompetitionFormatNotFoundError(Exception):
     """Class representing custom exception for get method."""
 
     def __init__(self, message: str) -> None:
@@ -38,7 +33,16 @@ class RaceclassesNotFoundException(Exception):
         super().__init__(message)
 
 
-class ContestantsNotFoundException(Exception):
+class RaceclassesNotFoundError(Exception):
+    """Class representing custom exception for get method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
+class ContestantsNotFoundError(Exception):
     """Class representing custom exception for get method."""
 
     def __init__(self, message: str) -> None:
@@ -55,28 +59,25 @@ class EventsAdapter:
         cls: Any, token: str, event_id: str
     ) -> dict:  # pragma: no cover
         """Get event from event-service."""
+        del token  # for now we do not use token
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}"
 
-        async with ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status == 200:
-                    event = await response.json()
-                    return event
-                elif response.status == 404:
-                    raise EventNotFoundException(
-                        f"Event {event_id} not found."
-                    ) from None
-                else:
-                    raise HTTPInternalServerError(
-                        reason=f"Got unknown status from events service: {response.status}."
-                    ) from None
+        async with ClientSession() as session, session.get(url) as response:
+            if response.status == HTTPStatus.OK:
+                return await response.json()
+            if response.status == HTTPStatus.NOT_FOUND:
+                msg = f"Event {event_id} not found."
+                raise EventNotFoundError(msg) from None
+            raise HTTPInternalServerError(
+                reason=f"Got unknown status from events service: {response.status}."
+            ) from None
 
     @classmethod
     async def get_competition_format(
         cls: Any,
         token: str,
         event_id: str,
-        competition_format_name: Optional[str] = None,
+        competition_format_name: str | None = None,
     ) -> dict:  # pragma: no cover
         """Get competition_format from event-service."""
         async with ClientSession() as session:
@@ -86,10 +87,9 @@ class EventsAdapter:
                 f"/events/{event_id}/format"
             )
             async with session.get(url) as response:
-                if response.status == 200:
-                    competition_format = await response.json()
-                    return competition_format
-                elif response.status == 404:
+                if response.status == HTTPStatus.OK:
+                    return await response.json()
+                if response.status == HTTPStatus.NOT_FOUND:
                     pass  # We will try to get the global config
                 else:
                     raise HTTPInternalServerError(
@@ -108,68 +108,62 @@ class EventsAdapter:
                 f"/competition-formats?name={competition_format_name}"
             )
             async with session.get(url) as response:
-                if response.status == 200:
+                if response.status == HTTPStatus.OK:
                     competition_formats = await response.json()
                     return competition_formats[0]
-                elif response.status == 404:
-                    raise CompetitionFormatNotFoundException(
-                        f'CompetitionFormat "{competition_format_name!r}" not found.'
-                    ) from None
-                else:
-                    raise HTTPInternalServerError(
-                        reason=(
-                            "Got unknown status from events service"
-                            f"when getting competition_format {competition_format_name}:"
-                            f"{response.status}."
-                        )
-                    ) from None
+                if response.status == HTTPStatus.NOT_FOUND:
+                    msg = f'CompetitionFormat "{competition_format_name!r}" not found.'
+                    raise CompetitionFormatNotFoundError(msg) from None
+                raise HTTPInternalServerError(
+                    reason=(
+                        "Got unknown status from events service"
+                        f"when getting competition_format {competition_format_name}:"
+                        f"{response.status}."
+                    )
+                ) from None
 
     @classmethod
     async def get_raceclasses(
         cls: Any, token: str, event_id: str
-    ) -> List[dict]:  # pragma: no cover
+    ) -> list[dict]:  # pragma: no cover
         """Get raceclasses from event-service."""
+        del token  # for now we do not use token
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/raceclasses"
 
-        async with ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status == 200:
-                    raceclasses = await response.json()
-                    if len(raceclasses) == 0:
-                        raise RaceclassesNotFoundException(
-                            f"No raceclasses found for event {event_id}."
-                        )
-                    return raceclasses
-                else:
-                    raise HTTPInternalServerError(
-                        reason=(
-                            "Got unknown status from events service"
-                            f"when getting raceclasses for event {event_id}:"
-                            f"{response.status}."
-                        )
-                    ) from None
+        async with ClientSession() as session, session.get(url) as response:
+            if response.status == HTTPStatus.OK:
+                raceclasses = await response.json()
+                if len(raceclasses) == 0:
+                    msg = f"No raceclasses found for event {event_id}."
+                    raise RaceclassesNotFoundError(msg)
+                return raceclasses
+            raise HTTPInternalServerError(
+                reason=(
+                    "Got unknown status from events service"
+                    f"when getting raceclasses for event {event_id}:"
+                    f"{response.status}."
+                )
+            ) from None
 
     @classmethod
     async def get_contestants(
         cls: Any, token: str, event_id: str
-    ) -> List[dict]:  # pragma: no cover
+    ) -> list[dict]:  # pragma: no cover
         """Get contestants from event-service."""
+        del token  # for now we do not use token
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
 
-        async with ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status == 200:
-                    contestants = await response.json()
-                    if len(contestants) == 0:
-                        raise ContestantsNotFoundException(
-                            f"No contestants found for event {event_id}."
-                        )
-                    return contestants
-                else:
-                    raise HTTPInternalServerError(
-                        reason=(
-                            "Got unknown status from events service"
-                            f"when getting contestants for event {event_id}:"
-                            f"{response.status}."
-                        )
-                    ) from None
+        async with ClientSession() as session, session.get(url) as response:
+            if response.status == HTTPStatus.OK:
+                contestants = await response.json()
+                if len(contestants) == 0:
+                    msg = f"No contestants found for event {event_id}."
+                    raise ContestantsNotFoundError(msg)
+                return contestants
+            raise HTTPInternalServerError(
+                reason=(
+                    "Got unknown status from events service"
+                    f"when getting contestants for event {event_id}:"
+                    f"{response.status}."
+                )
+            ) from None

@@ -1,4 +1,5 @@
 """Integration test cases for the startlist service."""
+
 from copy import deepcopy
 
 import pytest
@@ -6,12 +7,12 @@ from pytest_mock import MockFixture
 
 from race_service.models import Startlist
 from race_service.services import (
-    CouldNotCreateStartlistException,
-    IllegalValueException,
-    StartlistAllreadyExistException,
+    CouldNotCreateStartlistError,
+    IllegalValueError,
+    StartlistAllreadyExistError,
     StartlistsService,
 )
-from race_service.services.startlists_service import StartlistNotFoundException
+from race_service.services.startlists_service import StartlistNotFoundError
 
 
 @pytest.fixture
@@ -53,7 +54,7 @@ async def test_create_startlist_input_id(
     startlist: Startlist,
     startlist_mock: Startlist,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[],
@@ -63,7 +64,7 @@ async def test_create_startlist_input_id(
         return_value=True,
     )
 
-    with pytest.raises(IllegalValueException):
+    with pytest.raises(IllegalValueError):
         await StartlistsService.create_startlist(db=None, startlist=startlist)
 
 
@@ -74,7 +75,7 @@ async def test_create_startlist_allready_exist(
     new_startlist: Startlist,
     startlist_mock: Startlist,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[startlist_mock],
@@ -84,7 +85,7 @@ async def test_create_startlist_allready_exist(
         return_value=True,
     )
 
-    with pytest.raises(StartlistAllreadyExistException):
+    with pytest.raises(StartlistAllreadyExistError):
         await StartlistsService.create_startlist(db=None, startlist=new_startlist)
 
 
@@ -95,7 +96,7 @@ async def test_create_startlist_adapter_fails(
     new_startlist: Startlist,
     startlist_mock: Startlist,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[],
@@ -105,7 +106,7 @@ async def test_create_startlist_adapter_fails(
         return_value=None,
     )
 
-    with pytest.raises(CouldNotCreateStartlistException):
+    with pytest.raises(CouldNotCreateStartlistError):
         await StartlistsService.create_startlist(db=None, startlist=new_startlist)
 
 
@@ -116,7 +117,7 @@ async def test_update_startlist_change_id(
     startlist: Startlist,
     startlist_mock: Startlist,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     startlist_mock_with_other_id = deepcopy(startlist_mock)
     startlist_mock_with_other_id.id = "different_id"
     mocker.patch(
@@ -128,9 +129,9 @@ async def test_update_startlist_change_id(
         return_value=True,
     )
 
-    with pytest.raises(IllegalValueException):
+    with pytest.raises(IllegalValueError):
         await StartlistsService.update_startlist(
-            db=None, id=startlist_mock_with_other_id.id, startlist=startlist
+            db=None, id_=startlist_mock_with_other_id.id, startlist=startlist
         )
 
 
@@ -141,10 +142,10 @@ async def test_update_startlist_not_found(
     startlist: Startlist,
     startlist_mock: Startlist,
 ) -> None:
-    """Should raise StartlistNotFoundException."""
+    """Should raise StartlistNotFoundError."""
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
@@ -152,9 +153,9 @@ async def test_update_startlist_not_found(
     )
 
     assert startlist_mock.id
-    with pytest.raises(StartlistNotFoundException):
+    with pytest.raises(StartlistNotFoundError):
         await StartlistsService.update_startlist(
-            db=None, id=startlist_mock.id, startlist=startlist
+            db=None, id_=startlist_mock.id, startlist=startlist
         )
 
 
@@ -165,10 +166,10 @@ async def test_delete_startlist_not_found(
     startlist: Startlist,
     startlist_mock: Startlist,
 ) -> None:
-    """Should raise StartlistNotFoundException."""
+    """Should raise StartlistNotFoundError."""
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.delete_startlist",
@@ -176,8 +177,8 @@ async def test_delete_startlist_not_found(
     )
 
     assert startlist_mock.id
-    with pytest.raises(StartlistNotFoundException):
+    with pytest.raises(StartlistNotFoundError):
         await StartlistsService.delete_startlist(
             db=None,
-            id=startlist_mock.id,
+            id_=startlist_mock.id,
         )

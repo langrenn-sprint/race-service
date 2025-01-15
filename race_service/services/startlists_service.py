@@ -1,11 +1,13 @@
 """Module for startlists service."""
-import logging
-from typing import Any, Optional
-import uuid
 
-from race_service.adapters import StartlistNotFoundException, StartlistsAdapter
+import logging
+import uuid
+from typing import Any
+
+from race_service.adapters import StartlistNotFoundError, StartlistsAdapter
 from race_service.models import Startlist
-from .exceptions import IllegalValueException
+
+from .exceptions import IllegalValueError
 
 
 def create_id() -> str:  # pragma: no cover
@@ -13,7 +15,7 @@ def create_id() -> str:  # pragma: no cover
     return str(uuid.uuid4())
 
 
-class CouldNotCreateStartlistException(Exception):
+class CouldNotCreateStartlistError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -22,7 +24,7 @@ class CouldNotCreateStartlistException(Exception):
         super().__init__(message)
 
 
-class StartlistAllreadyExistException(Exception):
+class StartlistAllreadyExistError(Exception):
     """Class representing custom exception for fetch method."""
 
     def __init__(self, message: str) -> None:
@@ -46,9 +48,9 @@ class StartlistsService:
             str: The id of the created startlist
 
         Raises:
-            IllegalValueException: input object has illegal values
-            StartlistAllreadyExistException: event can have zero or one plan
-            CouldNotCreateStartlistException: creation failed
+            IllegalValueError: input object has illegal values
+            StartlistAllreadyExistError: event can have zero or one plan
+            CouldNotCreateStartlistError: creation failed
         """
         logging.debug(f"trying to insert startlist: {startlist}")
         # Event can have one, and only, one startlist:
@@ -56,59 +58,56 @@ class StartlistsService:
             db, startlist.event_id
         )
         if existing_sl and len(existing_sl) > 0:
-            raise StartlistAllreadyExistException(
-                f'Event "{startlist.event_id!r}" already has a startlist.'
-            )
+            msg = f'Event "{startlist.event_id!r}" already has a startlist.'
+            raise StartlistAllreadyExistError(msg)
         # Validation:
-        await validate_startlist(db, startlist)
+        await validate_startlist(startlist)
         if startlist.id:
-            raise IllegalValueException("Cannot create startlist with input id.")
+            msg = "Cannot create startlist with input id."
+            raise IllegalValueError(msg)
         # create ids:
-        id = create_id()
-        startlist.id = id
+        id_ = create_id()
+        startlist.id = id_
         # insert new startlist
         logging.debug(f"new startlist: {startlist}")
         result = await StartlistsAdapter.create_startlist(db, startlist)
-        logging.debug(f"inserted startlist with id: {id}")
+        logging.debug(f"inserted startlist with id: {id_}")
         if result:
-            return id
-        raise CouldNotCreateStartlistException(
-            "Creation of startlist failed."
-        ) from None
+            return id_
+        msg = "Creation of startlist failed."
+        raise CouldNotCreateStartlistError(msg) from None
 
     @classmethod
     async def update_startlist(
-        cls: Any, db: Any, id: str, startlist: Startlist
-    ) -> Optional[str]:
+        cls: Any, db: Any, id_: str, startlist: Startlist
+    ) -> str | None:
         """Get startlist function."""
         # get old document
         try:
-            old_startlist = await StartlistsAdapter.get_startlist_by_id(db, id)
-        except StartlistNotFoundException as e:
-            raise e
+            old_startlist = await StartlistsAdapter.get_startlist_by_id(db, id_)
+        except StartlistNotFoundError as e:
+            raise e from e
         # update the startlist if found:
         if startlist.id != old_startlist.id:
-            raise IllegalValueException("Cannot change id for startlist.")
-        result = await StartlistsAdapter.update_startlist(db, id, startlist)
-        return result
+            msg = "Cannot change id for startlist."
+            raise IllegalValueError(msg)
+        return await StartlistsAdapter.update_startlist(db, id_, startlist)
 
     @classmethod
-    async def delete_startlist(cls: Any, db: Any, id: str) -> Optional[str]:
+    async def delete_startlist(cls: Any, db: Any, id_: str) -> str | None:
         """Get startlist function."""
         # get old document
         try:
-            await StartlistsAdapter.get_startlist_by_id(db, id)
-        except StartlistNotFoundException as e:
-            raise e
+            await StartlistsAdapter.get_startlist_by_id(db, id_)
+        except StartlistNotFoundError as e:
+            raise e from e
         # delete the document if found:
-        result = await StartlistsAdapter.delete_startlist(db, id)
-        return result
+        return await StartlistsAdapter.delete_startlist(db, id_)
 
 
 #   Validation:
-async def validate_startlist(db: Any, startlist: Startlist) -> None:
+async def validate_startlist(startlist: Startlist) -> None:
     """Validate the startlist."""
-    # TODO: Validate startlist-properties:
     if startlist.start_entries:
         for _start_entry in startlist.start_entries:
             pass

@@ -1,7 +1,8 @@
 """Unit test cases for the event-service module."""
+
 from datetime import datetime
 from functools import reduce
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -42,7 +43,7 @@ async def event_interval_start() -> dict:
 
 
 @pytest.fixture
-async def raceclasses_interval_start() -> List[Dict[str, Any]]:
+async def raceclasses_interval_start() -> list[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -87,7 +88,7 @@ async def raceclasses_interval_start() -> List[Dict[str, Any]]:
 @pytest.fixture
 async def expected_raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     """Create a mock raceplan object."""
-    raceplan = Raceplan(event_id=event_interval_start["id"], races=list())
+    raceplan = Raceplan(event_id=event_interval_start["id"], races=[])
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 62
     return raceplan
@@ -97,9 +98,9 @@ async def expected_raceplan_interval_start(event_interval_start: dict) -> Racepl
 async def expected_races_interval_start(
     competition_format_interval_start: dict,
     event_interval_start: dict,
-) -> List[IntervalStartRace]:
+) -> list[IntervalStartRace]:
     """Create a mock raceplan object."""
-    races: List[IntervalStartRace] = []
+    races: list[IntervalStartRace] = []
     races.append(
         IntervalStartRace(
             id="",
@@ -172,9 +173,9 @@ async def expected_races_interval_start(
 async def test_calculate_raceplan_interval_start(
     competition_format_interval_start: dict,
     event_interval_start: dict,
-    raceclasses_interval_start: List[dict],
+    raceclasses_interval_start: list[dict],
     expected_raceplan_interval_start: Raceplan,
-    expected_races_interval_start: List[IntervalStartRace],
+    expected_races_interval_start: list[IntervalStartRace],
 ) -> None:
     """Should return a tuple of Raceplan and races equal to the expected raceplan."""
     raceplan, races = await calculate_raceplan_interval_start(
@@ -211,6 +212,5 @@ async def test_calculate_raceplan_interval_start(
         print("----")
         print("Expected raceplan:")
         print(*expected_races_interval_start, sep="\n")
-        raise AssertionError("Raceplan does not match expected.")
-    else:
-        assert 1 == 1
+        msg = "Raceplan does not match expected."
+        raise AssertionError(msg)

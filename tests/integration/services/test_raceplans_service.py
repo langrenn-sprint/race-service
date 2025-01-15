@@ -1,14 +1,13 @@
 """Integration test cases for the raceplan service."""
-from typing import Dict
 
 import pytest
 from pytest_mock import MockFixture
 
-from race_service.adapters import RaceplanNotFoundException
+from race_service.adapters import RaceplanNotFoundError
 from race_service.models import Raceplan
 from race_service.services import (
-    IllegalValueException,
-    RaceplanAllreadyExistException,
+    IllegalValueError,
+    RaceplanAllreadyExistError,
     RaceplansService,
 )
 
@@ -77,9 +76,9 @@ async def raceplan_mock() -> Raceplan:
 async def test_create_race_input_id(
     mocker: MockFixture,
     raceplan: Raceplan,
-    raceplan_mock: Dict,
+    raceplan_mock: dict,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
@@ -89,7 +88,7 @@ async def test_create_race_input_id(
         return_value=True,
     )
 
-    with pytest.raises(IllegalValueException):
+    with pytest.raises(IllegalValueError):
         await RaceplansService.create_raceplan(db=None, raceplan=raceplan)
 
 
@@ -100,7 +99,7 @@ async def test_create_raceplan_allready_exist(
     new_raceplan: Raceplan,
     raceplan_mock: Raceplan,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_mock],
@@ -110,7 +109,7 @@ async def test_create_raceplan_allready_exist(
         return_value=True,
     )
 
-    with pytest.raises(RaceplanAllreadyExistException):
+    with pytest.raises(RaceplanAllreadyExistError):
         await RaceplansService.create_raceplan(db=None, raceplan=new_raceplan)
 
 
@@ -121,13 +120,11 @@ async def test_delete_raceplan_not_found(
     new_raceplan: Raceplan,
     raceplan_mock: Raceplan,
 ) -> None:
-    """Should raise RaceplanNotFoundException."""
-    RACEPLAN_ID = "does-not-exist"
+    """Should raise RaceplanNotFoundError."""
+    raceplan_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        side_effect=RaceplanNotFoundException(
-            f"Raceplan with id {RACEPLAN_ID} not found."
-        ),
+        side_effect=RaceplanNotFoundError(f"Raceplan with id {raceplan_id} not found."),
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
@@ -138,8 +135,8 @@ async def test_delete_raceplan_not_found(
         return_value=[],
     )
 
-    with pytest.raises(RaceplanNotFoundException):
-        await RaceplansService.delete_raceplan(db=None, id=RACEPLAN_ID)
+    with pytest.raises(RaceplanNotFoundError):
+        await RaceplansService.delete_raceplan(db=None, id_=raceplan_id)
 
 
 @pytest.mark.integration
@@ -147,7 +144,7 @@ async def test_delete_raceplan_not_found(
 async def test_create_race_adapter_fails(
     mocker: MockFixture,
     new_raceplan: Raceplan,
-    raceplan_mock: Dict,
+    raceplan_mock: dict,
 ) -> None:
     """Should return None."""
     mocker.patch(

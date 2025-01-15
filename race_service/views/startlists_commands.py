@@ -1,6 +1,7 @@
 """Resource module for startlist command resources."""
-from json.decoder import JSONDecodeError
+
 import os
+from json.decoder import JSONDecodeError
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -13,26 +14,27 @@ from dotenv import load_dotenv
 from multidict import MultiDict
 
 from race_service.adapters import (
-    ContestantsNotFoundException,
-    EventNotFoundException,
-    RaceclassesNotFoundException,
+    ContestantsNotFoundError,
+    EventNotFoundError,
+    RaceclassesNotFoundError,
     UsersAdapter,
 )
 from race_service.commands import (
-    CompetitionFormatNotSupportedException,
-    DuplicateRaceplansInEventException,
+    CompetitionFormatNotSupportedError,
+    DuplicateRaceplansInEventError,
+    InconsistentInputDataError,
+    InconsistentValuesInContestantsError,
+    InvalidDateFormatError,
+    MissingPropertyError,
+    NoRaceplanInEventError,
+    NoRacesInRaceplanError,
     generate_startlist_for_event,
-    InconsistentInputDataException,
-    InconsistentValuesInContestantsException,
-    InvalidDateFormatException,
-    MissingPropertyException,
-    NoRaceplanInEventException,
-    NoRacesInRaceplanException,
 )
-from race_service.services import StartlistAllreadyExistException
+from race_service.services import StartlistAllreadyExistError
 from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -50,7 +52,7 @@ class GenerateStartlistForEventView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         # Execute command:
         try:
@@ -61,20 +63,20 @@ class GenerateStartlistForEventView(View):
         event_id = request_body["event_id"]
         try:
             startlist_id = await generate_startlist_for_event(db, token, event_id)
-        except EventNotFoundException as e:
+        except EventNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         except (
-            CompetitionFormatNotSupportedException,
-            ContestantsNotFoundException,
-            DuplicateRaceplansInEventException,
-            InconsistentInputDataException,
-            InconsistentValuesInContestantsException,
-            InvalidDateFormatException,
-            NoRaceplanInEventException,
-            NoRacesInRaceplanException,
-            MissingPropertyException,
-            RaceclassesNotFoundException,
-            StartlistAllreadyExistException,
+            CompetitionFormatNotSupportedError,
+            ContestantsNotFoundError,
+            DuplicateRaceplansInEventError,
+            InconsistentInputDataError,
+            InconsistentValuesInContestantsError,
+            InvalidDateFormatError,
+            NoRaceplanInEventError,
+            NoRacesInRaceplanError,
+            MissingPropertyError,
+            RaceclassesNotFoundError,
+            StartlistAllreadyExistError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
 

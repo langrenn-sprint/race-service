@@ -1,21 +1,29 @@
 """Integration test cases for the raceplans route."""
-from copy import deepcopy
-import os
-from typing import Any, Dict, List
-import uuid
 
+import os
+import uuid
+from copy import deepcopy
+from http import HTTPStatus
+from typing import Any
+
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
+from dotenv import load_dotenv
 from pytest_mock import MockFixture
 
 from race_service.adapters import (
-    CompetitionFormatNotFoundException,
-    EventNotFoundException,
-    RaceclassesNotFoundException,
+    CompetitionFormatNotFoundError,
+    EventNotFoundError,
+    RaceclassesNotFoundError,
 )
+
+load_dotenv()
+
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
 @pytest.fixture
@@ -24,7 +32,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -34,7 +42,7 @@ async def request_body() -> dict:
 
 
 @pytest.fixture
-async def event() -> Dict[str, Any]:
+async def event() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -49,7 +57,7 @@ async def event() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def event_not_supported_competition_format() -> Dict[str, Any]:
+async def event_not_supported_competition_format() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -64,7 +72,7 @@ async def event_not_supported_competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def event_has_no_competition_format() -> Dict[str, Any]:
+async def event_has_no_competition_format() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -78,7 +86,7 @@ async def event_has_no_competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def competition_format() -> Dict[str, Any]:
+async def competition_format() -> dict[str, Any]:
     """An competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -92,7 +100,7 @@ async def competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def raceclasses() -> List[Dict[str, Any]]:
+async def raceclasses() -> list[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -146,14 +154,14 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Server error."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
@@ -165,7 +173,7 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value={"id": RACEPLAN_ID},
+        return_value={"id": raceplan_id},
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
@@ -198,12 +206,12 @@ async def test_generate_raceplan_for_event_create_raceplan_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -214,18 +222,18 @@ async def test_generate_raceplan_for_event_create_race_fails(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -233,7 +241,7 @@ async def test_generate_raceplan_for_event_create_race_fails(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value={"id": RACEPLAN_ID},
+        return_value={"id": raceplan_id},
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
@@ -266,12 +274,12 @@ async def test_generate_raceplan_for_event_create_race_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 # Not authenticated
@@ -283,18 +291,18 @@ async def test_generate_raceplan_for_event_unauthorized(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 401 Unauthorized."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -319,12 +327,12 @@ async def test_generate_raceplan_for_event_unauthorized(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 401
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 # Not found cases:
@@ -336,18 +344,18 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -372,12 +380,12 @@ async def test_generate_raceplan_for_event_already_has_raceplan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 # Not found cases:
@@ -389,18 +397,18 @@ async def test_generate_raceplan_for_event_event_not_found(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 404 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -408,7 +416,7 @@ async def test_generate_raceplan_for_event_event_not_found(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
-        side_effect=EventNotFoundException("Event {event_id} not found."),
+        side_effect=EventNotFoundError("Event {event_id} not found."),
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
@@ -425,12 +433,12 @@ async def test_generate_raceplan_for_event_event_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -441,11 +449,11 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     competition_format_missing_max_no_of_contestants_in_raceclass = deepcopy(
         competition_format
     )
@@ -455,11 +463,11 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
 
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -484,12 +492,12 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -500,11 +508,11 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     competition_format_missing_max_no_of_contestants_in_race = deepcopy(
         competition_format
     )
@@ -514,11 +522,11 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
 
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -543,12 +551,12 @@ async def test_generate_raceplan_for_event_missing_max_no_of_contestants_in_race
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -562,14 +570,14 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -585,8 +593,8 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
-        side_effect=RaceclassesNotFoundException(
-            f'No raceclasses found for event {event["id"]}.'
+        side_effect=RaceclassesNotFoundError(
+            f"No raceclasses found for event {event['id']}."
         ),
     )
 
@@ -596,12 +604,12 @@ async def test_generate_raceplan_for_event_no_raceclasses(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -612,18 +620,18 @@ async def test_generate_raceplan_for_event_no_competition_format(
     token: MockFixture,
     event_has_no_competition_format: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -648,12 +656,12 @@ async def test_generate_raceplan_for_event_no_competition_format(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -664,20 +672,20 @@ async def test_generate_raceplan_for_event_missing_intervals(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     competition_format_missing_intervals = deepcopy(competition_format)
     competition_format_missing_intervals.pop("intervals", None)
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -702,12 +710,12 @@ async def test_generate_raceplan_for_event_missing_intervals(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -718,20 +726,20 @@ async def test_generate_raceplan_for_event_time_missing(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 201 Created, location header."""
     event_missing_time = deepcopy(event)
     event_missing_time.pop("time_of_event", None)
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -756,12 +764,12 @@ async def test_generate_raceplan_for_event_time_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -772,20 +780,20 @@ async def test_generate_raceplan_for_event_date_missing(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     event_missing_date = deepcopy(event)
     event_missing_date.pop("date_of_event", None)
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -810,12 +818,12 @@ async def test_generate_raceplan_for_event_date_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -826,20 +834,20 @@ async def test_generate_raceplan_for_event_invalid_date(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     event_invalid_date = deepcopy(event)
     event_invalid_date["date_of_event"] = "2021-13-32"
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -864,12 +872,12 @@ async def test_generate_raceplan_for_event_invalid_date(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -880,20 +888,20 @@ async def test_generate_raceplan_for_event_invalid_time(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     event_invalid_time = deepcopy(event)
     event_invalid_time["time_of_event"] = "15:67:99"
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -918,12 +926,12 @@ async def test_generate_raceplan_for_event_invalid_time(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -934,20 +942,20 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_inconsistent_group_values = deepcopy(raceclasses)
     raceclasses_inconsistent_group_values[0].pop("group", None)
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -972,12 +980,12 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "contains non numeric values." in body["detail"]
 
@@ -990,20 +998,20 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_inconsistent_group_values = deepcopy(raceclasses)
     raceclasses_inconsistent_group_values[0]["group"] = 999
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1028,12 +1036,12 @@ async def test_generate_raceplan_for_event_raceclasses_group_values_not_sorted(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "are not consecutive." in body["detail"]
 
@@ -1046,20 +1054,20 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_inconsistent_order_values = deepcopy(raceclasses)
     raceclasses_inconsistent_order_values[0].pop("order", None)
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1084,12 +1092,12 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "contains non numeric values." in body["detail"]
 
@@ -1102,20 +1110,20 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_inconsistent_order_values = deepcopy(raceclasses)
     raceclasses_inconsistent_order_values[0]["order"] = None
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1140,12 +1148,12 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_is_none(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "contains non numeric values." in body["detail"]
 
@@ -1158,21 +1166,21 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_inconsistent_order_values = deepcopy(raceclasses)
     raceclasses_inconsistent_order_values[0]["order"] = 1
     raceclasses_inconsistent_order_values[1]["order"] = 1
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1197,12 +1205,12 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_unique(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "are not unique inside group." in body["detail"]
 
@@ -1215,20 +1223,20 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_inconsistent_order_values = deepcopy(raceclasses)
     raceclasses_inconsistent_order_values[0]["order"] = 999
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1253,12 +1261,12 @@ async def test_generate_raceplan_for_event_raceclasses_order_values_non_consecut
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "are not consecutive." in body["detail"]
 
@@ -1274,18 +1282,18 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
     token: MockFixture,
     event_not_supported_competition_format: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1297,7 +1305,7 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
-        side_effect=CompetitionFormatNotFoundException("CompetitionFormat not found."),
+        side_effect=CompetitionFormatNotFoundError("CompetitionFormat not found."),
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1310,12 +1318,12 @@ async def test_generate_raceplan_for_event_competition_format_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1326,18 +1334,18 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
     token: MockFixture,
     event_not_supported_competition_format: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1362,12 +1370,12 @@ async def test_generate_raceplan_for_event_competition_format_not_supported(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1378,20 +1386,20 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceclasses_dirrering_ranking_values_in_group = deepcopy(raceclasses)
     raceclasses_dirrering_ranking_values_in_group[0]["ranking"] = False
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -1399,7 +1407,7 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value={"id": RACEPLAN_ID},
+        return_value={"id": raceplan_id},
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
@@ -1432,11 +1440,11 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "Ranking-value differs in group 1." in body["detail"]

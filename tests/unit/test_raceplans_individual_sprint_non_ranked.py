@@ -1,6 +1,7 @@
 """Unit test cases for the event-service module."""
+
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -176,7 +177,7 @@ async def competition_format_individual_sprint() -> dict:
     }
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def event_individual_sprint() -> dict:
     """An event object for testing."""
     return {
@@ -191,8 +192,8 @@ async def event_individual_sprint() -> dict:
     }
 
 
-@pytest.fixture(scope="function")
-async def raceclasses_individual_sprint_10_contestants() -> List[Dict[str, Any]]:
+@pytest.fixture
+async def raceclasses_individual_sprint_10_contestants() -> list[dict[str, Any]]:
     """A raceclass object for testing - 10 contestants."""
     return [
         {
@@ -208,8 +209,8 @@ async def raceclasses_individual_sprint_10_contestants() -> List[Dict[str, Any]]
     ]
 
 
-@pytest.fixture(scope="function")
-async def raceclasses_individual_sprint_17_contestants() -> List[Dict[str, Any]]:
+@pytest.fixture
+async def raceclasses_individual_sprint_17_contestants() -> list[dict[str, Any]]:
     """A raceclass object for testing - 17 contestants."""
     return [
         {
@@ -225,8 +226,8 @@ async def raceclasses_individual_sprint_17_contestants() -> List[Dict[str, Any]]
     ]
 
 
-@pytest.fixture(scope="function")
-async def raceclasses_individual_sprint_27_contestants() -> List[Dict[str, Any]]:
+@pytest.fixture
+async def raceclasses_individual_sprint_27_contestants() -> list[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -242,49 +243,49 @@ async def raceclasses_individual_sprint_27_contestants() -> List[Dict[str, Any]]
     ]
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_raceplan_individual_sprint_10_contestants(
     event_individual_sprint: dict,
 ) -> Raceplan:
     """Create a mock raceplan object - 10 contestants."""
-    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
+    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
     raceplan.id = "190e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 10
 
     return raceplan
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_raceplan_individual_sprint_17_contestants(
     event_individual_sprint: dict,
 ) -> Raceplan:
     """Create a mock raceplan object - 17 contestants."""
-    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
+    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
     raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 17
 
     return raceplan
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_raceplan_individual_sprint_27_contestants(
     event_individual_sprint: dict,
 ) -> Raceplan:
     """Create a mock raceplan object - 27 contestants."""
-    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=list())
+    raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
     raceplan.id = "390e70d5-0933-4af0-bb53-1d705ba7eb95"
     raceplan.no_of_contestants = 27
 
     return raceplan
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_races_individual_sprint_10_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
-) -> List[IndividualSprintRace]:
+) -> list[IndividualSprintRace]:
     """Create a mock raceplan object, races - 10 contestants."""
-    races: List[IndividualSprintRace] = []
+    races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
             id="",
@@ -369,13 +370,13 @@ async def expected_races_individual_sprint_10_contestants(
     return races
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_races_individual_sprint_17_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
-) -> List[IndividualSprintRace]:
+) -> list[IndividualSprintRace]:
     """Create a mock raceplan object, races - 17 contestants."""
-    races: List[IndividualSprintRace] = []
+    races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
             id="",
@@ -500,13 +501,13 @@ async def expected_races_individual_sprint_17_contestants(
     return races
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def expected_races_individual_sprint_27_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
-) -> List[IndividualSprintRace]:
+) -> list[IndividualSprintRace]:
     """Create a mock raceplan object, races - 27 contestants."""
-    races: List[IndividualSprintRace] = []
+    races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
             id="",
@@ -676,9 +677,9 @@ async def expected_races_individual_sprint_27_contestants(
 async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
-    raceclasses_individual_sprint_10_contestants: List[dict],
+    raceclasses_individual_sprint_10_contestants: list[dict],
     expected_raceplan_individual_sprint_10_contestants: Raceplan,
-    expected_races_individual_sprint_10_contestants: List[IndividualSprintRace],
+    expected_races_individual_sprint_10_contestants: list[IndividualSprintRace],
 ) -> None:
     """Should return a tuple of Raceplan and races equal to the expected raceplan."""
     raceplan, races = await calculate_raceplan_individual_sprint(
@@ -723,24 +724,18 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
 
     # Check that the two race lists match:
     print("Calculated raceplan:")
-    i = 0
-    for race in races:
-        print(f"[{i}]: {race}", sep="\n")
-        i += 1
+    for i, race in enumerate(races):
+        print(f"[{i}]: {race}")
 
     print("----")
     print("Expected raceplan:")
-    i = 0
-    for race in expected_races_individual_sprint_10_contestants:
-        print(f"[{i}]: {race}", sep="\n")
-        i += 1
+    for i, race in enumerate(expected_races_individual_sprint_10_contestants):
+        print(f"[{i}]: {race}")
 
-    i = 0
-    for race in races:
-        assert (
-            race == expected_races_individual_sprint_10_contestants[i]
-        ), f"race with index {i} did not match"
-        i += 1
+    for i, race in enumerate(races):
+        assert race == expected_races_individual_sprint_10_contestants[i], (
+            f"race with index {i} did not match"
+        )
 
 
 @pytest.mark.unit
@@ -748,9 +743,9 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
 async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
-    raceclasses_individual_sprint_27_contestants: List[dict],
+    raceclasses_individual_sprint_27_contestants: list[dict],
     expected_raceplan_individual_sprint_27_contestants: Raceplan,
-    expected_races_individual_sprint_27_contestants: List[IndividualSprintRace],
+    expected_races_individual_sprint_27_contestants: list[IndividualSprintRace],
 ) -> None:
     """Should return a tuple of Raceplan and races equal to the expected raceplan."""
     raceplan, races = await calculate_raceplan_individual_sprint(
@@ -795,24 +790,18 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
 
     # Check that the two race lists match:
     print("Calculated raceplan:")
-    i = 0
-    for race in races:
-        print(f"[{i}]: {race}", sep="\n")
-        i += 1
+    for i, race in enumerate(races):
+        print(f"[{i}]: {race}")
 
     print("----")
     print("Expected raceplan:")
-    i = 0
-    for race in expected_races_individual_sprint_27_contestants:
-        print(f"[{i}]: {race}", sep="\n")
-        i += 1
+    for i, race in enumerate(expected_races_individual_sprint_27_contestants):
+        print(f"[{i}]: {race}")
 
-    i = 0
-    for race in races:
-        assert (
-            race == expected_races_individual_sprint_27_contestants[i]
-        ), f"race with index {i} did not match"
-        i += 1
+    for i, race in enumerate(races):
+        assert race == expected_races_individual_sprint_27_contestants[i], (
+            f"race with index {i} did not match"
+        )
 
 
 @pytest.mark.unit
@@ -820,9 +809,9 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
 async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
     competition_format_individual_sprint: dict,
     event_individual_sprint: dict,
-    raceclasses_individual_sprint_17_contestants: List[dict],
+    raceclasses_individual_sprint_17_contestants: list[dict],
     expected_raceplan_individual_sprint_17_contestants: Raceplan,
-    expected_races_individual_sprint_17_contestants: List[IndividualSprintRace],
+    expected_races_individual_sprint_17_contestants: list[IndividualSprintRace],
 ) -> None:
     """Should return a tuple of Raceplan and races equal to the expected raceplan."""
     raceplan, races = await calculate_raceplan_individual_sprint(
@@ -867,28 +856,22 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
 
     # Check that the two race lists match:
     print("Calculated raceplan:")
-    i = 0
-    for race in races:
-        print(f"[{i}]: {race}", sep="\n")
-        i += 1
+    for i, race in enumerate(races):
+        print(f"[{i}]: {race}")
 
     print("----")
     print("Expected raceplan:")
-    i = 0
-    for race in expected_races_individual_sprint_17_contestants:
-        print(f"[{i}]: {race}", sep="\n")
-        i += 1
+    for i, race in enumerate(expected_races_individual_sprint_17_contestants):
+        print(f"[{i}]: {race}")
 
-    i = 0
-    for race in races:
-        assert (
-            race == expected_races_individual_sprint_17_contestants[i]
-        ), f"race with index {i} did not match"
-        i += 1
+    for i, race in enumerate(races):
+        assert race == expected_races_individual_sprint_17_contestants[i], (
+            f"race with index {i} did not match"
+        )
 
 
 # helpers
-def print_races(races: List[IndividualSprintRace]) -> None:
+def print_races(races: list[IndividualSprintRace]) -> None:
     """Print races in given round."""
     print("--- races ---")
     for race in races:

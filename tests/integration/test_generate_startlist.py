@@ -1,23 +1,28 @@
 """Integration test cases for the startlists route."""
+
+import os
 from copy import deepcopy
 from datetime import datetime
-import os
-from typing import Any, Dict, List
+from http import HTTPStatus
+from typing import Any
 
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
 from pytest_mock import MockFixture
 
 from race_service.adapters import (
-    CompetitionFormatNotFoundException,
-    ContestantsNotFoundException,
-    EventNotFoundException,
-    RaceclassesNotFoundException,
+    CompetitionFormatNotFoundError,
+    ContestantsNotFoundError,
+    EventNotFoundError,
+    RaceclassesNotFoundError,
 )
 from race_service.models import IntervalStartRace, Raceplan
+
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
 @pytest.fixture
@@ -26,7 +31,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -36,7 +41,7 @@ async def request_body() -> dict:
 
 
 @pytest.fixture
-async def event() -> Dict[str, Any]:
+async def event() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -51,7 +56,7 @@ async def event() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def event_not_supported_competition_format() -> Dict[str, Any]:
+async def event_not_supported_competition_format() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -66,7 +71,7 @@ async def event_not_supported_competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def event_has_no_competition_format() -> Dict[str, Any]:
+async def event_has_no_competition_format() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -80,7 +85,7 @@ async def event_has_no_competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def competition_format() -> Dict[str, Any]:
+async def competition_format() -> dict[str, Any]:
     """An competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -93,7 +98,7 @@ async def competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def raceclasses() -> List[Dict[str, Any]]:
+async def raceclasses() -> list[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -136,7 +141,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
 
 
 @pytest.fixture
-async def races(event: dict, competition_format: dict) -> List[IntervalStartRace]:
+async def races(event: dict, competition_format: dict) -> list[IntervalStartRace]:
     """A list of races for testing."""
     return [
         IntervalStartRace(
@@ -196,7 +201,7 @@ async def races(event: dict, competition_format: dict) -> List[IntervalStartRace
 
 @pytest.fixture
 async def raceplan_interval_start(
-    event: dict, races: List[IntervalStartRace]
+    event: dict, races: list[IntervalStartRace]
 ) -> Raceplan:
     """Create a mock raceplan object."""
     return Raceplan(
@@ -208,7 +213,7 @@ async def raceplan_interval_start(
 
 
 @pytest.fixture
-async def contestants(event: dict, raceplan_interval_start: Raceplan) -> List[dict]:
+async def contestants(event: dict, raceplan_interval_start: Raceplan) -> list[dict]:
     """Create a mock contestant list object."""
     return [
         {
@@ -327,21 +332,21 @@ async def test_generate_startlist_for_event_no_request_body(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -378,12 +383,12 @@ async def test_generate_startlist_for_event_no_request_body(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event", headers=headers
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -394,20 +399,20 @@ async def test_generate_startlist_for_event_no_races_in_plan(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    contestants: List[dict],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -444,14 +449,14 @@ async def test_generate_startlist_for_event_no_races_in_plan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -462,23 +467,23 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     contestants_bib_not_int = deepcopy(contestants)
     contestants_bib_not_int[0]["bib"] = "1"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -515,14 +520,14 @@ async def test_generate_startlist_for_event_contestants_bib_not_int(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -533,23 +538,23 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     contestants_bib_not_unique = deepcopy(contestants)
     contestants_bib_not_unique[1]["bib"] = 1
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -586,14 +591,14 @@ async def test_generate_startlist_for_event_contestants_bib_not_unique(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -604,21 +609,21 @@ async def test_generate_startlist_for_event_no_contestants(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -655,39 +660,39 @@ async def test_generate_startlist_for_event_no_contestants(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-async def test_generate_startlist_for_event_no_contestants_exception(
+async def test_generate_startlist_for_event_no_contestants_error(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -715,7 +720,7 @@ async def test_generate_startlist_for_event_no_contestants_exception(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
-        side_effect=ContestantsNotFoundException("Contestants not found for event."),
+        side_effect=ContestantsNotFoundError("Contestants not found for event."),
     )
 
     headers = {
@@ -724,14 +729,14 @@ async def test_generate_startlist_for_event_no_contestants_exception(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -742,20 +747,20 @@ async def test_generate_startlist_for_event_no_raceplan(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    contestants: List[dict],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -792,41 +797,41 @@ async def test_generate_startlist_for_event_no_raceplan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "No raceplan for event" in body["detail"]
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-async def test_generate_startlist_for_event_no_raceclasses_exception(
+async def test_generate_startlist_for_event_no_raceclasses_error(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -842,7 +847,7 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
-        side_effect=RaceclassesNotFoundException("No raceclasses for event."),
+        side_effect=RaceclassesNotFoundError("No raceclasses for event."),
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -863,14 +868,14 @@ async def test_generate_startlist_for_event_no_raceclasses_exception(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "No raceclasses for event" in body["detail"]
 
@@ -883,21 +888,21 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 201 Created, location header."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -934,14 +939,14 @@ async def test_generate_startlist_for_event_duplicate_raceplans(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert "Multiple raceplans for event " in body["detail"]
 
@@ -954,23 +959,23 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceclass
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
     raceclasses_with_wrong_no_of_contestants = deepcopy(raceclasses)
     raceclasses_with_wrong_no_of_contestants[0]["no_of_contestants"] = 100000
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1007,14 +1012,14 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceclass
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert (
             "len(contestants) does not match number of contestants in raceclasses"
@@ -1030,23 +1035,23 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
     raceplan_with_wrong_no_of_contestants = deepcopy(raceplan_interval_start)
     raceplan_with_wrong_no_of_contestants.no_of_contestants = 100000
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1083,14 +1088,14 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert (
             "len(contestants) does not match number of contestants in raceplan"
@@ -1106,10 +1111,10 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
@@ -1117,17 +1122,17 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
     races = deepcopy(races)
     race_with_wrong_number_of_contestants = races[-1]
     race_with_wrong_number_of_contestants.no_of_contestants = 100000
-    raceplan_races_with_wrong_no_of_contestants.races[
-        -1
-    ] = race_with_wrong_number_of_contestants.id
-    RACEPLAN_ID = raceplan_interval_start.id
+    raceplan_races_with_wrong_no_of_contestants.races[-1] = (
+        race_with_wrong_number_of_contestants.id
+    )
+    raceplan_id = raceplan_interval_start.id
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1164,14 +1169,14 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert (
             "len(contestants) does not match sum of contestants in races"
@@ -1188,21 +1193,21 @@ async def test_generate_startlist_for_event_unauthorized(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 401 Unauthorized."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1239,14 +1244,14 @@ async def test_generate_startlist_for_event_unauthorized(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 401
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 # Not found cases:
@@ -1258,21 +1263,21 @@ async def test_generate_startlist_for_event_already_has_startlist(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1309,14 +1314,14 @@ async def test_generate_startlist_for_event_already_has_startlist(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 # Not found cases:
@@ -1328,21 +1333,21 @@ async def test_generate_startlist_for_event_event_not_found(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 404 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1350,7 +1355,7 @@ async def test_generate_startlist_for_event_event_not_found(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
-        side_effect=EventNotFoundException("Event {event_id} not found."),
+        side_effect=EventNotFoundError("Event {event_id} not found."),
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
@@ -1379,14 +1384,14 @@ async def test_generate_startlist_for_event_event_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -1397,21 +1402,21 @@ async def test_generate_startlist_for_event_competition_format_not_found(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1423,7 +1428,7 @@ async def test_generate_startlist_for_event_competition_format_not_found(
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
-        side_effect=CompetitionFormatNotFoundException("Competition format not found."),
+        side_effect=CompetitionFormatNotFoundError("Competition format not found."),
     )
     mocker.patch(
         "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
@@ -1448,14 +1453,14 @@ async def test_generate_startlist_for_event_competition_format_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1466,21 +1471,21 @@ async def test_generate_startlist_for_event_no_raceclasses(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 404 Not found."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1517,14 +1522,14 @@ async def test_generate_startlist_for_event_no_raceclasses(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1535,21 +1540,21 @@ async def test_generate_startlist_for_event_no_competition_format(
     token: MockFixture,
     event_has_no_competition_format: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1586,14 +1591,14 @@ async def test_generate_startlist_for_event_no_competition_format(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1604,23 +1609,23 @@ async def test_generate_startlist_for_event_missing_intervals(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     competition_format_missing_intervals = deepcopy(competition_format)
     competition_format_missing_intervals.pop("intervals", None)
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1657,14 +1662,14 @@ async def test_generate_startlist_for_event_missing_intervals(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1675,23 +1680,23 @@ async def test_generate_startlist_for_event_time_missing(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad request."""
     event_missing_time = deepcopy(event)
     event_missing_time.pop("time_of_event", None)
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1728,14 +1733,14 @@ async def test_generate_startlist_for_event_time_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1746,23 +1751,23 @@ async def test_generate_startlist_for_event_date_missing(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     event_missing_date = deepcopy(event)
     event_missing_date.pop("date_of_event", None)
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1799,14 +1804,14 @@ async def test_generate_startlist_for_event_date_missing(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1817,23 +1822,23 @@ async def test_generate_startlist_for_event_invalid_date(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     event_invalid_date = deepcopy(event)
     event_invalid_date["date_of_event"] = "2021-13-32"
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1870,14 +1875,14 @@ async def test_generate_startlist_for_event_invalid_date(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1888,23 +1893,23 @@ async def test_generate_startlist_for_event_invalid_time(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
     event_invalid_time = deepcopy(event)
     event_invalid_time["time_of_event"] = "15:67:99"
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -1941,14 +1946,14 @@ async def test_generate_startlist_for_event_invalid_time(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 # Not supported errors:
@@ -1962,21 +1967,21 @@ async def test_generate_startlist_for_event_competition_format_not_supported(
     token: MockFixture,
     event_not_supported_competition_format: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    races: List[IntervalStartRace],
-    contestants: List[dict],
+    races: list[IntervalStartRace],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 400 Bad Request."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -2013,11 +2018,11 @@ async def test_generate_startlist_for_event_competition_format_not_supported(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST

@@ -1,8 +1,8 @@
 """Resource module for race_results resources."""
+
 import json
 import logging
 import os
-from typing import List, Union
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -13,8 +13,8 @@ from aiohttp.web import (
 from dotenv import load_dotenv
 
 from race_service.adapters import (
-    RaceNotFoundException,
-    RaceResultNotFoundException,
+    RaceNotFoundError,
+    RaceResultNotFoundError,
     RaceResultsAdapter,
     RacesAdapter,
     TimeEventsAdapter,
@@ -27,13 +27,14 @@ from race_service.models import (
     TimeEvent,
 )
 from race_service.services import (
-    IllegalValueException,
+    IllegalValueError,
     RaceResultsService,
     RacesService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -60,15 +61,11 @@ class RaceResultsView(View):
                 db, race_id
             )
         # We expand references to time-events in race-results ranking-sequence:
-        idsOnly = (
-            self.request.rel_url.query["idsOnly"]
-            if "idsOnly" in self.request.rel_url.query
-            else None
-        )
-        if not idsOnly:
+        ids_only = self.request.rel_url.query.get("idsOnly", None)
+        if not ids_only:
             for race_result in race_results:
-                time_events: List[TimeEvent] = []
-                time_events_sorted: List[TimeEvent] = []
+                time_events = []
+                time_events_sorted = []
                 for time_event_id in race_result.ranking_sequence:
                     time_event = await TimeEventsAdapter.get_time_event_by_id(
                         db, time_event_id
@@ -85,13 +82,11 @@ class RaceResultsView(View):
                     reverse=False,
                 )
 
-                race_result.ranking_sequence = time_events_sorted  # type: ignore
+                race_result.ranking_sequence = time_events_sorted
 
-        list = []
-        for race_result in race_results:
-            list.append(race_result.to_dict())
+        _race_results = [race_result.to_dict() for race_result in race_results]
 
-        body = json.dumps(list, default=str, ensure_ascii=False)
+        body = json.dumps(_race_results, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
 
@@ -110,7 +105,7 @@ class RaceResultView(View):
                 db, race_result_id
             )
             # We expand references to time-events in race-result's ranking-sequence:
-            time_events: List[TimeEvent] = []
+            time_events: list[TimeEvent] = []
             for time_event_id in race_result.ranking_sequence:
                 time_event = await TimeEventsAdapter.get_time_event_by_id(
                     db, time_event_id
@@ -127,8 +122,8 @@ class RaceResultView(View):
                 reverse=False,
             )
 
-            race_result.ranking_sequence = time_events_sorted  # type: ignore
-        except RaceResultNotFoundException as e:
+            race_result.ranking_sequence = time_events_sorted # type: ignore [reportAttributeAccessIssue]
+        except RaceResultNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got race_result: {race_result}")
         body = race_result.to_json()
@@ -159,9 +154,9 @@ class RaceResultView(View):
 
         try:
             await RaceResultsService.update_race_result(db, race_result_id, race_result)
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except RaceResultNotFoundException as e:
+        except RaceResultNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
@@ -185,10 +180,10 @@ class RaceResultView(View):
             )
             # We need to remove the race-result from the race containing the race-result:
             try:
-                race: Union[
-                    IndividualSprintRace, IntervalStartRace
-                ] = await RacesAdapter.get_race_by_id(db, race_result.race_id)
-            except RaceNotFoundException as e:
+                race: (
+                    IndividualSprintRace | IntervalStartRace
+                ) = await RacesAdapter.get_race_by_id(db, race_result.race_id)
+            except RaceNotFoundError as e:
                 raise HTTPNotFound(
                     reason=(
                         f"DB is inconsistent: cannot find race with id "
@@ -200,6 +195,6 @@ class RaceResultView(View):
 
             # We can finally delete the race-result:
             await RaceResultsService.delete_race_result(db, race_result_for_deletion_id)
-        except RaceResultNotFoundException as e:
+        except RaceResultNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

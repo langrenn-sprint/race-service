@@ -1,4 +1,5 @@
 """Resource module for raceplan command resources."""
+
 import json
 import os
 
@@ -13,28 +14,29 @@ from dotenv import load_dotenv
 from multidict import MultiDict
 
 from race_service.adapters import (
-    EventNotFoundException,
-    RaceplanNotFoundException,
+    EventNotFoundError,
+    RaceplanNotFoundError,
     RaceplansAdapter,
     UsersAdapter,
 )
 from race_service.commands import (
-    CompetitionFormatNotSupportedException,
-    CouldNotCreateRaceException,
-    CouldNotCreateRaceplanException,
+    CompetitionFormatNotSupportedError,
+    CouldNotCreateRaceError,
+    CouldNotCreateRaceplanError,
     IllegalValueInRaceError,
-    InconsistentValuesInRaceclassesException,
-    InvalidDateFormatException,
-    MissingPropertyException,
-    NoRaceclassesInEventException,
+    InconsistentValuesInRaceclassesError,
+    InvalidDateFormatError,
+    MissingPropertyError,
+    NoRaceclassesInEventError,
     RaceplansCommands,
 )
 from race_service.services import (
-    RaceplanAllreadyExistException,
+    RaceplanAllreadyExistError,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -52,7 +54,7 @@ class GenerateRaceplanForEventView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
         except Exception as e:
-            raise e
+            raise e from e
 
         # Execute command:
         request_body = await self.request.json()
@@ -61,18 +63,18 @@ class GenerateRaceplanForEventView(View):
             raceplan_id = await RaceplansCommands.generate_raceplan_for_event(
                 db, token, event_id
             )
-        except EventNotFoundException as e:
+        except EventNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         except (
-            CompetitionFormatNotSupportedException,
-            CouldNotCreateRaceException,
-            CouldNotCreateRaceplanException,
+            CompetitionFormatNotSupportedError,
+            CouldNotCreateRaceError,
+            CouldNotCreateRaceplanError,
             IllegalValueInRaceError,
-            InvalidDateFormatException,
-            NoRaceclassesInEventException,
-            MissingPropertyException,
-            InconsistentValuesInRaceclassesException,
-            RaceplanAllreadyExistException,
+            InvalidDateFormatError,
+            NoRaceclassesInEventError,
+            MissingPropertyError,
+            InconsistentValuesInRaceclassesError,
+            RaceplanAllreadyExistError,
             ValueError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
@@ -92,20 +94,20 @@ class ValidateRaceplanView(View):
         try:
             await UsersAdapter.authorize(token, roles=["admin", "event-admin"])
         except Exception as e:  # pragma: no cover
-            raise e
+            raise e from e
 
         raceplan_id = self.request.match_info["raceplanId"]
 
         # Fetch the raceplan:
         try:
             raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)
-        except RaceplanNotFoundException as e:  # pragma: no cover
+        except RaceplanNotFoundError as e:  # pragma: no cover
             raise HTTPNotFound(reason=str(e)) from e
 
         # Validate
         try:
             result = await RaceplansCommands.validate_raceplan(db, token, raceplan)
-        except NoRaceclassesInEventException as e:
+        except NoRaceclassesInEventError as e:
             raise HTTPBadRequest(reason=str(e)) from e
         headers = MultiDict([(hdrs.CONTENT_TYPE, "application/json")])
         body = json.dumps(result, default=str, ensure_ascii=False)

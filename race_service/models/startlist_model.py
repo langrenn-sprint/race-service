@@ -1,9 +1,9 @@
 """Raceplan data class module."""
+
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
 
-from dataclasses_json import config, DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, config
 from marshmallow.fields import DateTime
 
 from .changelog import Changelog
@@ -26,9 +26,9 @@ class StartEntry(DataClassJsonMixin):
     )
     name: str
     club: str
-    status: Optional[str] = field(default=None)
-    changelog: Optional[List[Changelog]] = field(default=None)
-    id: Optional[str] = field(default=None)
+    status: str | None = field(default=None)
+    changelog: list[Changelog] | None = field(default=None)
+    id: str | None = field(default=None)
 
 
 @dataclass
@@ -37,5 +37,5 @@ class Startlist(DataClassJsonMixin):
 
     event_id: str
     no_of_contestants: int
-    start_entries: List[str]
-    id: Optional[str] = field(default=None)
+    start_entries: list[str]
+    id: str | None = field(default=None)

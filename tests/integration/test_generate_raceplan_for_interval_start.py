@@ -1,16 +1,21 @@
 """Integration test cases for the raceplans route."""
-import os
-from typing import Any, Dict, List
-import uuid
 
+import os
+import uuid
+from http import HTTPStatus
+from typing import Any
+
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
 from pytest_mock import MockFixture
 
 from race_service.models import Raceplan
+
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
 @pytest.fixture
@@ -19,7 +24,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -29,7 +34,7 @@ async def request_body() -> dict:
 
 
 @pytest.fixture
-async def event() -> Dict[str, Any]:
+async def event() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -44,7 +49,7 @@ async def event() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def competition_format() -> Dict[str, Any]:
+async def competition_format() -> dict[str, Any]:
     """A competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -58,7 +63,7 @@ async def competition_format() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def raceclasses() -> List[Dict[str, Any]]:
+async def raceclasses() -> list[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -112,18 +117,18 @@ async def test_generate_raceplan_for_event(
     token: MockFixture,
     event: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 201 Created, location header."""
-    RACEPLAN_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.raceplans_service.create_id",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=RACEPLAN_ID,
+        return_value=raceplan_id,
     )
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
@@ -132,7 +137,7 @@ async def test_generate_raceplan_for_event(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=Raceplan(
-            id=RACEPLAN_ID, event_id=event["id"], races=[], no_of_contestants=0
+            id=raceplan_id, event_id=event["id"], races=[], no_of_contestants=0
         ),
     )
     mocker.patch(
@@ -170,13 +175,13 @@ async def test_generate_raceplan_for_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
         )
-        assert resp.status == 201
-        assert f"/raceplans/{RACEPLAN_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == HTTPStatus.CREATED
+        assert f"/raceplans/{raceplan_id}" in resp.headers[hdrs.LOCATION]
 
 
 races = [

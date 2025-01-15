@@ -1,8 +1,9 @@
 """Resource module for startlists resources."""
+
 import json
 import logging
 import os
-from typing import List, Union
+from typing import TYPE_CHECKING
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -14,20 +15,23 @@ from dotenv import load_dotenv
 from race_service.adapters import (
     RacesAdapter,
     StartEntriesAdapter,
+    StartlistNotFoundError,
     StartlistsAdapter,
     UsersAdapter,
 )
-from race_service.models import StartEntry, Startlist
-from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
 from race_service.services import (
     RacesService,
     StartEntriesService,
-    StartlistNotFoundException,
     StartlistsService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
+if TYPE_CHECKING: # pragma: no cover
+    from race_service.models import StartEntry, Startlist
+    from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
+
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -46,7 +50,7 @@ class StartlistsView(View):
                 db, event_id
             )
             for startlist in startlists:
-                start_entries: List[StartEntry] = []
+                start_entries: list[StartEntry] = []
                 for start_entry_id in startlist.start_entries:
                     start_entry = await StartEntriesAdapter.get_start_entry_by_id(
                         db, start_entry_id
@@ -56,15 +60,14 @@ class StartlistsView(View):
                             start_entries.append(start_entry)
                     else:
                         start_entries.append(start_entry)
-                startlist.start_entries = start_entries  # type: ignore
+                startlist.start_entries = start_entries  # type: ignore [reportAttributeAccessIssue]
 
         else:
             startlists = await StartlistsAdapter.get_all_startlists(db)
-        list = []
-        for _e in startlists:
-            list.append(_e.to_dict())
 
-        body = json.dumps(list, default=str, ensure_ascii=False)
+        _startlists = [startlist.to_dict() for startlist in startlists]
+
+        body = json.dumps(_startlists, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
 
@@ -82,14 +85,14 @@ class StartlistView(View):
             startlist: Startlist = await StartlistsAdapter.get_startlist_by_id(
                 db, startlist_id
             )
-            start_entries: List[StartEntry] = []
+            start_entries: list[StartEntry] = []
             for start_entry_id in startlist.start_entries:
                 start_entry = await StartEntriesAdapter.get_start_entry_by_id(
                     db, start_entry_id
                 )
                 start_entries.append(start_entry)
-            startlist.start_entries = start_entries  # type: ignore
-        except StartlistNotFoundException as e:
+            startlist.start_entries = start_entries  # type: ignore [reportAttributeAccessIssue]
+        except StartlistNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got startlist: {startlist}")
         body = startlist.to_json()
@@ -120,13 +123,13 @@ class StartlistView(View):
             races = await RacesAdapter.get_races_by_event_id(
                 db, startlist_to_be_deleted.event_id
             )
-            race: Union[IndividualSprintRace, IntervalStartRace]
+            race: IndividualSprintRace | IntervalStartRace
             for race in races:
                 race.start_entries = []
                 await RacesService.update_race(db, race.id, race)
 
             # We can then delete the startlist:
             await StartlistsService.delete_startlist(db, startlist_id)
-        except StartlistNotFoundException as e:
+        except StartlistNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

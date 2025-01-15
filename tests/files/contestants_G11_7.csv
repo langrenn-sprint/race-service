@@ -1,8 +1,8 @@
 Fornavn;Etternavn;E-post;Mobil;Adresse;Postnummer;Sted;Alder;Fødselsdato;Kjønn;Land;Landskode;Bypass ID;Person ID;Klubb;Klubb-ID;Gruppe-ID;Krets/region-id;Krets/region;Sport;Øvelse;Klasse;Team;Påmeldt dato;Påmeldt kl.
-Tor;Larsen;kim60@example.net;88017962;Eidemoen 67;8009;Andresen;11;2013-03-28;M;Norway;NO;985629926;5975381;Røa Allianseidrettslag - Ski;96282;21294;867;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;20:26
-Kåre;Jakobsen;gundersenegil@example.net;47263346;Ellingsenhøgda 3E;0469;Monicafoss;11;2013-08-20;M;Norway;NO;774938857;5835982;Kjelsås IL - Ski;77935;43239;732;Oslo Skikrets;Ski;Gutter 11;;;02.01.2024;18:49
-Egil;Mikkelsen;petterpettersen@example.org;52659445;Johnsenstien 47;3896;Vik;11;2013-09-20;M;Norway;NO;764102416;9140869;Bækkelagets SK - Ski;31338;10945;840;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;07:12
-Martin;Andreassen;heriksen@example.org;22 77 46 38;Berntsenroa 8;7180;Holm;11;2013-08-05;M;Norway;NO;831128199;8624491;Kjelsås IL - Ski;77935;38364;430;Oslo Skikrets;Ski;Gutter 11;;;02.01.2024;15:18
-Magnus;Henriksen;berntsenlene@example.org;80771962;Næssjordet 96;6561;Øyvindås;11;2013-11-05;M;Norway;NO;865175960;7887292;Bækkelagets SK - Ski;31338;40898;276;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;06:43
-Egil;Dahl;ujohansen@example.org;496 73 184;Aasrøa 3;2473;Johannessen;11;2013-08-14;M;Norway;NO;915540418;2104343;Røa Allianseidrettslag - Ski;96282;79179;998;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;06:51
-Mathias;Abrahamsen;xlarsen@example.com;27 11 75 71;Johansenlyngen 5;1642;Olaås;11;2013-10-04;M;Norway;NO;534883429;6394762;Bækkelagets SK - Ski;31338;28092;862;Oslo Skikrets;Ski;Gutter 11;;;02.01.2024;19:22
+Tor;Larsen;kim60@example.net;88017962;Eidemoen 67;8009;Andresen;11;2013-03-28;M;Norway;NO;985629926;5975381;Røa Allianseidrettslag - Ski;96282;21294;867;Oslo Skikrets;Ski;;Gutter 11;;01.01.2024;20:26
+Kåre;Jakobsen;gundersenegil@example.net;47263346;Ellingsenhøgda 3E;0469;Monicafoss;11;2013-08-20;M;Norway;NO;774938857;5835982;Kjelsås IL - Ski;77935;43239;732;Oslo Skikrets;Ski;;Gutter 11;;02.01.2024;18:49
+Egil;Mikkelsen;petterpettersen@example.org;52659445;Johnsenstien 47;3896;Vik;11;2013-09-20;M;Norway;NO;764102416;9140869;Bækkelagets SK - Ski;31338;10945;840;Oslo Skikrets;Ski;;Gutter 11;;01.01.2024;07:12
+Martin;Andreassen;heriksen@example.org;22 77 46 38;Berntsenroa 8;7180;Holm;11;2013-08-05;M;Norway;NO;831128199;8624491;Kjelsås IL - Ski;77935;38364;430;Oslo Skikrets;Ski;;Gutter 11;;02.01.2024;15:18
+Magnus;Henriksen;berntsenlene@example.org;80771962;Næssjordet 96;6561;Øyvindås;11;2013-11-05;M;Norway;NO;865175960;7887292;Bækkelagets SK - Ski;31338;40898;276;Oslo Skikrets;Ski;;Gutter 11;;01.01.2024;06:43
+Egil;Dahl;ujohansen@example.org;496 73 184;Aasrøa 3;2473;Johannessen;11;2013-08-14;M;Norway;NO;915540418;2104343;Røa Allianseidrettslag - Ski;96282;79179;998;Oslo Skikrets;Ski;;Gutter 11;;01.01.2024;06:51
+Mathias;Abrahamsen;xlarsen@example.com;27 11 75 71;Johansenlyngen 5;1642;Olaås;11;2013-10-04;M;Norway;NO;534883429;6394762;Bækkelagets SK - Ski;31338;28092;862;Oslo Skikrets;Ski;;Gutter 11;;02.01.2024;19:22

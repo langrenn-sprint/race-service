@@ -1,11 +1,15 @@
 """Module for time_events service."""
-import logging
-from typing import Any, Optional
-import uuid
 
-from race_service.adapters import TimeEventNotFoundException, TimeEventsAdapter
+import logging
+import uuid
+from typing import Any
+
+from race_service.adapters import (
+    TimeEventNotFoundError,
+    TimeEventsAdapter,
+)
 from race_service.models import TimeEvent
-from .exceptions import IllegalValueException
+from race_service.services import IllegalValueError
 
 
 def create_id() -> str:  # pragma: no cover
@@ -13,7 +17,7 @@ def create_id() -> str:  # pragma: no cover
     return str(uuid.uuid4())
 
 
-class CouldNotCreateTimeEventException(Exception):
+class CouldNotCreateTimeEventError(Exception):
     """Class representing custom exception for command."""
 
     def __init__(self, message: str) -> None:
@@ -22,7 +26,7 @@ class CouldNotCreateTimeEventException(Exception):
         super().__init__(message)
 
 
-class TimeEventAllreadyExistException(Exception):
+class TimeEventAllreadyExistError(Exception):
     """Class representing custom exception for fetch method."""
 
     def __init__(self, message: str) -> None:
@@ -46,79 +50,73 @@ class TimeEventsService:
             str: The id of the created time_event. None otherwise.
 
         Raises:
-            CouldNotCreateTimeEventException: creation failed
-            IllegalValueException: input object has illegal values
-            TimeEventAllreadyExistException: time_event for bib and given timing-point already exists
+            CouldNotCreateTimeEventError: creation failed
+            IllegalValueError: input object has illegal values
+            TimeEventAllreadyExistError: time_event for bib and given timing-point already exists
         """
         logging.debug(f"trying to insert time_event: {time_event}")
         # Validation:
         await validate_time_event(db, time_event)
         if time_event.id:
-            raise IllegalValueException("Cannot create time_event with input id.")
+            msg = "Cannot create time_event with input id."
+            raise IllegalValueError(msg)
         # If time-event for bib and given timing-point already exists in the race, throw error:
         _time_events = await TimeEventsAdapter.get_time_events_by_race_id(
-            db, time_event.race_id  # type: ignore
+            db, time_event.race_id # type: ignore [reportArgumentType]
         )
         for _time_event in _time_events:
-            if _time_event.timing_point != "Template":
-                if (
-                    _time_event.bib == time_event.bib
-                    and _time_event.timing_point == time_event.timing_point
-                ):
-                    raise TimeEventAllreadyExistException(
-                        (
-                            f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point}"
-                            f" already exists in race {time_event.race_id}."
-                        )
-                    )
+            if (
+                _time_event.timing_point != "Template"
+                and _time_event.bib == time_event.bib
+                and _time_event.timing_point == time_event.timing_point
+            ):
+                msg = (
+                    f"Time-event for bib {time_event.bib} and timing-point {time_event.timing_point}"
+                    f" already exists in race {time_event.race_id}."
+                )
+                raise TimeEventAllreadyExistError(msg)
         # create ids:
-        id = create_id()
-        time_event.id = id
+        id_ = create_id()
+        time_event.id = id_
         # insert new time_event
         logging.debug(f"new time_event: {time_event}")
         result = await TimeEventsAdapter.create_time_event(db, time_event)
-        logging.debug(f"inserted time_event with id: {id}")
+        logging.debug(f"inserted time_event with id: {id_}")
         if result:
-            return id
-        raise CouldNotCreateTimeEventException(
-            "Creation of time-event failed."
-        ) from None
+            return id_
+        msg = "Creation of time-event failed."
+        raise CouldNotCreateTimeEventError(msg) from None
 
     @classmethod
     async def update_time_event(
-        cls: Any, db: Any, id: str, time_event: TimeEvent
-    ) -> Optional[str]:
+        cls: Any, db: Any, id_: str, time_event: TimeEvent
+    ) -> str | None:
         """Get time_event function."""
         # get old document
         try:
-            old_time_event = await TimeEventsAdapter.get_time_event_by_id(db, id)
-        except TimeEventNotFoundException as e:
-            raise TimeEventNotFoundException(
-                f"TimeEvent with id {id} not found."
-            ) from e
+            old_time_event = await TimeEventsAdapter.get_time_event_by_id(db, id_)
+        except TimeEventNotFoundError as e:
+            msg = f"TimeEvent with id {id_} not found."
+            raise TimeEventNotFoundError(msg) from e
         # update the time_event if found:
         if time_event.id != old_time_event.id:
-            raise IllegalValueException("Cannot change id for time_event.")
-        result = await TimeEventsAdapter.update_time_event(db, id, time_event)
-        return result
+            msg = "Cannot change id for time_event."
+            raise IllegalValueError(msg)
+        return await TimeEventsAdapter.update_time_event(db, id_, time_event)
 
     @classmethod
-    async def delete_time_event(cls: Any, db: Any, id: str) -> Optional[str]:
+    async def delete_time_event(cls: Any, db: Any, id_: str) -> str | None:
         """Get time_event function."""
         # check if time-event exist:
         try:
-            await TimeEventsAdapter.get_time_event_by_id(db, id)
-        except TimeEventNotFoundException as e:
-            raise TimeEventNotFoundException(
-                f"TimeEvent with id {id} not found."
-            ) from e
+            await TimeEventsAdapter.get_time_event_by_id(db, id_)
+        except TimeEventNotFoundError as e:
+            msg = f"TimeEvent with id {id_} not found."
+            raise TimeEventNotFoundError(msg) from e
         # delete the document if found:
-        result = await TimeEventsAdapter.delete_time_event(db, id)
-        return result
+        return await TimeEventsAdapter.delete_time_event(db, id_)
 
 
 #   Validation:
 async def validate_time_event(db: Any, time_event: TimeEvent) -> None:
     """Validate the time_event."""
-    # TODO: validate time_event-properties.
-    pass
