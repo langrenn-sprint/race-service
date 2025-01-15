@@ -1,9 +1,10 @@
 """Resource module for time_events resources."""
-from datetime import datetime
+
 import json
 import logging
 import os
-from typing import List
+from datetime import datetime
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from aiohttp.web import (
@@ -17,27 +18,30 @@ from dotenv import load_dotenv
 
 from race_service.adapters import (
     EventsAdapter,
-    RaceNotFoundException,
+    RaceNotFoundError,
     RaceResultsAdapter,
+    TimeEventNotFoundError,
     TimeEventsAdapter,
     UsersAdapter,
 )
 from race_service.models import Changelog, TimeEvent
-from race_service.models.race_model import RaceResult
 from race_service.services import (
-    ContestantNotInStartEntriesException,
-    CouldNotCreateTimeEventException,
-    IllegalValueException,
+    ContestantNotInStartEntriesError,
+    CouldNotCreateTimeEventError,
+    IllegalValueError,
     RaceResultsService,
-    TimeEventAllreadyExistException,
-    TimeEventDoesNotReferenceRaceException,
-    TimeEventIsNotIdentifiableException,
-    TimeEventNotFoundException,
+    TimeEventAllreadyExistError,
+    TimeEventDoesNotReferenceRaceError,
+    TimeEventIsNotIdentifiableError,
     TimeEventsService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
+if TYPE_CHECKING:
+    from race_service.models.race_model import RaceResult  # pragma: no cover
+
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -75,14 +79,13 @@ class TimeEventsView(View):
             )
         else:
             time_events = await TimeEventsAdapter.get_all_time_events(db)
-        list = []
-        for _e in time_events:
-            list.append(_e.to_dict())
 
-        body = json.dumps(list, default=str, ensure_ascii=False)
+        _time_events = [time_event.to_dict() for time_event in time_events]
+
+        body = json.dumps(_time_events, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
-    async def post(self) -> Response:  # noqa: C901
+    async def post(self) -> Response:
         """Post route function."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
@@ -110,16 +113,16 @@ class TimeEventsView(View):
                 await RaceResultsService.add_time_event_to_race_result(db, time_event)
                 time_event.status = "OK"
             except (
-                RaceNotFoundException,
-                TimeEventDoesNotReferenceRaceException,
-                TimeEventIsNotIdentifiableException,
-                ContestantNotInStartEntriesException,
+                RaceNotFoundError,
+                TimeEventDoesNotReferenceRaceError,
+                TimeEventIsNotIdentifiableError,
+                ContestantNotInStartEntriesError,
             ) as e:
                 time_event.status = "Error"
                 if not time_event.changelog:
                     time_event.changelog = []
                 event = await EventsAdapter.get_event_by_id(
-                    token=token, event_id=time_event.event_id  # type: ignore
+                    token=token, event_id=time_event.event_id # type: ignore [reportArgumentType]
                 )
                 time_event.changelog.append(
                     Changelog(
@@ -129,11 +132,11 @@ class TimeEventsView(View):
                     )
                 )
             await TimeEventsService.update_time_event(db, time_event.id, time_event)
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
         except (
-            CouldNotCreateTimeEventException,
-            TimeEventAllreadyExistException,
+            CouldNotCreateTimeEventError,
+            TimeEventAllreadyExistError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
         logging.debug(f"inserted document with time_event_id {time_event_id}")
@@ -154,7 +157,7 @@ class TimeEventView(View):
 
         try:
             time_event = await TimeEventsAdapter.get_time_event_by_id(db, time_event_id)
-        except TimeEventNotFoundException as e:
+        except TimeEventNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got time_event: {time_event}")
         body = time_event.to_json()
@@ -187,9 +190,9 @@ class TimeEventView(View):
 
         try:
             await TimeEventsService.update_time_event(db, time_event_id, time_event)
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except TimeEventNotFoundException as e:
+        except TimeEventNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
@@ -213,7 +216,7 @@ class TimeEventView(View):
             )
             # First we try to remove time-event from race-result's ranking-sequence:
             if time_event.race_id:
-                race_results: List[
+                race_results: list[
                     RaceResult
                 ] = await RaceResultsAdapter.get_race_results_by_race_id_and_timing_point(
                     db, time_event.race_id, time_event.timing_point
@@ -231,6 +234,6 @@ class TimeEventView(View):
                         pass  # We do not care if it is not there
             # We are ready to remove the time-event
             await TimeEventsService.delete_time_event(db, time_event_id)
-        except TimeEventNotFoundException as e:
+        except TimeEventNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

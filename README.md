@@ -84,14 +84,10 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 
 ### Requirements
 
-- [pyenv](https://github.com/pyenv/pyenv) (recommended)
-- [poetry](https://python-poetry.org/)
-- [nox](https://nox.thea.codes/en/stable/)
+- [uv](https://docs.astral.sh/uv/)
 
 ```shell
-% pipx install nox
-% pipx install poetry
-% pipx inject nox nox-poetry
+% curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ### Install software
@@ -99,8 +95,7 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 ```shell
 % git clone https://github.com/langrenn-sprint/race-service.git
 % cd race-service
-% pyenv install 3.11.2
-% poetry install
+% uv sync
 ```
 
 ### Environment variables
@@ -124,13 +119,13 @@ LOGGING_LEVEL=DEBUG
 Start the server locally:
 
 ```shell
-% poetry run adev runserver -p 8080 --aux-port 8089 race_service
+% uv run adev runserver -p 8080 --aux-port 8089 race_service
 ```
 
 ### Running the API in a wsgi-server (gunicorn)
 
 ```shell
-% poetry run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% uv run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
 ```
 
 ### Running the wsgi-server in Docker
@@ -155,17 +150,17 @@ We use [pytest](https://docs.pytest.org/en/latest/) for contract testing.
 To run linters, checkers and tests:
 
 ```shell
-% nox
+% uv run poe release
 ```
 
 To run specific test:
 
 ```shell
-% nox -s integration_tests -- -k test_create_race_adapter_fails
+% uv run poe integration_test --no-cov -- test_create_race_adapter_fails
 ```
 
 To run tests with logging, do:
 
 ```shell
-% nox -s integration_tests -- --log-cli-level=DEBUG
+% uv run poe integration_test  --log-cli-level=DEBUG
 ```

@@ -1,19 +1,24 @@
 """Integration test cases for the startlists route."""
-from datetime import datetime
-import os
-from typing import Any, Dict, List
-import uuid
 
+import os
+import uuid
+from datetime import datetime
+from http import HTTPStatus
+from typing import Any
+
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
 from pytest_mock import MockFixture
 
 from race_service.models import IntervalStartRace, Raceplan, Startlist
 
-MAX_NO_OF_CONTESTANTS_IN_RACECLASS = 80
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+
+MAX_NO_OF_CONTESTANTS_IN_raceclass = 80
 MAX_NO_OF_CONTESTANTS_IN_RACE = 10
 
 
@@ -23,7 +28,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -45,13 +50,13 @@ EVENT = {
 
 
 @pytest.fixture
-async def event_interval_start() -> Dict[str, Any]:
+async def event_interval_start() -> dict[str, Any]:
     """An event object for testing."""
     return EVENT
 
 
 @pytest.fixture
-async def competition_format() -> Dict[str, Any]:
+async def competition_format() -> dict[str, Any]:
     """An competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -59,13 +64,13 @@ async def competition_format() -> Dict[str, Any]:
         "start_procedure": "Interval Start",
         "time_between_groups": "00:10:00",
         "intervals": "00:00:30",
-        "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_RACECLASS,
+        "max_no_of_contestants_in_raceclass": MAX_NO_OF_CONTESTANTS_IN_raceclass,
         "max_no_of_contestants_in_race": MAX_NO_OF_CONTESTANTS_IN_RACE,
     }
 
 
 @pytest.fixture
-async def raceclasses() -> List[Dict[str, Any]]:
+async def raceclasses() -> list[dict[str, Any]]:
     """An raceclasses object for testing."""
     return [
         {
@@ -107,7 +112,7 @@ async def raceclasses() -> List[Dict[str, Any]]:
     ]
 
 
-RACES: List[IntervalStartRace] = [
+RACES: list[IntervalStartRace] = [
     IntervalStartRace(
         id="1",
         raceclass="J15",
@@ -179,7 +184,7 @@ async def raceplan_interval_start(event_interval_start: dict) -> Raceplan:
 @pytest.fixture
 async def contestants(
     event_interval_start: dict, raceplan_interval_start: Raceplan
-) -> List[dict]:
+) -> list[dict]:
     """Create a mock contestant list object."""
     return [
         {
@@ -289,9 +294,9 @@ async def contestants(
     ]
 
 
-def get_race_by_id(db: Any, id: str) -> IntervalStartRace:
+def get_race_by_id(db: Any, id_: str) -> IntervalStartRace:
     """Mock function to look up correct race from list."""
-    return next(race for race in RACES if race.id == id)
+    return next(race for race in RACES if race.id == id_)
 
 
 @pytest.mark.integration
@@ -302,20 +307,20 @@ async def test_generate_startlist_for_event(
     token: MockFixture,
     event_interval_start: dict,
     competition_format: dict,
-    raceclasses: List[dict],
+    raceclasses: list[dict],
     raceplan_interval_start: Raceplan,
-    contestants: List[dict],
+    contestants: list[dict],
     request_body: dict,
 ) -> None:
     """Should return 201 Created, location header."""
-    STARTLIST_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    startlist_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
@@ -328,7 +333,7 @@ async def test_generate_startlist_for_event(
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
         return_value=Startlist(
-            id=STARTLIST_ID,
+            id=startlist_id,
             event_id=event_interval_start["id"],
             start_entries=[],
             no_of_contestants=0,
@@ -377,12 +382,12 @@ async def test_generate_startlist_for_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             "/startlists/generate-startlist-for-event",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 201
-        assert f"/startlists/{STARTLIST_ID}" in resp.headers[hdrs.LOCATION]
+        assert resp.status == HTTPStatus.CREATED
+        assert f"/startlists/{startlist_id}" in resp.headers[hdrs.LOCATION]

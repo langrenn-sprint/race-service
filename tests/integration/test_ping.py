@@ -1,6 +1,9 @@
 """Integration test cases for the ping route."""
-from aiohttp.test_utils import TestClient as _TestClient
+
+from http import HTTPStatus
+
 import pytest
+from aiohttp.test_utils import TestClient as _TestClient
 
 
 @pytest.mark.integration
@@ -8,6 +11,6 @@ import pytest
 async def test_ready(client: _TestClient) -> None:
     """Should return OK."""
     resp = await client.get("/ping")
-    assert resp.status == 200
+    assert resp.status == HTTPStatus.OK
     text = await resp.text()
     assert "OK" in text

@@ -1,13 +1,13 @@
 """Integration test cases for the race service."""
+
 from datetime import datetime
-from typing import Dict
 
 import pytest
 from pytest_mock import MockFixture
 
 from race_service.models import Race
 from race_service.services import (
-    IllegalValueException,
+    IllegalValueError,
     RacesService,
 )
 
@@ -47,7 +47,7 @@ async def race() -> Race:
 
 
 @pytest.fixture
-async def race_mock() -> Dict:
+async def race_mock() -> dict:
     """Create a race object."""
     return {
         "id": "race_1",
@@ -73,15 +73,15 @@ async def race_mock() -> Dict:
 async def test_create_race_input_id(
     mocker: MockFixture,
     race: Race,
-    race_mock: Dict,
+    race_mock: dict,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.create_race",
         return_value=True,
     )
 
-    with pytest.raises(IllegalValueException):
+    with pytest.raises(IllegalValueError):
         await RacesService.create_race(db=None, race=race)
 
 
@@ -90,9 +90,9 @@ async def test_create_race_input_id(
 async def test_create_race_adapter_fails(
     mocker: MockFixture,
     new_race: Race,
-    race_mock: Dict,
+    race_mock: dict,
 ) -> None:
-    """Should raise IllegalValueException."""
+    """Should raise IllegalValueError."""
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.create_race",
         return_value=None,

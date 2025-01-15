@@ -1,8 +1,8 @@
 """Resource module for start_entries resources."""
+
 import json
 import logging
 import os
-from typing import Union
 
 from aiohttp import hdrs
 from aiohttp.web import (
@@ -17,11 +17,12 @@ from multidict import MultiDict
 
 from race_service.adapters import (
     EventsAdapter,
-    RaceNotFoundException,
+    RaceNotFoundError,
     RaceplansAdapter,
     RacesAdapter,
     StartEntriesAdapter,
-    StartEntryNotFoundException,
+    StartEntryNotFoundError,
+    StartlistNotFoundError,
     StartlistsAdapter,
     UsersAdapter,
 )
@@ -31,17 +32,17 @@ from race_service.models import (
 )
 from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
 from race_service.services import (
-    CouldNotCreateStartEntryException,
-    IllegalValueException,
+    CouldNotCreateStartEntryError,
+    IllegalValueError,
     RaceplansService,
     RacesService,
     StartEntriesService,
     StartlistsService,
 )
-from race_service.services.startlists_service import StartlistNotFoundException
 from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -67,14 +68,13 @@ class StartEntriesView(View):
             start_entries = await StartEntriesAdapter.get_start_entries_by_race_id(
                 db, race_id
             )
-        list = []
-        for start_entry in start_entries:
-            list.append(start_entry.to_dict())
 
-        body = json.dumps(list, default=str, ensure_ascii=False)
+        _start_entries = [start_entry.to_dict() for start_entry in start_entries]
+
+        body = json.dumps(_start_entries, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
-    async def post(self) -> Response:  # noqa: C901
+    async def post(self) -> Response:
         """Create the start_entry and add it to the race and startlist."""
         db = self.request.app["db"]
         token = extract_token_from_request(self.request)
@@ -102,9 +102,9 @@ class StartEntriesView(View):
             # We need to check if the bib is already in the race, and
             # if the given starting-position is vacant, or
             # if there open starting-positions:
-            race: Union[
-                IndividualSprintRace, IntervalStartRace
-            ] = await RacesAdapter.get_race_by_id(db, new_start_entry.race_id)
+            race: (
+                IndividualSprintRace | IntervalStartRace
+            ) = await RacesAdapter.get_race_by_id(db, new_start_entry.race_id)
             start_entries_in_race = (
                 await StartEntriesAdapter.get_start_entries_by_race_id(db, race.id)
             )
@@ -116,19 +116,17 @@ class StartEntriesView(View):
                 raise HTTPBadRequest(
                     reason="Cannot add start-entry: race is full."
                 ) from None
-            elif new_start_entry.bib in bibs_in_race:
+            if new_start_entry.bib in bibs_in_race:
                 raise HTTPBadRequest(
                     reason=f"Cannot add start-entry: Bib {new_start_entry.bib} is already in the race."
                 ) from None
-            elif new_start_entry.starting_position in starting_positions_in_race:
+            if new_start_entry.starting_position in starting_positions_in_race:
                 raise HTTPBadRequest(
                     reason=(
                         "Cannot add start-entry: Starting_position"
                         f"{new_start_entry.starting_position} is taken."
                     )
                 ) from None
-            else:
-                pass
 
             # We can create the start-entry:
             start_entry_id = await StartEntriesService.create_start_entry(
@@ -142,21 +140,18 @@ class StartEntriesView(View):
 
             # If the race is in first round, we need to add to the raceplan's no_of_contestants:
             competition_format = await EventsAdapter.get_competition_format(
-                token=token, event_id=race.event_id  # type: ignore
+                token=token, event_id=race.event_id # type: ignore [reportArgumentType]
             )
             first_rounds = [
                 competition_format["rounds_ranked_classes"][0],
                 competition_format["rounds_non_ranked_classes"][0],
             ]
-            if (
-                isinstance(race, IndividualSprintRace)
-                and race.round in first_rounds  # type: ignore
-            ):
+            if isinstance(race, IndividualSprintRace) and race.round in first_rounds:
                 raceplan = await RaceplansAdapter.get_raceplan_by_id(
                     db, race.raceplan_id
                 )
                 raceplan.no_of_contestants += 1
-                await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
+                await RaceplansService.update_raceplan(db, raceplan.id, raceplan) # type: ignore [reportArgumentType]
 
             # We also need to add the start-entry to the startlist
             # and add the start_entry to it's no_of_contestants
@@ -164,12 +159,12 @@ class StartEntriesView(View):
             startlist.start_entries.append(start_entry_id)
             assert startlist.id  # noqa: S101
             await StartlistsService.update_startlist(db, startlist.id, startlist)
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
         except (
-            StartlistNotFoundException,
-            RaceNotFoundException,
-            CouldNotCreateStartEntryException,
+            StartlistNotFoundError,
+            RaceNotFoundError,
+            CouldNotCreateStartEntryError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
         logging.debug(f"inserted document with start_entry_id {start_entry_id}")
@@ -200,7 +195,7 @@ class StartEntryView(View):
             start_entry = await StartEntriesAdapter.get_start_entry_by_id(
                 db, start_entry_id
             )
-        except StartEntryNotFoundException as e:
+        except StartEntryNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got start_entry: {start_entry}")
         body = start_entry.to_json()
@@ -235,9 +230,9 @@ class StartEntryView(View):
             await StartEntriesService.update_start_entry(
                 db, start_entry_id, start_entry
             )
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except StartEntryNotFoundException as e:
+        except StartEntryNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
@@ -263,10 +258,10 @@ class StartEntryView(View):
             )
             # We need to remove the start-entry from the race containing the start-entry:
             try:
-                race: Union[
-                    IndividualSprintRace, IntervalStartRace
-                ] = await RacesAdapter.get_race_by_id(db, start_entry.race_id)
-            except RaceNotFoundException as e:
+                race: (
+                    IndividualSprintRace | IntervalStartRace
+                ) = await RacesAdapter.get_race_by_id(db, start_entry.race_id)
+            except RaceNotFoundError as e:
                 raise HTTPNotFound(
                     reason=(
                         f"DB is inconsistent: cannot find race with id "
@@ -285,21 +280,18 @@ class StartEntryView(View):
 
             # If the race is in first round, we need to subract from the raceplan's no_of_contestants:
             competition_format = await EventsAdapter.get_competition_format(
-                token=token, event_id=race.event_id  # type: ignore
+                token=token, event_id=race.event_id # type: ignore [reportArgumentType]
             )
             first_rounds = [
                 competition_format["rounds_ranked_classes"][0],
                 competition_format["rounds_non_ranked_classes"][0],
             ]
-            if (
-                isinstance(race, IndividualSprintRace)
-                and race.round in first_rounds  # type: ignore
-            ):
+            if isinstance(race, IndividualSprintRace) and race.round in first_rounds:
                 raceplan = await RaceplansAdapter.get_raceplan_by_id(
                     db, race.raceplan_id
                 )
                 raceplan.no_of_contestants -= 1
-                await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore
+                await RaceplansService.update_raceplan(db, raceplan.id, raceplan) # type: ignore [reportArgumentType]
 
             # We also need to remove the start-entry from the startlist,
             # and subtract the start_entry from it's no_of_contestants
@@ -307,7 +299,7 @@ class StartEntryView(View):
                 startlist: Startlist = await StartlistsAdapter.get_startlist_by_id(
                     db, start_entry.startlist_id
                 )
-            except StartlistNotFoundException as e:
+            except StartlistNotFoundError as e:
                 raise HTTPNotFound(
                     reason=(
                         f"DB is inconsistent: cannot find startlist with id "
@@ -321,12 +313,12 @@ class StartEntryView(View):
             ]
             startlist.start_entries = new_start_entries
             startlist.no_of_contestants += -1
-            await StartlistsService.update_startlist(db, startlist.id, startlist)  # type: ignore
+            await StartlistsService.update_startlist(db, startlist.id, startlist) # type: ignore [reportArgumentType]
 
             # We can finally delete the start-entry:
             await StartEntriesService.delete_start_entry(
                 db, start_entry_for_deletion_id
             )
-        except StartEntryNotFoundException as e:
+        except StartEntryNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

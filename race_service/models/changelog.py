@@ -1,8 +1,9 @@
 """Raceplan data class module."""
+
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from dataclasses_json import config, DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, config
 from marshmallow.fields import DateTime
 
 

@@ -1,9 +1,9 @@
 """TimeEvent data class module."""
+
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
 
-from dataclasses_json import config, DataClassJsonMixin
+from dataclasses_json import DataClassJsonMixin, config
 from marshmallow.fields import DateTime
 
 from .changelog import Changelog
@@ -23,14 +23,14 @@ class TimeEvent(DataClassJsonMixin):
             mm_field=DateTime(format="iso"),
         )
     )
-    name: Optional[str] = field(default=None)
-    club: Optional[str] = field(default=None)
-    race: Optional[str] = field(default=None)
-    race_id: Optional[str] = field(default=None)
-    rank: Optional[int] = field(default=None)
-    next_race: Optional[str] = field(default=None)
-    next_race_id: Optional[str] = field(default=None)
-    next_race_position: Optional[int] = field(default=None)
-    status: Optional[str] = field(default=None)
-    changelog: Optional[List[Changelog]] = field(default=None)
-    id: Optional[str] = field(default=None)
+    name: str | None = field(default=None)
+    club: str | None = field(default=None)
+    race: str | None = field(default=None)
+    race_id: str | None = field(default=None)
+    rank: int | None = field(default=None)
+    next_race: str | None = field(default=None)
+    next_race_id: str | None = field(default=None)
+    next_race_position: int | None = field(default=None)
+    status: str | None = field(default=None)
+    changelog: list[Changelog] | None = field(default=None)
+    id: str | None = field(default=None)

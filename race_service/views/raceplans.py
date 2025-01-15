@@ -1,8 +1,8 @@
 """Resource module for raceplans resources."""
+
 import json
 import logging
 import os
-from typing import List, Union
 
 from aiohttp.web import (
     HTTPNotFound,
@@ -13,21 +13,22 @@ from aiohttp.web import (
 from dotenv import load_dotenv
 
 from race_service.adapters import (
-    RaceNotFoundException,
-    RaceplanNotFoundException,
+    RaceNotFoundError,
+    RaceplanNotFoundError,
     RaceplansAdapter,
     RacesAdapter,
     UsersAdapter,
 )
 from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
 from race_service.services import (
-    IllegalValueException,
+    IllegalValueError,
     RaceplansService,
     RacesService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -45,11 +46,10 @@ class RaceplansView(View):
             raceplans = await RaceplansAdapter.get_raceplans_by_event_id(db, event_id)
         else:
             raceplans = await RaceplansAdapter.get_all_raceplans(db)
-        list = []
-        for _e in raceplans:
-            list.append(_e.to_dict())
 
-        body = json.dumps(list, default=str, ensure_ascii=False)
+        _raceplans = [raceplan.to_dict() for raceplan in raceplans]
+
+        body = json.dumps(_raceplans, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
 
@@ -65,7 +65,7 @@ class RaceplanView(View):
 
         try:
             raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)
-            races: List[Union[IndividualSprintRace, IntervalStartRace]] = []
+            races: list[IndividualSprintRace | IntervalStartRace] = []
             # Replace list of race-ids with corresponding races:
             for race_id in raceplan.races:
                 race = await RacesAdapter.get_race_by_id(db, race_id)
@@ -74,8 +74,8 @@ class RaceplanView(View):
                 key=lambda k: (k.order,),
                 reverse=False,
             )
-            raceplan.races = races  # type: ignore
-        except RaceplanNotFoundException as e:
+            raceplan.races = races # type: ignore [reportAttributeAccessIssue]
+        except RaceplanNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         logging.debug(f"Got raceplan: {raceplan}")
         body = raceplan.to_json()
@@ -104,9 +104,9 @@ class RaceplanView(View):
 
         try:
             await RaceplansService.update_raceplan(db, raceplan_id, raceplan)
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except RaceplanNotFoundException as e:
+        except RaceplanNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
@@ -127,6 +127,6 @@ class RaceplanView(View):
             for race_id in raceplan.races:
                 await RacesService.delete_race(db, race_id)
             await RaceplansService.delete_raceplan(db, raceplan_id)
-        except (RaceplanNotFoundException, RaceNotFoundException) as e:
+        except (RaceplanNotFoundError, RaceNotFoundError) as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)

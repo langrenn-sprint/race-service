@@ -1,18 +1,20 @@
 """Integration test cases for the time_events route."""
+
+import os
 from copy import deepcopy
 from datetime import datetime
+from http import HTTPStatus
 from json import dumps
-import os
-from typing import Any, Dict, List
+from typing import Any
 
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
 from pytest_mock import MockFixture
 
-from race_service.adapters import RaceNotFoundException, TimeEventNotFoundException
+from race_service.adapters import RaceNotFoundError, TimeEventNotFoundError
 from race_service.models import (
     Changelog,
     IndividualSprintRace,
@@ -21,6 +23,9 @@ from race_service.models import (
     TimeEvent,
 )
 
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+
 
 @pytest.fixture
 def token() -> str:
@@ -28,7 +33,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -37,11 +42,11 @@ def token_unsufficient_role() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": "user", "roles": ["user"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
-async def event() -> Dict[str, Any]:
+async def event() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -158,7 +163,7 @@ async def time_event() -> TimeEvent:
 
 
 @pytest.fixture
-async def time_events() -> List[TimeEvent]:
+async def time_events() -> list[TimeEvent]:
     """Create a mock time_event object."""
     return [
         TimeEvent(
@@ -200,18 +205,18 @@ async def test_create_time_event(
     time_event: TimeEvent,
 ) -> None:
     """Should return 200 OK, and a body containing the new time-event."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -226,7 +231,7 @@ async def test_create_time_event(
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -256,9 +261,9 @@ async def test_create_time_event(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
 
         body = await resp.json()
         assert body["status"] == "OK"
@@ -276,19 +281,19 @@ async def test_create_time_event_race_result_not_found(
     time_event: TimeEvent,
 ) -> None:
     """Should return 200 OK, and a body containing the new time-event."""
-    TIME_EVENT_ID = time_event.id
-    race_result_ID = "new_race_result"
+    time_event_id = time_event.id
+    race_result_id = "new_race_result"
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -303,12 +308,12 @@ async def test_create_time_event_race_result_not_found(
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.create_race_result",  # noqa: B950
-        return_value=race_result_ID,
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.create_race_result",
+        return_value=race_result_id,
     )
     mocker.patch(
         "race_service.adapters.race_results_adapter.RaceResultsAdapter.update_race_result",
@@ -337,9 +342,9 @@ async def test_create_time_event_race_result_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
 
         body = await resp.json()
         assert body["status"] == "OK"
@@ -359,21 +364,21 @@ async def test_create_time_event_contestant_not_in_race(
     time_event: TimeEvent,
 ) -> None:
     """Should return 200 OK, and a body containing the new time-event."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     start_entry_wrong_bib = deepcopy(start_entry)
     start_entry_wrong_bib.bib = 1000
 
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -388,7 +393,7 @@ async def test_create_time_event_contestant_not_in_race(
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -422,9 +427,9 @@ async def test_create_time_event_contestant_not_in_race(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
 
         body = await resp.json()
         assert body["status"] == "Error"
@@ -436,21 +441,21 @@ async def test_get_time_event_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return OK, and a body containing one time_event."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
-        assert resp.status == 200
+        resp = await client.get(f"/time-events/{time_event_id}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is dict
-        assert body["id"] == TIME_EVENT_ID
+        assert body["id"] == time_event_id
         assert body["event_id"] == time_event.event_id
 
 
@@ -460,20 +465,20 @@ async def test_get_time_events_by_event_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    time_events: List[TimeEvent],
+    time_events: list[TimeEvent],
 ) -> None:
     """Should return OK, and a body containing one time_event."""
-    EVENT_ID = time_events[0].event_id
+    event_id = time_events[0].event_id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=time_events,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/time-events?eventId={EVENT_ID}")
-        assert resp.status == 200
+        resp = await client.get(f"/time-events?eventId={event_id}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is list
@@ -487,23 +492,23 @@ async def test_get_time_events_by_event_id_and_bib(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    time_events: List[TimeEvent],
+    time_events: list[TimeEvent],
 ) -> None:
     """Should return OK, and a body containing one time_event."""
-    BIB = time_events[0].bib
-    EVENT_ID = time_events[0].event_id
+    bib = time_events[0].bib
+    event_id = time_events[0].event_id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_bib",
         return_value=[
-            time_event for time_event in time_events if time_event.bib == BIB
+            time_event for time_event in time_events if time_event.bib == bib
         ],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/time-events?eventId={EVENT_ID}&bib={BIB}")
-        assert resp.status == 200
+        resp = await client.get(f"/time-events?eventId={event_id}&bib={bib}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is list
@@ -518,23 +523,23 @@ async def test_get_time_events_by_event_id_and_timing_point(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    time_events: List[TimeEvent],
+    time_events: list[TimeEvent],
 ) -> None:
     """Should return OK, and a body containing one time_event."""
-    EVENT_ID = time_events[0].event_id
-    TIMING_POINT = time_events[0].timing_point
+    event_id = time_events[0].event_id
+    timing_point = time_events[0].timing_point
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id_and_timing_point",
         return_value=time_events,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.get(
-            f"/time-events?eventId={EVENT_ID}&timingPoint={TIMING_POINT}"
+            f"/time-events?eventId={event_id}&timingPoint={timing_point}"
         )
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is list
@@ -549,20 +554,20 @@ async def test_get_time_events_by_race_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    time_events: List[TimeEvent],
+    time_events: list[TimeEvent],
 ) -> None:
     """Should return OK, and a body containing one time_event."""
-    RACE_ID = time_events[0].race_id
+    race_id = time_events[0].race_id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=time_events,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/time-events?raceId={RACE_ID}")
-        assert resp.status == 200
+        resp = await client.get(f"/time-events?raceId={race_id}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is list
@@ -576,7 +581,7 @@ async def test_update_time_event_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return No Content."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
@@ -587,7 +592,7 @@ async def test_update_time_event_by_id(
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
 
     headers = {
@@ -598,12 +603,12 @@ async def test_update_time_event_by_id(
     request_body = dumps(time_event.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
+            f"/time-events/{time_event_id}", headers=headers, data=request_body
         )
-        assert resp.status == 204
+        assert resp.status == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.integration
@@ -612,7 +617,7 @@ async def test_get_all_time_events(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return OK and a valid json body."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_all_time_events",
         return_value=[time_event],
@@ -623,14 +628,14 @@ async def test_get_all_time_events(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.get("/time-events")
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         time_events = await resp.json()
         assert type(time_events) is list
         assert len(time_events) > 0
-        assert TIME_EVENT_ID == time_events[0]["id"]
+        assert time_events[0]["id"] == time_event_id
 
 
 @pytest.mark.integration
@@ -643,21 +648,21 @@ async def test_delete_time_event_by_id(
     race_result: RaceResult,
 ) -> None:
     """Should return No Content."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.delete_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -672,10 +677,10 @@ async def test_delete_time_event_by_id(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
-        assert resp.status == 204
+        resp = await client.delete(f"/time-events/{time_event_id}", headers=headers)
+        assert resp.status == HTTPStatus.NO_CONTENT
 
 
 # Bad cases
@@ -687,17 +692,17 @@ async def test_create_time_event_with_input_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
@@ -713,9 +718,9 @@ async def test_create_time_event_with_input_id(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -731,18 +736,18 @@ async def test_create_time_event_race_not_found(
     time_event: TimeEvent,
 ) -> None:
     """Should return 200 OK, and a body containing the new time-event, status=Error."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -750,14 +755,14 @@ async def test_create_time_event_race_not_found(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=RaceNotFoundException(f"Race with id {race.id} not found."),
+        side_effect=RaceNotFoundError(f"Race with id {race.id} not found."),
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.update_race",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -787,9 +792,9 @@ async def test_create_time_event_race_not_found(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
 
         body = await resp.json()
         assert body["status"] == "Error"
@@ -808,19 +813,19 @@ async def test_create_time_event_does_not_reference_race(
     time_event: TimeEvent,
 ) -> None:
     """Should return 200 OK, and a body containing the new time-event, status=Error."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     time_event_with_no_race_reference = deepcopy(new_time_event)
     time_event_with_no_race_reference.race_id = None
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
@@ -829,14 +834,14 @@ async def test_create_time_event_does_not_reference_race(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=RaceNotFoundException(f"Race with id {race.id} not found."),
+        side_effect=RaceNotFoundError(f"Race with id {race.id} not found."),
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.update_race",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -869,9 +874,9 @@ async def test_create_time_event_does_not_reference_race(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
 
         body = await resp.json()
         assert body["status"] == "Error"
@@ -890,19 +895,19 @@ async def test_create_time_event_is_not_identifiable(
     time_event: TimeEvent,
 ) -> None:
     """Should return 200 OK, and a body containing the new time-event, status=Error."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     time_event_with_no_id = deepcopy(new_time_event)
     time_event_with_no_id.id = None
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
@@ -911,14 +916,14 @@ async def test_create_time_event_is_not_identifiable(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=RaceNotFoundException(f"Race with id {race.id} not found."),
+        side_effect=RaceNotFoundError(f"Race with id {race.id} not found."),
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.update_race",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -948,9 +953,9 @@ async def test_create_time_event_is_not_identifiable(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
 
         body = await resp.json()
         assert body["status"] == "Error"
@@ -970,7 +975,7 @@ async def test_create_time_event_adapter_fails(
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
@@ -992,9 +997,9 @@ async def test_create_time_event_adapter_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1003,18 +1008,18 @@ async def test_create_time_event_mandatory_property(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1026,13 +1031,13 @@ async def test_create_time_event_mandatory_property(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = {"id": TIME_EVENT_ID}
+    request_body = {"id": time_event_id}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post("/time-events", headers=headers, json=request_body)
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -1048,21 +1053,21 @@ async def test_create_time_event_bib_timing_point_exist(
     time_event: TimeEvent,
 ) -> None:
     """Should return 400 Bad request."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[time_event],
     )
     mocker.patch(
@@ -1074,7 +1079,7 @@ async def test_create_time_event_bib_timing_point_exist(
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -1104,9 +1109,9 @@ async def test_create_time_event_bib_timing_point_exist(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -1115,14 +1120,14 @@ async def test_update_time_event_by_id_missing_mandatory_property(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1134,15 +1139,15 @@ async def test_update_time_event_by_id_missing_mandatory_property(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = {"id": TIME_EVENT_ID}
+    request_body = {"id": time_event_id}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"/time-events/{TIME_EVENT_ID}", headers=headers, json=request_body
+            f"/time-events/{time_event_id}", headers=headers, json=request_body
         )
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -1151,14 +1156,14 @@ async def test_update_time_event_by_id_different_id_in_body(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1175,12 +1180,12 @@ async def test_update_time_event_by_id_different_id_in_body(
     request_body = dumps(update_body.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
+            f"/time-events/{time_event_id}", headers=headers, data=request_body
         )
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -1193,23 +1198,23 @@ async def test_delete_time_event_by_id_not_found(
     race_result: RaceResult,
 ) -> None:
     """Should return 404 Not Found."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=TimeEventNotFoundException(
+        side_effect=TimeEventNotFoundError(
             f"TimeEvent with id {id} not found in database."
         ),
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.delete_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result],
     )
     mocker.patch(
@@ -1224,10 +1229,10 @@ async def test_delete_time_event_by_id_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
-        assert resp.status == 404
+        resp = await client.delete(f"/time-events/{time_event_id}", headers=headers)
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 # Unauthorized cases:
@@ -1239,18 +1244,18 @@ async def test_create_time_event_no_authorization(
     client: _TestClient, mocker: MockFixture, new_time_event: TimeEvent
 ) -> None:
     """Should return 401 Unauthorized."""
-    TIME_EVENT_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    time_event_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1263,10 +1268,10 @@ async def test_create_time_event_no_authorization(
     headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 401
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 @pytest.mark.integration
@@ -1275,18 +1280,18 @@ async def test_update_time_event_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 401 Unauthorized."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
         return_value=time_event,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1298,12 +1303,12 @@ async def test_update_time_event_by_id_no_authorization(
     request_body = dumps(time_event.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
         resp = await client.put(
-            f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
+            f"/time-events/{time_event_id}", headers=headers, data=request_body
         )
-        assert resp.status == 401
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 @pytest.mark.integration
@@ -1312,10 +1317,10 @@ async def test_delete_time_event_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 401 Unauthorized."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.delete_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1323,10 +1328,10 @@ async def test_delete_time_event_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
-        resp = await client.delete(f"/time-events/{TIME_EVENT_ID}")
-        assert resp.status == 401
+        resp = await client.delete(f"/time-events/{time_event_id}")
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 # Forbidden:
@@ -1340,18 +1345,18 @@ async def test_create_time_event_insufficient_role(
     time_event: TimeEvent,
 ) -> None:
     """Should return 403 Forbidden."""
-    TIME_EVENT_ID = time_event.id
+    time_event_id = time_event.id
     mocker.patch(
         "race_service.services.time_events_service.create_id",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
-        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",  # noqa: B950
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
-        return_value=TIME_EVENT_ID,
+        return_value=time_event_id,
     )
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_event_id",
@@ -1367,9 +1372,9 @@ async def test_create_time_event_insufficient_role(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=403)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=403)
         resp = await client.post("/time-events", headers=headers, data=request_body)
-        assert resp.status == 403
+        assert resp.status == HTTPStatus.FORBIDDEN
 
 
 # NOT FOUND CASES:
@@ -1381,10 +1386,10 @@ async def test_get_time_event_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
     """Should return 404 Not found."""
-    TIME_EVENT_ID = "does-not-exist"
+    time_event_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=TimeEventNotFoundException(
+        side_effect=TimeEventNotFoundError(
             f"TimeEvent with id {id} not found in database."
         ),
     )
@@ -1394,10 +1399,10 @@ async def test_get_time_event_not_found(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/time-events/{TIME_EVENT_ID}")
-        assert resp.status == 404
+        resp = await client.get(f"/time-events/{time_event_id}")
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -1406,10 +1411,10 @@ async def test_update_time_event_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture, time_event: TimeEvent
 ) -> None:
     """Should return 404 Not found."""
-    TIME_EVENT_ID = "does-not-exist"
+    time_event_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=TimeEventNotFoundException(
+        side_effect=TimeEventNotFoundError(
             f"TimeEvent with id {id} not found in database."
         ),
     )
@@ -1430,11 +1435,11 @@ async def test_update_time_event_not_found(
     request_body = dumps(time_event.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.put(
-            f"/time-events/{TIME_EVENT_ID}", headers=headers, data=request_body
+            f"/time-events/{time_event_id}", headers=headers, data=request_body
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -1443,10 +1448,10 @@ async def test_delete_time_event_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
     """Should return 404 Not found."""
-    TIME_EVENT_ID = "does-not-exist"
+    time_event_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=TimeEventNotFoundException(
+        side_effect=TimeEventNotFoundError(
             f"TimeEvent with id {id} not found in database."
         ),
     )
@@ -1462,6 +1467,6 @@ async def test_delete_time_event_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
-        resp = await client.delete(f"/time-events/{TIME_EVENT_ID}", headers=headers)
-        assert resp.status == 404
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
+        resp = await client.delete(f"/time-events/{time_event_id}", headers=headers)
+        assert resp.status == HTTPStatus.NOT_FOUND

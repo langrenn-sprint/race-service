@@ -1,7 +1,7 @@
 """Module for service exceptions."""
 
 
-class IllegalValueException(Exception):
+class IllegalValueError(Exception):
     """Class representing custom exception for create method."""
 
     def __init__(self, message: str) -> None:

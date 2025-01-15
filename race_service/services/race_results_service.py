@@ -1,11 +1,12 @@
 """Module for race-results service."""
+
 import logging
-from typing import Any, List, Optional
 import uuid
+from typing import Any
 
 from race_service.adapters import (
-    RaceNotFoundException,
-    RaceResultNotFoundException,
+    RaceNotFoundError,
+    RaceResultNotFoundError,
     RaceResultsAdapter,
     RacesAdapter,
     StartEntriesAdapter,
@@ -16,8 +17,8 @@ from race_service.models import (
     StartEntry,
     TimeEvent,
 )
-from .exceptions import IllegalValueException
-from .races_service import RacesService
+
+from .races_service import IllegalValueError, RacesService
 
 
 def create_id() -> str:  # pragma: no cover
@@ -25,7 +26,7 @@ def create_id() -> str:  # pragma: no cover
     return str(uuid.uuid4())
 
 
-class TimeEventIsNotIdentifiableException(Exception):
+class TimeEventIsNotIdentifiableError(Exception):
     """Class representing custom exception for fetch method."""
 
     def __init__(self, message: str) -> None:
@@ -34,7 +35,7 @@ class TimeEventIsNotIdentifiableException(Exception):
         super().__init__(message)
 
 
-class TimeEventDoesNotReferenceRaceException(Exception):
+class TimeEventDoesNotReferenceRaceError(Exception):
     """Class representing custom exception for fetch method."""
 
     def __init__(self, message: str) -> None:
@@ -43,7 +44,7 @@ class TimeEventDoesNotReferenceRaceException(Exception):
         super().__init__(message)
 
 
-class ContestantNotInStartEntriesException(Exception):
+class ContestantNotInStartEntriesError(Exception):
     """Class representing custom exception for fetch method."""
 
     def __init__(self, message: str) -> None:
@@ -57,31 +58,30 @@ class RaceResultsService:
 
     @classmethod
     async def update_race_result(
-        cls: Any, db: Any, id: str, race_result: RaceResult
-    ) -> Optional[str]:
+        cls: Any, db: Any, id_: str, race_result: RaceResult
+    ) -> str | None:
         """Update race-result function."""
         # get old document
         try:
-            old_race_result = await RaceResultsAdapter.get_race_result_by_id(db, id)
-        except RaceResultNotFoundException as e:
+            old_race_result = await RaceResultsAdapter.get_race_result_by_id(db, id_)
+        except RaceResultNotFoundError as e:
             raise e from e
         # update the race_result if found:
         if race_result.id != old_race_result.id:
-            raise IllegalValueException("Cannot change id for race_result.")
-        result = await RaceResultsAdapter.update_race_result(db, id, race_result)
-        return result
+            msg = "Cannot change id for race_result."
+            raise IllegalValueError(msg)
+        return await RaceResultsAdapter.update_race_result(db, id_, race_result)
 
     @classmethod
-    async def delete_race_result(cls: Any, db: Any, id: str) -> Optional[str]:
+    async def delete_race_result(cls: Any, db: Any, id_: str) -> str | None:
         """Delete race-result function."""
         # get old document
         try:
-            await RaceResultsAdapter.get_race_result_by_id(db, id)
-        except RaceResultNotFoundException as e:
+            await RaceResultsAdapter.get_race_result_by_id(db, id_)
+        except RaceResultNotFoundError as e:
             raise e from e
         # delete the document if found:
-        result = await RaceResultsAdapter.delete_race_result(db, id)
-        return result
+        return await RaceResultsAdapter.delete_race_result(db, id_)
 
     @classmethod
     async def add_time_event_to_race_result(
@@ -89,18 +89,17 @@ class RaceResultsService:
     ) -> str:
         """Add time-event to race-result function."""
         if not time_event.id or len(time_event.id) == 0:
-            raise TimeEventIsNotIdentifiableException(
-                "Time-event has no id. Cannot proceed."
-            ) from None
+            msg = "Time-event has no id. Cannot proceed."
+            raise TimeEventIsNotIdentifiableError(msg) from None
 
         if time_event.race_id and len(time_event.race_id) > 0:
             # Check if race exist:
             try:
                 race = await RacesAdapter.get_race_by_id(db, time_event.race_id)
-            except RaceNotFoundException as e:
+            except RaceNotFoundError as e:
                 raise e from e
             # Check if bib is in race's start-entries.
-            start_entries: List[
+            start_entries: list[
                 StartEntry
             ] = await StartEntriesAdapter.get_start_entries_by_race_id(db, race.id)
             # For "Template" timing-point, we don't check if bib is in start-entries:
@@ -109,10 +108,11 @@ class RaceResultsService:
                 and time_event.bib
                 not in [start_entry.bib for start_entry in start_entries]
             ):
-                raise ContestantNotInStartEntriesException(
+                msg = (
                     f'Error in time-event "{time_event.timing_point!r}": '
                     f"Contestant with bib {time_event.bib} is not in race start-entries."
                 )
+                raise ContestantNotInStartEntriesError(msg)
             # Check if race_result exist for this timing-point:
             race_results = (
                 await RaceResultsAdapter.get_race_results_by_race_id_and_timing_point(
@@ -146,7 +146,5 @@ class RaceResultsService:
                 await RacesService.update_race(db, race.id, race)
 
             return race_result.id
-        else:
-            raise TimeEventDoesNotReferenceRaceException(
-                f"Time-event {time_event.id} does not have race reference."
-            ) from None
+        msg = f"Time-event {time_event.id} does not have race reference."
+        raise TimeEventDoesNotReferenceRaceError(msg) from None

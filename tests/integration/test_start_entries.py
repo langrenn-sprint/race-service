@@ -1,23 +1,28 @@
 """Integration test cases for the start_entries route."""
+
+import os
 from copy import deepcopy
 from datetime import datetime
+from http import HTTPStatus
 from json import dumps
-import os
-from typing import Any, Dict
+from typing import Any
 
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
 from pytest_mock import MockFixture
 
 from race_service.adapters import (
-    RaceNotFoundException,
-    StartEntryNotFoundException,
-    StartlistNotFoundException,
+    RaceNotFoundError,
+    StartEntryNotFoundError,
+    StartlistNotFoundError,
 )
 from race_service.models import IndividualSprintRace, Raceplan, StartEntry, Startlist
+
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
 @pytest.fixture
@@ -26,7 +31,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -35,11 +40,11 @@ def token_unsufficient_role() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": "user", "roles": ["user"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
-async def event() -> Dict[str, Any]:
+async def event() -> dict[str, Any]:
     """An event object for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -54,7 +59,7 @@ async def event() -> Dict[str, Any]:
 
 
 @pytest.fixture
-async def competition_format() -> Dict[str, Any]:
+async def competition_format() -> dict[str, Any]:
     """A competition-format for testing."""
     return {
         "id": "290e70d5-0933-4af0-bb53-1d705ba7eb95",
@@ -152,14 +157,14 @@ async def test_create_start_entry(
     competition_format: dict,
 ) -> None:
     """Should return Created, location header."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
@@ -184,7 +189,7 @@ async def test_create_start_entry(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=Raceplan(
-            id="RACEPLAN_ID", event_id=event["id"], races=[], no_of_contestants=0
+            id="raceplan_id", event_id=event["id"], races=[], no_of_contestants=0
         ),
     )
     mocker.patch(
@@ -205,13 +210,13 @@ async def test_create_start_entry(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post(
             "races/1/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 201
+        assert resp.status == HTTPStatus.CREATED
         assert (
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}"
+            f"races/{race.id}/start-entries/{start_entry_id}"
             in resp.headers[hdrs.LOCATION]
         )
 
@@ -226,21 +231,21 @@ async def test_get_start_entry_by_id(
     start_entry: StartEntry,
 ) -> None:
     """Should return OK, and a body containing one start_entry."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"races/{race.id}/start-entries/{START_ENTRY_ID}")
-        assert resp.status == 200
+        resp = await client.get(f"races/{race.id}/start-entries/{start_entry_id}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is dict
-        assert body["id"] == START_ENTRY_ID
+        assert body["id"] == start_entry_id
         assert body["startlist_id"] == start_entry.startlist_id
         assert body["race_id"] == start_entry.race_id
         assert body["bib"] == start_entry.bib
@@ -264,14 +269,14 @@ async def test_update_start_entry_by_id(
     start_entry: StartEntry,
 ) -> None:
     """Should return No Content."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     headers = {
@@ -282,14 +287,14 @@ async def test_update_start_entry_by_id(
     request_body = dumps(start_entry.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}",
+            f"races/{race.id}/start-entries/{start_entry_id}",
             headers=headers,
             data=request_body,
         )
-        assert resp.status == 204
+        assert resp.status == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.integration
@@ -302,21 +307,21 @@ async def test_get_start_entries_by_race_id(
     start_entry: StartEntry,
 ) -> None:
     """Should return OK and a valid json body."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
         return_value=[start_entry],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.get(f"races/{race.id}/start-entries")
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         start_entries = await resp.json()
         assert type(start_entries) is list
         assert len(start_entries) > 0
-        assert START_ENTRY_ID == start_entries[0]["id"]
+        assert start_entries[0]["id"] == start_entry_id
 
 
 @pytest.mark.integration
@@ -330,23 +335,23 @@ async def test_get_start_entries_by_race_id_and_startlist_id(
     start_entry: StartEntry,
 ) -> None:
     """Should return OK and a valid json body."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_startlist_id",  # noqa: B950
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id_and_startlist_id",
         return_value=[start_entry],
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.get(
             f"races/{race.id}/start-entries?startlistId={startlist.id}"
         )
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         start_entries = await resp.json()
         assert type(start_entries) is list
         assert len(start_entries) > 0
-        assert START_ENTRY_ID == start_entries[0]["id"]
+        assert start_entries[0]["id"] == start_entry_id
 
 
 @pytest.mark.integration
@@ -362,7 +367,7 @@ async def test_delete_start_entry(
     competition_format: dict,
 ) -> None:
     """Should return No Content."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
@@ -390,7 +395,7 @@ async def test_delete_start_entry(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=Raceplan(
-            id="RACEPLAN_ID", event_id=event["id"], races=[], no_of_contestants=0
+            id="raceplan_id", event_id=event["id"], races=[], no_of_contestants=0
         ),
     )
     mocker.patch(
@@ -405,12 +410,12 @@ async def test_delete_start_entry(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.delete(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}", headers=headers
+            f"races/{race.id}/start-entries/{start_entry_id}", headers=headers
         )
-        assert resp.status == 204
+        assert resp.status == HTTPStatus.NO_CONTENT
 
 
 # Bad cases
@@ -429,16 +434,16 @@ async def test_create_start_entry_race_is_full(
     start_entry: StartEntry,
 ) -> None:
     """Should return 400 Bad request."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     full_race = deepcopy(race)
     full_race.start_entries = [f"{s}" for s in range(1, race.max_no_of_contestants + 1)]
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
@@ -471,11 +476,11 @@ async def test_create_start_entry_race_is_full(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post(
             "races/1/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -490,14 +495,14 @@ async def test_create_start_entry_race_bib_already_in_race(
     start_entry: StartEntry,
 ) -> None:
     """Should return 400 Bad request."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
@@ -530,11 +535,11 @@ async def test_create_start_entry_race_bib_already_in_race(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post(
             "races/1/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -549,16 +554,16 @@ async def test_create_start_entry_race_position_is_taken(
     start_entry: StartEntry,
 ) -> None:
     """Should return 400 Bad request."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     start_entry_different_bib_same_starting_position = deepcopy(start_entry)
     start_entry_different_bib_same_starting_position.bib = 1000
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
@@ -591,11 +596,11 @@ async def test_create_start_entry_race_position_is_taken(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post(
             "races/1/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -609,14 +614,14 @@ async def test_create_start_entry_with_input_id(
     startlist: Startlist,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
@@ -647,11 +652,11 @@ async def test_create_start_entry_with_input_id(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post(
             f"races/{race.id}/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -666,10 +671,10 @@ async def test_create_start_entry_adapter_fails(
     new_start_entry: StartEntry,
 ) -> None:
     """Should return 400 HTTPBadRequest."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
@@ -706,11 +711,11 @@ async def test_create_start_entry_adapter_fails(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post(
             f"races/{race.id}/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 400
+        assert resp.status == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
@@ -723,10 +728,10 @@ async def test_create_start_entry_mandatory_property(
     start_entry: StartEntry,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
@@ -758,15 +763,15 @@ async def test_create_start_entry_mandatory_property(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = {"id": START_ENTRY_ID}
+    request_body = {"id": start_entry_id}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.post(
             f"races/{race.id}/start-entries", headers=headers, json=request_body
         )
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -779,14 +784,14 @@ async def test_update_start_entry_by_id_missing_mandatory_property(
     start_entry: StartEntry,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     headers = {
@@ -794,17 +799,17 @@ async def test_update_start_entry_by_id_missing_mandatory_property(
         hdrs.AUTHORIZATION: f"Bearer {token}",
     }
 
-    request_body = {"id": START_ENTRY_ID}
+    request_body = {"id": start_entry_id}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}",
+            f"races/{race.id}/start-entries/{start_entry_id}",
             headers=headers,
             json=request_body,
         )
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -817,14 +822,14 @@ async def test_update_start_entry_by_id_different_id_in_body(
     start_entry: StartEntry,
 ) -> None:
     """Should return 422 HTTPUnprocessableEntity."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     headers = {
@@ -837,14 +842,14 @@ async def test_update_start_entry_by_id_different_id_in_body(
     request_body = dumps(update_body.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}",
+            f"races/{race.id}/start-entries/{start_entry_id}",
             headers=headers,
             data=request_body,
         )
-        assert resp.status == 422
+        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
@@ -859,7 +864,7 @@ async def test_delete_start_entry_race_not_found(
     competition_format: dict,
 ) -> None:
     """Should return 404 Not found."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
@@ -870,7 +875,7 @@ async def test_delete_start_entry_race_not_found(
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
-        side_effect=RaceNotFoundException(f"Race with id {race.id} not found."),
+        side_effect=RaceNotFoundError(f"Race with id {race.id} not found."),
     )
     mocker.patch(
         "race_service.adapters.races_adapter.RacesAdapter.update_race",
@@ -892,12 +897,12 @@ async def test_delete_start_entry_race_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.delete(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}", headers=headers
+            f"races/{race.id}/start-entries/{start_entry_id}", headers=headers
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND
         body = await resp.json()
         assert "DB is inconsistent: cannot find race with id" in body["detail"]
 
@@ -915,7 +920,7 @@ async def test_delete_start_entry_startlist_not_found(
     competition_format: dict,
 ) -> None:
     """Should return 404 Not found."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
@@ -934,7 +939,7 @@ async def test_delete_start_entry_startlist_not_found(
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
@@ -943,7 +948,7 @@ async def test_delete_start_entry_startlist_not_found(
     mocker.patch(
         "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=Raceplan(
-            id="RACEPLAN_ID", event_id=event["id"], races=[], no_of_contestants=0
+            id="raceplan_id", event_id=event["id"], races=[], no_of_contestants=0
         ),
     )
     mocker.patch(
@@ -958,12 +963,12 @@ async def test_delete_start_entry_startlist_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.delete(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}", headers=headers
+            f"races/{race.id}/start-entries/{start_entry_id}", headers=headers
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND
         body = await resp.json()
         assert "DB is inconsistent: cannot find startlist with id" in body["detail"]
 
@@ -980,14 +985,14 @@ async def test_create_start_entry_no_authorization(
     new_start_entry: StartEntry,
 ) -> None:
     """Should return 401 Unauthorized."""
-    START_ENTRY_ID = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    start_entry_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     request_body = dumps(
@@ -997,12 +1002,12 @@ async def test_create_start_entry_no_authorization(
     headers = {hdrs.CONTENT_TYPE: "application/json"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
         resp = await client.post(
             f"races/{race.id}/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 401
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 @pytest.mark.integration
@@ -1014,14 +1019,14 @@ async def test_update_start_entry_by_id_no_authorization(
     start_entry: StartEntry,
 ) -> None:
     """Should return 401 Unauthorized."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     headers = {hdrs.CONTENT_TYPE: "application/json"}
@@ -1029,14 +1034,14 @@ async def test_update_start_entry_by_id_no_authorization(
     request_body = dumps(start_entry.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
         resp = await client.put(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}",
+            f"races/{race.id}/start-entries/{start_entry_id}",
             headers=headers,
             data=request_body,
         )
-        assert resp.status == 401
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 @pytest.mark.integration
@@ -1048,21 +1053,21 @@ async def test_delete_start_entry_by_id_no_authorization(
     start_entry: StartEntry,
 ) -> None:
     """Should return 401 Unauthorized."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
-        side_effect=StartEntryNotFoundException(f"StartEntry with id {id} not found"),
+        side_effect=StartEntryNotFoundError(f"StartEntry with id {id} not found"),
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
-        resp = await client.delete(f"races/{race.id}/start-entries/{START_ENTRY_ID}")
-        assert resp.status == 401
+        resp = await client.delete(f"races/{race.id}/start-entries/{start_entry_id}")
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 # Forbidden:
@@ -1077,14 +1082,14 @@ async def test_create_start_entry_insufficient_role(
     start_entry: StartEntry,
 ) -> None:
     """Should return 403 Forbidden."""
-    START_ENTRY_ID = start_entry.id
+    start_entry_id = start_entry.id
     mocker.patch(
         "race_service.services.start_entries_service.create_id",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=START_ENTRY_ID,
+        return_value=start_entry_id,
     )
 
     request_body = dumps(
@@ -1097,11 +1102,11 @@ async def test_create_start_entry_insufficient_role(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=403)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=403)
         resp = await client.post(
             f"races/{race.id}/start-entries", headers=headers, data=request_body
         )
-        assert resp.status == 403
+        assert resp.status == HTTPStatus.FORBIDDEN
 
 
 # NOT FOUND CASES:
@@ -1116,17 +1121,17 @@ async def test_get_start_entry_not_found(
     race: IndividualSprintRace,
 ) -> None:
     """Should return 404 Not found."""
-    START_ENTRY_ID = "does-not-exist"
+    start_entry_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
-        side_effect=StartEntryNotFoundException(f"StartEntry with id {id} not found"),
+        side_effect=StartEntryNotFoundError(f"StartEntry with id {id} not found"),
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"races/{race.id}/start-entries/{START_ENTRY_ID}")
-        assert resp.status == 404
+        resp = await client.get(f"races/{race.id}/start-entries/{start_entry_id}")
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -1139,10 +1144,10 @@ async def test_update_start_entry_not_found(
     start_entry: StartEntry,
 ) -> None:
     """Should return 404 Not found."""
-    START_ENTRY_ID = "does-not-exist"
+    start_entry_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
-        side_effect=StartEntryNotFoundException(f"StartEntry with id {id} not found"),
+        side_effect=StartEntryNotFoundError(f"StartEntry with id {id} not found"),
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
@@ -1157,13 +1162,13 @@ async def test_update_start_entry_not_found(
     request_body = dumps(start_entry.to_dict(), indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.put(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}",
+            f"races/{race.id}/start-entries/{start_entry_id}",
             headers=headers,
             data=request_body,
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -1175,10 +1180,10 @@ async def test_delete_start_entry_not_found(
     race: IndividualSprintRace,
 ) -> None:
     """Should return 404 Not found."""
-    START_ENTRY_ID = "does-not-exist"
+    start_entry_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
-        side_effect=StartEntryNotFoundException(f"StartEntry with id {id} not found"),
+        side_effect=StartEntryNotFoundError(f"StartEntry with id {id} not found"),
     )
     mocker.patch(
         "race_service.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
@@ -1188,8 +1193,8 @@ async def test_delete_start_entry_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.delete(
-            f"races/{race.id}/start-entries/{START_ENTRY_ID}", headers=headers
+            f"races/{race.id}/start-entries/{start_entry_id}", headers=headers
         )
-        assert resp.status == 404
+        assert resp.status == HTTPStatus.NOT_FOUND

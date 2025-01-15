@@ -1,18 +1,23 @@
 """Integration test cases for the startlists route."""
-from datetime import datetime
-from json import dumps
-import os
-from typing import Any, Dict, List
 
+import os
+from datetime import datetime
+from http import HTTPStatus
+from json import dumps
+from typing import Any
+
+import jwt
+import pytest
 from aiohttp import hdrs
 from aiohttp.test_utils import TestClient as _TestClient
 from aioresponses import aioresponses
-import jwt
-import pytest
 from pytest_mock import MockFixture
 
-from race_service.adapters import StartlistNotFoundException
+from race_service.adapters import StartlistNotFoundError
 from race_service.models import IntervalStartRace, StartEntry, Startlist
+
+USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
+USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
 
 
 @pytest.fixture
@@ -21,7 +26,7 @@ def token() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
 @pytest.fixture
@@ -30,10 +35,10 @@ def token_unsufficient_role() -> str:
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
     payload = {"identity": "user", "roles": ["user"]}
-    return jwt.encode(payload, secret, algorithm)  # type: ignore
+    return jwt.encode(payload, secret, algorithm)
 
 
-RACES: List[IntervalStartRace] = [
+RACES: list[IntervalStartRace] = [
     IntervalStartRace(
         id="race_1",
         raceclass="J15",
@@ -93,17 +98,17 @@ RACES: List[IntervalStartRace] = [
 
 
 @pytest.fixture
-async def races() -> List[IntervalStartRace]:
+async def races() -> list[IntervalStartRace]:
     """Create a mock race object."""
     return RACES
 
 
-def get_race_by_id(db: Any, id: str) -> IntervalStartRace:
+def get_race_by_id(db: Any, id_: str) -> IntervalStartRace:
     """Mock function to look up correct race from list."""
-    return next(race for race in RACES if race.id == id)
+    return next(race for race in RACES if race.id == id_)
 
 
-START_ENTRIES: List[StartEntry] = [
+START_ENTRIES: list[StartEntry] = [
     StartEntry(
         id="11",
         race_id="J15",
@@ -188,18 +193,18 @@ START_ENTRIES: List[StartEntry] = [
 
 
 @pytest.fixture
-async def start_entries() -> List[StartEntry]:
+async def start_entries() -> list[StartEntry]:
     """Create a mock startlist object."""
     return START_ENTRIES
 
 
-def get_start_entry_by_id(db: Any, id: str) -> StartEntry:
+def get_start_entry_by_id(db: Any, id_: str) -> StartEntry:
     """Mock function to look up correct race from list."""
-    return next(start_entry for start_entry in START_ENTRIES if start_entry.id == id)
+    return next(start_entry for start_entry in START_ENTRIES if start_entry.id == id_)
 
 
 @pytest.fixture
-async def new_startlist(start_entries: List[StartEntry]) -> Startlist:
+async def new_startlist(start_entries: list[StartEntry]) -> Startlist:
     """Create a startlist object."""
     return Startlist(
         event_id="event_1",
@@ -211,7 +216,7 @@ async def new_startlist(start_entries: List[StartEntry]) -> Startlist:
 
 
 @pytest.fixture
-async def startlist(start_entries: List[StartEntry]) -> Startlist:
+async def startlist(start_entries: list[StartEntry]) -> Startlist:
     """Create a mock startlist object."""
     return Startlist(
         id="startlist_1",
@@ -233,14 +238,14 @@ async def test_create_startlist(
     startlist: Startlist,
 ) -> None:
     """Should return 405 Method Not Allowed."""
-    STARTLIST_ID = startlist.id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.services.startlists_service.create_id",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -255,9 +260,9 @@ async def test_create_startlist(
     }
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.post("/startlists", headers=headers, data=request_body)
-        assert resp.status == 405
+        assert resp.status == HTTPStatus.METHOD_NOT_ALLOWED
 
 
 @pytest.mark.integration
@@ -269,7 +274,7 @@ async def test_get_startlist_by_id(
     startlist: Startlist,
 ) -> None:
     """Should return OK, and a body containing one startlist."""
-    STARTLIST_ID = startlist.id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
         return_value=startlist,
@@ -284,14 +289,14 @@ async def test_get_startlist_by_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/startlists/{STARTLIST_ID}")
-        assert resp.status == 200
+        resp = await client.get(f"/startlists/{startlist_id}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is dict
-        assert body["id"] == STARTLIST_ID
+        assert body["id"] == startlist_id
         assert body["event_id"] == startlist.event_id
         assert len(body["start_entries"]) == len(startlist.start_entries)
         for start_entry in body["start_entries"]:
@@ -310,11 +315,11 @@ async def test_get_startlists_by_event_id(
     startlist: Startlist,
 ) -> None:
     """Should return OK, and a body containing one startlist."""
-    EVENT_ID = startlist.event_id
-    STARTLIST_ID = startlist.id
+    event_id = startlist.event_id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -326,15 +331,15 @@ async def test_get_startlists_by_event_id(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/startlists?eventId={EVENT_ID}")
-        assert resp.status == 200
+        resp = await client.get(f"/startlists?eventId={event_id}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is list
         assert len(body) == 1
-        assert body[0]["id"] == STARTLIST_ID
+        assert body[0]["id"] == startlist_id
         assert body[0]["event_id"] == startlist.event_id
         assert len(body[0]["start_entries"]) == len(startlist.start_entries)
         for start_entry in body[0]["start_entries"]:
@@ -352,13 +357,13 @@ async def test_get_startlists_by_event_id_and_bib(
     token: MockFixture,
     startlist: Startlist,
 ) -> None:
-    """Should return OK, and a body containing one startlist with start_entries where bib == BIB."""
-    EVENT_ID = startlist.event_id
-    STARTLIST_ID = startlist.id
-    BIB = START_ENTRIES[0].bib
+    """Should return OK, and a body containing one startlist with start_entries where bib == bib."""
+    event_id = startlist.event_id
+    startlist_id = startlist.id
+    bib = START_ENTRIES[0].bib
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -370,22 +375,22 @@ async def test_get_startlists_by_event_id_and_bib(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/startlists?eventId={EVENT_ID}&bib={BIB}")
-        assert resp.status == 200
+        resp = await client.get(f"/startlists?eventId={event_id}&bib={bib}")
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         body = await resp.json()
         assert type(body) is list
         assert len(body) == 1
-        assert body[0]["id"] == STARTLIST_ID
+        assert body[0]["id"] == startlist_id
         assert body[0]["event_id"] == startlist.event_id
         assert len(body[0]["start_entries"]) == len(
-            [se for se in START_ENTRIES if se.bib == BIB]
+            [se for se in START_ENTRIES if se.bib == bib]
         )
         for start_entry in body[0]["start_entries"]:
             assert start_entry["race_id"]
-            assert start_entry["bib"] == BIB
+            assert start_entry["bib"] == bib
             assert start_entry["starting_position"]
             assert start_entry["scheduled_start_time"]
 
@@ -396,7 +401,7 @@ async def test_update_startlist_by_id(
     client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: Startlist
 ) -> None:
     """Should return 405 Method not allowed."""
-    STARTLIST_ID = startlist.id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
         return_value=startlist,
@@ -407,7 +412,7 @@ async def test_update_startlist_by_id(
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
 
     headers = {
@@ -418,12 +423,12 @@ async def test_update_startlist_by_id(
     request_body = dumps(startlist, indent=4, sort_keys=True, default=str)
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
         resp = await client.put(
-            f"/startlists/{STARTLIST_ID}", headers=headers, data=request_body
+            f"/startlists/{startlist_id}", headers=headers, data=request_body
         )
-        assert resp.status == 405
+        assert resp.status == HTTPStatus.METHOD_NOT_ALLOWED
 
 
 @pytest.mark.integration
@@ -432,7 +437,7 @@ async def test_get_all_startlists(
     client: _TestClient, mocker: MockFixture, token: MockFixture, startlist: Startlist
 ) -> None:
     """Should return OK and a valid json body."""
-    STARTLIST_ID = startlist.id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_all_startlists",
         return_value=[startlist],
@@ -443,14 +448,14 @@ async def test_get_all_startlists(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
         resp = await client.get("/startlists")
-        assert resp.status == 200
+        assert resp.status == HTTPStatus.OK
         assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
         startlists = await resp.json()
         assert type(startlists) is list
         assert len(startlists) > 0
-        assert STARTLIST_ID == startlists[0]["id"]
+        assert startlists[0]["id"] == startlist_id
 
 
 @pytest.mark.integration
@@ -459,19 +464,19 @@ async def test_delete_startlist_by_id(
     client: _TestClient,
     mocker: MockFixture,
     token: MockFixture,
-    start_entries: List[Dict],
+    start_entries: list[dict],
     startlist: Startlist,
-    races: List[Dict],
+    races: list[dict],
 ) -> None:
     """Should return No Content."""
-    STARTLIST_ID = startlist.id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
         return_value=startlist,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.delete_startlist",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -505,10 +510,10 @@ async def test_delete_startlist_by_id(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.delete(f"/startlists/{STARTLIST_ID}", headers=headers)
-        assert resp.status == 204
+        resp = await client.delete(f"/startlists/{startlist_id}", headers=headers)
+        assert resp.status == HTTPStatus.NO_CONTENT
 
 
 # Bad cases
@@ -523,10 +528,10 @@ async def test_delete_startlist_by_id_no_authorization(
     client: _TestClient, mocker: MockFixture, startlist: Startlist
 ) -> None:
     """Should return 401 Unauthorized."""
-    STARTLIST_ID = startlist.id
+    startlist_id = startlist.id
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.delete_startlist",
-        return_value=STARTLIST_ID,
+        return_value=startlist_id,
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -534,10 +539,10 @@ async def test_delete_startlist_by_id_no_authorization(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=401)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
 
-        resp = await client.delete(f"/startlists/{STARTLIST_ID}")
-        assert resp.status == 401
+        resp = await client.delete(f"/startlists/{startlist_id}")
+        assert resp.status == HTTPStatus.UNAUTHORIZED
 
 
 # NOT FOUND CASES:
@@ -549,10 +554,10 @@ async def test_get_startlist_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
     """Should return 404 Not found."""
-    STARTLIST_ID = "does-not-exist"
+    startlist_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
@@ -560,10 +565,10 @@ async def test_get_startlist_not_found(
     )
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
 
-        resp = await client.get(f"/startlists/{STARTLIST_ID}")
-        assert resp.status == 404
+        resp = await client.get(f"/startlists/{startlist_id}")
+        assert resp.status == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
@@ -572,10 +577,10 @@ async def test_delete_startlist_not_found(
     client: _TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
     """Should return 404 Not found."""
-    STARTLIST_ID = "does-not-exist"
+    startlist_id = "does-not-exist"
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        side_effect=StartlistNotFoundException(f"Startlist with id {id} not found."),
+        side_effect=StartlistNotFoundError(f"Startlist with id {id} not found."),
     )
     mocker.patch(
         "race_service.adapters.startlists_adapter.StartlistsAdapter.delete_startlist",
@@ -589,6 +594,6 @@ async def test_delete_startlist_not_found(
     headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
 
     with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post("http://users.example.com:8080/authorize", status=204)
-        resp = await client.delete(f"/startlists/{STARTLIST_ID}", headers=headers)
-        assert resp.status == 404
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
+        resp = await client.delete(f"/startlists/{startlist_id}", headers=headers)
+        assert resp.status == HTTPStatus.NOT_FOUND

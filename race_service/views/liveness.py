@@ -1,8 +1,12 @@
 """Resource module for liveness resources."""
+
 import logging
 import os
 
 from aiohttp import web
+from dotenv import load_dotenv
+
+load_dotenv()
 
 CONFIG = os.getenv("CONFIG", "production")
 

@@ -1,8 +1,9 @@
 """Resource module for races resources."""
+
 import json
 import logging
 import os
-from typing import Any, Dict, List, Union
+from typing import Any
 
 from aiohttp.web import (
     HTTPInternalServerError,
@@ -14,7 +15,7 @@ from aiohttp.web import (
 from dotenv import load_dotenv
 
 from race_service.adapters import (
-    NotSupportedRaceDatatype,
+    NotSupportedRaceDatatypeError,
     RaceResultsAdapter,
     RacesAdapter,
     StartEntriesAdapter,
@@ -31,13 +32,14 @@ from race_service.models.race_model import (
     RaceResult,
 )
 from race_service.services import (
-    IllegalValueException,
-    RaceNotFoundException,
+    IllegalValueError,
+    RaceNotFoundError,
     RacesService,
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
 load_dotenv()
+
 HOST_SERVER = os.getenv("HOST_SERVER", "localhost")
 HOST_PORT = os.getenv("HOST_PORT", "8080")
 BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
@@ -60,16 +62,16 @@ class RacesView(View):
                 if races:
                     for race in races:
                         # Get the start_entries:
-                        race.start_entries = await get_start_entries(db, race.start_entries)  # type: ignore
+                        race.start_entries = await get_start_entries( # type: ignore [reportAttributeAccessIssue]
+                            db, race.start_entries
+                        )
                         # Get the race_results:
-                        race.results = await get_race_results(db, race.results)  # type: ignore
+                        race.results = await get_race_results(db, race.results)  # type: ignore [reportAttributeAccessIssue]
             else:
                 races = await RacesAdapter.get_races_by_event_id(db, event_id)
         else:
             races = await RacesAdapter.get_all_races(db)
-        _races = []
-        for race in races:
-            _races.append(race.to_dict())
+        _races = [race.to_dict() for race in races]
         body = json.dumps(_races, default=str, ensure_ascii=False)
         return Response(status=200, body=body, content_type="application/json")
 
@@ -87,12 +89,12 @@ class RaceView(View):
         try:
             race = await RacesAdapter.get_race_by_id(db, race_id)
             # Get the start_entries:
-            race.start_entries = await get_start_entries(db, race.start_entries)  # type: ignore
+            race.start_entries = await get_start_entries(db, race.start_entries)  # type: ignore [reportAttributeAccessIssue]
             # Get the race_results:
-            race.results = await get_race_results(db, race.results)  # type: ignore
-        except RaceNotFoundException as e:
+            race.results = await get_race_results(db, race.results)  # type: ignore [reportAttributeAccessIssue]
+        except RaceNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
-        except NotSupportedRaceDatatype as e:
+        except NotSupportedRaceDatatypeError as e:
             raise HTTPInternalServerError(reason=str(e)) from e
         logging.debug(f"Got race: {race}")
         body = race.to_json()
@@ -112,7 +114,7 @@ class RaceView(View):
         logging.debug(f"Got request-body {body} for {race_id} of type {type(body)}")
         body = await self.request.json()
         logging.debug(f"Got put request for race {body} of type {type(body)}")
-        race: Union[IndividualSprintRace, IntervalStartRace]
+        race: IndividualSprintRace | IntervalStartRace
         try:
             if body["datatype"] == "individual_sprint":
                 race = IndividualSprintRace.from_dict(body)
@@ -129,9 +131,9 @@ class RaceView(View):
 
         try:
             await RacesService.update_race(db, race_id, race)
-        except IllegalValueException as e:
+        except IllegalValueError as e:
             raise HTTPUnprocessableEntity(reason=str(e)) from e
-        except RaceNotFoundException as e:
+        except RaceNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
@@ -149,14 +151,14 @@ class RaceView(View):
 
         try:
             await RacesService.delete_race(db, race_id)
-        except RaceNotFoundException as e:
+        except RaceNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
         return Response(status=204)
 
 
-async def get_start_entries(db: Any, start_entry_ids: list) -> List[StartEntry]:
+async def get_start_entries(db: Any, start_entry_ids: list) -> list[StartEntry]:
     """Get the start entries."""
-    start_entries: List[StartEntry] = []
+    start_entries: list[StartEntry] = []
     for start_entry_id in start_entry_ids:
         start_entry: StartEntry = await StartEntriesAdapter.get_start_entry_by_id(
             db, start_entry_id
@@ -172,15 +174,15 @@ async def get_start_entries(db: Any, start_entry_ids: list) -> List[StartEntry]:
     return start_entries
 
 
-async def get_race_results(db: Any, race_results: dict) -> Dict[str, RaceResult]:
+async def get_race_results(db: Any, race_results: dict) -> dict[str, RaceResult]:
     """Get the race results in sorted order."""
-    results: Dict[str, RaceResult] = {}
-    for key in race_results:
+    results: dict[str, RaceResult] = {}
+    for key in race_results:  # noqa: PLC0206
         if key.lower() != "Template".lower():  # We skip the template
             race_result: RaceResult = await RaceResultsAdapter().get_race_result_by_id(
                 db, race_results[key]
             )
-            ranking_sequence: List[TimeEvent] = []
+            ranking_sequence: list[TimeEvent] = []
             for time_event_id in race_result.ranking_sequence:
                 time_event = await TimeEventsAdapter.get_time_event_by_id(
                     db, time_event_id
@@ -196,6 +198,6 @@ async def get_race_results(db: Any, race_results: dict) -> Dict[str, RaceResult]
                 ),
                 reverse=False,
             )
-            race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore
+            race_result.ranking_sequence = ranking_sequence_sorted  # type: ignore [reportAttributeAccessIssue]
             results[key] = race_result
     return results

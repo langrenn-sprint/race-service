@@ -1,11 +1,11 @@
 Fornavn;Etternavn;E-post;Mobil;Adresse;Postnummer;Sted;Alder;Fødselsdato;Kjønn;Land;Landskode;Bypass ID;Person ID;Klubb;Klubb-ID;Gruppe-ID;Krets/region-id;Krets/region;Sport;Øvelse;Klasse;Team;Påmeldt dato;Påmeldt kl.
-Torbjørn;Bakken;lindahaugen@example.net;69730856;Fredriksenjordet 8;4221;Annfjord;11;2013-09-24;M;Norway;NO;367647636;3302868;Bækkelagets SK - Ski;70361;40213;369;Oslo Skikrets;Ski;Gutter 11;;;02.01.2024;03:27
-Arild;Mikkelsen;vmoe@example.net;57 77 66 70;Hauglandtoppen 03;0890;Andresen;11;2013-11-15;M;Norway;NO;951903540;7609637;Njård - Ski;53862;29596;629;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;19:53
-Øystein;Vik;hmartinsen@example.org;98 35 60 62;Haugenlunden 21A;7086;Idavik;11;2013-04-02;M;Norway;NO;388666639;3834916;Årvoll IL - Ski;12136;75033;820;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;12:17
-Adrian;Nygård;wberge@example.net;48996181;Iversenspranget 4;9636;Halvorsen;11;2013-01-14;M;Norway;NO;281656510;1630111;Njård - Ski;53862;99718;318;Oslo Skikrets;Ski;Gutter 11;;;02.01.2024;15:00
-Trond;Ahmed;kjell47@example.org;49 49 18 13;Sætherhavna 49;4934;Berg;11;2013-01-27;M;Norway;NO;493254649;1660301;Heming, IL - Ski;10768;34632;684;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;21:31
-Simen;Ellingsen;iboee@example.org;85959761;Myklebustroa 263;5597;Frankmark;11;2013-09-24;M;Norway;NO;639095740;9130740;Hasle-Løren IL - Ski;88362;57503;441;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;08:40
-Sondre;Solheim;qkristoffersen@example.org;49351909;Sivertsenskrenten 9;8968;Abrahamsen;11;2013-01-04;M;Norway;NO;408469015;6993028;Hasle-Løren IL - Ski;88362;44775;980;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;22:01
-Egil;Nguyen;oddevensen@example.com;40933406;Hellandlunden 9B;8133;Bakke;11;2013-04-17;M;Norway;NO;746549004;5076447;Koll, IL - Ski;56776;35624;916;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;20:57
-Simen;Eliassen;rune56@example.com;+47 75 44 37 34;Evensengropa 320;1901;Johnsen;11;2013-07-10;M;Norway;NO;666699462;8699782;Rustad Idrettslag - Ski;47703;50456;344;Oslo Skikrets;Ski;Gutter 11;;;01.01.2024;19:45
-Steinar;Halvorsen;amundsenrune@example.com;52651561;Ødegårdstykket 616;7603;Aune;11;2013-04-15;M;Norway;NO;674178853;4498732;Lyn Ski - Ski;73871;53879;732;Oslo Skikrets;Ski;Gutter 11;;;02.01.2024;15:12
+Torbjørn;Bakken;lindahaugen@example.net;69730856;Fredriksenjordet 8;4221;Annfjord;11;2013-09-24;M;Norway;NO;367647636;3302868;Bækkelagets SK - Ski;70361;40213;369;Oslo Skikrets;Ski;;G 11 år;;02.01.2024;03:27
+Arild;Mikkelsen;vmoe@example.net;57 77 66 70;Hauglandtoppen 03;0890;Andresen;11;2013-11-15;M;Norway;NO;951903540;7609637;Njård - Ski;53862;29596;629;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;19:53
+Øystein;Vik;hmartinsen@example.org;98 35 60 62;Haugenlunden 21A;7086;Idavik;11;2013-04-02;M;Norway;NO;388666639;3834916;Årvoll IL - Ski;12136;75033;820;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;12:17
+Adrian;Nygård;wberge@example.net;48996181;Iversenspranget 4;9636;Halvorsen;11;2013-01-14;M;Norway;NO;281656510;1630111;Njård - Ski;53862;99718;318;Oslo Skikrets;Ski;;G 11 år;;02.01.2024;15:00
+Trond;Ahmed;kjell47@example.org;49 49 18 13;Sætherhavna 49;4934;Berg;11;2013-01-27;M;Norway;NO;493254649;1660301;Heming, IL - Ski;10768;34632;684;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;21:31
+Simen;Ellingsen;iboee@example.org;85959761;Myklebustroa 263;5597;Frankmark;11;2013-09-24;M;Norway;NO;639095740;9130740;Hasle-Løren IL - Ski;88362;57503;441;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;08:40
+Sondre;Solheim;qkristoffersen@example.org;49351909;Sivertsenskrenten 9;8968;Abrahamsen;11;2013-01-04;M;Norway;NO;408469015;6993028;Hasle-Løren IL - Ski;88362;44775;980;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;22:01
+Egil;Nguyen;oddevensen@example.com;40933406;Hellandlunden 9B;8133;Bakke;11;2013-04-17;M;Norway;NO;746549004;5076447;Koll, IL - Ski;56776;35624;916;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;20:57
+Simen;Eliassen;rune56@example.com;+47 75 44 37 34;Evensengropa 320;1901;Johnsen;11;2013-07-10;M;Norway;NO;666699462;8699782;Rustad Idrettslag - Ski;47703;50456;344;Oslo Skikrets;Ski;;G 11 år;;01.01.2024;19:45
+Steinar;Halvorsen;amundsenrune@example.com;52651561;Ødegårdstykket 616;7603;Aune;11;2013-04-15;M;Norway;NO;674178853;4498732;Lyn Ski - Ski;73871;53879;732;Oslo Skikrets;Ski;;G 11 år;;02.01.2024;15:12

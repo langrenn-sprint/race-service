@@ -1,15 +1,16 @@
 """Integration test cases for the race_results service."""
+
 from datetime import datetime
 
 import pytest
 from pytest_mock import MockFixture
 
-from race_service.adapters import RaceResultNotFoundException
+from race_service.adapters import RaceResultNotFoundError
 from race_service.models import IndividualSprintRace, RaceResult, StartEntry, TimeEvent
 from race_service.services import (
     RaceResultsService,
-    TimeEventDoesNotReferenceRaceException,
-    TimeEventIsNotIdentifiableException,
+    TimeEventDoesNotReferenceRaceError,
+    TimeEventIsNotIdentifiableError,
 )
 
 
@@ -186,7 +187,7 @@ async def test_add_time_event_to_race_result(
         return_value=race_mock,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result_mock],
     )
     mocker.patch(
@@ -202,10 +203,10 @@ async def test_add_time_event_to_race_result(
         return_value=[start_entry_mock],
     )
 
-    id = await RaceResultsService.add_time_event_to_race_result(
+    _id = await RaceResultsService.add_time_event_to_race_result(
         db=None, time_event=time_event
     )
-    assert id == race_result_mock.id
+    assert _id == race_result_mock.id
 
 
 @pytest.mark.integration
@@ -231,7 +232,7 @@ async def test_add_time_event_to_race_result_race_does_not_have_any_results(
         return_value=race_mock_without_results,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[],
     )
     mocker.patch(
@@ -247,10 +248,10 @@ async def test_add_time_event_to_race_result_race_does_not_have_any_results(
         return_value=[start_entry_mock],
     )
 
-    id = await RaceResultsService.add_time_event_to_race_result(
+    _id = await RaceResultsService.add_time_event_to_race_result(
         db=None, time_event=time_event
     )
-    assert id == race_result_mock.id
+    assert _id == race_result_mock.id
 
 
 @pytest.mark.integration
@@ -276,7 +277,7 @@ async def test_add_time_event_to_race_result_no_ranking_sequence(
         return_value=race_mock,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result_empty_ranking_sequence_mock],
     )
     mocker.patch(
@@ -292,10 +293,10 @@ async def test_add_time_event_to_race_result_no_ranking_sequence(
         return_value=[start_entry_mock],
     )
 
-    id = await RaceResultsService.add_time_event_to_race_result(
+    _id = await RaceResultsService.add_time_event_to_race_result(
         db=None, time_event=time_event
     )
-    assert id == race_result_empty_ranking_sequence_mock.id
+    assert _id == race_result_empty_ranking_sequence_mock.id
 
 
 @pytest.mark.integration
@@ -306,7 +307,7 @@ async def test_add_time_event_to_race_result_no_id(
     race_mock: IndividualSprintRace,
     race_result_mock: RaceResult,
 ) -> None:
-    """Should raise TimeEventIsNotIdentifiableException."""
+    """Should raise TimeEventIsNotIdentifiableError."""
     mocker.patch(
         "race_service.services.race_results_service.create_id",
         return_value=race_result_mock.id,
@@ -320,7 +321,7 @@ async def test_add_time_event_to_race_result_no_id(
         return_value=race_mock,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result_mock],
     )
     mocker.patch(
@@ -332,7 +333,7 @@ async def test_add_time_event_to_race_result_no_id(
         return_value=race_mock.id,
     )
 
-    with pytest.raises(TimeEventIsNotIdentifiableException):
+    with pytest.raises(TimeEventIsNotIdentifiableError):
         await RaceResultsService.add_time_event_to_race_result(
             db=None, time_event=time_event_with_no_id
         )
@@ -346,7 +347,7 @@ async def test_add_time_event_to_race_race_does_not_exist(
     race_mock: IndividualSprintRace,
     race_result_mock: RaceResult,
 ) -> None:
-    """Should raise TimeEventDoesNotReferenceRaceException."""
+    """Should raise TimeEventDoesNotReferenceRaceError."""
     mocker.patch(
         "race_service.services.race_results_service.create_id",
         return_value=race_result_mock.id,
@@ -360,7 +361,7 @@ async def test_add_time_event_to_race_race_does_not_exist(
         return_value=race_mock,
     )
     mocker.patch(
-        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",  # noqa: B950
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_results_by_race_id_and_timing_point",
         return_value=[race_result_mock],
     )
     mocker.patch(
@@ -372,7 +373,7 @@ async def test_add_time_event_to_race_race_does_not_exist(
         return_value=race_mock.id,
     )
 
-    with pytest.raises(TimeEventDoesNotReferenceRaceException):
+    with pytest.raises(TimeEventDoesNotReferenceRaceError):
         await RaceResultsService.add_time_event_to_race_result(
             db=None, time_event=time_event_with_no_race_id
         )
@@ -385,11 +386,13 @@ async def test_delete_race_result_race_result_not_found(
     race_mock: IndividualSprintRace,
     race_result_mock: RaceResult,
 ) -> None:
-    """Should raise RaceResultNotFoundException."""
+    """Should raise RaceResultNotFoundError."""
     mocker.patch(
         "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
-        side_effect=RaceResultNotFoundException(f"RaceResult with id {id} not found"),
+        side_effect=RaceResultNotFoundError(
+            f"RaceResult with id {race_result_mock.id} not found"
+        ),
     )
 
-    with pytest.raises(RaceResultNotFoundException):
-        await RaceResultsService.delete_race_result(db=None, id=race_result_mock.id)
+    with pytest.raises(RaceResultNotFoundError):
+        await RaceResultsService.delete_race_result(db=None, id_=race_result_mock.id)
