@@ -36,6 +36,10 @@ class StartlistAllreadyExistError(Exception):
 class StartlistsService:
     """Class representing a service for startlists."""
 
+    logger = logging.getLogger(
+        "race_service.services.startlists_service.StartlistsService"
+    )
+
     @classmethod
     async def create_startlist(cls: Any, db: Any, startlist: Startlist) -> str:
         """Create startlist function.
@@ -52,7 +56,7 @@ class StartlistsService:
             StartlistAllreadyExistError: event can have zero or one plan
             CouldNotCreateStartlistError: creation failed
         """
-        logging.debug(f"trying to insert startlist: {startlist}")
+        cls.logger.debug(f"trying to insert startlist: {startlist}")
         # Event can have one, and only, one startlist:
         existing_sl = await StartlistsAdapter.get_startlists_by_event_id(
             db, startlist.event_id
@@ -69,9 +73,9 @@ class StartlistsService:
         id_ = create_id()
         startlist.id = id_
         # insert new startlist
-        logging.debug(f"new startlist: {startlist}")
+        cls.logger.debug(f"new startlist: {startlist}")
         result = await StartlistsAdapter.create_startlist(db, startlist)
-        logging.debug(f"inserted startlist with id: {id_}")
+        cls.logger.debug(f"inserted startlist with id: {id_}")
         if result:
             return id_
         msg = "Creation of startlist failed."

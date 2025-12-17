@@ -37,6 +37,8 @@ BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
 class RaceplansView(View):
     """Class representing raceplans resource."""
 
+    logger = logging.getLogger("race_service.views.raceplans.RaceplansView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
@@ -56,12 +58,14 @@ class RaceplansView(View):
 class RaceplanView(View):
     """Class representing a single raceplan resource."""
 
+    logger = logging.getLogger("race_service.views.raceplans.RaceplanView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
 
         raceplan_id = self.request.match_info["raceplanId"]
-        logging.debug(f"Got get request for raceplan {raceplan_id}")
+        self.logger.debug(f"Got get request for raceplan {raceplan_id}")
 
         try:
             raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)
@@ -74,10 +78,10 @@ class RaceplanView(View):
                 key=lambda k: (k.order,),
                 reverse=False,
             )
-            raceplan.races = races # type: ignore [reportAttributeAccessIssue]
+            raceplan.races = races  # type: ignore [reportAttributeAccessIssue]
         except RaceplanNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
-        logging.debug(f"Got raceplan: {raceplan}")
+        self.logger.debug(f"Got raceplan: {raceplan}")
         body = raceplan.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
@@ -92,9 +96,11 @@ class RaceplanView(View):
 
         body = await self.request.json()
         raceplan_id = self.request.match_info["raceplanId"]
-        logging.debug(f"Got request-body {body} for {raceplan_id} of type {type(body)}")
+        self.logger.debug(
+            f"Got request-body {body} for {raceplan_id} of type {type(body)}"
+        )
         body = await self.request.json()
-        logging.debug(f"Got put request for raceplan {body} of type {type(body)}")
+        self.logger.debug(f"Got put request for raceplan {body} of type {type(body)}")
         try:
             raceplan = Raceplan.from_dict(body)
         except KeyError as e:
@@ -120,7 +126,7 @@ class RaceplanView(View):
             raise e from e
 
         raceplan_id = self.request.match_info["raceplanId"]
-        logging.debug(f"Got delete request for raceplan {raceplan_id}")
+        self.logger.debug(f"Got delete request for raceplan {raceplan_id}")
 
         try:
             raceplan = await RaceplansAdapter.get_raceplan_by_id(db, raceplan_id)

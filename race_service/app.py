@@ -51,6 +51,18 @@ async def create_app() -> web.Application:
             error_middleware(),  # default error handler for whole application
         ]
     )
+
+    # Set up logging:
+    # logging configurataion:
+    logging.basicConfig(
+        format="%(asctime)s,%(msecs)d %(levelname)s - %(module)s:%(lineno)d: %(message)s",
+        datefmt="%H:%M:%S",
+        level=LOGGING_LEVEL,
+    )
+    logger = logging.getLogger("race_service.app")
+    logger.setLevel(LOGGING_LEVEL)
+    logging.getLogger("chardet.charsetprober").setLevel(LOGGING_LEVEL)
+
     # Set up routes:
     app.add_routes(
         [
@@ -79,17 +91,9 @@ async def create_app() -> web.Application:
         ]
     )
 
-    # logging configurataion:
-    logging.basicConfig(
-        format="%(asctime)s,%(msecs)d %(levelname)s - %(module)s:%(lineno)d: %(message)s",
-        datefmt="%H:%M:%S",
-        level=LOGGING_LEVEL,
-    )
-    logging.getLogger("chardet.charsetprober").setLevel(LOGGING_LEVEL)
-
     async def mongo_context(app: Application) -> AsyncGenerator[None]:
         # Set up database connection:
-        logging.debug(f"Connecting to db at {DB_HOST}:{DB_PORT}")
+        logger.debug(f"Connecting to db at {DB_HOST}:{DB_PORT}")
         mongo = motor.motor_asyncio.AsyncIOMotorClient(
             host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
         )
@@ -102,7 +106,7 @@ async def create_app() -> web.Application:
                 await db_utils.create_indexes(db)
 
             except Exception:
-                logging.exception("Could not create index on race_collection.")
+                logger.exception("Could not create index on race_collection.")
         yield
 
         mongo.close()

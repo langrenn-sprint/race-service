@@ -70,7 +70,7 @@ async def generate_startlist_for_event(  # noqa: C901
         raise e from e
     # and the races:
     try:
-        races = await get_races(db, raceplan.id) # type: ignore [reportArgumentType]
+        races = await get_races(db, raceplan.id)  # type: ignore [reportArgumentType]
     except NoRacesInRaceplanError as e:
         raise e from e
     # And finally we get the list of contestants:
@@ -106,7 +106,7 @@ async def generate_startlist_for_event(  # noqa: C901
         start_entries = await generate_start_entries_for_individual_sprint(
             competition_format,
             raceclasses,
-            races, # type: ignore [reportArgumentType]
+            races,  # type: ignore [reportArgumentType]
             contestants,
         )
 
@@ -114,7 +114,7 @@ async def generate_startlist_for_event(  # noqa: C901
         start_entries = await generate_start_entries_for_interval_start(
             competition_format,
             raceclasses,
-            races, # type: ignore [reportArgumentType]
+            races,  # type: ignore [reportArgumentType]
             contestants,
         )
     else:

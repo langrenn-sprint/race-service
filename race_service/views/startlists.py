@@ -26,7 +26,7 @@ from race_service.services import (
 )
 from race_service.utils.jwt_utils import extract_token_from_request
 
-if TYPE_CHECKING: # pragma: no cover
+if TYPE_CHECKING:  # pragma: no cover
     from race_service.models import StartEntry, Startlist
     from race_service.models.race_model import IndividualSprintRace, IntervalStartRace
 
@@ -74,12 +74,14 @@ class StartlistsView(View):
 class StartlistView(View):
     """Class representing a single startlist resource."""
 
+    logger = logging.getLogger("race_service.startlists_view.StartlistView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
 
         startlist_id = self.request.match_info["startlistId"]
-        logging.debug(f"Got get request for startlist {startlist_id}")
+        self.logger.debug(f"Got get request for startlist {startlist_id}")
 
         try:
             startlist: Startlist = await StartlistsAdapter.get_startlist_by_id(
@@ -94,7 +96,7 @@ class StartlistView(View):
             startlist.start_entries = start_entries  # type: ignore [reportAttributeAccessIssue]
         except StartlistNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
-        logging.debug(f"Got startlist: {startlist}")
+        self.logger.debug(f"Got startlist: {startlist}")
         body = startlist.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
@@ -108,7 +110,7 @@ class StartlistView(View):
             raise e from e
 
         startlist_id = self.request.match_info["startlistId"]
-        logging.debug(f"Got delete request for startlist {startlist_id}")
+        self.logger.debug(f"Got delete request for startlist {startlist_id}")
 
         try:
             startlist_to_be_deleted: Startlist = (

@@ -20,6 +20,8 @@ def create_id() -> str:  # pragma: no cover
 class RacesService:
     """Class representing a service for races."""
 
+    logger = logging.getLogger("race_service.services.races_service.RacesService")
+
     @classmethod
     async def create_race(cls: Any, db: Any, race: Race) -> str | None:
         """Create race function.
@@ -34,7 +36,7 @@ class RacesService:
         Raises:
             IllegalValueError: input object has illegal values
         """
-        logging.debug(f"trying to insert race: {race}")
+        cls.logger.debug(f"trying to insert race: {race}")
         # Validation:
         await validate_race(db, race)
         if hasattr(race, "id") and len(race.id) > 0:
@@ -44,9 +46,9 @@ class RacesService:
         race_id = create_id()
         race.id = race_id
         # insert new race
-        logging.debug(f"new_race: {race}")
+        cls.logger.debug(f"new_race: {race}")
         result = await RacesAdapter.create_race(db, race)
-        logging.debug(f"inserted race with id: {race_id}")
+        cls.logger.debug(f"inserted race with id: {race_id}")
         if result:
             return race_id
         return None
@@ -63,7 +65,7 @@ class RacesService:
         if race.id != old_race.id:
             msg = "Cannot change id for race."
             raise IllegalValueError(msg)
-        logging.debug(f"Updating race with following values:\n {race}")
+        cls.logger.debug(f"Updating race with following values:\n {race}")
         return await RacesAdapter.update_race(db, id_, race)
 
     @classmethod

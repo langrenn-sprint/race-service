@@ -50,6 +50,8 @@ BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
 class TimeEventsView(View):
     """Class representing time_events resource."""
 
+    logger = logging.getLogger("race_service.views.time_events.TimeEventsView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
@@ -97,7 +99,9 @@ class TimeEventsView(View):
             raise e from e
 
         body = await self.request.json()
-        logging.debug(f"Got create request for time_event {body} of type {type(body)}")
+        self.logger.debug(
+            f"Got create request for time_event {body} of type {type(body)}"
+        )
         try:
             time_event = TimeEvent.from_dict(body)
         except KeyError as e:
@@ -122,7 +126,8 @@ class TimeEventsView(View):
                 if not time_event.changelog:
                     time_event.changelog = []
                 event = await EventsAdapter.get_event_by_id(
-                    token=token, event_id=time_event.event_id # type: ignore [reportArgumentType]
+                    token=token,  # type: ignore [reportArgumentType]
+                    event_id=time_event.event_id,
                 )
                 time_event.changelog.append(
                     Changelog(
@@ -139,7 +144,7 @@ class TimeEventsView(View):
             TimeEventAllreadyExistError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
-        logging.debug(f"inserted document with time_event_id {time_event_id}")
+        self.logger.debug(f"inserted document with time_event_id {time_event_id}")
 
         body = time_event.to_json()
         return Response(status=200, body=body, content_type="application/json")
@@ -148,18 +153,20 @@ class TimeEventsView(View):
 class TimeEventView(View):
     """Class representing a single time_event resource."""
 
+    logger = logging.getLogger("race_service.views.time_events.TimeEventView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
 
         time_event_id = self.request.match_info["time_eventId"]
-        logging.debug(f"Got get request for time_event {time_event_id}")
+        self.logger.debug(f"Got get request for time_event {time_event_id}")
 
         try:
             time_event = await TimeEventsAdapter.get_time_event_by_id(db, time_event_id)
         except TimeEventNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
-        logging.debug(f"Got time_event: {time_event}")
+        self.logger.debug(f"Got time_event: {time_event}")
         body = time_event.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
@@ -176,11 +183,11 @@ class TimeEventView(View):
 
         body = await self.request.json()
         time_event_id = self.request.match_info["time_eventId"]
-        logging.debug(
+        self.logger.debug(
             f"Got request-body {body} for {time_event_id} of type {type(body)}"
         )
         body = await self.request.json()
-        logging.debug(f"Got put request for time_event {body} of type {type(body)}")
+        self.logger.debug(f"Got put request for time_event {body} of type {type(body)}")
         try:
             time_event = TimeEvent.from_dict(body)
         except KeyError as e:
@@ -208,7 +215,7 @@ class TimeEventView(View):
             raise e from e
 
         time_event_id = self.request.match_info["time_eventId"]
-        logging.debug(f"Got delete request for time_event {time_event_id}")
+        self.logger.debug(f"Got delete request for time_event {time_event_id}")
 
         try:
             time_event: TimeEvent = await TimeEventsAdapter.get_time_event_by_id(

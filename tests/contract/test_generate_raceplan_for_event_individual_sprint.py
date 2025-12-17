@@ -29,6 +29,8 @@ DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
+logger = logging.getLogger(__name__)
+
 
 @pytest.fixture(autouse=True)
 async def token(http_service: Any) -> str:
@@ -44,32 +46,32 @@ async def token(http_service: Any) -> str:
         body = await response.json()
     await session.close()
     if response.status != HTTPStatus.OK:
-        logging.error(f"Got unexpected status {response.status} from {http_service}.")
+        logger.error(f"Got unexpected status {response.status} from {http_service}.")
     return body["token"]
 
 
 @pytest.fixture(autouse=True)
 async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
-    logging.info(" --- Cleaning db at startup. ---")
+    logger.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
         await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
     except Exception as error:
-        logging.exception(f"Failed to drop database {DB_NAME}.")
+        logger.exception(f"Failed to drop database {DB_NAME}.")
         raise error from error
-    logging.info(" --- Testing starts. ---")
+    logger.info(" --- Testing starts. ---")
     yield
-    logging.info(" --- Testing finished. ---")
-    logging.info(" --- Cleaning db after testing. ---")
+    logger.info(" --- Testing finished. ---")
+    logger.info(" --- Cleaning db after testing. ---")
     try:
         await db_utils.drop_db(mongo, DB_NAME)
     except Exception as error:
-        logging.exception(f"Failed to drop database {DB_NAME}.")
+        logger.exception(f"Failed to drop database {DB_NAME}.")
         raise error from error
-    logging.info(" --- Cleaning db done. ---")
+    logger.info(" --- Cleaning db done. ---")
 
 
 @pytest.mark.contract
@@ -125,13 +127,13 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_J10_17.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 body = await response.json()
                 if response.status != HTTPStatus.OK:
                     body = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {body}."
                     )
                 assert status == HTTPStatus.OK
@@ -175,11 +177,9 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
                 body = await response.json()
-                logging.error(f"Got body {body}.")
+                logger.error(f"Got body {body}.")
 
         # ASSERT
 
@@ -288,11 +288,11 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
                 url, headers=headers, json=request_body
             ) as response:
                 if response.status != HTTPStatus.CREATED:
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status} from {http_service}."
                     )
                     body = await response.json()
-                    logging.error(f"Got body {body}.")
+                    logger.error(f"Got body {body}.")
                 assert response.status == HTTPStatus.CREATED
                 # return the event_id, which is the last item of the path
                 event_id = response.headers[hdrs.LOCATION].split("/")[-1]
@@ -303,13 +303,13 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_J11_17.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 body = await response.json()
                 if response.status != HTTPStatus.OK:
                     body = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {body}."
                     )
                 assert status == HTTPStatus.OK
@@ -352,11 +352,9 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
                 body = await response.json()
-                logging.error(f"Got body {body}.")
+                logger.error(f"Got body {body}.")
 
         # ASSERT
 
@@ -455,11 +453,11 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
                 url, headers=headers, json=request_body
             ) as response:
                 if response.status != HTTPStatus.CREATED:
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status} from {http_service}."
                     )
                     body = await response.json()
-                    logging.error(f"Got body {body}.")
+                    logger.error(f"Got body {body}.")
                 assert response.status == HTTPStatus.CREATED
                 # return the event_id, which is the last item of the path
                 event_id = response.headers[hdrs.LOCATION].split("/")[-1]
@@ -470,13 +468,13 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_G11_10.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 body = await response.json()
                 if response.status != HTTPStatus.OK:
                     body = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {body}."
                     )
                 assert status == HTTPStatus.OK
@@ -519,11 +517,9 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
                 body = await response.json()
-                logging.error(f"Got body {body}.")
+                logger.error(f"Got body {body}.")
 
         # ASSERT
 
@@ -622,11 +618,11 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
                 url, headers=headers, json=request_body
             ) as response:
                 if response.status != HTTPStatus.CREATED:
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status} from {http_service}."
                     )
                     body = await response.json()
-                    logging.error(f"Got body {body}.")
+                    logger.error(f"Got body {body}.")
 
                 assert response.status == HTTPStatus.CREATED
                 # return the event_id, which is the last item of the path
@@ -638,13 +634,13 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_all.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 body = await response.json()
                 if response.status != HTTPStatus.OK:
                     body = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {body}."
                     )
                 assert status == HTTPStatus.OK
@@ -688,11 +684,9 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
                 body = await response.json()
-                logging.error(f"Got body {body}.")
+                logger.error(f"Got body {body}.")
 
         # ASSERT:
 
@@ -796,11 +790,11 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
                 url, headers=headers, json=request_body
             ) as response:
                 if response.status != HTTPStatus.CREATED:
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status} from {http_service}."
                     )
                     body = await response.json()
-                    logging.error(f"Got body {body}.")
+                    logger.error(f"Got body {body}.")
                 assert response.status == HTTPStatus.CREATED
                 # return the event_id, which is the last item of the path
                 event_id = response.headers[hdrs.LOCATION].split("/")[-1]
@@ -811,13 +805,13 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_G11_7.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 body = await response.json()
                 if response.status != HTTPStatus.OK:
                     body = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {body}."
                     )
                 assert status == HTTPStatus.OK
@@ -860,11 +854,9 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
                 body = await response.json()
-                logging.error(f"Got body {body}.")
+                logger.error(f"Got body {body}.")
 
         # ASSERT
 

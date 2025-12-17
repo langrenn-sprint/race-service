@@ -29,6 +29,8 @@ DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
+logger = logging.getLogger(__name__)
+
 # ARRANGE
 
 
@@ -48,7 +50,7 @@ async def token(http_service: Any) -> str:
         startlist = await response.json()
 
     if response.status != HTTPStatus.OK:
-        logging.error(f"Got unexpected status {response.status} from {http_service}.")
+        logger.error(f"Got unexpected status {response.status} from {http_service}.")
     assert response.status == HTTPStatus.OK
 
     return startlist["token"]
@@ -57,25 +59,25 @@ async def token(http_service: Any) -> str:
 @pytest.fixture(scope="module", autouse=True)
 async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
-    logging.info(" --- Cleaning db at startup. ---")
+    logger.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
         await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
     except Exception as error:
-        logging.exception(f"Failed to drop database {DB_NAME}.")
+        logger.exception(f"Failed to drop database {DB_NAME}.")
         raise error from error
-    logging.info(" --- Testing starts. ---")
+    logger.info(" --- Testing starts. ---")
     yield
-    logging.info(" --- Testing finished. ---")
-    logging.info(" --- Cleaning db after testing. ---")
+    logger.info(" --- Testing finished. ---")
+    logger.info(" --- Cleaning db after testing. ---")
     try:
         await db_utils.drop_db(mongo, DB_NAME)
     except Exception as error:
-        logging.exception(f"Failed to drop database {DB_NAME}.")
+        logger.exception(f"Failed to drop database {DB_NAME}.")
         raise error from error
-    logging.info(" --- Cleaning db done. ---")
+    logger.info(" --- Cleaning db done. ---")
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -99,7 +101,7 @@ async def context(
             ) as response:
                 if response.status != HTTPStatus.CREATED:
                     startlist = await response.json()
-                    logging.error(
+                    logger.error(
                         f"When creating competition-format, got error {startlist}"
                     )
                 assert response.status == HTTPStatus.CREATED
@@ -127,13 +129,13 @@ async def context(
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_all.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 startlist = await response.json()
                 if response.status != HTTPStatus.OK:
                     startlist = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {startlist}."
                     )
                 assert status == HTTPStatus.OK
@@ -187,7 +189,7 @@ async def context(
         ) as response:
             if response.status != HTTPStatus.CREATED:
                 startlist = await response.json()
-                logging.error(
+                logger.error(
                     f"Got unexpected status {response.status}, reason {startlist}."
                 )
             assert response.status == HTTPStatus.CREATED
@@ -196,7 +198,7 @@ async def context(
         async with session.get(url) as response:
             if response.status != HTTPStatus.OK:
                 startlist = await response.json()
-                logging.error(
+                logger.error(
                     f"Got unexpected status {response.status}, reason {startlist}."
                 )
             assert response.status == HTTPStatus.OK
@@ -209,7 +211,7 @@ async def context(
         ) as response:
             if response.status != HTTPStatus.CREATED:
                 startlist = await response.json()
-                logging.error(
+                logger.error(
                     f"Got unexpected status {response.status}, reason {startlist}."
                 )
             assert response.status == HTTPStatus.CREATED
@@ -875,7 +877,7 @@ async def delete_competition_formats(token: MockFixture) -> None:
                     f"{url}/{competition_format['id']}", headers=headers
                 ) as delete_response:
                     assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all competition_formats.")
+    logger.info("Clear_db: Deleted all competition_formats.")
 
 
 async def delete_events(token: MockFixture) -> None:
@@ -894,7 +896,7 @@ async def delete_events(token: MockFixture) -> None:
                     f"{url}/{event['id']}", headers=headers
                 ) as delete_response:
                     assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all events.")
+    logger.info("Clear_db: Deleted all events.")
 
 
 async def delete_contestants(token: MockFixture) -> None:
@@ -913,7 +915,7 @@ async def delete_contestants(token: MockFixture) -> None:
                     f"{url}/{event['id']}/contestants", headers=headers
                 ) as delete_response:
                     assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all contestants.")
+    logger.info("Clear_db: Deleted all contestants.")
 
 
 async def delete_raceclasses(token: MockFixture) -> None:
@@ -939,7 +941,7 @@ async def delete_raceclasses(token: MockFixture) -> None:
                             headers=headers,
                         ) as delete_response:
                             assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all raceclasses.")
+    logger.info("Clear_db: Deleted all raceclasses.")
 
 
 async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
@@ -958,7 +960,7 @@ async def delete_raceplans(http_service: Any, token: MockFixture) -> None:
                 f"{url}/{raceplan_id}", headers=headers
             ) as delete_response:
                 assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all raceplans.")
+    logger.info("Clear_db: Deleted all raceplans.")
 
 
 async def delete_startlists(http_service: Any, token: MockFixture) -> None:
@@ -977,7 +979,7 @@ async def delete_startlists(http_service: Any, token: MockFixture) -> None:
                 f"{url}/{startlist_id}", headers=headers
             ) as delete_response:
                 assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all startlists.")
+    logger.info("Clear_db: Deleted all startlists.")
 
 
 async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
@@ -997,7 +999,7 @@ async def delete_start_entries(http_service: Any, token: MockFixture) -> None:
                     headers=headers,
                 ) as delete_response:
                     assert delete_response.status == HTTPStatus.NO_CONTENT
-    logging.info("Clear_db: Deleted all start_entries.")
+    logger.info("Clear_db: Deleted all start_entries.")
 
 
 async def _decide_group_order_and_ranking(  # noqa: C901

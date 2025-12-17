@@ -29,6 +29,8 @@ DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
+logger = logging.getLogger(__name__)
+
 
 @pytest.fixture(scope="module", autouse=True)
 async def token(http_service: Any) -> str:
@@ -46,7 +48,7 @@ async def token(http_service: Any) -> str:
         assert response.status == HTTPStatus.OK
         body = await response.json()
         if response.status != HTTPStatus.OK:
-            logging.error(
+            logger.error(
                 f"Got unexpected status {response.status} from {http_service}."
             )
     return body["token"]
@@ -55,25 +57,25 @@ async def token(http_service: Any) -> str:
 @pytest.fixture(scope="module", autouse=True)
 async def clear_db() -> AsyncGenerator:
     """Clear db before and after tests."""
-    logging.info(" --- Cleaning db at startup. ---")
+    logger.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
         host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
     )
     try:
         await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
     except Exception as error:
-        logging.exception(f"Failed to drop database {DB_NAME}.")
+        logger.exception(f"Failed to drop database {DB_NAME}.")
         raise error from error
-    logging.info(" --- Testing starts. ---")
+    logger.info(" --- Testing starts. ---")
     yield
-    logging.info(" --- Testing finished. ---")
-    logging.info(" --- Cleaning db after testing. ---")
+    logger.info(" --- Testing finished. ---")
+    logger.info(" --- Cleaning db after testing. ---")
     try:
         await db_utils.drop_db(mongo, DB_NAME)
     except Exception as error:
-        logging.exception(f"Failed to drop database {DB_NAME}.")
+        logger.exception(f"Failed to drop database {DB_NAME}.")
         raise error from error
-    logging.info(" --- Cleaning db done. ---")
+    logger.info(" --- Cleaning db done. ---")
 
 
 @pytest.fixture(scope="module")
@@ -109,7 +111,7 @@ async def test_generate_startlist_for_individual_sprint_event(
             ) as response:
                 if response.status != HTTPStatus.CREATED:
                     body = await response.json()
-                    logging.error(f"When creating competition-format, got error {body}")
+                    logger.error(f"When creating competition-format, got error {body}")
                 assert response.status == HTTPStatus.CREATED
 
         # Next we create the event:
@@ -135,13 +137,13 @@ async def test_generate_startlist_for_individual_sprint_event(
         }
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
         with open("tests/files/contestants_all.csv", "rb") as file:
-            logging.debug(f"Adding contestants from file at url {url}.")
+            logger.debug(f"Adding contestants from file at url {url}.")
             async with session.post(url, headers=headers, data=file) as response:
                 status = response.status
                 no_of_contestants_added = await response.json()
                 if response.status != HTTPStatus.OK:
                     body = await response.json()
-                    logging.error(
+                    logger.error(
                         f"Got unexpected status {response.status}, reason {body}."
                     )
                 assert status == HTTPStatus.OK
@@ -204,9 +206,7 @@ async def test_generate_startlist_for_individual_sprint_event(
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
             assert response.status == HTTPStatus.CREATED
             assert "/raceplans/" in response.headers[hdrs.LOCATION]
         # Get the raceplan for debugging purposes:
@@ -214,9 +214,7 @@ async def test_generate_startlist_for_individual_sprint_event(
         async with session.get(url) as response:
             if response.status != HTTPStatus.OK:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
             assert response.status == HTTPStatus.OK
             raceplan = await response.json()
 
@@ -230,9 +228,7 @@ async def test_generate_startlist_for_individual_sprint_event(
         async with session.post(url, headers=headers, json=request_body) as response:
             if response.status != HTTPStatus.CREATED:
                 body = await response.json()
-                logging.error(
-                    f"Got unexpected status {response.status}, reason {body}."
-                )
+                logger.error(f"Got unexpected status {response.status}, reason {body}.")
             assert response.status == HTTPStatus.CREATED
             assert "/startlists/" in response.headers[hdrs.LOCATION]
 

@@ -51,6 +51,8 @@ BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
 class StartEntriesView(View):
     """Class representing start_entries resource."""
 
+    logger = logging.getLogger("race_service.views.start_entries.StartEntriesView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
@@ -86,7 +88,9 @@ class StartEntriesView(View):
             raise e from e
 
         body = await self.request.json()
-        logging.debug(f"Got create request for start_entry {body} of type {type(body)}")
+        self.logger.debug(
+            f"Got create request for start_entry {body} of type {type(body)}"
+        )
         try:
             new_start_entry = StartEntry.from_dict(body)
         except KeyError as e:
@@ -140,7 +144,8 @@ class StartEntriesView(View):
 
             # If the race is in first round, we need to add to the raceplan's no_of_contestants:
             competition_format = await EventsAdapter.get_competition_format(
-                token=token, event_id=race.event_id # type: ignore [reportArgumentType]
+                token=token,  # type: ignore [reportArgumentType]
+                event_id=race.event_id,
             )
             first_rounds = [
                 competition_format["rounds_ranked_classes"][0],
@@ -151,7 +156,7 @@ class StartEntriesView(View):
                     db, race.raceplan_id
                 )
                 raceplan.no_of_contestants += 1
-                await RaceplansService.update_raceplan(db, raceplan.id, raceplan) # type: ignore [reportArgumentType]
+                await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore [reportArgumentType]
 
             # We also need to add the start-entry to the startlist
             # and add the start_entry to it's no_of_contestants
@@ -167,7 +172,7 @@ class StartEntriesView(View):
             CouldNotCreateStartEntryError,
         ) as e:
             raise HTTPBadRequest(reason=str(e)) from e
-        logging.debug(f"inserted document with start_entry_id {start_entry_id}")
+        self.logger.debug(f"inserted document with start_entry_id {start_entry_id}")
 
         headers = MultiDict(
             [
@@ -184,12 +189,14 @@ class StartEntriesView(View):
 class StartEntryView(View):
     """Class representing a single start_entry resource."""
 
+    logger = logging.getLogger("race_service.views.start_entries.StartEntryView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
 
         start_entry_id = self.request.match_info["startEntryId"]
-        logging.debug(f"Got get request for start_entry {start_entry_id}")
+        self.logger.debug(f"Got get request for start_entry {start_entry_id}")
 
         try:
             start_entry = await StartEntriesAdapter.get_start_entry_by_id(
@@ -197,7 +204,7 @@ class StartEntryView(View):
             )
         except StartEntryNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
-        logging.debug(f"Got start_entry: {start_entry}")
+        self.logger.debug(f"Got start_entry: {start_entry}")
         body = start_entry.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
@@ -214,11 +221,13 @@ class StartEntryView(View):
 
         body = await self.request.json()
         start_entry_id = self.request.match_info["startEntryId"]
-        logging.debug(
+        self.logger.debug(
             f"Got request-body {body} for {start_entry_id} of type {type(body)}"
         )
         body = await self.request.json()
-        logging.debug(f"Got put request for start_entry {body} of type {type(body)}")
+        self.logger.debug(
+            f"Got put request for start_entry {body} of type {type(body)}"
+        )
         try:
             start_entry = StartEntry.from_dict(body)
         except KeyError as e:
@@ -248,7 +257,7 @@ class StartEntryView(View):
             raise e from e
 
         start_entry_for_deletion_id = self.request.match_info["startEntryId"]
-        logging.debug(
+        self.logger.debug(
             f"Got delete request for start_entry {start_entry_for_deletion_id}"
         )
 
@@ -280,7 +289,8 @@ class StartEntryView(View):
 
             # If the race is in first round, we need to subract from the raceplan's no_of_contestants:
             competition_format = await EventsAdapter.get_competition_format(
-                token=token, event_id=race.event_id # type: ignore [reportArgumentType]
+                token=token,  # type: ignore [reportArgumentType]
+                event_id=race.event_id,
             )
             first_rounds = [
                 competition_format["rounds_ranked_classes"][0],
@@ -291,7 +301,7 @@ class StartEntryView(View):
                     db, race.raceplan_id
                 )
                 raceplan.no_of_contestants -= 1
-                await RaceplansService.update_raceplan(db, raceplan.id, raceplan) # type: ignore [reportArgumentType]
+                await RaceplansService.update_raceplan(db, raceplan.id, raceplan)  # type: ignore [reportArgumentType]
 
             # We also need to remove the start-entry from the startlist,
             # and subtract the start_entry from it's no_of_contestants
@@ -313,7 +323,7 @@ class StartEntryView(View):
             ]
             startlist.start_entries = new_start_entries
             startlist.no_of_contestants += -1
-            await StartlistsService.update_startlist(db, startlist.id, startlist) # type: ignore [reportArgumentType]
+            await StartlistsService.update_startlist(db, startlist.id, startlist)  # type: ignore [reportArgumentType]
 
             # We can finally delete the start-entry:
             await StartEntriesService.delete_start_entry(

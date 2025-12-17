@@ -43,6 +43,8 @@ BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
 class RaceResultsView(View):
     """Class representing race_results resource."""
 
+    logger = logging.getLogger("race_service.views.race_results.RaceResultsView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
@@ -93,12 +95,14 @@ class RaceResultsView(View):
 class RaceResultView(View):
     """Class representing a single race_result resource."""
 
+    logger = logging.getLogger("race_service.views.race_results.RaceResultView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
 
         race_result_id = self.request.match_info["raceResultId"]
-        logging.debug(f"Got get request for race_result {race_result_id}")
+        self.logger.debug(f"Got get request for race_result {race_result_id}")
 
         try:
             race_result = await RaceResultsAdapter.get_race_result_by_id(
@@ -122,10 +126,10 @@ class RaceResultView(View):
                 reverse=False,
             )
 
-            race_result.ranking_sequence = time_events_sorted # type: ignore [reportAttributeAccessIssue]
+            race_result.ranking_sequence = time_events_sorted  # type: ignore [reportAttributeAccessIssue]
         except RaceResultNotFoundError as e:
             raise HTTPNotFound(reason=str(e)) from e
-        logging.debug(f"Got race_result: {race_result}")
+        self.logger.debug(f"Got race_result: {race_result}")
         body = race_result.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
@@ -140,11 +144,13 @@ class RaceResultView(View):
 
         body = await self.request.json()
         race_result_id = self.request.match_info["raceResultId"]
-        logging.debug(
+        self.logger.debug(
             f"Got request-body {body} for {race_result_id} of type {type(body)}"
         )
         body = await self.request.json()
-        logging.debug(f"Got put request for race_result {body} of type {type(body)}")
+        self.logger.debug(
+            f"Got put request for race_result {body} of type {type(body)}"
+        )
         try:
             race_result = RaceResult.from_dict(body)
         except KeyError as e:
@@ -170,7 +176,7 @@ class RaceResultView(View):
             raise e from e
 
         race_result_for_deletion_id = self.request.match_info["raceResultId"]
-        logging.debug(
+        self.logger.debug(
             f"Got delete request for race_result {race_result_for_deletion_id}"
         )
 
