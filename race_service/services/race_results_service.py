@@ -56,6 +56,10 @@ class ContestantNotInStartEntriesError(Exception):
 class RaceResultsService:
     """Class representing a service for race_results."""
 
+    logger = logging.getLogger(
+        "race_service.services.race_results_service.RaceResultsService"
+    )
+
     @classmethod
     async def update_race_result(
         cls: Any, db: Any, id_: str, race_result: RaceResult
@@ -129,7 +133,7 @@ class RaceResultsService:
                     ranking_sequence=[],
                     status=RaceResultStatus.UNOFFICIAL.value,
                 )
-                logging.debug(f"Create race result for {race_result}")
+                cls.logger.debug(f"Create race result for {race_result}")
                 await RaceResultsAdapter.create_race_result(db, race_result)
             else:
                 race_result = race_results[0]

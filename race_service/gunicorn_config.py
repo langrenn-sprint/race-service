@@ -13,7 +13,6 @@ from pythonjsonlogger.json import JsonFormatter
 load_dotenv()
 
 HOST_PORT = env.get("HOST_PORT", "8080")
-DEBUG_MODE = env.get("DEBUG_MODE", False)
 LOGGING_LEVEL = env.get("LOGGING_LEVEL", "INFO")
 
 # Gunicorn config
@@ -39,12 +38,12 @@ class StackdriverJsonFormatter(JsonFormatter):
         """Init function."""
         JsonFormatter.__init__(self, *args, **kwargs, fmt=fmt, style=style)
 
-    def process_log_record(self, log_record: dict) -> dict:
+    def process_log_record(self, log_data: dict) -> dict:
         """Process log record."""
-        log_record["severity"] = log_record["levelname"]
-        del log_record["levelname"]
-        log_record["serviceContext"] = {"service": "race-service"}
-        return super().process_log_record(log_record)
+        log_data["severity"] = log_data["levelname"]
+        del log_data["levelname"]
+        log_data["serviceContext"] = {"service": "race-service"}
+        return super().process_log_record(log_data)
 
 
 # Override the logger to remove healthcheck (ping) from the access log and format logs as json

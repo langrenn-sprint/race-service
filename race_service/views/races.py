@@ -48,6 +48,8 @@ BASE_URL = f"http://{HOST_SERVER}:{HOST_PORT}"
 class RacesView(View):
     """Class representing races resource."""
 
+    logger = logging.getLogger("race_service.views.races.RacesView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
@@ -62,7 +64,7 @@ class RacesView(View):
                 if races:
                     for race in races:
                         # Get the start_entries:
-                        race.start_entries = await get_start_entries( # type: ignore [reportAttributeAccessIssue]
+                        race.start_entries = await get_start_entries(  # type: ignore [reportAttributeAccessIssue]
                             db, race.start_entries
                         )
                         # Get the race_results:
@@ -79,12 +81,14 @@ class RacesView(View):
 class RaceView(View):
     """Class representing a single race resource."""
 
+    logger = logging.getLogger("race_service.views.races.RaceView")
+
     async def get(self) -> Response:
         """Get route function."""
         db = self.request.app["db"]
 
         race_id = self.request.match_info["raceId"]
-        logging.debug(f"Got get request for race {race_id}")
+        self.logger.debug(f"Got get request for race {race_id}")
 
         try:
             race = await RacesAdapter.get_race_by_id(db, race_id)
@@ -96,7 +100,7 @@ class RaceView(View):
             raise HTTPNotFound(reason=str(e)) from e
         except NotSupportedRaceDatatypeError as e:
             raise HTTPInternalServerError(reason=str(e)) from e
-        logging.debug(f"Got race: {race}")
+        self.logger.debug(f"Got race: {race}")
         body = race.to_json()
         return Response(status=200, body=body, content_type="application/json")
 
@@ -111,9 +115,9 @@ class RaceView(View):
 
         body = await self.request.json()
         race_id = self.request.match_info["raceId"]
-        logging.debug(f"Got request-body {body} for {race_id} of type {type(body)}")
+        self.logger.debug(f"Got request-body {body} for {race_id} of type {type(body)}")
         body = await self.request.json()
-        logging.debug(f"Got put request for race {body} of type {type(body)}")
+        self.logger.debug(f"Got put request for race {body} of type {type(body)}")
         race: IndividualSprintRace | IntervalStartRace
         try:
             if body["datatype"] == "individual_sprint":
@@ -147,7 +151,7 @@ class RaceView(View):
             raise e from e
 
         race_id = self.request.match_info["raceId"]
-        logging.debug(f"Got delete request for race {race_id}")
+        self.logger.debug(f"Got delete request for race {race_id}")
 
         try:
             await RacesService.delete_race(db, race_id)

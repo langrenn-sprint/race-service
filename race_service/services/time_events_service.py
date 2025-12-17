@@ -38,6 +38,10 @@ class TimeEventAllreadyExistError(Exception):
 class TimeEventsService:
     """Class representing a service for time_events."""
 
+    logger = logging.getLogger(
+        "race_service.services.time_events_service.TimeEventsService"
+    )
+
     @classmethod
     async def create_time_event(cls: Any, db: Any, time_event: TimeEvent) -> str:
         """Create time_event function.
@@ -54,7 +58,7 @@ class TimeEventsService:
             IllegalValueError: input object has illegal values
             TimeEventAllreadyExistError: time_event for bib and given timing-point already exists
         """
-        logging.debug(f"trying to insert time_event: {time_event}")
+        cls.logger.debug(f"trying to insert time_event: {time_event}")
         # Validation:
         await validate_time_event(db, time_event)
         if time_event.id:
@@ -62,7 +66,8 @@ class TimeEventsService:
             raise IllegalValueError(msg)
         # If time-event for bib and given timing-point already exists in the race, throw error:
         _time_events = await TimeEventsAdapter.get_time_events_by_race_id(
-            db, time_event.race_id # type: ignore [reportArgumentType]
+            db,
+            time_event.race_id,  # type: ignore [reportArgumentType]
         )
         for _time_event in _time_events:
             if (
@@ -79,9 +84,9 @@ class TimeEventsService:
         id_ = create_id()
         time_event.id = id_
         # insert new time_event
-        logging.debug(f"new time_event: {time_event}")
+        cls.logger.debug(f"new time_event: {time_event}")
         result = await TimeEventsAdapter.create_time_event(db, time_event)
-        logging.debug(f"inserted time_event with id: {id_}")
+        cls.logger.debug(f"inserted time_event with id: {id_}")
         if result:
             return id_
         msg = "Creation of time-event failed."

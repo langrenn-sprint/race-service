@@ -27,6 +27,8 @@ class CouldNotCreateStartEntryError(Exception):
 class StartEntriesService:
     """Class representing a service for start_entries."""
 
+    logger = logging.getLogger("race_service.services.start_entries_service")
+
     @classmethod
     async def create_start_entry(cls: Any, db: Any, start_entry: StartEntry) -> str:
         """Create start_entry function.
@@ -42,7 +44,7 @@ class StartEntriesService:
             IllegalValueError: input object has illegal values
             CouldNotCreateStartEntryError: creation failed
         """
-        logging.debug(f"trying to insert start_entry: {start_entry}")
+        cls.logger.debug(f"trying to insert start_entry: {start_entry}")
         # Validation:
         await validate_start_entry(db, start_entry)
         if start_entry.id:
@@ -52,9 +54,9 @@ class StartEntriesService:
         start_entry_id = create_id()
         start_entry.id = start_entry_id
         # insert new start_entry
-        logging.debug(f"new start_entry: {start_entry}")
+        cls.logger.debug(f"new start_entry: {start_entry}")
         result = await StartEntriesAdapter.create_start_entry(db, start_entry)
-        logging.debug(f"inserted start_entry with id: {start_entry_id}")
+        cls.logger.debug(f"inserted start_entry with id: {start_entry_id}")
         if result:
             return start_entry_id
         msg = "Creation of start-entry failed."

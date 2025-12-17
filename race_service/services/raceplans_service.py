@@ -27,6 +27,8 @@ class RaceplanAllreadyExistError(Exception):
 class RaceplansService:
     """Class representing a service for raceplans."""
 
+    logger = logging.getLogger("race_service.raceplans_service.RaceplansService")
+
     @classmethod
     async def create_raceplan(cls: Any, db: Any, raceplan: Raceplan) -> str | None:
         """Create raceplan function.
@@ -42,13 +44,13 @@ class RaceplansService:
             IllegalValueError: input object has illegal values
             RaceplanAllreadyExistError: event can have zero or one plan
         """
-        logging.debug(f"trying to insert raceplan: {raceplan}")
+        cls.logger.debug(f"trying to insert raceplan: {raceplan}")
         # Event can have one, and only, one raceplan:
         existing_rps: list[Raceplan] = []
         existing_rps = await RaceplansAdapter.get_raceplans_by_event_id(
             db, raceplan.event_id
         )
-        logging.debug(f"existing_rps: {existing_rps}")
+        cls.logger.debug(f"existing_rps: {existing_rps}")
         if len(existing_rps) > 0:
             msg = f'Event "{raceplan.event_id}!r" already has a raceplan.'
             raise RaceplanAllreadyExistError(msg)
@@ -59,9 +61,9 @@ class RaceplansService:
         id_ = create_id()
         raceplan.id = id_
         # insert new raceplan
-        logging.debug(f"new_raceplan: {raceplan}")
+        cls.logger.debug(f"new_raceplan: {raceplan}")
         result = await RaceplansAdapter.create_raceplan(db, raceplan)
-        logging.debug(f"inserted raceplan with id: {id_}")
+        cls.logger.debug(f"inserted raceplan with id: {id_}")
         if result:
             return id_
         return None
