@@ -72,4 +72,3 @@ async def test_get_raceclass_by_name_not_found_via_mocker(
 
     assert f'Raceclass "{name}" not found' in str(exc_info.value)
     assert event_id in str(exc_info.value)
-
