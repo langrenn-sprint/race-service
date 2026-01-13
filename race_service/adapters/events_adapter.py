@@ -3,6 +3,7 @@
 import os
 from http import HTTPStatus
 from typing import Any
+from urllib.parse import quote
 
 from aiohttp import ClientSession
 from aiohttp.web import (
@@ -44,6 +45,11 @@ class RaceclassesNotFoundError(Exception):
 
 class RaceclassNotFoundError(Exception):
     """Class representing custom exception for get method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
 
 
 class ContestantsNotFoundError(Exception):
@@ -157,7 +163,7 @@ class EventsAdapter:
         del token  # for now we do not use token
         url = (
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses?name={name}"
+            f"/events/{event_id}/raceclasses?name={quote(name)}"
         )
 
         async with ClientSession() as session, session.get(url) as response:
