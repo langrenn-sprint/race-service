@@ -6,6 +6,7 @@ from .events_adapter import (
     EventNotFoundError,
     EventsAdapter,
     RaceclassesNotFoundError,
+    RaceclassNotFoundError,
 )
 from .race_results_adapter import RaceResultNotFoundError, RaceResultsAdapter
 from .raceplans_adapter import RaceplanNotFoundError, RaceplansAdapter
@@ -29,6 +30,7 @@ __all__ = [
     "RaceResultNotFoundError",
     "RaceResultsAdapter",
     "RaceclassesNotFoundError",
+    "RaceclassNotFoundError",
     "RaceplanNotFoundError",
     "RaceplansAdapter",
     "RacesAdapter",

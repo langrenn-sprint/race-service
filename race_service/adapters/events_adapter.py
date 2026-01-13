@@ -42,6 +42,15 @@ class RaceclassesNotFoundError(Exception):
         super().__init__(message)
 
 
+class RaceclassNotFoundError(Exception):
+    """Class representing custom exception for get method."""
+
+    def __init__(self, message: str) -> None:
+        """Initialize the error."""
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+
 class ContestantsNotFoundError(Exception):
     """Class representing custom exception for get method."""
 
@@ -141,6 +150,32 @@ class EventsAdapter:
                 reason=(
                     "Got unknown status from events service"
                     f"when getting raceclasses for event {event_id}:"
+                    f"{response.status}."
+                )
+            ) from None
+
+    @classmethod
+    async def get_raceclass_by_name(
+        cls: Any, token: str, event_id: str, name: str
+    ) -> dict:  # pragma: no cover
+        """Get a raceclass by name from event-service."""
+        del token  # for now we do not use token
+        url = (
+            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
+            f"/events/{event_id}/raceclasses?name={name}"
+        )
+
+        async with ClientSession() as session, session.get(url) as response:
+            if response.status == HTTPStatus.OK:
+                raceclasses = await response.json()
+                if len(raceclasses) == 0:
+                    msg = f'Raceclass "{name}" not found for event {event_id}.'
+                    raise RaceclassNotFoundError(msg)
+                return raceclasses[0]
+            raise HTTPInternalServerError(
+                reason=(
+                    "Got unknown status from events service "
+                    f'when getting raceclass "{name}" for event {event_id}: '
                     f"{response.status}."
                 )
             ) from None
