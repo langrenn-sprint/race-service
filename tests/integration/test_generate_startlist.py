@@ -1022,7 +1022,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceclass
         assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert (
-            "len(contestants) does not match number of contestants in raceclasses"
+            "Number of contestants in event does not match number of contestants in raceclasses"
             in body["detail"]
         )
 
@@ -1098,7 +1098,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_raceplan(
         assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert (
-            "len(contestants) does not match number of contestants in raceplan"
+            "Number of contestants in event does not match number of contestants in raceplan"
             in body["detail"]
         )
 
@@ -1179,7 +1179,7 @@ async def test_generate_startlist_for_event_no_contestants_differ_from_races(
         assert resp.status == HTTPStatus.BAD_REQUEST
         body = await resp.json()
         assert (
-            "len(contestants) does not match sum of contestants in races"
+            "Number of contestants in event does not match sum of contestants in races"
             in body["detail"]
         )
 

@@ -82,14 +82,14 @@ async def generate_startlist_for_event(  # noqa: C901
     )
     if len(contestants) != no_of_contestants_in_raceclasses:
         msg = (
-            "len(contestants) does not match number of contestants in raceclasses:"
+            "Number of contestants in event does not match number of contestants in raceclasses:"
             f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
         )
         raise InconsistentInputDataError(msg)
     if len(contestants) != raceplan.no_of_contestants:
         msg = (
-            "len(contestants) does not match number of contestants in raceplan:"
-            f"{len(contestants)} != {no_of_contestants_in_raceclasses}."
+            "Number of contestants in event does not match number of contestants in raceplan:"
+            f"{len(contestants)} != {raceplan.no_of_contestants}."
         )
         raise InconsistentInputDataError(msg)
 
@@ -285,7 +285,7 @@ async def generate_start_entries_for_interval_start(
     no_of_contestants_in_races = sum(race.no_of_contestants for race in races)
     if len(contestants) != no_of_contestants_in_races:
         msg = (
-            "len(contestants) does not match sum of contestants in races:"
+            "Number of contestants in event does not match sum of contestants in races:"
             f"{len(contestants)} != {no_of_contestants_in_races}."
         )
         raise InconsistentInputDataError(msg)
