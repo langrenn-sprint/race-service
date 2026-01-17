@@ -5,25 +5,15 @@
   "time_between_groups": "00:10:00",
   "time_between_rounds": "00:05:00",
   "time_between_heats": "00:02:30",
-  "rounds_ranked_classes": [
-    "Q",
-    "S",
-    "F"
-  ],
-  "rounds_non_ranked_classes": [
-    "R1",
-    "R2"
-  ],
+  "rounds_ranked_classes": ["Q", "S", "F"],
+  "rounds_non_ranked_classes": ["R1", "R2"],
   "max_no_of_contestants_in_raceclass": 80,
   "max_no_of_contestants_in_race": 10,
   "datatype": "individual_sprint",
   "race_config_non_ranked": [
     {
       "max_no_of_contestants": 8,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 1
@@ -44,10 +34,7 @@
     },
     {
       "max_no_of_contestants": 16,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 2
@@ -68,10 +55,7 @@
     },
     {
       "max_no_of_contestants": 24,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 3
@@ -92,10 +76,7 @@
     },
     {
       "max_no_of_contestants": 32,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 4
@@ -116,10 +97,7 @@
     },
     {
       "max_no_of_contestants": 40,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 6
@@ -140,10 +118,7 @@
     },
     {
       "max_no_of_contestants": 48,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 6
@@ -164,10 +139,7 @@
     },
     {
       "max_no_of_contestants": 56,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 7
@@ -188,10 +160,7 @@
     },
     {
       "max_no_of_contestants": 80,
-      "rounds": [
-        "R1",
-        "R2"
-      ],
+      "rounds": ["R1", "R2"],
       "no_of_heats": {
         "R1": {
           "A": 8
@@ -214,10 +183,7 @@
   "race_config_ranked": [
     {
       "max_no_of_contestants": 8,
-      "rounds": [
-        "Q",
-        "F"
-      ],
+      "rounds": ["Q", "F"],
       "no_of_heats": {
         "Q": {
           "A": 1
@@ -246,10 +212,7 @@
     },
     {
       "max_no_of_contestants": 16,
-      "rounds": [
-        "Q",
-        "F"
-      ],
+      "rounds": ["Q", "F"],
       "no_of_heats": {
         "Q": {
           "A": 2
@@ -278,11 +241,7 @@
     },
     {
       "max_no_of_contestants": 24,
-      "rounds": [
-        "Q",
-        "S",
-        "F"
-      ],
+      "rounds": ["Q", "S", "F"],
       "no_of_heats": {
         "Q": {
           "A": 3
@@ -326,11 +285,7 @@
     },
     {
       "max_no_of_contestants": 32,
-      "rounds": [
-        "Q",
-        "S",
-        "F"
-      ],
+      "rounds": ["Q", "S", "F"],
       "no_of_heats": {
         "Q": {
           "A": 4
@@ -371,11 +326,7 @@
     },
     {
       "max_no_of_contestants": 40,
-      "rounds": [
-        "Q",
-        "S",
-        "F"
-      ],
+      "rounds": ["Q", "S", "F"],
       "no_of_heats": {
         "Q": {
           "A": 6
@@ -416,11 +367,7 @@
     },
     {
       "max_no_of_contestants": 48,
-      "rounds": [
-        "Q",
-        "S",
-        "F"
-      ],
+      "rounds": ["Q", "S", "F"],
       "no_of_heats": {
         "Q": {
           "A": 6
@@ -461,11 +408,7 @@
     },
     {
       "max_no_of_contestants": 56,
-      "rounds": [
-        "Q",
-        "S",
-        "F"
-      ],
+      "rounds": ["Q", "S", "F"],
       "no_of_heats": {
         "Q": {
           "A": 7
@@ -506,11 +449,7 @@
     },
     {
       "max_no_of_contestants": 80,
-      "rounds": [
-        "Q",
-        "S",
-        "F"
-      ],
+      "rounds": ["Q", "S", "F"],
       "no_of_heats": {
         "Q": {
           "A": 8
