@@ -15,6 +15,8 @@ from pytest_mock import MockFixture
 
 from race_service.utils import db_utils
 
+from .utils import _decide_group_order_and_ranking
+
 load_dotenv()
 
 EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
@@ -326,58 +328,6 @@ async def test_generate_startlist_for_individual_sprint_event(
 
 
 # ---
-async def _decide_group_order_and_ranking(  # noqa: C901
-    raceclass: dict,
-) -> tuple[int, int, bool]:
-    if raceclass["name"] == "Menn senior":
-        return (1, 1, True)
-    if raceclass["name"] == "Kvinner senior":
-        return (1, 2, True)
-    if raceclass["name"] == "Menn 19-20":
-        return (1, 3, True)
-    if raceclass["name"] == "Kvinner 19-20":
-        return (1, 4, True)
-    if raceclass["name"] == "Menn 18":
-        return (2, 1, True)
-    if raceclass["name"] == "Kvinner 18":
-        return (2, 2, True)
-    if raceclass["name"] == "Menn 17":
-        return (3, 1, True)
-    if raceclass["name"] == "Kvinner 17":
-        return (3, 2, True)
-    if raceclass["name"] == "G 16 år":
-        return (4, 1, True)
-    if raceclass["name"] == "J 16 år":
-        return (4, 2, True)
-    if raceclass["name"] == "G 15 år":
-        return (4, 3, True)
-    if raceclass["name"] == "J 15 år":
-        return (4, 4, True)
-    if raceclass["name"] == "G 14 år":
-        return (5, 1, True)
-    if raceclass["name"] == "J 14 år":
-        return (5, 2, True)
-    if raceclass["name"] == "G 13 år":
-        return (5, 3, True)
-    if raceclass["name"] == "J 13 år":
-        return (5, 4, True)
-    if raceclass["name"] == "G 12 år":
-        return (6, 1, True)
-    if raceclass["name"] == "J 12 år":
-        return (6, 2, True)
-    if raceclass["name"] == "G 11 år":
-        return (6, 3, True)
-    if raceclass["name"] == "J 11 år":
-        return (6, 4, True)
-    if raceclass["name"] == "G 10 år":
-        return (7, 1, False)
-    if raceclass["name"] == "J 10 år":
-        return (7, 2, False)
-    if raceclass["name"] == "G 9 år":
-        return (8, 1, False)
-    if raceclass["name"] == "J 9 år":
-        return (8, 2, False)
-    return (0, 0, True)  # should not reach this point
 
 
 async def _print_raceclasses(raceclasses: list[dict]) -> None:
