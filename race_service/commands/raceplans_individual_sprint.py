@@ -93,7 +93,7 @@ async def calculate_raceplan_individual_sprint(
                         # Add the race to the raceplan:
                         races.append(race)
             # Calculate start_time for next round:
-            if _round in ConfigMatrix.get_rounds_in_raceclass(_raceclass):  # noqa: PGH003 # type: ignore
+            if _round in ConfigMatrix.get_rounds_in_raceclass(_raceclass):
                 start_time = start_time - time_between_heats + time_between_rounds
         # Calculate start_time for next group:
         start_time = start_time + time_between_groups
