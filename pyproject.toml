@@ -58,6 +58,9 @@ dev = [
     "ty>=0.0.12",
 ]
 
+[tool.uv]
+required-version = ">=0.9.26"
+
 [tool.ruff.lint]
 select = ["ALL"]
 # and then manually ignore annoying ones:
@@ -88,10 +91,6 @@ known-first-party = ["race_service"]
 [tool.ruff.lint.pydocstyle]
 # Use Google-style docstrings.
 convention = "google"
-
-[tool.pyright]
-venvPath = "." # rye installs the venv in the current dir
-venv = ".venv" # in a folder called `.venv`
 
 [tool.deptry]
 ignore_notebooks = true
