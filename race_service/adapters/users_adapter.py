@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER", "users.example.com")
-USERS_HOST_PORT = int(os.getenv("USERS_HOST_PORT", "8080"))
+USERS_HOST_PORT = int(os.getenv("USERS_HOST_PORT", "8000"))
 
 
 class UsersAdapter:
@@ -27,7 +27,7 @@ class UsersAdapter:
     ) -> None:  # pragma: no cover
         """Try to authorize."""
         url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize"
-        body = {"token": token, "roles": roles}
+        body = {"token": token, "target_roles": roles}
 
         async with ClientSession() as session, session.post(url, json=body) as response:
             if response.status == HTTPStatus.NO_CONTENT:
@@ -38,5 +38,5 @@ class UsersAdapter:
                 raise HTTPForbidden from None
             else:
                 raise HTTPInternalServerError(
-                    reason=f"Got unknown status from users service: {response.status}."
+                    reason=f"Got unknown status from users service: {response.status}/{response.text}."
                 ) from None

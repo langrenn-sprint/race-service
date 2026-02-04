@@ -131,7 +131,7 @@ async def test_generate_raceplan_for_interval_start_entry(
                 except ContentTypeError:
                     body = None
 
-                assert response.status == HTTPStatus.CREATED, body if body else ""
+                assert response.status == HTTPStatus.CREATED, body or ""
                 # return the event_id, which is the last item of the path
                 event_id = response.headers[hdrs.LOCATION].split("/")[-1]
 
