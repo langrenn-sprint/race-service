@@ -115,7 +115,7 @@ show_missing = true
 [tool.pytest.ini_options]
 env = [
     "CONFIG=test",
-    "JWT_SECRET=secret",
+    "JWT_SECRET=test_jwt_secret_key_for_development_do_not_use_in_production_12345",
     "ADMIN_USERNAME=admin",
     "ADMIN_PASSWORD=password",
     "JWT_EXP_DELTA_SECONDS=60",
