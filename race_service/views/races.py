@@ -54,7 +54,21 @@ class RacesView(View):
         """Get route function."""
         db = self.request.app["db"]
 
-        if "eventId" in self.request.rel_url.query:
+        if "ids" in self.request.rel_url.query:
+            race_ids = [
+                id_
+                for id_ in self.request.rel_url.query["ids"].split(",")
+                if id_.strip()
+            ]
+            races = await RacesAdapter.get_races_by_ids(db, race_ids)
+            for race in races:
+                # Get the start_entries:
+                race.start_entries = await get_start_entries(  # type: ignore [reportAttributeAccessIssue]
+                    db, race.start_entries
+                )
+                # Get the race_results:
+                race.results = await get_race_results(db, race.results)  # type: ignore [reportAttributeAccessIssue]
+        elif "eventId" in self.request.rel_url.query:
             event_id = self.request.rel_url.query["eventId"]
             if "raceclass" in self.request.rel_url.query:
                 raceclass = self.request.rel_url.query["raceclass"]

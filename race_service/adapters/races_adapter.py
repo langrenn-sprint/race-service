@@ -122,6 +122,26 @@ class RacesAdapter:
         return races
 
     @classmethod
+    async def get_races_by_ids(
+        cls: Any, db: Any, ids: list[str]
+    ) -> list[IndividualSprintRace | IntervalStartRace]:  # pragma: no cover
+        """Get races by list of ids function."""
+        races: list[IndividualSprintRace | IntervalStartRace] = []
+
+        cursor = db.races_collection.find({"id": {"$in": ids}})
+
+        for race in await cursor.to_list(None):
+            if race["datatype"] == "interval_start":
+                races.append(IntervalStartRace.from_dict(race))
+            elif race["datatype"] == "individual_sprint":
+                races.append(IndividualSprintRace.from_dict(race))
+            else:
+                msg = f"Datatype {race['datatype']} not supported."
+                raise NotSupportedRaceDatatypeError(msg)
+
+        return races
+
+    @classmethod
     async def get_races_by_raceplan_id(
         cls: Any, db: Any, raceplan_id: str
     ) -> list[IndividualSprintRace | IntervalStartRace]:  # pragma: no cover

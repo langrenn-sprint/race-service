@@ -675,6 +675,134 @@ async def test_get_races_by_event_id_and_raceclass_individual_sprint(
 
 @pytest.mark.integration
 @pytest.mark.asyncio
+async def test_get_races_by_ids_interval_start(
+    client: _TestClient,
+    mocker: MockFixture,
+    mock_race_result: RaceResult,
+    token: MockFixture,
+    race_interval_start: IntervalStartRace,
+) -> None:
+    """Should return OK, and a body containing races with full details."""
+    race_id = race_interval_start.id
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_ids",
+        return_value=[race_interval_start],
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=mock_race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
+
+        resp = await client.get(f"/races?ids={race_id}")
+        assert resp.status == HTTPStatus.OK
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["id"] == race_id
+        assert body[0]["event_id"] == race_interval_start.event_id
+        assert body[0]["raceclass"] == race_interval_start.raceclass
+        assert body[0]["order"] == race_interval_start.order
+        assert body[0]["start_time"] == race_interval_start.start_time.isoformat()
+        assert body[0]["no_of_contestants"] == race_interval_start.no_of_contestants
+        assert body[0]["datatype"] == race_interval_start.datatype
+        for start_entry in body[0]["start_entries"]:
+            assert type(start_entry) is dict
+            assert (
+                start_entry
+                == get_start_entry_by_id(db=None, id_=start_entry["id"]).to_dict()
+            )
+        assert type(body[0]["results"]) is dict
+        for key in body[0]["results"]:
+            assert type(key) is str
+            race_result = body[0]["results"][key]
+            assert type(race_result) is dict
+            assert race_result["id"] == mock_race_result.id
+            assert race_result["race_id"] == mock_race_result.race_id
+            assert (
+                race_result["no_of_contestants"] == mock_race_result.no_of_contestants
+            )
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+async def test_get_races_by_ids_individual_sprint(
+    client: _TestClient,
+    mocker: MockFixture,
+    mock_race_result: RaceResult,
+    token: MockFixture,
+    race_individual_sprint: IndividualSprintRace,
+) -> None:
+    """Should return OK, and a body containing races with full details."""
+    race_id = race_individual_sprint.id
+    mocker.patch(
+        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_ids",
+        return_value=[race_individual_sprint],
+    )
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=get_start_entry_by_id,
+    )
+    mocker.patch(
+        "race_service.adapters.race_results_adapter.RaceResultsAdapter.get_race_result_by_id",
+        return_value=mock_race_result,
+    )
+    mocker.patch(
+        "race_service.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=get_time_event_by_id,
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
+
+        resp = await client.get(f"/races?ids={race_id}")
+        assert resp.status == HTTPStatus.OK
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        body = await resp.json()
+        assert type(body) is list
+        assert len(body) == 1
+        assert body[0]["id"] == race_id
+        assert body[0]["event_id"] == race_individual_sprint.event_id
+        assert body[0]["raceclass"] == race_individual_sprint.raceclass
+        assert body[0]["order"] == race_individual_sprint.order
+        assert body[0]["start_time"] == race_individual_sprint.start_time.isoformat()
+        assert body[0]["no_of_contestants"] == race_individual_sprint.no_of_contestants
+        assert body[0]["round"] == race_individual_sprint.round
+        assert body[0]["index"] == race_individual_sprint.index
+        assert body[0]["heat"] == race_individual_sprint.heat
+        assert body[0]["rule"] == race_individual_sprint.rule
+        assert body[0]["datatype"] == race_individual_sprint.datatype
+        for start_entry in body[0]["start_entries"]:
+            assert type(start_entry) is dict
+            assert (
+                start_entry
+                == get_start_entry_by_id(db=None, id_=start_entry["id"]).to_dict()
+            )
+        assert type(body[0]["results"]) is dict
+        for key in body[0]["results"]:
+            assert type(key) is str
+            race_result = body[0]["results"][key]
+            assert type(race_result) is dict
+            assert race_result["id"] == mock_race_result.id
+            assert race_result["race_id"] == mock_race_result.race_id
+            assert (
+                race_result["no_of_contestants"] == mock_race_result.no_of_contestants
+            )
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
 async def test_update_race_by_id_interval_start(
     client: _TestClient,
     mocker: MockFixture,
