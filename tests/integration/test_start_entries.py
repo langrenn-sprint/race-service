@@ -356,6 +356,51 @@ async def test_get_start_entries_by_race_id_and_startlist_id(
 
 @pytest.mark.integration
 @pytest.mark.asyncio
+async def test_get_start_entries_by_bib(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: IndividualSprintRace,
+    start_entry: StartEntry,
+) -> None:
+    """Should return OK and a valid json body."""
+    start_entry_id = start_entry.id
+    mocker.patch(
+        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_bib",
+        return_value=[start_entry],
+    )
+
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
+        resp = await client.get(
+            f"races/{race.id}/start-entries?bib={start_entry.bib}"
+        )
+        assert resp.status == HTTPStatus.OK
+        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
+        start_entries = await resp.json()
+        assert type(start_entries) is list
+        assert len(start_entries) > 0
+        assert start_entries[0]["id"] == start_entry_id
+        assert start_entries[0]["bib"] == start_entry.bib
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
+async def test_get_start_entries_by_bib_invalid_bib(
+    client: _TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: IndividualSprintRace,
+) -> None:
+    """Should return Bad Request when bib is not a valid integer."""
+    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
+        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
+        resp = await client.get(f"races/{race.id}/start-entries?bib=invalid")
+        assert resp.status == HTTPStatus.BAD_REQUEST
+
+
+@pytest.mark.integration
+@pytest.mark.asyncio
 async def test_delete_start_entry(
     client: _TestClient,
     mocker: MockFixture,

@@ -66,6 +66,14 @@ class StartEntriesView(View):
                     db, race_id, startlist_id
                 )
             )
+        elif "bib" in self.request.rel_url.query:
+            try:
+                bib = int(self.request.rel_url.query["bib"])
+            except ValueError as e:
+                raise HTTPBadRequest(reason="bib must be a valid integer.") from e
+            start_entries = await StartEntriesAdapter.get_start_entries_by_bib(
+                db, bib
+            )
         else:
             start_entries = await StartEntriesAdapter.get_start_entries_by_race_id(
                 db, race_id
