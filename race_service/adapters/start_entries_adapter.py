@@ -34,10 +34,8 @@ class StartEntriesAdapter:
     async def get_start_entries_by_bib(
         cls: Any, db: Any, bib: int
     ) -> list[StartEntry]:  # pragma: no cover
-        """Get start_entries matching the given bib number, sorted by starting_position."""
-        cursor = db.start_entries_collection.find({"bib": bib}).sort(
-            [("starting_position", 1)]
-        )
+        """Get start_entries matching the given bib number."""
+        cursor = db.start_entries_collection.find({"bib": bib})
         return [
             StartEntry.from_dict(start_entry)
             for start_entry in await cursor.to_list(None)
