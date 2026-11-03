@@ -11,6 +11,8 @@ from app.adapters import (
 from app.models import TimeEvent
 from app.services import IllegalValueError
 
+logger = logging.getLogger(__name__)
+
 
 class CouldNotCreateTimeEventError(Exception):
     """Class representing custom exception for command."""
@@ -33,10 +35,6 @@ class TimeEventAllreadyExistError(Exception):
 class TimeEventsService:
     """Class representing a service for time_events."""
 
-    logger = logging.getLogger(
-        "race_service.services.time_events_service.TimeEventsService"
-    )
-
     @classmethod
     async def create_time_event(cls: Any, time_event: TimeEvent) -> UUID:
         """Create time_event function.
@@ -52,7 +50,7 @@ class TimeEventsService:
             CouldNotCreateTimeEventError: creation failed
             TimeEventAllreadyExistError: time_event for bib and given timing-point already exists
         """
-        cls.logger.debug(f"trying to insert time_event: {time_event}")
+        logger.debug(f"trying to insert time_event: {time_event}")
         # Validation:
         await validate_time_event(time_event)
         # The id may be given by the client, so it must not already be in use:
@@ -79,9 +77,9 @@ class TimeEventsService:
                 )
                 raise TimeEventAllreadyExistError(msg)
         # insert new time_event
-        cls.logger.debug(f"new time_event: {time_event}")
+        logger.debug(f"new time_event: {time_event}")
         result = await TimeEventsAdapter.create_time_event(time_event)
-        cls.logger.debug(f"inserted time_event with id: {time_event.id}")
+        logger.debug(f"inserted time_event with id: {time_event.id}")
         if result:
             return time_event.id
         msg = "Creation of time-event failed."

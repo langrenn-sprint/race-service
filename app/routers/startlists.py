@@ -22,7 +22,7 @@ from app.services import (
     StartlistsService,
 )
 
-logger = logging.getLogger("uvicorn.error")
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["startlists"])
 

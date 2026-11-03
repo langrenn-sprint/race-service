@@ -15,7 +15,7 @@ from fastapi.security import (
 )
 
 # Set up logging:
-logger = logging.getLogger("uvicorn.error")
+logger = logging.getLogger(__name__)
 
 
 class TokenError(Exception):

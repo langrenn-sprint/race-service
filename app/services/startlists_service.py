@@ -9,6 +9,8 @@ from app.models import Startlist
 
 from .exceptions import IllegalValueError
 
+logger = logging.getLogger(__name__)
+
 
 class CouldNotCreateStartlistError(Exception):
     """Class representing custom exception for command."""
@@ -31,10 +33,6 @@ class StartlistAllreadyExistError(Exception):
 class StartlistsService:
     """Class representing a service for startlists."""
 
-    logger = logging.getLogger(
-        "race_service.services.startlists_service.StartlistsService"
-    )
-
     @classmethod
     async def create_startlist(cls: Any, startlist: Startlist) -> UUID:
         """Create startlist function.
@@ -49,7 +47,7 @@ class StartlistsService:
             StartlistAllreadyExistError: event can have zero or one plan
             CouldNotCreateStartlistError: creation failed
         """
-        cls.logger.debug(f"trying to insert startlist: {startlist}")
+        logger.debug(f"trying to insert startlist: {startlist}")
         # Event can have one, and only, one startlist:
         existing_sl = await StartlistsAdapter.get_startlists_by_event_id(
             startlist.event_id
@@ -60,9 +58,9 @@ class StartlistsService:
         # Validation:
         await validate_startlist(startlist)
         # insert new startlist
-        cls.logger.debug(f"new startlist: {startlist}")
+        logger.debug(f"new startlist: {startlist}")
         result = await StartlistsAdapter.create_startlist(startlist)
-        cls.logger.debug(f"inserted startlist with id: {startlist.id}")
+        logger.debug(f"inserted startlist with id: {startlist.id}")
         if result:
             return startlist.id
         msg = "Creation of startlist failed."

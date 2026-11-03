@@ -29,7 +29,7 @@ from app.services import (
     TimeEventsService,
 )
 
-logger = logging.getLogger("uvicorn.error")
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["time-events"])
 

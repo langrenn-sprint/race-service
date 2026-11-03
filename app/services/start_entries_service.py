@@ -9,6 +9,8 @@ from app.models import StartEntry
 
 from .exceptions import IllegalValueError
 
+logger = logging.getLogger(__name__)
+
 
 class CouldNotCreateStartEntryError(Exception):
     """Class representing custom exception for fetch method."""
@@ -21,8 +23,6 @@ class CouldNotCreateStartEntryError(Exception):
 
 class StartEntriesService:
     """Class representing a service for start_entries."""
-
-    logger = logging.getLogger("race_service.services.start_entries_service")
 
     @classmethod
     async def create_start_entry(cls: Any, start_entry: StartEntry) -> UUID:
@@ -38,7 +38,7 @@ class StartEntriesService:
             IllegalValueError: a start_entry with the given id already exists
             CouldNotCreateStartEntryError: creation failed
         """
-        cls.logger.debug(f"trying to insert start_entry: {start_entry}")
+        logger.debug(f"trying to insert start_entry: {start_entry}")
         # Validation:
         await validate_start_entry(start_entry)
         # The id may be given by the client, so it must not already be in use:
@@ -50,9 +50,9 @@ class StartEntriesService:
             msg = f"Start-entry with id {start_entry.id} already exists."
             raise IllegalValueError(msg) from None
         # insert new start_entry
-        cls.logger.debug(f"new start_entry: {start_entry}")
+        logger.debug(f"new start_entry: {start_entry}")
         result = await StartEntriesAdapter.create_start_entry(start_entry)
-        cls.logger.debug(f"inserted start_entry with id: {start_entry.id}")
+        logger.debug(f"inserted start_entry with id: {start_entry.id}")
         if result:
             return start_entry.id
         msg = "Creation of start-entry failed."

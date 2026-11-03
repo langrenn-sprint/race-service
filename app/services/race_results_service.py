@@ -20,6 +20,8 @@ from app.models import (
 
 from .races_service import IllegalValueError, RacesService
 
+logger = logging.getLogger(__name__)
+
 
 class TimeEventDoesNotReferenceRaceError(Exception):
     """Class representing custom exception for fetch method."""
@@ -41,10 +43,6 @@ class ContestantNotInStartEntriesError(Exception):
 
 class RaceResultsService:
     """Class representing a service for race_results."""
-
-    logger = logging.getLogger(
-        "race_service.services.race_results_service.RaceResultsService"
-    )
 
     @classmethod
     async def update_race_result(
@@ -112,7 +110,7 @@ class RaceResultsService:
                     ranking_sequence=[],
                     status=RaceResultStatus.UNOFFICIAL.value,
                 )
-                cls.logger.debug(f"Create race result for {race_result}")
+                logger.debug(f"Create race result for {race_result}")
                 await RaceResultsAdapter.create_race_result(race_result)
             else:
                 race_result = race_results[0]

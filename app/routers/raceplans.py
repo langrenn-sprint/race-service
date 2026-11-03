@@ -27,7 +27,7 @@ from app.services import (
     RacesService,
 )
 
-logger = logging.getLogger("uvicorn.error")
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["raceplans"])
 

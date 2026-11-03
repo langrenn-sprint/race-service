@@ -9,6 +9,8 @@ from app.models import Raceplan
 
 from .exceptions import IllegalValueError
 
+logger = logging.getLogger(__name__)
+
 
 class RaceplanAllreadyExistError(Exception):
     """Class representing custom exception for fetch method."""
@@ -21,8 +23,6 @@ class RaceplanAllreadyExistError(Exception):
 
 class RaceplansService:
     """Class representing a service for raceplans."""
-
-    logger = logging.getLogger("race_service.raceplans_service.RaceplansService")
 
     @classmethod
     async def create_raceplan(cls: Any, raceplan: Raceplan) -> UUID | None:
@@ -37,20 +37,20 @@ class RaceplansService:
         Raises:
             RaceplanAllreadyExistError: event can have zero or one plan
         """
-        cls.logger.debug(f"trying to insert raceplan: {raceplan}")
+        logger.debug(f"trying to insert raceplan: {raceplan}")
         # Event can have one, and only, one raceplan:
         existing_rps: list[Raceplan] = []
         existing_rps = await RaceplansAdapter.get_raceplans_by_event_id(
             raceplan.event_id
         )
-        cls.logger.debug(f"existing_rps: {existing_rps}")
+        logger.debug(f"existing_rps: {existing_rps}")
         if len(existing_rps) > 0:
             msg = f'Event "{raceplan.event_id}!r" already has a raceplan.'
             raise RaceplanAllreadyExistError(msg)
         # insert new raceplan
-        cls.logger.debug(f"new_raceplan: {raceplan}")
+        logger.debug(f"new_raceplan: {raceplan}")
         result = await RaceplansAdapter.create_raceplan(raceplan)
-        cls.logger.debug(f"inserted raceplan with id: {raceplan.id}")
+        logger.debug(f"inserted raceplan with id: {raceplan.id}")
         if result:
             return raceplan.id
         return None

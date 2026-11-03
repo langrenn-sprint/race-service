@@ -11,11 +11,11 @@ from app.models import (
 
 from .exceptions import IllegalValueError
 
+logger = logging.getLogger(__name__)
+
 
 class RacesService:
     """Class representing a service for races."""
-
-    logger = logging.getLogger("race_service.services.races_service.RacesService")
 
     @classmethod
     async def create_race(cls: Any, race: Race) -> UUID | None:
@@ -27,13 +27,13 @@ class RacesService:
         Returns:
             Optional[UUID]: The id of the created race. None otherwise.
         """
-        cls.logger.debug(f"trying to insert race: {race}")
+        logger.debug(f"trying to insert race: {race}")
         # Validation:
         await validate_race(race)
         # insert new race
-        cls.logger.debug(f"new_race: {race}")
+        logger.debug(f"new_race: {race}")
         result = await RacesAdapter.create_race(race)
-        cls.logger.debug(f"inserted race with id: {race.id}")
+        logger.debug(f"inserted race with id: {race.id}")
         if result:
             return race.id
         return None
@@ -50,7 +50,7 @@ class RacesService:
         if race.id != old_race.id:
             msg = "Cannot change id for race."
             raise IllegalValueError(msg)
-        cls.logger.debug(f"Updating race with following values:\n {race}")
+        logger.debug(f"Updating race with following values:\n {race}")
         return await RacesAdapter.update_race(id_, race)
 
     @classmethod
