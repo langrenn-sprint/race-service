@@ -14,6 +14,7 @@ from pytest_mock import MockFixture
 from app.adapters import (
     CompetitionFormatNotFoundError,
     EventNotFoundError,
+    EventsAdapterError,
     RaceclassesNotFoundError,
 )
 
@@ -1280,3 +1281,31 @@ async def test_generate_raceplan_for_event_differing_ranking_values_in_group(
     assert resp.status_code == HTTPStatus.BAD_REQUEST
     body = resp.json()
     assert "Ranking-value differs in group 1." in body["detail"]
+
+
+@pytest.mark.integration
+async def test_generate_raceplan_for_event_upstream_service_fails(
+    client: TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    request_body: dict,
+) -> None:
+    """Should return 500 with a JSON error body when event-service fails."""
+    mocker.patch(
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        return_value=[],
+    )
+    mocker.patch(
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        side_effect=EventsAdapterError("Got unknown status from events service: 503."),
+    )
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+    resp = client.post(
+        "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
+    )
+    assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert resp.json() == {"detail": "Got unknown status from events service: 503."}

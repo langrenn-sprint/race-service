@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.adapters import (
+    EventsAdapterError,
     LivenessAdapter,
     RaceplansAdapter,
     RaceResultsAdapter,
@@ -20,6 +21,7 @@ from app.adapters import (
     TimeEventsAdapter,
 )
 from app.authorization import (
+    APIConfigurationError,
     TokenError,
     TokenMissingError,
     TokenValidationError,
@@ -190,11 +192,16 @@ api.add_middleware(
 
 
 @api.exception_handler(TokenError)
-async def token_exception_handler(
-    request: Request, exc: TokenError
-) -> JSONResponse:  # pragma: no cover
+async def token_exception_handler(request: Request, exc: TokenError) -> JSONResponse:
     """Handle token validation errors."""
     _ = request  # Unused variable
+    if isinstance(exc, APIConfigurationError):
+        # The server is misconfigured (e.g. JWT_SECRET is missing), not the client.
+        # The details are logged where the error is raised, not returned to the client.
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Internal Server Error"},
+        )
     if isinstance(exc, TokenMissingError):
         return JSONResponse(
             status_code=401,
@@ -210,6 +217,16 @@ async def token_exception_handler(
         status_code=403,
         content={"detail": "Not authorized to access this resource"},
     )
+
+
+@api.exception_handler(EventsAdapterError)
+async def events_adapter_exception_handler(
+    request: Request, exc: EventsAdapterError
+) -> JSONResponse:
+    """Return a JSON error when event-service or competition-format-service fails."""
+    _ = request  # Unused variable
+    logger.error(f"Error from upstream service: {exc}")
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 
 # Set up routes:

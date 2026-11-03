@@ -60,6 +60,18 @@ async def test_valid_token_with_insufficient_role(client: TestClient) -> None:
 
 
 @pytest.mark.integration
+async def test_jwt_secret_not_configured(
+    client: TestClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Should return 500, not 403, when the server has no JWT_SECRET."""
+    token = _token(os.environ["JWT_SECRET"], exp=9999999999)
+    monkeypatch.delenv("JWT_SECRET")
+    resp = client.delete(PROTECTED_URL, headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert resp.json() == {"detail": "Internal Server Error"}
+
+
+@pytest.mark.integration
 async def test_invalid_token_is_logged_without_traceback(
     client: TestClient, caplog: pytest.LogCaptureFixture
 ) -> None:
