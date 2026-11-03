@@ -8,15 +8,10 @@ from typing import Any
 
 import jwt
 import pytest
-from aiohttp import hdrs
-from aiohttp.test_utils import TestClient as _TestClient
-from aioresponses import aioresponses
+from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 
-from race_service.models import IntervalStartRace, Raceplan, Startlist
-
-USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
-USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+from app.models import IntervalStartRace, Raceplan, Startlist
 
 MAX_NO_OF_CONTESTANTS_IN_raceclass = 80
 MAX_NO_OF_CONTESTANTS_IN_RACE = 10
@@ -27,7 +22,11 @@ def token() -> str:
     """Create a valid token."""
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
-    payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
+    payload = {
+        "username": os.getenv("ADMIN_USERNAME"),
+        "exp": 9999999999,
+        "role": "admin",
+    }
     return jwt.encode(payload, secret, algorithm)
 
 
@@ -114,7 +113,7 @@ async def raceclasses() -> list[dict[str, Any]]:
 
 RACES: list[IntervalStartRace] = [
     IntervalStartRace(
-        id="1",
+        id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
         raceclass="J15",
         order=1,
         start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
@@ -127,7 +126,7 @@ RACES: list[IntervalStartRace] = [
         datatype="interval_start",
     ),
     IntervalStartRace(
-        id="2",
+        id="ce565303-7508-5221-9f88-4630b31cf3dc",
         raceclass="G15",
         order=2,
         start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
@@ -140,7 +139,7 @@ RACES: list[IntervalStartRace] = [
         datatype="interval_start",
     ),
     IntervalStartRace(
-        id="3",
+        id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
         raceclass="J16",
         order=3,
         start_time=datetime.fromisoformat("2021-08-31 09:02:00"),
@@ -153,7 +152,7 @@ RACES: list[IntervalStartRace] = [
         datatype="interval_start",
     ),
     IntervalStartRace(
-        id="4",
+        id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
         raceclass="G16",
         order=4,
         start_time=datetime.fromisoformat("2021-08-31 09:03:00"),
@@ -294,15 +293,15 @@ async def contestants(
     ]
 
 
-def get_race_by_id(db: Any, id_: str) -> IntervalStartRace:
+def get_race_by_id(id_: str) -> IntervalStartRace:
     """Mock function to look up correct race from list."""
-    return next(race for race in RACES if race.id == id_)
+    return next(race for race in RACES if str(race.id) == str(id_))
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_generate_startlist_for_event(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event_interval_start: dict,
@@ -314,80 +313,74 @@ async def test_generate_startlist_for_event(
 ) -> None:
     """Should return 201 Created, location header."""
     startlist_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    mocker.patch(
-        "race_service.services.startlists_service.create_id",
+    create_startlist = mocker.patch(
+        "app.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
         return_value=startlist_id,
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
-        return_value=startlist_id,
-    )
-    mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         side_effect=str(uuid.uuid4()),
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
+        "app.adapters.startlists_adapter.StartlistsAdapter.get_startlists_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
-        return_value=Startlist(
-            id=startlist_id,
+        "app.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        side_effect=lambda id_: Startlist(
+            id=id_,
             event_id=event_interval_start["id"],
             start_entries=[],
             no_of_contestants=0,
         ),
     )
     mocker.patch(
-        "race_service.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
+        "app.adapters.startlists_adapter.StartlistsAdapter.update_startlist",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
+        "app.adapters.races_adapter.RacesAdapter.get_races_by_raceplan_id",
         return_value=RACES,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_contestants",
+        "app.adapters.events_adapter.EventsAdapter.get_contestants",
         return_value=contestants,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=get_race_by_id,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.update_race",
+        "app.adapters.races_adapter.RacesAdapter.update_race",
         return_value=True,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(
-            "/startlists/generate-startlist-for-event",
-            headers=headers,
-            json=request_body,
-        )
-        assert resp.status == HTTPStatus.CREATED
-        assert f"/startlists/{startlist_id}" in resp.headers[hdrs.LOCATION]
+    resp = client.post(
+        "/startlists/generate-startlist-for-event",
+        headers=headers,
+        json=request_body,
+    )
+    assert resp.status_code == HTTPStatus.CREATED
+    created_startlist = create_startlist.call_args.args[0]
+    assert f"/startlists/{created_startlist.id}" in resp.headers["Location"]

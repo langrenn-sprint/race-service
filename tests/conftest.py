@@ -6,34 +6,21 @@ from os import environ as env
 from pathlib import Path
 from typing import Any
 
+import httpx
 import pytest
-import requests
-from aiohttp.test_utils import TestClient as _TestClient
-from dotenv import load_dotenv
-from requests import exceptions
 
-from race_service import create_app
-
-load_dotenv()
-HOST_PORT = int(env.get("HOST_PORT", "8080"))
-
-
-@pytest.fixture
-async def client(aiohttp_client: Any) -> _TestClient:
-    """Instantiate server and start it."""
-    app = await create_app()
-    return await aiohttp_client(app)
+HOST_PORT = int(env.get("HOST_PORT", "8000"))
 
 
 def is_responsive(url: Any) -> Any:
     """Return true if response from service is 200."""
     url = f"{url}/ready"
     try:
-        response = requests.get(url, timeout=30)
+        response = httpx.get(url, timeout=30)
         if response.status_code == HTTPStatus.OK:
             time.sleep(2)  # sleep extra 2 sec
             return True
-    except exceptions.ConnectionError:
+    except httpx.RequestError:
         return False
 
 

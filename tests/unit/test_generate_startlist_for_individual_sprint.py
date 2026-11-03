@@ -2,15 +2,23 @@
 
 from datetime import datetime
 from functools import reduce
+from uuid import UUID, uuid4
 
 import pytest
 
-from race_service.commands.startlists_commands import (
+from app.commands.startlists_commands import (
     generate_start_entries_for_individual_sprint,
 )
-from race_service.models import IndividualSprintRace, Raceplan, StartEntry, Startlist
+from app.models import IndividualSprintRace, Raceplan, StartEntry, Startlist
 
 # --- Individual Sprint, ranked. ---
+
+
+# Ids are generated, so we compare everything else:
+IGNORED_FIELDS = {"id", "raceplan_id"}
+# Placeholder for references that are set when the objects are generated:
+PLACEHOLDER_ID = UUID(int=0)
+STARTLIST_ID = UUID("8b0a6a39-3f0c-4f0e-9a3b-2d4b8f6c1e11")
 
 
 @pytest.mark.unit
@@ -24,6 +32,7 @@ async def test_generate_startlist_for_individual_sprint(
 ) -> None:
     """Should return an instance of Startlist equal to the expected startlist."""
     start_entries = await generate_start_entries_for_individual_sprint(
+        STARTLIST_ID,
         competition_format_individual_sprint,
         raceclasses,
         races_individual_sprint,
@@ -38,7 +47,10 @@ async def test_generate_startlist_for_individual_sprint(
     if not reduce(
         lambda x, y: x and y,
         map(
-            lambda p, q: p == q,
+            lambda p, q: (
+                p.model_dump(exclude=IGNORED_FIELDS)
+                == q.model_dump(exclude=IGNORED_FIELDS)
+            ),
             start_entries,
             expected_startlist_individual_sprint.start_entries,
         ),
@@ -112,11 +124,11 @@ async def raceclasses(
 async def raceplan_individual_sprint(event_individual_sprint: dict) -> Raceplan:
     """Create a mock raceplan object."""
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
-    raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan.id = UUID("290e70d5-0933-4af0-bb53-1d705ba7eb95")
     raceplan.no_of_contestants = 27
     # Add list of race_ids:
-    for race_id in range(1, 12):
-        raceplan.races.append(str(race_id))
+    for _ in range(1, 12):
+        raceplan.races.append(uuid4())
 
     return raceplan
 
@@ -130,7 +142,7 @@ async def races_individual_sprint(
     races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
-            id="1",
+            id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             order=1,
             raceclass="J15",
             round="Q",
@@ -143,14 +155,14 @@ async def races_individual_sprint(
             ],
             rule={"S": {"A": 4, "C": "REST"}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="2",
+            id="ce565303-7508-5221-9f88-4630b31cf3dc",
             order=2,
             raceclass="J15",
             round="Q",
@@ -163,14 +175,14 @@ async def races_individual_sprint(
             ],
             rule={"S": {"A": 4, "C": "REST"}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="3",
+            id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             order=3,
             raceclass="J15",
             round="Q",
@@ -183,14 +195,14 @@ async def races_individual_sprint(
             ],
             rule={"S": {"A": 4, "C": "REST"}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="4",
+            id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             order=4,
             raceclass="J15",
             round="Q",
@@ -203,14 +215,14 @@ async def races_individual_sprint(
             ],
             rule={"S": {"A": 4, "C": "REST"}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="5",
+            id="8f9c99eb-e3d1-556c-a038-01566e675050",
             order=5,
             raceclass="J15",
             round="S",
@@ -223,14 +235,14 @@ async def races_individual_sprint(
             ],
             rule={"F": {"C": 4}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="6",
+            id="c18d9d8f-ca83-5a26-a56d-bc9f95fbbd20",
             order=6,
             raceclass="J15",
             round="S",
@@ -243,14 +255,14 @@ async def races_individual_sprint(
             ],
             rule={"F": {"C": 4}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="7",
+            id="738da62e-6d7c-5ce0-b8c6-b927a8658598",
             order=7,
             raceclass="J15",
             round="S",
@@ -263,14 +275,14 @@ async def races_individual_sprint(
             ],
             rule={"F": {"A": 4, "B": "REST"}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="8",
+            id="ca390b27-afc8-5a2c-9bf9-7b70abfc3e35",
             order=8,
             raceclass="J15",
             round="S",
@@ -283,14 +295,14 @@ async def races_individual_sprint(
             ],
             rule={"F": {"A": 4, "B": "REST"}},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="9",
+            id="65a5e6f5-9120-5545-b51b-adf582ff69a5",
             order=9,
             raceclass="J15",
             round="F",
@@ -303,14 +315,14 @@ async def races_individual_sprint(
             ],
             rule={},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="10",
+            id="c2e39f9f-4115-5b7c-9f0e-e4b9afb5a79b",
             order=10,
             raceclass="J15",
             round="F",
@@ -323,14 +335,14 @@ async def races_individual_sprint(
             ],
             rule={},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="11",
+            id="f23c88f5-c6c9-5056-8c39-232a7a3fbd06",
             order=11,
             raceclass="J15",
             round="F",
@@ -343,7 +355,7 @@ async def races_individual_sprint(
             ],
             rule={},
             event_id=raceplan_individual_sprint.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
@@ -597,9 +609,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     start_entries: list[StartEntry] = []
     start_entries.append(
         StartEntry(
-            id="",
-            race_id="1",
-            startlist_id="",
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
+            startlist_id=STARTLIST_ID,
             bib=1,
             starting_position=1,
             name="First Contender",
@@ -609,9 +620,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            race_id="1",
-            startlist_id="",
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
+            startlist_id=STARTLIST_ID,
             bib=2,
             starting_position=2,
             name="Second Contender",
@@ -621,9 +631,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            race_id="1",
-            startlist_id="",
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
+            startlist_id=STARTLIST_ID,
             bib=3,
             starting_position=3,
             name="Third Contender",
@@ -633,9 +642,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="1",
+            startlist_id=STARTLIST_ID,
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             bib=4,
             starting_position=4,
             name="Fourth Contender",
@@ -645,9 +653,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="1",
+            startlist_id=STARTLIST_ID,
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             bib=5,
             starting_position=5,
             name="Fifth Contender",
@@ -657,9 +664,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="1",
+            startlist_id=STARTLIST_ID,
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             bib=6,
             starting_position=6,
             name="Sixth Contender",
@@ -669,9 +675,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="1",
+            startlist_id=STARTLIST_ID,
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             bib=7,
             starting_position=7,
             name="Seventh Contender",
@@ -681,9 +686,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=8,
             starting_position=1,
             name="Eigth Contender",
@@ -693,9 +697,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=9,
             starting_position=2,
             name="Nineth Contender",
@@ -705,9 +708,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=10,
             starting_position=3,
             name="Tenth Contender",
@@ -717,9 +719,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=11,
             starting_position=4,
             name="Eleventh Contender",
@@ -729,9 +730,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=12,
             starting_position=5,
             name="Twelvth Contender",
@@ -741,9 +741,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=13,
             starting_position=6,
             name="Thirteenth Contender",
@@ -753,9 +752,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=14,
             starting_position=7,
             name="Fourtheenth Contender",
@@ -765,9 +763,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=15,
             starting_position=1,
             name="Fifteenth Contender",
@@ -777,9 +774,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=16,
             starting_position=2,
             name="Sixteenth Contender",
@@ -789,9 +785,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=17,
             starting_position=3,
             name="Seventeenth Contender",
@@ -801,9 +796,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=18,
             starting_position=4,
             name="Eighteenth Contender",
@@ -813,9 +807,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=19,
             starting_position=5,
             name="Nineteenth Contender",
@@ -825,9 +818,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=20,
             starting_position=6,
             name="Twentieth Contender",
@@ -837,9 +829,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=21,
             starting_position=7,
             name="Twenty First Contender",
@@ -849,9 +840,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=22,
             starting_position=1,
             name="Twenty Second Contender",
@@ -861,9 +851,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=23,
             starting_position=2,
             name="Twenty Third Contender",
@@ -873,9 +862,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=24,
             starting_position=3,
             name="Twenty Fourth Contender",
@@ -885,9 +873,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=25,
             starting_position=4,
             name="Twenty Fifth Contender",
@@ -897,9 +884,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=26,
             starting_position=5,
             name="Twenty Sixth Contender",
@@ -909,9 +895,8 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=27,
             name="Twenty Seventh Contender",
             club="Lyn Ski",

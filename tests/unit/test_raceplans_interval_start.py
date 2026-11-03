@@ -3,15 +3,23 @@
 from datetime import datetime
 from functools import reduce
 from typing import Any
+from uuid import UUID
 
 import pytest
 
-from race_service.commands.raceplans_interval_start import (
+from app.commands.raceplans_interval_start import (
     calculate_raceplan_interval_start,
 )
-from race_service.models import IntervalStartRace, Raceplan
+from app.models import IntervalStartRace, Raceplan
 
 # --- Interval Start ---
+
+
+# Ids are generated, so we compare everything else:
+IGNORED_FIELDS = {"id", "raceplan_id"}
+# Placeholder for references that are set when the objects are generated:
+PLACEHOLDER_ID = UUID(int=0)
+STARTLIST_ID = UUID("8b0a6a39-3f0c-4f0e-9a3b-2d4b8f6c1e11")
 
 
 @pytest.fixture
@@ -89,7 +97,7 @@ async def raceclasses_interval_start() -> list[dict[str, Any]]:
 async def expected_raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     """Create a mock raceplan object."""
     raceplan = Raceplan(event_id=event_interval_start["id"], races=[])
-    raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan.id = UUID("290e70d5-0933-4af0-bb53-1d705ba7eb95")
     raceplan.no_of_contestants = 62
     return raceplan
 
@@ -103,7 +111,6 @@ async def expected_races_interval_start(
     races: list[IntervalStartRace] = []
     races.append(
         IntervalStartRace(
-            id="",
             raceclass="J15",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
@@ -112,14 +119,13 @@ async def expected_races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=event_interval_start["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IntervalStartRace(
-            id="",
             raceclass="G15",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:08:00"),
@@ -128,14 +134,13 @@ async def expected_races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=event_interval_start["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IntervalStartRace(
-            id="",
             raceclass="J16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:25:00"),
@@ -144,14 +149,13 @@ async def expected_races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=event_interval_start["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IntervalStartRace(
-            id="",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:33:30"),
@@ -160,7 +164,7 @@ async def expected_races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=event_interval_start["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
@@ -185,7 +189,8 @@ async def test_calculate_raceplan_interval_start(
     )
 
     assert type(raceplan) is Raceplan
-    assert raceplan.id is None
+    assert isinstance(raceplan.id, UUID)
+    assert all(race.raceplan_id == raceplan.id for race in races)
     assert raceplan.event_id == expected_raceplan_interval_start.event_id
     assert (
         raceplan.no_of_contestants == expected_raceplan_interval_start.no_of_contestants
@@ -204,7 +209,14 @@ async def test_calculate_raceplan_interval_start(
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
-        map(lambda p, q: p == q, races, expected_races_interval_start),
+        map(
+            lambda p, q: (
+                p.model_dump(exclude=IGNORED_FIELDS)
+                == q.model_dump(exclude=IGNORED_FIELDS)
+            ),
+            races,
+            expected_races_interval_start,
+        ),
         True,
     ):
         print("Calculated raceplan:")

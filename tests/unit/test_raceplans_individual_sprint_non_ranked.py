@@ -2,15 +2,23 @@
 
 from datetime import datetime
 from typing import Any
+from uuid import UUID
 
 import pytest
 
-from race_service.commands.raceplans_individual_sprint import (
+from app.commands.raceplans_individual_sprint import (
     calculate_raceplan_individual_sprint,
 )
-from race_service.models import IndividualSprintRace, Raceplan
+from app.models import IndividualSprintRace, Raceplan
 
 # --- Individual Sprint ---
+
+
+# Ids are generated, so we compare everything else:
+IGNORED_FIELDS = {"id", "raceplan_id"}
+# Placeholder for references that are set when the objects are generated:
+PLACEHOLDER_ID = UUID(int=0)
+STARTLIST_ID = UUID("8b0a6a39-3f0c-4f0e-9a3b-2d4b8f6c1e11")
 
 
 @pytest.fixture
@@ -249,7 +257,7 @@ async def expected_raceplan_individual_sprint_10_contestants(
 ) -> Raceplan:
     """Create a mock raceplan object - 10 contestants."""
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
-    raceplan.id = "190e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan.id = UUID("190e70d5-0933-4af0-bb53-1d705ba7eb95")
     raceplan.no_of_contestants = 10
 
     return raceplan
@@ -261,7 +269,7 @@ async def expected_raceplan_individual_sprint_17_contestants(
 ) -> Raceplan:
     """Create a mock raceplan object - 17 contestants."""
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
-    raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan.id = UUID("290e70d5-0933-4af0-bb53-1d705ba7eb95")
     raceplan.no_of_contestants = 17
 
     return raceplan
@@ -273,7 +281,7 @@ async def expected_raceplan_individual_sprint_27_contestants(
 ) -> Raceplan:
     """Create a mock raceplan object - 27 contestants."""
     raceplan = Raceplan(event_id=event_individual_sprint["id"], races=[])
-    raceplan.id = "390e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan.id = UUID("390e70d5-0933-4af0-bb53-1d705ba7eb95")
     raceplan.no_of_contestants = 27
 
     return raceplan
@@ -288,7 +296,6 @@ async def expected_races_individual_sprint_10_contestants(
     races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
-            id="",
             order=1,
             raceclass="G11",
             round="R1",
@@ -301,14 +308,13 @@ async def expected_races_individual_sprint_10_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=2,
             raceclass="G11",
             round="R1",
@@ -321,14 +327,13 @@ async def expected_races_individual_sprint_10_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=3,
             raceclass="G11",
             round="R2",
@@ -341,14 +346,13 @@ async def expected_races_individual_sprint_10_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=4,
             raceclass="G11",
             round="R2",
@@ -361,7 +365,7 @@ async def expected_races_individual_sprint_10_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
@@ -379,7 +383,6 @@ async def expected_races_individual_sprint_17_contestants(
     races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
-            id="",
             order=1,
             raceclass="J11",
             round="R1",
@@ -392,14 +395,13 @@ async def expected_races_individual_sprint_17_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=2,
             raceclass="J11",
             round="R1",
@@ -412,14 +414,13 @@ async def expected_races_individual_sprint_17_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=3,
             raceclass="J11",
             round="R1",
@@ -432,14 +433,13 @@ async def expected_races_individual_sprint_17_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=4,
             raceclass="J11",
             round="R2",
@@ -452,14 +452,13 @@ async def expected_races_individual_sprint_17_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=5,
             raceclass="J11",
             round="R2",
@@ -472,14 +471,13 @@ async def expected_races_individual_sprint_17_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=6,
             raceclass="J11",
             round="R2",
@@ -492,7 +490,7 @@ async def expected_races_individual_sprint_17_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
@@ -510,7 +508,6 @@ async def expected_races_individual_sprint_27_contestants(
     races: list[IndividualSprintRace] = []
     races.append(
         IndividualSprintRace(
-            id="",
             order=1,
             raceclass="J15",
             round="R1",
@@ -523,14 +520,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=2,
             raceclass="J15",
             round="R1",
@@ -543,14 +539,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=3,
             raceclass="J15",
             round="R1",
@@ -563,14 +558,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=4,
             raceclass="J15",
             round="R1",
@@ -583,14 +577,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={"R2": {"A": "ALL"}},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=5,
             raceclass="J15",
             round="R2",
@@ -603,14 +596,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=6,
             raceclass="J15",
             round="R2",
@@ -623,14 +615,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=7,
             raceclass="J15",
             round="R2",
@@ -643,14 +634,13 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IndividualSprintRace(
-            id="",
             order=8,
             raceclass="J15",
             round="R2",
@@ -663,7 +653,7 @@ async def expected_races_individual_sprint_27_contestants(
             ],
             rule={},
             event_id=event_individual_sprint["id"],
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
@@ -689,7 +679,8 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
     )
 
     assert type(raceplan) is Raceplan
-    assert raceplan.id is None
+    assert isinstance(raceplan.id, UUID)
+    assert all(race.raceplan_id == raceplan.id for race in races)
     assert (
         raceplan.event_id == expected_raceplan_individual_sprint_10_contestants.event_id
     )
@@ -733,9 +724,11 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_10_contestants(
         print(f"[{i}]: {race}")
 
     for i, race in enumerate(races):
-        assert race == expected_races_individual_sprint_10_contestants[i], (
-            f"race with index {i} did not match"
-        )
+        assert race.model_dump(
+            exclude=IGNORED_FIELDS
+        ) == expected_races_individual_sprint_10_contestants[i].model_dump(
+            exclude=IGNORED_FIELDS
+        ), f"race with index {i} did not match"
 
 
 @pytest.mark.unit
@@ -755,7 +748,8 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
     )
 
     assert type(raceplan) is Raceplan
-    assert raceplan.id is None
+    assert isinstance(raceplan.id, UUID)
+    assert all(race.raceplan_id == raceplan.id for race in races)
     assert (
         raceplan.event_id == expected_raceplan_individual_sprint_27_contestants.event_id
     )
@@ -799,9 +793,11 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_27_contestants(
         print(f"[{i}]: {race}")
 
     for i, race in enumerate(races):
-        assert race == expected_races_individual_sprint_27_contestants[i], (
-            f"race with index {i} did not match"
-        )
+        assert race.model_dump(
+            exclude=IGNORED_FIELDS
+        ) == expected_races_individual_sprint_27_contestants[i].model_dump(
+            exclude=IGNORED_FIELDS
+        ), f"race with index {i} did not match"
 
 
 @pytest.mark.unit
@@ -821,7 +817,8 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
     )
 
     assert type(raceplan) is Raceplan
-    assert raceplan.id is None
+    assert isinstance(raceplan.id, UUID)
+    assert all(race.raceplan_id == raceplan.id for race in races)
     assert (
         raceplan.event_id == expected_raceplan_individual_sprint_17_contestants.event_id
     )
@@ -865,9 +862,11 @@ async def test_calculate_raceplan_individual_sprint_non_ranked_17_contestants(
         print(f"[{i}]: {race}")
 
     for i, race in enumerate(races):
-        assert race == expected_races_individual_sprint_17_contestants[i], (
-            f"race with index {i} did not match"
-        )
+        assert race.model_dump(
+            exclude=IGNORED_FIELDS
+        ) == expected_races_individual_sprint_17_contestants[i].model_dump(
+            exclude=IGNORED_FIELDS
+        ), f"race with index {i} did not match"
 
 
 # helpers

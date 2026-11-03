@@ -25,6 +25,8 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 
 ## Example of usage
 
+Docs available at http://localhost:8080/docs when running the API with docker compose (http://localhost:8000/docs when running it locally).
+
 ### Scenario: generate raceplan and startlist for an event
 
 ```shell
@@ -52,8 +54,8 @@ cf <https://assets.fis-ski.com/image/upload/v1624284540/fis-prod/assets/ICR_Cros
 % curl -H "Content-Type: multipart/form-data" \
   -H "Authorization: Bearer $ACCESS" \
   -X POST \
-  -F "data=@tests/files/contestants_all.csv; type=text/csv" \
-  http://localhost:8081/events/1234/contestants # use the id from the event in previous step
+  -F "file=@tests/files/contestants_all.csv; type=text/csv" \
+  http://localhost:8081/events/1234/contestants/file # use the id from the event in previous step
 % # Generate raceclasses based on contestants
 % curl -H "Authorization: Bearer $ACCESS" \
   -X POST \
@@ -105,7 +107,7 @@ To run the service locally, you need to supply a set of environment variables. A
 A minimal .env:
 
 ```shell
-JWT_SECRET=secret
+JWT_SECRET=test_jwt_secret_key_for_development_do_not_use_in_production_12345
 JWT_EXP_DELTA_SECONDS=3600
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=passw123
@@ -119,22 +121,22 @@ LOGGING_LEVEL=DEBUG
 Start the server locally:
 
 ```shell
-% uv run adev runserver -p 8080 --aux-port 8089 race_service
+% uv run --env-file .env fastapi dev
 ```
 
-### Running the API in a wsgi-server (gunicorn)
+### Running the API in a asgi-server (uvicorn)
 
 ```shell
-% uv run gunicorn race_service:create_app --bind localhost:8080 --worker-class aiohttp.GunicornWebWorker
+% uv run --env-file .env uvicorn app:api --host 0.0.0.0 --port 8000 --workers 1 --log-config=logging.yaml
 ```
 
-### Running the wsgi-server in Docker
+### Running the asgi-server in Docker
 
 To build and run the api in a Docker container:
 
 ```shell
 % docker build -t ghcr.io/langrenn-sprint/race-service:latest .
-% docker run --env-file .env -p 8080:8080 -d ghcr.io/langrenn-sprint/race-service:latest
+% docker run --env-file .env -p 8080:8000 -d ghcr.io/langrenn-sprint/race-service:latest
 ```
 
 The easier way would be with docker-compose:
@@ -156,11 +158,11 @@ To run linters, checkers and tests:
 To run specific test:
 
 ```shell
-% uv run poe integration_test --no-cov -- test_create_race_adapter_fails
+% uv run poe integration-test --no-cov -- test_create_race_adapter_fails
 ```
 
 To run tests with logging, do:
 
 ```shell
-% uv run poe integration_test  --log-cli-level=DEBUG
+% uv run poe integration-test --log-cli-level=DEBUG
 ```
