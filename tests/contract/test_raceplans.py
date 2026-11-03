@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import uuid
 from collections.abc import AsyncGenerator
 from copy import deepcopy
 from http import HTTPStatus
@@ -10,15 +11,12 @@ from typing import Any
 
 import motor.motor_asyncio
 import pytest
-from aiohttp import ClientSession, hdrs
-from dotenv import load_dotenv
+from httpx import AsyncClient
 from pytest_mock import MockFixture
 
-from race_service.utils import db_utils
+from app.utils import db_utils
 
 from .utils import _decide_group_order_and_ranking
-
-load_dotenv()
 
 EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
 EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
@@ -39,17 +37,19 @@ logger = logging.getLogger(__name__)
 async def token(http_service: Any) -> str:
     """Create a valid token."""
     url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
-    headers = {hdrs.CONTENT_TYPE: "application/json"}
+    headers = {"Content-Type": "application/json"}
     request_body = {
         "username": os.getenv("ADMIN_USERNAME"),
         "password": os.getenv("ADMIN_PASSWORD"),
     }
-    session = ClientSession()
-    async with session.post(url, headers=headers, json=request_body) as response:
-        body = await response.json()
-    await session.close()
-    if response.status != HTTPStatus.OK:
-        logger.error(f"Got unexpected status {response.status} from {http_service}.")
+    client = AsyncClient()
+    response = await client.post(url, headers=headers, json=request_body)
+    body = response.json()
+    await client.aclose()
+    if response.status_code != HTTPStatus.OK:
+        logger.error(
+            f"Got unexpected status {response.status_code} from {http_service}."
+        )
     return body["token"]
 
 
@@ -86,123 +86,127 @@ async def context(
 ) -> dict:
     """Create context and return event_id."""
     event_id = ""
-    async with ClientSession() as session:
+    async with AsyncClient() as client:
         # First we need create the competition-format:
         with open("tests/files/competition_format_individual_sprint.json") as file:
             competition_format = json.load(file)
             headers = {
-                hdrs.CONTENT_TYPE: "application/json",
-                hdrs.AUTHORIZATION: f"Bearer {token}",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}",
             }
             url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
             request_body = competition_format
-            async with session.post(
-                url, headers=headers, json=request_body
-            ) as response:
-                if response.status != HTTPStatus.CREATED:
-                    body = await response.json()
-                    logger.error(f"When creating competition-format, got error {body}")
-                assert response.status == HTTPStatus.CREATED
+            response = await client.post(url, headers=headers, json=request_body)
+            if response.status_code != HTTPStatus.CREATED:
+                body = response.json()
+                logger.error(f"When creating competition-format, got error {body}")
+            assert response.status_code == HTTPStatus.CREATED
 
         # Next we create the event:
         with open("tests/files/event_individual_sprint.json") as file:
             event = json.load(file)
 
             headers = {
-                hdrs.CONTENT_TYPE: "application/json",
-                hdrs.AUTHORIZATION: f"Bearer {token}",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}",
             }
             url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
             request_body = event
-            async with session.post(
-                url, headers=headers, json=request_body
-            ) as response:
-                assert response.status == HTTPStatus.CREATED
-                # return the event_id, which is the last item of the path
-                event_id = response.headers[hdrs.LOCATION].split("/")[-1]
+            response = await client.post(url, headers=headers, json=request_body)
+            assert response.status_code == HTTPStatus.CREATED
+            # return the event_id, which is the last item of the path
+            event_id = response.headers["Location"].split("/")[-1]
 
         # Add list of contestants to event:
         headers = {
-            hdrs.AUTHORIZATION: f"Bearer {token}",
+            "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
+        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_all.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
-            async with session.post(url, headers=headers, data=file) as response:
-                status = response.status
-                body = await response.json()
-                if response.status != HTTPStatus.OK:
-                    body = await response.json()
-                    logger.error(
-                        f"Got unexpected status {response.status}, reason {body}."
-                    )
-                assert status == HTTPStatus.OK
+            response = await client.post(
+                url, headers=headers, files={"file": (file.name, file, "text/csv")}
+            )
+            status = response.status_code
+            body = response.json()
+            if response.status_code != HTTPStatus.OK:
+                body = response.json()
+                logger.error(
+                    f"Got unexpected status {response.status_code}, reason {body}."
+                )
+            assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
         url = (
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/generate-raceclasses"
         )
-        async with session.post(url, headers=headers) as response:
-            assert response.status == HTTPStatus.CREATED
-            assert f"/events/{event_id}/raceclasses" in response.headers[hdrs.LOCATION]
+        response = await client.post(url, headers=headers)
+        assert response.status_code == HTTPStatus.CREATED
+        assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set group and order on all raceclasses:
         url = (
             f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
             f"/events/{event_id}/raceclasses"
         )
-        async with session.get(url) as response:
-            assert response.status == HTTPStatus.OK
-            raceclasses = await response.json()
-            for raceclass in raceclasses:
-                raceclass_id = raceclass["id"]
-                (
-                    raceclass["group"],
-                    raceclass["order"],
-                    raceclass["ranking"],
-                ) = await _decide_group_order_and_ranking(raceclass)
-                async with session.put(
-                    f"{url}/{raceclass_id}", headers=headers, json=raceclass
-                ) as put_response:
-                    assert put_response.status == HTTPStatus.NO_CONTENT
+        response = await client.get(url)
+        assert response.status_code == HTTPStatus.OK
+        raceclasses = response.json()
+        for raceclass in raceclasses:
+            raceclass_id = raceclass["id"]
+            (
+                raceclass["group"],
+                raceclass["order"],
+                raceclass["ranking"],
+            ) = await _decide_group_order_and_ranking(raceclass)
+            put_response = await client.put(
+                f"{url}/{raceclass_id}", headers=headers, json=raceclass
+            )
+            assert put_response.status_code == HTTPStatus.NO_CONTENT
 
         # Then we have to assign bibs to all contestants:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/assign-bibs"
-        async with session.post(url, headers=headers) as response:
-            assert response.status == HTTPStatus.CREATED
-            assert f"/events/{event_id}/contestants" in response.headers[hdrs.LOCATION]
+        response = await client.post(url, headers=headers)
+        assert response.status_code == HTTPStatus.CREATED
+        assert f"/events/{event_id}/contestants" in response.headers["Location"]
 
         # Get the contestants for debugging purposes:
         url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
-        async with session.get(url) as response:
-            assert response.status == HTTPStatus.OK
+        response = await client.get(url)
+        assert response.status_code == HTTPStatus.OK
 
         # We need to base the startlist on the raceplan. Need to generate it.
         request_body = {"event_id": event_id}
         url = f"{http_service}/raceplans/generate-raceplan-for-event"
-        async with session.post(url, headers=headers, json=request_body) as response:
-            if response.status != HTTPStatus.CREATED:
-                body = await response.json()
-                logger.error(f"Got unexpected status {response.status}, reason {body}.")
-            assert response.status == HTTPStatus.CREATED
+        response = await client.post(url, headers=headers, json=request_body)
+        if response.status_code != HTTPStatus.CREATED:
+            body = response.json()
+            logger.error(
+                f"Got unexpected status {response.status_code}, reason {body}."
+            )
+        assert response.status_code == HTTPStatus.CREATED
         # Get the raceplan for debugging purposes:
         url = f"{http_service}/raceplans?eventId={event_id}"
-        async with session.get(url) as response:
-            if response.status != HTTPStatus.OK:
-                body = await response.json()
-                logger.error(f"Got unexpected status {response.status}, reason {body}.")
-            assert response.status == HTTPStatus.OK
-            _raceplans = await response.json()
+        response = await client.get(url)
+        if response.status_code != HTTPStatus.OK:
+            body = response.json()
+            logger.error(
+                f"Got unexpected status {response.status_code}, reason {body}."
+            )
+        assert response.status_code == HTTPStatus.OK
+        _raceplans = response.json()
         # We generate the startlist:
         request_body = {"event_id": event_id}
         url = f"{http_service}/startlists/generate-startlist-for-event"
-        async with session.post(url, headers=headers, json=request_body) as response:
-            if response.status != HTTPStatus.CREATED:
-                body = await response.json()
-                logger.error(f"Got unexpected status {response.status}, reason {body}.")
-            assert response.status == HTTPStatus.CREATED, body
-            assert "/startlists/" in response.headers[hdrs.LOCATION]
+        response = await client.post(url, headers=headers, json=request_body)
+        if response.status_code != HTTPStatus.CREATED:
+            body = response.json()
+            logger.error(
+                f"Got unexpected status {response.status_code}, reason {body}."
+            )
+        assert response.status_code == HTTPStatus.CREATED, body
+        assert "/startlists/" in response.headers["Location"]
 
         return _raceplans[0]
 
@@ -215,15 +219,15 @@ async def test_create_raceplan(
     """Should return 405 Method not allowed."""
     url = f"{http_service}/raceplans"
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
     request_body = json.dumps(context, indent=4, sort_keys=True, default=str)
 
-    session = ClientSession()
-    async with session.post(url, headers=headers, data=request_body) as response:
-        status = response.status
-    await session.close()
+    client = AsyncClient()
+    response = await client.post(url, headers=headers, content=request_body)
+    status = response.status_code
+    await client.aclose()
 
     assert status == HTTPStatus.METHOD_NOT_ALLOWED
 
@@ -236,13 +240,13 @@ async def test_get_all_raceplans(
     """Should return OK and a list of raceplans as json."""
     url = f"{http_service}/raceplans"
 
-    session = ClientSession()
-    async with session.get(url) as response:
-        raceplans = await response.json()
-    await session.close()
+    client = AsyncClient()
+    response = await client.get(url)
+    raceplans = response.json()
+    await client.aclose()
 
-    assert response.status == HTTPStatus.OK
-    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert response.status_code == HTTPStatus.OK
+    assert "application/json" in response.headers["Content-Type"]
     assert type(raceplans) is list
     assert len(raceplans) > 0
 
@@ -256,13 +260,13 @@ async def test_get_all_raceplan_by_event_id(
     event_id = context["event_id"]
 
     url = f"{http_service}/raceplans?eventId={event_id}"
-    session = ClientSession()
-    async with session.get(url) as response:
-        raceplans = await response.json()
-    await session.close()
+    client = AsyncClient()
+    response = await client.get(url)
+    raceplans = response.json()
+    await client.aclose()
 
-    assert response.status == HTTPStatus.OK
-    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert response.status_code == HTTPStatus.OK
+    assert "application/json" in response.headers["Content-Type"]
     assert type(raceplans) is list
     assert len(raceplans) == 1
     assert raceplans[0]["event_id"] == event_id
@@ -281,11 +285,12 @@ async def test_get_raceplan(
     raceplan_id = context["id"]
     url = f"{url}/{raceplan_id}"
 
-    async with ClientSession() as session, session.get(url) as response:
-        raceplan = await response.json()
+    async with AsyncClient() as client:
+        response = await client.get(url)
+        raceplan = response.json()
 
-    assert response.status == HTTPStatus.OK
-    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert response.status_code == HTTPStatus.OK
+    assert "application/json" in response.headers["Content-Type"]
     assert type(raceplan) is dict
     assert raceplan["id"] == raceplan_id
     assert raceplan["event_id"] == context["event_id"]
@@ -302,16 +307,16 @@ async def test_validate_raceplan(
     raceplan_id = context["id"]
     url = f"{http_service}/raceplans/{raceplan_id}/validate"
     headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Authorization": f"Bearer {token}",
     }
-    session = ClientSession()
-    async with session.post(url, headers=headers) as response:
-        status = response.status
-        results = await response.json()
-    await session.close()
+    client = AsyncClient()
+    response = await client.post(url, headers=headers)
+    status = response.status_code
+    results = response.json()
+    await client.aclose()
 
     assert status == HTTPStatus.OK
-    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert "application/json" in response.headers["Content-Type"]
     assert type(results) is dict
     assert len(results) == 0
 
@@ -323,33 +328,32 @@ async def test_update_race(
 ) -> None:
     """Should return No Content."""
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
     races = context["races"]
     race_to_be_updated_id = races[-1]  # we update the last race
 
     url = f"{http_service}/races/{race_to_be_updated_id}"
 
-    async with ClientSession() as session:
-        async with session.get(url) as response:
-            race_to_be_updated = await response.json()
+    async with AsyncClient() as client:
+        response = await client.get(url)
+        race_to_be_updated = response.json()
         # we change the start-time:
         race_to_be_updated["start_time"] = "2021-12-06T11:00:00"
         request_body = json.dumps(
             race_to_be_updated, indent=4, sort_keys=True, default=str
         )
-        async with session.put(url, headers=headers, data=request_body) as response:
-            pass
+        response = await client.put(url, headers=headers, content=request_body)
 
-        assert response.status == HTTPStatus.NO_CONTENT
+        assert response.status_code == HTTPStatus.NO_CONTENT
 
         # We get all the races in event to verify:
         url = f"{http_service}/races?eventId={context['event_id']}"
-        async with session.get(url, headers=headers, data=request_body) as response:
-            _ = await response.json()
+        response = await client.get(url, headers=headers)
+        _ = response.json()
 
-        assert response.status == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.OK
 
 
 @pytest.mark.contract
@@ -360,22 +364,19 @@ async def test_update_raceplan(
     """Should return No Content."""
     url = f"{http_service}/raceplans"
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
     raceplan_id = context["id"]
     url = f"{url}/{raceplan_id}"
     update_raceplan = deepcopy(context)
-    update_raceplan["event_id"] = "new_event_id"
+    update_raceplan["event_id"] = str(uuid.uuid4())
     request_body = json.dumps(update_raceplan, indent=4, sort_keys=True, default=str)
-    async with (
-        ClientSession() as session,
-        session.put(url, headers=headers, data=request_body) as response,
-    ):
-        pass
+    async with AsyncClient() as client:
+        response = await client.put(url, headers=headers, content=request_body)
 
-    assert response.status == HTTPStatus.NO_CONTENT
+    assert response.status_code == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.contract
@@ -384,18 +385,17 @@ async def test_delete_raceplan(http_service: Any, token: MockFixture) -> None:
     """Should return No Content."""
     url = f"{http_service}/raceplans"
     headers = {
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Authorization": f"Bearer {token}",
     }
 
-    async with ClientSession() as session:
-        async with session.get(url) as response:
-            raceplans = await response.json()
+    async with AsyncClient() as client:
+        response = await client.get(url)
+        raceplans = response.json()
         raceplan_id = raceplans[0]["id"]
         url = f"{url}/{raceplan_id}"
-        async with session.delete(url, headers=headers) as response:
-            pass
+        response = await client.delete(url, headers=headers)
 
-    assert response.status == HTTPStatus.NO_CONTENT
+    assert response.status_code == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.contract
@@ -404,16 +404,16 @@ async def test_get_all_raceplan_by_event_id_when_event_does_not_exist(
     http_service: Any, token: MockFixture, context: dict
 ) -> None:
     """Should return OK and an empty list."""
-    event_id = "does_not_exist"
+    event_id = str(uuid.uuid4())  # an event that does not exist
     url = f"{http_service}/raceplans?eventId={event_id}"
 
-    session = ClientSession()
-    async with session.get(url) as response:
-        raceplans = await response.json()
-    await session.close()
+    client = AsyncClient()
+    response = await client.get(url)
+    raceplans = response.json()
+    await client.aclose()
 
-    assert response.status == HTTPStatus.OK
-    assert "application/json" in response.headers[hdrs.CONTENT_TYPE]
+    assert response.status_code == HTTPStatus.OK
+    assert "application/json" in response.headers["Content-Type"]
     assert type(raceplans) is list
     assert len(raceplans) == 0
 

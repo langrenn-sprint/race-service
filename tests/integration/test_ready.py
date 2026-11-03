@@ -3,14 +3,14 @@
 from http import HTTPStatus
 
 import pytest
-from aiohttp.test_utils import TestClient as _TestClient
+from fastapi.testclient import TestClient
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-async def test_ready(client: _TestClient) -> None:
+async def test_ready(client: TestClient) -> None:
     """Should return OK."""
-    resp = await client.get("/ready")
-    assert resp.status == HTTPStatus.OK
-    text = await resp.text()
+    resp = client.get("/ready")
+    assert resp.status_code == HTTPStatus.OK
+    text = resp.text
     assert "OK" in text

@@ -2,15 +2,23 @@
 
 from datetime import datetime
 from functools import reduce
+from uuid import UUID, uuid4
 
 import pytest
 
-from race_service.commands.startlists_commands import (
+from app.commands.startlists_commands import (
     generate_start_entries_for_interval_start,
 )
-from race_service.models import IntervalStartRace, Raceplan, StartEntry, Startlist
+from app.models import IntervalStartRace, Raceplan, StartEntry, Startlist
 
 # --- Interval Start ---
+
+
+# Ids are generated, so we compare everything else:
+IGNORED_FIELDS = {"id", "raceplan_id"}
+# Placeholder for references that are set when the objects are generated:
+PLACEHOLDER_ID = UUID(int=0)
+STARTLIST_ID = UUID("8b0a6a39-3f0c-4f0e-9a3b-2d4b8f6c1e11")
 
 
 @pytest.mark.unit
@@ -25,6 +33,7 @@ async def test_generate_start_entries_for_interval_start(
 ) -> None:
     """Should return an instance of Raceplan equal to the expected raceplan."""
     start_entries = await generate_start_entries_for_interval_start(
+        STARTLIST_ID,
         competition_format_interval_start,
         raceclasses,
         races_interval_start,
@@ -39,9 +48,12 @@ async def test_generate_start_entries_for_interval_start(
     if not reduce(
         lambda x, y: x and y,
         map(
-            lambda p, q: p == q,
+            lambda p, q: (
+                p.model_dump(exclude=IGNORED_FIELDS)
+                == q.model_dump(exclude=IGNORED_FIELDS)
+            ),
             start_entries,
-            expected_startlist_interval_start.start_entries,
+            expected_start_entries_interval_start,
         ),
         True,
     ):
@@ -139,11 +151,11 @@ async def raceclasses(
 async def raceplan_interval_start(event_interval_start: dict) -> Raceplan:
     """Create a mock raceplan object."""
     raceplan = Raceplan(event_id=event_interval_start["id"], races=[])
-    raceplan.id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
+    raceplan.id = UUID("290e70d5-0933-4af0-bb53-1d705ba7eb95")
     raceplan.no_of_contestants = 8
     # Add list of race_ids:
-    for race_id in range(1, 6):
-        raceplan.races.append(str(race_id))
+    for _ in range(1, 6):
+        raceplan.races.append(uuid4())
     return raceplan
 
 
@@ -156,7 +168,7 @@ async def races_interval_start(
     races: list[IntervalStartRace] = []
     races.append(
         IntervalStartRace(
-            id="1",
+            id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             raceclass="J15",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
@@ -165,14 +177,14 @@ async def races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=raceplan_interval_start.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IntervalStartRace(
-            id="2",
+            id="ce565303-7508-5221-9f88-4630b31cf3dc",
             raceclass="G15",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
@@ -181,14 +193,14 @@ async def races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=raceplan_interval_start.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IntervalStartRace(
-            id="3",
+            id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             raceclass="J16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 09:11:30"),
@@ -197,14 +209,14 @@ async def races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=raceplan_interval_start.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
     )
     races.append(
         IntervalStartRace(
-            id="4",
+            id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 09:12:30"),
@@ -213,7 +225,7 @@ async def races_interval_start(
                 "max_no_of_contestants_in_race"
             ],
             event_id=raceplan_interval_start.event_id,
-            raceplan_id="",
+            raceplan_id=PLACEHOLDER_ID,
             start_entries=[],
             results={},
         )
@@ -352,9 +364,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     start_entries: list[StartEntry] = []
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="1",
+            startlist_id=STARTLIST_ID,
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             bib=1,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:00:00"),
@@ -364,9 +375,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="1",
+            startlist_id=STARTLIST_ID,
+            race_id="311ad0e6-2c39-506d-b2f9-1c317c38b50b",
             bib=2,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:00:30"),
@@ -376,9 +386,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=3,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:01:00"),
@@ -388,9 +397,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="2",
+            startlist_id=STARTLIST_ID,
+            race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=4,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:01:30"),
@@ -400,9 +408,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=5,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:11:30"),
@@ -412,9 +419,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="3",
+            startlist_id=STARTLIST_ID,
+            race_id="0d1a98aa-7a4a-589a-a6f6-2c652c454901",
             bib=6,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:12:00"),
@@ -424,9 +430,8 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=7,
             starting_position=1,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:12:30"),
@@ -436,13 +441,12 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
     )
     start_entries.append(
         StartEntry(
-            id="",
-            startlist_id="",
-            race_id="4",
+            startlist_id=STARTLIST_ID,
+            race_id="0b59eb8e-e5b1-567e-9713-4caf1a3b155f",
             bib=8,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:13:00"),
-            name="Eigth Contender",
+            name="Eight Contender",
             club="Lyn Ski",
         )
     )

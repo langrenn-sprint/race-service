@@ -6,13 +6,13 @@ from datetime import datetime
 import pytest
 from pytest_mock import MockFixture
 
-from race_service.adapters import StartEntryNotFoundError
-from race_service.models import StartEntry
-from race_service.services import (
+from app.adapters import StartEntryNotFoundError
+from app.models import StartEntry
+from app.services import (
     IllegalValueError,
     StartEntriesService,
 )
-from race_service.services.start_entries_service import (
+from app.services.start_entries_service import (
     CouldNotCreateStartEntryError,
 )
 
@@ -57,18 +57,16 @@ async def test_create_start_entry(
 ) -> None:
     """Should return Created, location header."""
     mocker.patch(
-        "race_service.services.start_entries_service.create_id",
-        return_value=start_entry_mock.id,
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=start_entry_mock.id,
     )
 
-    _id = await StartEntriesService.create_start_entry(
-        db=None, start_entry=new_start_entry
-    )
-    assert _id == start_entry_mock.id
+    _id = await StartEntriesService.create_start_entry(start_entry=new_start_entry)
+    assert _id == new_start_entry.id
 
 
 @pytest.mark.integration
@@ -80,18 +78,18 @@ async def test_update_start_entry(
 ) -> None:
     """Should return a truthy result."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry_mock,
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.update_start_entry",
         return_value=True,
     )
     updated_start_entry = deepcopy(new_start_entry)
     updated_start_entry.id = start_entry_mock.id
     assert start_entry_mock.id
     result = await StartEntriesService.update_start_entry(
-        db=None, id_=start_entry_mock.id, start_entry=updated_start_entry
+        id_=start_entry_mock.id, start_entry=updated_start_entry
     )
     assert result
 
@@ -104,46 +102,19 @@ async def test_delete_start_entry(
 ) -> None:
     """Should return a truthy result."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry_mock,
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
         return_value=True,
     )
     assert start_entry_mock.id
-    result = await StartEntriesService.delete_start_entry(
-        db=None, id_=start_entry_mock.id
-    )
+    result = await StartEntriesService.delete_start_entry(id_=start_entry_mock.id)
     assert result
 
 
 # Bad cases
-
-
-@pytest.mark.integration
-@pytest.mark.asyncio
-async def test_create_start_entry_input_id(
-    mocker: MockFixture,
-    new_start_entry: StartEntry,
-    start_entry_mock: StartEntry,
-) -> None:
-    """Should raise IllegalValueError."""
-    mocker.patch(
-        "race_service.services.start_entries_service.create_id",
-        return_value=start_entry_mock.id,
-    )
-    mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
-        return_value=start_entry_mock.id,
-    )
-    start_entry_with_id = deepcopy(new_start_entry)
-    start_entry_with_id.id = start_entry_mock.id
-
-    with pytest.raises(IllegalValueError):
-        await StartEntriesService.create_start_entry(
-            db=None, start_entry=start_entry_with_id
-        )
 
 
 @pytest.mark.integration
@@ -155,18 +126,16 @@ async def test_create_start_entry_adapter_fails(
 ) -> None:
     """Should raise IllegalValueError."""
     mocker.patch(
-        "race_service.services.start_entries_service.create_id",
-        return_value=start_entry_mock.id,
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=None,
     )
 
     with pytest.raises(CouldNotCreateStartEntryError):
-        await StartEntriesService.create_start_entry(
-            db=None, start_entry=new_start_entry
-        )
+        await StartEntriesService.create_start_entry(start_entry=new_start_entry)
 
 
 @pytest.mark.integration
@@ -178,7 +147,7 @@ async def test_update_start_entry_not_found(
 ) -> None:
     """Should raise StartEntryNotFoundError."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         side_effect=StartEntryNotFoundError(f"StartEntry with id {id} not found"),
     )
     updated_start_entry = deepcopy(new_start_entry)
@@ -187,7 +156,7 @@ async def test_update_start_entry_not_found(
     assert start_entry_mock.id
     with pytest.raises(StartEntryNotFoundError):
         await StartEntriesService.update_start_entry(
-            db=None, id_=start_entry_mock.id, start_entry=updated_start_entry
+            id_=start_entry_mock.id, start_entry=updated_start_entry
         )
 
 
@@ -200,16 +169,16 @@ async def test_update_start_entry_wrong_id(
 ) -> None:
     """Should raise StartEntryNotFoundError."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         return_value=start_entry_mock,
     )
     updated_start_entry = deepcopy(new_start_entry)
-    updated_start_entry.id = "wrong_id"
+    updated_start_entry.id = "a0e01d95-4362-54d8-9003-5dac0f233828"
 
     assert start_entry_mock.id
     with pytest.raises(IllegalValueError):
         await StartEntriesService.update_start_entry(
-            db=None, id_=start_entry_mock.id, start_entry=updated_start_entry
+            id_=start_entry_mock.id, start_entry=updated_start_entry
         )
 
 
@@ -221,14 +190,14 @@ async def test_delete_start_entry_not_found(
 ) -> None:
     """Should raise StartEntryNotFoundError."""
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
         side_effect=StartEntryNotFoundError(f"StartEntry with id {id} not found"),
     )
     mocker.patch(
-        "race_service.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.delete_start_entry",
         return_value=True,
     )
 
     assert start_entry_mock.id
     with pytest.raises(StartEntryNotFoundError):
-        await StartEntriesService.delete_start_entry(db=None, id_=start_entry_mock.id)
+        await StartEntriesService.delete_start_entry(id_=start_entry_mock.id)

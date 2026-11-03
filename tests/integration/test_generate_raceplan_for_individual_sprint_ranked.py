@@ -7,15 +7,10 @@ from typing import Any
 
 import jwt
 import pytest
-from aiohttp import hdrs
-from aiohttp.test_utils import TestClient as _TestClient
-from aioresponses import aioresponses
+from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 
-from race_service.models import Raceplan
-
-USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
-USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+from app.models import Raceplan
 
 
 @pytest.fixture
@@ -23,7 +18,11 @@ def token() -> str:
     """Create a valid token."""
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
-    payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
+    payload = {
+        "username": os.getenv("ADMIN_USERNAME"),
+        "exp": 9999999999,
+        "role": "admin",
+    }
     return jwt.encode(payload, secret, algorithm)
 
 
@@ -266,7 +265,7 @@ async def raceclasses() -> list[dict[str, Any]]:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_generate_raceplan_for_event(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -276,67 +275,61 @@ async def test_generate_raceplan_for_event(
 ) -> None:
     """Should return 201 Created, location header."""
     raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
-    mocker.patch(
-        "race_service.services.raceplans_service.create_id",
+    create_raceplan = mocker.patch(
+        "app.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=raceplan_id,
-    )
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
-        return_value=Raceplan(
-            id=raceplan_id, event_id=event["id"], races=[], no_of_contestants=0
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        side_effect=lambda id_: Raceplan(
+            id=id_, event_id=event["id"], races=[], no_of_contestants=0
         ),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        "app.adapters.races_adapter.RacesAdapter.create_race",
         return_value=str(uuid.uuid4()),
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id",
+        "app.adapters.races_adapter.RacesAdapter.get_races_by_event_id",
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
 
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=races,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(
-            "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
-        )
-        assert resp.status == HTTPStatus.CREATED
-        assert f"/raceplans/{raceplan_id}" in resp.headers[hdrs.LOCATION]
+    resp = client.post(
+        "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
+    )
+    assert resp.status_code == HTTPStatus.CREATED
+    created_raceplan = create_raceplan.call_args.args[0]
+    assert f"/raceplans/{created_raceplan.id}" in resp.headers["Location"]
 
 
 @pytest.fixture
@@ -359,7 +352,7 @@ async def raceclass_with_more_than_max_contestants() -> list[dict[str, Any]]:
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_raceclass(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -370,60 +363,53 @@ async def test_generate_raceplan_for_event_exceeds_max_no_of_contestants_in_race
     """Should return 400 Bad request."""
     raceplan_id = "290e70d5-0933-4af0-bb53-1d705ba7eb95"
     mocker.patch(
-        "race_service.services.raceplans_service.create_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=raceplan_id,
-    )
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value={"id": raceplan_id},
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        "app.adapters.races_adapter.RacesAdapter.create_race",
         return_value=str(uuid.uuid4()),
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_races_by_event_id",
+        "app.adapters.races_adapter.RacesAdapter.get_races_by_event_id",
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclass_with_more_than_max_contestants,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(
-            "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
-        )
-        assert resp.status == HTTPStatus.BAD_REQUEST
-        body = await resp.json()
-        assert "Unsupported value for no of contestants" in body["detail"]
+    resp = client.post(
+        "/raceplans/generate-raceplan-for-event", headers=headers, json=request_body
+    )
+    assert resp.status_code == HTTPStatus.BAD_REQUEST
+    body = resp.json()
+    assert "Unsupported value for no of contestants" in body["detail"]
 
 
 races = [

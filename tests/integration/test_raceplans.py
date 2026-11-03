@@ -1,6 +1,7 @@
 """Integration test cases for the raceplans route."""
 
 import os
+import uuid
 from copy import deepcopy
 from datetime import datetime
 from http import HTTPStatus
@@ -9,16 +10,11 @@ from typing import Any
 
 import jwt
 import pytest
-from aiohttp import hdrs
-from aiohttp.test_utils import TestClient as _TestClient
-from aioresponses import aioresponses
+from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 
-from race_service.adapters import RaceclassesNotFoundError, RaceplanNotFoundError
-from race_service.models import IndividualSprintRace, IntervalStartRace, Raceplan
-
-USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
-USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
+from app.adapters import RaceclassesNotFoundError, RaceplanNotFoundError
+from app.models import IndividualSprintRace, IntervalStartRace, Raceplan
 
 
 @pytest.fixture
@@ -26,7 +22,11 @@ def token() -> str:
     """Create a valid token."""
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
-    payload = {"identity": os.getenv("ADMIN_USERNAME"), "roles": ["admin"]}
+    payload = {
+        "username": os.getenv("ADMIN_USERNAME"),
+        "exp": 9999999999,
+        "role": "admin",
+    }
     return jwt.encode(payload, secret, algorithm)
 
 
@@ -35,7 +35,7 @@ def token_unsufficient_role() -> str:
     """Create a valid token."""
     secret = os.getenv("JWT_SECRET")
     algorithm = "HS256"
-    payload = {"identity": "user", "roles": ["user"]}
+    payload = {"username": "user", "exp": 9999999999, "role": "user"}
     return jwt.encode(payload, secret, algorithm)
 
 
@@ -141,53 +141,53 @@ async def interval_start_races(event: dict) -> list[IntervalStartRace]:
     """Create a a list of interval-start races."""
     return [
         IntervalStartRace(
-            id="race_1",
+            id="f910dc1f-18da-50b1-948b-c847165a0556",
             raceclass="G16",
             order=1,
             start_time=datetime.fromisoformat("2021-08-31 12:00:00"),
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="interval_start",
         ),
         IntervalStartRace(
-            id="race_2",
+            id="fa9e1174-f861-5300-a867-1cc364621b5c",
             raceclass="G16",
             order=2,
             start_time=datetime.fromisoformat("2021-08-31 12:15:00"),
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="interval_start",
         ),
         IntervalStartRace(
-            id="race_3",
+            id="e222b1af-b820-5165-a2ad-ae76db9c9456",
             raceclass="G16",
             order=3,
             start_time=datetime.fromisoformat("2021-08-31 12:30:00"),
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="interval_start",
         ),
         IntervalStartRace(
-            id="race_4",
+            id="551c94af-eb9d-58b5-99d6-02299bd6e363",
             raceclass="G16",
             order=4,
             start_time=datetime.fromisoformat("2021-08-31 12:45:00"),
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="interval_start",
@@ -201,7 +201,7 @@ async def new_raceplan_interval_start(
 ) -> Raceplan:
     """Create a raceplan object."""
     return Raceplan(
-        id="raceplan_1",
+        id="b24f50bf-52e0-589a-a8cc-2bee6f7a4b64",
         event_id=event["id"],
         no_of_contestants=32,
         races=[race.id for race in interval_start_races],
@@ -226,7 +226,7 @@ async def individual_sprint_races(event: dict) -> list[IndividualSprintRace]:
     """Create a a list of individual sprint races."""
     return [
         IndividualSprintRace(
-            id="race_1",
+            id="f910dc1f-18da-50b1-948b-c847165a0556",
             raceclass="G16",
             order=1,
             round="Q",
@@ -236,13 +236,13 @@ async def individual_sprint_races(event: dict) -> list[IndividualSprintRace]:
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="individual_sprint",
         ),
         IndividualSprintRace(
-            id="race_2",
+            id="fa9e1174-f861-5300-a867-1cc364621b5c",
             raceclass="G16",
             order=2,
             round="Q",
@@ -252,13 +252,13 @@ async def individual_sprint_races(event: dict) -> list[IndividualSprintRace]:
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="individual_sprint",
         ),
         IndividualSprintRace(
-            id="race_3",
+            id="e222b1af-b820-5165-a2ad-ae76db9c9456",
             raceclass="G16",
             order=3,
             round="Q",
@@ -268,13 +268,13 @@ async def individual_sprint_races(event: dict) -> list[IndividualSprintRace]:
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="individual_sprint",
         ),
         IndividualSprintRace(
-            id="race_4",
+            id="551c94af-eb9d-58b5-99d6-02299bd6e363",
             raceclass="G16",
             order=4,
             round="Q",
@@ -284,7 +284,7 @@ async def individual_sprint_races(event: dict) -> list[IndividualSprintRace]:
             no_of_contestants=8,
             max_no_of_contestants=10,
             event_id=event["id"],
-            raceplan_id="",
+            raceplan_id="290e70d5-0933-4af0-bb53-1d705ba7eb95",
             start_entries=[],
             results={},
             datatype="individual_sprint",
@@ -320,7 +320,7 @@ async def raceplan_individual_sprint(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_create_raceplan(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     new_raceplan_interval_start: Raceplan,
@@ -330,27 +330,23 @@ async def test_create_raceplan(
     """Should return 405 Method Not Allowed."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.services.raceplans_service.create_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.create_raceplan",
-        return_value=raceplan_id,
-    )
-    mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.create_race",
+        "app.adapters.races_adapter.RacesAdapter.create_race",
         side_effect=interval_start_races,
     )
 
@@ -359,20 +355,18 @@ async def test_create_raceplan(
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-        resp = await client.post("/raceplans", headers=headers, data=request_body)
-        assert resp.status == HTTPStatus.METHOD_NOT_ALLOWED
+    resp = client.post("/raceplans", headers=headers, content=request_body)
+    assert resp.status_code == HTTPStatus.METHOD_NOT_ALLOWED
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_raceplan_by_id(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -381,39 +375,36 @@ async def test_get_raceplan_by_id(
     """Should return OK, and a body containing one raceplan."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=interval_start_races,
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.get(f"/raceplans/{raceplan_id}")
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert body["id"] == raceplan_id
-        assert body["event_id"] == raceplan_interval_start.event_id
-        assert len(body["races"]) == len(raceplan_interval_start.races)
-        for race in body["races"]:
-            assert race["raceclass"]
-            assert race["order"]
-            assert race["start_time"]
+    resp = client.get(f"/raceplans/{raceplan_id}")
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert body["id"] == str(raceplan_id)
+    assert body["event_id"] == str(raceplan_interval_start.event_id)
+    assert len(body["races"]) == len(raceplan_interval_start.races)
+    for race in body["races"]:
+        assert race["raceclass"]
+        assert race["order"]
+        assert race["start_time"]
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -425,50 +416,47 @@ async def test_validate_raceplan(
     """Should return OK, and an empty list."""
     raceplan_id = raceplan_individual_sprint.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=individual_sprint_races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert len(body) == 0
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert len(body) == 0
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan_interval_start(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -480,50 +468,47 @@ async def test_validate_raceplan_interval_start(
     """Should return OK, and an empty list."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=interval_start_races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format_interval_start,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert len(body) == 0
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert len(body) == 0
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan_race_has_no_contestants(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -538,58 +523,55 @@ async def test_validate_raceplan_race_has_no_contestants(
     races[0].no_of_contestants = 0
 
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert len(body) == 2  # noqa: PLR2004
-        assert "0" in body  # error on raceplan-result (key "0")
-        assert len(body["0"]) == 1
-        assert body["0"] == [
-            "The sum of contestants in races (24) is not equal to the number of contestants in the raceplan (32)."
-        ]
-        assert "1" in body  # it is race with order 1 that has no contestants
-        assert len(body["1"]) == 1
-        assert body["1"] == ["Race has no contestants."]
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert len(body) == 2  # noqa: PLR2004
+    assert "0" in body  # error on raceplan-result (key "0")
+    assert len(body["0"]) == 1
+    assert body["0"] == [
+        "The sum of contestants in races (24) is not equal to the number of contestants in the raceplan (32)."
+    ]
+    assert "1" in body  # it is race with order 1 that has no contestants
+    assert len(body["1"]) == 1
+    assert body["1"] == ["Race has no contestants."]
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan_race_no_chronological_time(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -604,53 +586,50 @@ async def test_validate_raceplan_race_no_chronological_time(
     races[-1].start_time = races[0].start_time
 
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert len(body) == 1
-        assert "4" in body  # it is race with order 4 that has wrong time
-        assert len(body["4"]) == 1
-        assert body["4"] == ["Start time is not in chronological order."]
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert len(body) == 1
+    assert "4" in body  # it is race with order 4 that has wrong time
+    assert len(body["4"]) == 1
+    assert body["4"] == ["Start time is not in chronological order."]
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan_race_has_no_contestants_and_faulty_time(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -666,61 +645,58 @@ async def test_validate_raceplan_race_has_no_contestants_and_faulty_time(
     races[-1].start_time = races[0].start_time
 
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert len(body) == 2  # noqa: PLR2004
-        assert "0" in body  # error on raceplan-result (key "0")
-        assert len(body["0"]) == 1
-        assert body["0"] == [
-            "The sum of contestants in races (24) is not equal to the number of contestants in the raceplan (32)."
-        ]
-        assert "4" in body  # it is race with order 4 that has no contestants
-        assert len(body["4"]) == 2  # noqa: PLR2004
-        assert body["4"] == [
-            "Start time is not in chronological order.",
-            "Race has no contestants.",
-        ]
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert len(body) == 2  # noqa: PLR2004
+    assert "0" in body  # error on raceplan-result (key "0")
+    assert len(body["0"]) == 1
+    assert body["0"] == [
+        "The sum of contestants in races (24) is not equal to the number of contestants in the raceplan (32)."
+    ]
+    assert "4" in body  # it is race with order 4 that has no contestants
+    assert len(body["4"]) == 2  # noqa: PLR2004
+    assert body["4"] == [
+        "Start time is not in chronological order.",
+        "Race has no contestants.",
+    ]
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan_contestants_not_equal_no_of_contestants_in_raceclasses(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -737,56 +713,53 @@ async def test_validate_raceplan_contestants_not_equal_no_of_contestants_in_race
     raceplan_individual_sprint_with_faulty_contestants.no_of_contestants = 30
 
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint_with_faulty_contestants,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=individual_sprint_races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         return_value=raceclasses,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is dict
-        assert len(body) == 1
-        assert "0" in body  # error on raceplan-result (key "0")
-        assert len(body["0"]) == 2  # noqa: PLR2004
-        assert body["0"] == [
-            "The sum of contestants in races (32) is not equal to the number of contestants in the raceplan (30).",
-            "Number of contestants in raceplan (30) is not equal to the number of contestants in the raceclasses (32).",
-        ]
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is dict
+    assert len(body) == 1
+    assert "0" in body  # error on raceplan-result (key "0")
+    assert len(body["0"]) == 2  # noqa: PLR2004
+    assert body["0"] == [
+        "The sum of contestants in races (32) is not equal to the number of contestants in the raceplan (30).",
+        "Number of contestants in raceplan (30) is not equal to the number of contestants in the raceclasses (32).",
+    ]
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_raceplans_by_event_id(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -795,34 +768,31 @@ async def test_get_raceplans_by_event_id(
     event_id = raceplan_interval_start.event_id
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         side_effect=RaceplanNotFoundError(f"Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_interval_start],
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.get(f"/raceplans?eventId={event_id}")
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is list
-        assert len(body) == 1
-        assert body[0]["id"] == raceplan_id
-        assert body[0]["event_id"] == raceplan_interval_start.event_id
-        assert len(body[0]["races"]) == len(raceplan_interval_start.races)
-        for race_id in body[0]["races"]:
-            assert race_id
+    resp = client.get(f"/raceplans?eventId={event_id}")
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is list
+    assert len(body) == 1
+    assert body[0]["id"] == str(raceplan_id)
+    assert body[0]["event_id"] == str(raceplan_interval_start.event_id)
+    assert len(body[0]["races"]) == len(raceplan_interval_start.races)
+    for race_id in body[0]["races"]:
+        assert race_id
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_raceplans_by_event_id_individual_sprint(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_individual_sprint: Raceplan,
@@ -831,34 +801,31 @@ async def test_get_raceplans_by_event_id_individual_sprint(
     event_id = raceplan_individual_sprint.event_id
     raceplan_id = raceplan_individual_sprint.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         side_effect=RaceplanNotFoundError(f"Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_individual_sprint],
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.get(f"/raceplans?eventId={event_id}")
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is list
-        assert len(body) == 1
-        assert body[0]["id"] == raceplan_id
-        assert body[0]["event_id"] == raceplan_individual_sprint.event_id
-        assert len(body[0]["races"]) == len(raceplan_individual_sprint.races)
-        for race_id in body[0]["races"]:
-            assert race_id
+    resp = client.get(f"/raceplans?eventId={event_id}")
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is list
+    assert len(body) == 1
+    assert body[0]["id"] == str(raceplan_id)
+    assert body[0]["event_id"] == str(raceplan_individual_sprint.event_id)
+    assert len(body[0]["races"]) == len(raceplan_individual_sprint.races)
+    for race_id in body[0]["races"]:
+        assert race_id
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_update_raceplan_by_id(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -867,44 +834,44 @@ async def test_update_raceplan_by_id(
     """Should return No Content."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=interval_start_races,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
     request_body = dumps(
-        raceplan_interval_start.to_dict(), indent=4, sort_keys=True, default=str
+        raceplan_interval_start.model_dump(mode="json"),
+        indent=4,
+        sort_keys=True,
+        default=str,
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.put(
-            f"/raceplans/{raceplan_id}", headers=headers, data=request_body
-        )
-        assert resp.status == HTTPStatus.NO_CONTENT
+    resp = client.put(
+        f"/raceplans/{raceplan_id}", headers=headers, content=request_body
+    )
+    assert resp.status_code == HTTPStatus.NO_CONTENT
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_all_raceplans(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -912,29 +879,27 @@ async def test_get_all_raceplans(
     """Should return OK and a valid json body."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
         return_value=[raceplan_interval_start],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-        resp = await client.get("/raceplans")
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        raceplans = await resp.json()
-        assert type(raceplans) is list
-        assert len(raceplans) > 0
-        assert raceplans[0]["id"] == raceplan_id
+    resp = client.get("/raceplans")
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    raceplans = resp.json()
+    assert type(raceplans) is list
+    assert len(raceplans) > 0
+    assert raceplans[0]["id"] == str(raceplan_id)
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_all_raceplans_individual_sprint(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_individual_sprint: Raceplan,
@@ -942,29 +907,27 @@ async def test_get_all_raceplans_individual_sprint(
     """Should return OK and a valid json body."""
     raceplan_id = raceplan_individual_sprint.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_all_raceplans",
         return_value=[raceplan_individual_sprint],
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-        resp = await client.get("/raceplans")
-        assert resp.status == HTTPStatus.OK
-        assert "application/json" in resp.headers[hdrs.CONTENT_TYPE]
-        body = await resp.json()
-        assert type(body) is list
-        assert len(body) > 0
-        assert body[0]["id"] == raceplan_id
+    resp = client.get("/raceplans")
+    assert resp.status_code == HTTPStatus.OK
+    assert "application/json" in resp.headers["Content-Type"]
+    body = resp.json()
+    assert type(body) is list
+    assert len(body) > 0
+    assert body[0]["id"] == str(raceplan_id)
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_delete_raceplan_by_id(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -972,33 +935,30 @@ async def test_delete_raceplan_by_id(
     """Should return No Content."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=raceplan_interval_start.races,
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.delete_race",
+        "app.adapters.races_adapter.RacesAdapter.delete_race",
         return_value=None,
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
+    headers = {"Authorization": f"Bearer {token}"}
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.delete(f"/raceplans/{raceplan_id}", headers=headers)
-        assert resp.status == HTTPStatus.NO_CONTENT
+    resp = client.delete(f"/raceplans/{raceplan_id}", headers=headers)
+    assert resp.status_code == HTTPStatus.NO_CONTENT
 
 
 # Bad cases
@@ -1007,7 +967,7 @@ async def test_delete_raceplan_by_id(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_validate_raceplan_has_no_raceclasses(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     event: dict,
@@ -1019,48 +979,45 @@ async def test_validate_raceplan_has_no_raceclasses(
     """Should return 400 Bad request."""
     raceplan_id = raceplan_individual_sprint.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_individual_sprint,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
     mocker.patch(
-        "race_service.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
         side_effect=individual_sprint_races,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_raceclasses",
+        "app.adapters.events_adapter.EventsAdapter.get_raceclasses",
         side_effect=RaceclassesNotFoundError(
             f"No raceclasses found for event {event['id']}."
         ),
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_event_by_id",
+        "app.adapters.events_adapter.EventsAdapter.get_event_by_id",
         return_value=event,
     )
     mocker.patch(
-        "race_service.adapters.events_adapter.EventsAdapter.get_competition_format",
+        "app.adapters.events_adapter.EventsAdapter.get_competition_format",
         return_value=competition_format,
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
-        assert resp.status == HTTPStatus.BAD_REQUEST
+    resp = client.post(f"/raceplans/{raceplan_id}/validate", headers=headers)
+    assert resp.status_code == HTTPStatus.BAD_REQUEST
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_update_raceplan_by_id_missing_mandatory_property(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -1068,38 +1025,33 @@ async def test_update_raceplan_by_id_missing_mandatory_property(
     """Should return 422 HTTPUnprocessableEntity."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
-    request_body = {"id": raceplan_id}
+    request_body = {"id": str(raceplan_id)}
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.put(
-            f"/raceplans/{raceplan_id}", headers=headers, json=request_body
-        )
-        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
+    resp = client.put(f"/raceplans/{raceplan_id}", headers=headers, json=request_body)
+    assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_update_raceplan_by_id_different_id_in_body(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
@@ -1107,34 +1059,33 @@ async def test_update_raceplan_by_id_different_id_in_body(
     """Should return 422 HTTPUnprocessableEntity."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
     update_body = deepcopy(raceplan_interval_start)
-    update_body.id = "different_id"
-    request_body = dumps(update_body.to_dict(), indent=4, sort_keys=True, default=str)
+    update_body.id = uuid.UUID("2b920f5c-eb82-5655-bd13-2001e5f0683e")
+    request_body = dumps(
+        update_body.model_dump(mode="json"), indent=4, sort_keys=True, default=str
+    )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.put(
-            f"/raceplans/{raceplan_id}", headers=headers, data=request_body
-        )
-        assert resp.status == HTTPStatus.UNPROCESSABLE_ENTITY
+    resp = client.put(
+        f"/raceplans/{raceplan_id}", headers=headers, content=request_body
+    )
+    assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 # Unauthorized cases:
@@ -1143,66 +1094,62 @@ async def test_update_raceplan_by_id_different_id_in_body(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_update_raceplan_by_id_no_authorization(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 401 Unauthorized."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
     }
 
     request_body = dumps(
-        raceplan_interval_start.to_dict(), indent=4, sort_keys=True, default=str
+        raceplan_interval_start.model_dump(mode="json"),
+        indent=4,
+        sort_keys=True,
+        default=str,
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
-
-        resp = await client.put(
-            f"/raceplans/{raceplan_id}", headers=headers, data=request_body
-        )
-        assert resp.status == HTTPStatus.UNAUTHORIZED
+    resp = client.put(
+        f"/raceplans/{raceplan_id}", headers=headers, content=request_body
+    )
+    assert resp.status_code == HTTPStatus.UNAUTHORIZED
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_delete_raceplan_by_id_no_authorization(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 401 Unauthorized."""
     raceplan_id = raceplan_interval_start.id
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=raceplan_id,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=401)
-
-        resp = await client.delete(f"/raceplans/{raceplan_id}")
-        assert resp.status == HTTPStatus.UNAUTHORIZED
+    resp = client.delete(f"/raceplans/{raceplan_id}")
+    assert resp.status_code == HTTPStatus.UNAUTHORIZED
 
 
 # Forbidden:
@@ -1211,39 +1158,37 @@ async def test_delete_raceplan_by_id_no_authorization(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_update_raceplan_insufficient_role(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
-    token: MockFixture,
+    token_unsufficient_role: str,
     raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 403 Forbidden."""
-    raceplan_id = "does-not-exist"
+    raceplan_id = "c644a3f6-b351-595b-beca-813a3b77a7f7"
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         return_value=raceplan_interval_start,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=True,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[raceplan_interval_start],
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token_unsufficient_role}",
     }
 
     request_body = dumps(raceplan_interval_start, indent=4, sort_keys=True, default=str)
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=403)
-        resp = await client.put(
-            f"/raceplans/{raceplan_id}", headers=headers, data=request_body
-        )
-        assert resp.status == HTTPStatus.FORBIDDEN
+    resp = client.put(
+        f"/raceplans/{raceplan_id}", headers=headers, content=request_body
+    )
+    assert resp.status_code == HTTPStatus.FORBIDDEN
 
 
 # NOT FOUND CASES:
@@ -1252,91 +1197,87 @@ async def test_update_raceplan_insufficient_role(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_raceplan_not_found(
-    client: _TestClient, mocker: MockFixture, token: MockFixture
+    client: TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
     """Should return 404 Not found."""
-    raceplan_id = "does-not-exist"
+    raceplan_id = "c644a3f6-b351-595b-beca-813a3b77a7f7"
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         side_effect=RaceplanNotFoundError("Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-
-        resp = await client.get(f"/raceplans/{raceplan_id}")
-        assert resp.status == HTTPStatus.NOT_FOUND
+    resp = client.get(f"/raceplans/{raceplan_id}")
+    assert resp.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_update_raceplan_not_found(
-    client: _TestClient,
+    client: TestClient,
     mocker: MockFixture,
     token: MockFixture,
     raceplan_interval_start: Raceplan,
 ) -> None:
     """Should return 404 Not found."""
-    raceplan_id = "does-not-exist"
+    raceplan_id = "c644a3f6-b351-595b-beca-813a3b77a7f7"
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         side_effect=RaceplanNotFoundError(
             f"Raceplan with id {raceplan_interval_start.id} not found."
         ),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.update_raceplan",
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
     headers = {
-        hdrs.CONTENT_TYPE: "application/json",
-        hdrs.AUTHORIZATION: f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
     }
 
     request_body = dumps(
-        raceplan_interval_start.to_dict(), indent=4, sort_keys=True, default=str
+        raceplan_interval_start.model_dump(mode="json"),
+        indent=4,
+        sort_keys=True,
+        default=str,
     )
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-        resp = await client.put(
-            f"/raceplans/{raceplan_id}", headers=headers, data=request_body
-        )
-        assert resp.status == HTTPStatus.NOT_FOUND
+    resp = client.put(
+        f"/raceplans/{raceplan_id}", headers=headers, content=request_body
+    )
+    assert resp.status_code == HTTPStatus.NOT_FOUND
 
 
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_delete_raceplan_not_found(
-    client: _TestClient, mocker: MockFixture, token: MockFixture
+    client: TestClient, mocker: MockFixture, token: MockFixture
 ) -> None:
     """Should return 404 Not found."""
-    raceplan_id = "does-not-exist"
+    raceplan_id = "c644a3f6-b351-595b-beca-813a3b77a7f7"
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplan_by_id",
         side_effect=RaceplanNotFoundError("Raceplan with id {id} not found."),
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.delete_raceplan",
         return_value=None,
     )
     mocker.patch(
-        "race_service.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
+        "app.adapters.raceplans_adapter.RaceplansAdapter.get_raceplans_by_event_id",
         return_value=[],
     )
 
-    headers = {hdrs.AUTHORIZATION: f"Bearer {token}"}
+    headers = {"Authorization": f"Bearer {token}"}
 
-    with aioresponses(passthrough=["http://127.0.0.1"]) as m:
-        m.post(f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/authorize", status=204)
-        resp = await client.delete(f"/raceplans/{raceplan_id}", headers=headers)
-        assert resp.status == HTTPStatus.NOT_FOUND
+    resp = client.delete(f"/raceplans/{raceplan_id}", headers=headers)
+    assert resp.status_code == HTTPStatus.NOT_FOUND

@@ -4,7 +4,7 @@ from http import HTTPStatus
 from typing import Any
 
 import pytest
-from aiohttp import ClientSession
+from httpx import AsyncClient
 
 
 @pytest.mark.contract
@@ -13,10 +13,10 @@ async def test_ping(http_service: Any) -> None:
     """Should return OK."""
     url = f"{http_service}/ping"
 
-    session = ClientSession()
-    async with session.get(url) as response:
-        text = await response.text()
-    await session.close()
+    client = AsyncClient()
+    response = await client.get(url)
+    text = response.text
+    await client.aclose()
 
-    assert response.status == HTTPStatus.OK
+    assert response.status_code == HTTPStatus.OK
     assert text == "OK"
