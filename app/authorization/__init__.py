@@ -1,7 +1,6 @@
 """Authorization module initialization."""
 
 from .authorization import (
-    APIConfigurationError,
     Role,
     RoleChecker,
     TokenError,
@@ -10,7 +9,6 @@ from .authorization import (
 )
 
 __all__ = [
-    "APIConfigurationError",
     "Role",
     "RoleChecker",
     "TokenError",

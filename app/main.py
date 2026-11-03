@@ -21,7 +21,6 @@ from app.adapters import (
     TimeEventsAdapter,
 )
 from app.authorization import (
-    APIConfigurationError,
     TokenError,
     TokenMissingError,
     TokenValidationError,
@@ -193,29 +192,24 @@ api.add_middleware(
 
 @api.exception_handler(TokenError)
 async def token_exception_handler(request: Request, exc: TokenError) -> JSONResponse:
-    """Handle token validation errors."""
+    """Handle token errors.
+
+    Users without the required role get 403 from RoleChecker, not from here.
+    """
     _ = request  # Unused variable
-    if isinstance(exc, APIConfigurationError):
-        # The server is misconfigured (e.g. JWT_SECRET is missing), not the client.
-        # The details are logged where the error is raised, not returned to the client.
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Internal Server Error"},
-        )
-    if isinstance(exc, TokenMissingError):
+    if isinstance(exc, (TokenMissingError, TokenValidationError)):
+        # Missing, expired, wrongly signed or undecodable token:
+        # the client is not authenticated.
         return JSONResponse(
             status_code=401,
             content={"detail": "Not authenticated"},
         )
-    if isinstance(exc, TokenValidationError):
-        # Expired, wrongly signed or undecodable token: the client is not authenticated.
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Not authenticated"},
-        )
+    # Any other token error is a server problem, e.g. APIConfigurationError when
+    # JWT_SECRET is missing. The details are logged where the error is raised,
+    # not returned to the client.
     return JSONResponse(
-        status_code=403,
-        content={"detail": "Not authorized to access this resource"},
+        status_code=500,
+        content={"detail": "Internal Server Error"},
     )
 
 
