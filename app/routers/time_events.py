@@ -108,6 +108,10 @@ async def create_time_event(time_event: TimeEvent) -> TimeEvent:
                 )
             )
         await TimeEventsService.update_time_event(time_event.id, time_event)
+    except IllegalValueError as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e)
+        ) from e
     except (
         CouldNotCreateTimeEventError,
         TimeEventAllreadyExistError,

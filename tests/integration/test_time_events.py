@@ -2,11 +2,13 @@
 
 import os
 import uuid
+from collections.abc import Callable
 from copy import deepcopy
 from datetime import datetime
 from http import HTTPStatus
 from json import dumps
 from typing import Any
+from uuid import UUID
 
 import jwt
 import pytest
@@ -21,6 +23,25 @@ from app.models import (
     StartEntry,
     TimeEvent,
 )
+
+
+def not_found_until_created(time_event: TimeEvent) -> Callable[[UUID], TimeEvent]:
+    """Mock for get_time_event_by_id in create tests.
+
+    The first lookup (the duplicate-id check) finds nothing, later lookups
+    find the created time-event.
+    """
+    calls = 0
+
+    def get_time_event_by_id(id_: UUID) -> TimeEvent:
+        nonlocal calls
+        calls += 1
+        if calls == 1:
+            msg = f"TimeEvent with id {id_} not found."
+            raise TimeEventNotFoundError(msg)
+        return time_event.model_copy(update={"id": id_})
+
+    return get_time_event_by_id
 
 
 @pytest.fixture
@@ -236,7 +257,7 @@ async def test_create_time_event(
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -311,7 +332,7 @@ async def test_create_time_event_race_result_not_found(
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -385,7 +406,7 @@ async def test_create_time_event_contestant_not_in_race(
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -688,7 +709,7 @@ async def test_create_time_event_race_not_found(
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -761,7 +782,7 @@ async def test_create_time_event_does_not_reference_race(
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -801,6 +822,10 @@ async def test_create_time_event_adapter_fails(
 ) -> None:
     """Should return 400 HTTPBadRequest."""
     mocker.patch(
+        "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        side_effect=TimeEventNotFoundError("Time-event not found."),
+    )
+    mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
         return_value=[],
     )
@@ -835,7 +860,7 @@ async def test_create_time_event_mandatory_property(
     time_event_id = time_event.id
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_events_by_race_id",
@@ -905,7 +930,7 @@ async def test_create_time_event_bib_timing_point_exist(
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
-        side_effect=lambda id_: time_event.model_copy(update={"id": id_}),
+        side_effect=not_found_until_created(time_event),
     )
     mocker.patch(
         "app.adapters.time_events_adapter.TimeEventsAdapter.update_time_event",
@@ -1256,3 +1281,34 @@ async def test_delete_time_event_not_found(
 
     resp = client.delete(f"/time-events/{time_event_id}", headers=headers)
     assert resp.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.integration
+async def test_create_time_event_id_already_exists(
+    client: TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    new_time_event: TimeEvent,
+    time_event: TimeEvent,
+) -> None:
+    """Should return 422 Unprocessable Entity when the given id is already in use."""
+    mocker.patch(
+        "app.adapters.time_events_adapter.TimeEventsAdapter.get_time_event_by_id",
+        return_value=time_event,
+    )
+    create_time_event = mocker.patch(
+        "app.adapters.time_events_adapter.TimeEventsAdapter.create_time_event",
+        return_value=time_event.id,
+    )
+
+    request_body = new_time_event.model_dump(mode="json")
+    request_body["id"] = str(time_event.id)
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+
+    resp = client.post("/time-events", headers=headers, json=request_body)
+    assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    assert "already exists" in resp.json()["detail"]
+    create_time_event.assert_not_called()

@@ -11,6 +11,7 @@ import pytest
 from fastapi.testclient import TestClient
 from pytest_mock import MockFixture
 
+from app.adapters import StartEntryNotFoundError
 from app.models import IntervalStartRace, Raceplan, Startlist
 
 MAX_NO_OF_CONTESTANTS_IN_raceclass = 80
@@ -316,6 +317,10 @@ async def test_generate_startlist_for_event(
     create_startlist = mocker.patch(
         "app.adapters.startlists_adapter.StartlistsAdapter.create_startlist",
         return_value=startlist_id,
+    )
+    mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
     )
     mocker.patch(
         "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",

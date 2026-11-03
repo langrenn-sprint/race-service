@@ -132,6 +132,10 @@ async def create_start_entry(race_id: UUID, new_start_entry: StartEntry) -> Resp
         startlist.no_of_contestants += 1
         startlist.start_entries.append(start_entry_id)
         await StartlistsService.update_startlist(startlist.id, startlist)
+    except IllegalValueError as e:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY, detail=str(e)
+        ) from e
     except (
         StartlistNotFoundError,
         RaceNotFoundError,

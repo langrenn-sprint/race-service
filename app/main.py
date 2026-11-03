@@ -39,7 +39,7 @@ from app.routers import (
 from app.utils import db_utils
 
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
-DB_HOST = os.getenv("DB_HOST", "mongodb")
+DB_HOST = os.getenv("DB_HOST", "localhost")
 DB_PORT = int(os.getenv("DB_PORT", "27017"))
 DB_NAME = os.getenv("DB_NAME", "races")
 DB_USER = os.getenv("DB_USER")
@@ -69,6 +69,8 @@ class EndpointFilter(logging.Filter):
 
 
 logger = logging.getLogger("uvicorn.error")
+# The application modules log through "uvicorn.error", so apply the configured level:
+logger.setLevel(LOGGING_LEVEL)
 access_logger = logging.getLogger("uvicorn.access")
 # Exclude metrics and health check endpoint from access logs
 excluded_endpoints = ["/health", "/metrics"]
@@ -169,9 +171,10 @@ async def token_exception_handler(
             content={"detail": "Not authenticated"},
         )
     if isinstance(exc, TokenValidationError):
+        # Expired, wrongly signed or undecodable token: the client is not authenticated.
         return JSONResponse(
-            status_code=403,
-            content={"detail": "Not authorized to access this resource"},
+            status_code=401,
+            content={"detail": "Not authenticated"},
         )
     return JSONResponse(
         status_code=403,

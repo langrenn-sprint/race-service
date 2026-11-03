@@ -48,12 +48,21 @@ class TimeEventsService:
             UUID: The id of the created time_event. None otherwise.
 
         Raises:
+            IllegalValueError: a time_event with the given id already exists
             CouldNotCreateTimeEventError: creation failed
             TimeEventAllreadyExistError: time_event for bib and given timing-point already exists
         """
         cls.logger.debug(f"trying to insert time_event: {time_event}")
         # Validation:
         await validate_time_event(time_event)
+        # The id may be given by the client, so it must not already be in use:
+        try:
+            await TimeEventsAdapter.get_time_event_by_id(time_event.id)
+        except TimeEventNotFoundError:
+            pass
+        else:
+            msg = f"Time-event with id {time_event.id} already exists."
+            raise IllegalValueError(msg) from None
         # If time-event for bib and given timing-point already exists in the race, throw error:
         _time_events = await TimeEventsAdapter.get_time_events_by_race_id(
             time_event.race_id,  # ty: ignore[invalid-argument-type]

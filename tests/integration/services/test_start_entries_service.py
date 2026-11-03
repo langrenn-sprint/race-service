@@ -57,6 +57,10 @@ async def test_create_start_entry(
 ) -> None:
     """Should return Created, location header."""
     mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
+    )
+    mocker.patch(
         "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=start_entry_mock.id,
     )
@@ -121,6 +125,10 @@ async def test_create_start_entry_adapter_fails(
     start_entry_mock: StartEntry,
 ) -> None:
     """Should raise IllegalValueError."""
+    mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
+    )
     mocker.patch(
         "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=None,

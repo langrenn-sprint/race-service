@@ -159,6 +159,10 @@ async def test_create_start_entry(
     """Should return Created, location header."""
     start_entry_id = start_entry.id
     mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
+    )
+    mocker.patch(
         "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=start_entry_id,
     )
@@ -581,6 +585,10 @@ async def test_create_start_entry_adapter_fails(
     new_start_entry: StartEntry,
 ) -> None:
     """Should return 400 HTTPBadRequest."""
+    mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        side_effect=StartEntryNotFoundError("Start-entry not found."),
+    )
     mocker.patch(
         "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
         return_value=None,
@@ -1065,3 +1073,50 @@ async def test_delete_start_entry_not_found(
         f"races/{race.id}/start-entries/{start_entry_id}", headers=headers
     )
     assert resp.status_code == HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.integration
+async def test_create_start_entry_id_already_exists(
+    client: TestClient,
+    mocker: MockFixture,
+    token: MockFixture,
+    race: IndividualSprintRace,
+    startlist: Startlist,
+    new_start_entry: StartEntry,
+    start_entry: StartEntry,
+) -> None:
+    """Should return 422 Unprocessable Entity when the given id is already in use."""
+    mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entry_by_id",
+        return_value=start_entry,
+    )
+    create_start_entry = mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.create_start_entry",
+        return_value=start_entry.id,
+    )
+    mocker.patch(
+        "app.adapters.start_entries_adapter.StartEntriesAdapter.get_start_entries_by_race_id",
+        return_value=[],
+    )
+    mocker.patch(
+        "app.adapters.races_adapter.RacesAdapter.get_race_by_id",
+        return_value=race,
+    )
+    mocker.patch(
+        "app.adapters.startlists_adapter.StartlistsAdapter.get_startlist_by_id",
+        return_value=startlist,
+    )
+
+    request_body = new_start_entry.model_dump(mode="json")
+    request_body["id"] = str(start_entry.id)
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {token}",
+    }
+
+    resp = client.post(
+        f"races/{race.id}/start-entries", headers=headers, json=request_body
+    )
+    assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+    assert "already exists" in resp.json()["detail"]
+    create_start_entry.assert_not_called()

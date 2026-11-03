@@ -35,11 +35,20 @@ class StartEntriesService:
             UUID: The id of the created start_entry
 
         Raises:
+            IllegalValueError: a start_entry with the given id already exists
             CouldNotCreateStartEntryError: creation failed
         """
         cls.logger.debug(f"trying to insert start_entry: {start_entry}")
         # Validation:
         await validate_start_entry(start_entry)
+        # The id may be given by the client, so it must not already be in use:
+        try:
+            await StartEntriesAdapter.get_start_entry_by_id(start_entry.id)
+        except StartEntryNotFoundError:
+            pass
+        else:
+            msg = f"Start-entry with id {start_entry.id} already exists."
+            raise IllegalValueError(msg) from None
         # insert new start_entry
         cls.logger.debug(f"new start_entry: {start_entry}")
         result = await StartEntriesAdapter.create_start_entry(start_entry)
