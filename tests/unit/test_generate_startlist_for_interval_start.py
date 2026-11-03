@@ -44,22 +44,16 @@ async def test_generate_start_entries_for_interval_start(
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
 
-    # TODO: expected_startlist_*.start_entries is always empty, so nothing is
-
-    # compared here. Comparing with expected_start_entries_* fails (also on main),
-
-    # so the expected start-entries or the generation logic need investigation.
-
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
         map(
             lambda p, q: (
                 p.model_dump(exclude=IGNORED_FIELDS)
-                == q.model_dump(exclude=IGNORED_FIELDS)  # ty: ignore[unresolved-attribute]
+                == q.model_dump(exclude=IGNORED_FIELDS)
             ),
             start_entries,
-            expected_startlist_interval_start.start_entries,
+            expected_start_entries_interval_start,
         ),
         True,
     ):
@@ -452,7 +446,7 @@ async def expected_start_entries_interval_start() -> list[StartEntry]:
             bib=8,
             starting_position=2,
             scheduled_start_time=datetime.fromisoformat("2021-08-31 09:13:00"),
-            name="Eigth Contender",
+            name="Eight Contender",
             club="Lyn Ski",
         )
     )

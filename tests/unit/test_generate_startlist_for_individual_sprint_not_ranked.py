@@ -44,22 +44,16 @@ async def test_generate_startlist_for_individual_sprint_not_ranked(
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
 
-    # TODO: expected_startlist_*.start_entries is always empty, so nothing is
-
-    # compared here. Comparing with expected_start_entries_* fails (also on main),
-
-    # so the expected start-entries or the generation logic need investigation.
-
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
         map(
             lambda p, q: (
                 p.model_dump(exclude=IGNORED_FIELDS)
-                == q.model_dump(exclude=IGNORED_FIELDS)  # ty: ignore[unresolved-attribute]
+                == q.model_dump(exclude=IGNORED_FIELDS)
             ),
             start_entries,
-            expected_startlist_individual_sprint.start_entries,
+            expected_start_entries_individual_sprint,
         ),
         True,
     ):
@@ -636,7 +630,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=8,
             starting_position=1,
-            name="Eigth Contender",
+            name="Eight Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
@@ -647,7 +641,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=9,
             starting_position=2,
-            name="Nineth Contender",
+            name="Ninth Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
@@ -680,7 +674,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=12,
             starting_position=5,
-            name="Twelvth Contender",
+            name="Twelfth Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
@@ -702,7 +696,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="ce565303-7508-5221-9f88-4630b31cf3dc",
             bib=14,
             starting_position=7,
-            name="Fourtheenth Contender",
+            name="Fourteenth Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:02:30"),
         )
@@ -934,7 +928,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="c18d9d8f-ca83-5a26-a56d-bc9f95fbbd20",
             bib=8,
             starting_position=1,
-            name="Eigth Contender",
+            name="Eight Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
         )
@@ -945,7 +939,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="c18d9d8f-ca83-5a26-a56d-bc9f95fbbd20",
             bib=9,
             starting_position=2,
-            name="Nineth Contender",
+            name="Ninth Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
         )
@@ -978,7 +972,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="c18d9d8f-ca83-5a26-a56d-bc9f95fbbd20",
             bib=12,
             starting_position=5,
-            name="Twelvth Contender",
+            name="Twelfth Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
         )
@@ -1000,7 +994,7 @@ async def expected_start_entries_individual_sprint() -> list[StartEntry]:
             race_id="c18d9d8f-ca83-5a26-a56d-bc9f95fbbd20",
             bib=14,
             starting_position=7,
-            name="Fourtheenth Contender",
+            name="Fourteenth Contender",
             club="Lyn Ski",
             scheduled_start_time=datetime.fromisoformat("2021-09-29 09:20:00"),
         )
