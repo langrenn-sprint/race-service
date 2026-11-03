@@ -56,7 +56,7 @@ class TimeEventsService:
         await validate_time_event(time_event)
         # If time-event for bib and given timing-point already exists in the race, throw error:
         _time_events = await TimeEventsAdapter.get_time_events_by_race_id(
-            time_event.race_id,  # type: ignore [reportArgumentType]
+            time_event.race_id,  # ty: ignore[invalid-argument-type]
         )
         for _time_event in _time_events:
             if (

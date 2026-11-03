@@ -154,8 +154,10 @@ class RaceplansCommands:
         # Check if the sum of contestants in races is equal to the number of contestants in the raceplan:
         if sum_no_of_contestants != raceplan.no_of_contestants:
             results[0] = [
-                f"The sum of contestants in races ({sum_no_of_contestants})"
-                f" is not equal to the number of contestants in the raceplan ({raceplan.no_of_contestants})."
+                (
+                    f"The sum of contestants in races ({sum_no_of_contestants})"
+                    f" is not equal to the number of contestants in the raceplan ({raceplan.no_of_contestants})."
+                )
             ]
 
         # Check if the number of contestants in the plan is equal to

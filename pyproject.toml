@@ -54,7 +54,7 @@ required-version = ">=0.9.26"
 [tool.ruff.lint]
 select = ["ALL"]
 # and then manually ignore annoying ones:
-ignore = ["COM812", "ISC001", "T201", "G004", "E501", "ANN401"]
+ignore = ["COM812", "ISC001", "T201", "G004", "E501", "ANN401", "CPY001"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = [
@@ -63,6 +63,7 @@ ignore = ["COM812", "ISC001", "T201", "G004", "E501", "ANN401"]
     "ANN401",   # Any should be allowed
     "ARG001",   # Unused function args -> fixtures nevertheless are functionally relevant...
     "PLR0913",
+    "PLR0917",  # pytest fixtures are injected as positional arguments
     "PTH123",   # Don't care about paths in tests
     "ASYNC230", # Don't care about async in tests
     "ERA001",   # Don't care about commented-out code in tests
@@ -89,6 +90,7 @@ include = ["tests/**"]
 # Tests pass id literals as strings, Pydantic converts them to UUID:
 invalid-argument-type = "ignore"
 invalid-assignment = "ignore"
+not-subscriptable = "ignore"
 
 [tool.deptry]
 ignore_notebooks = true

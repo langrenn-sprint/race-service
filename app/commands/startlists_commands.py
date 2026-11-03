@@ -107,7 +107,7 @@ async def generate_startlist_for_event(  # noqa: C901
             startlist_id,
             competition_format,
             raceclasses,
-            races,  # type: ignore [reportArgumentType]
+            races,  # ty: ignore[invalid-argument-type]
             contestants,
         )
 
@@ -116,7 +116,7 @@ async def generate_startlist_for_event(  # noqa: C901
             startlist_id,
             competition_format,
             raceclasses,
-            races,  # type: ignore [reportArgumentType]
+            races,  # ty: ignore[invalid-argument-type]
             contestants,
         )
     else:

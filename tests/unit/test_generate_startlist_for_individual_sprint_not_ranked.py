@@ -44,13 +44,19 @@ async def test_generate_startlist_for_individual_sprint_not_ranked(
     for start_entry in start_entries:
         assert type(start_entry) is StartEntry
 
+    # TODO: expected_startlist_*.start_entries is always empty, so nothing is
+
+    # compared here. Comparing with expected_start_entries_* fails (also on main),
+
+    # so the expected start-entries or the generation logic need investigation.
+
     # Check that the two race lists match:
     if not reduce(
         lambda x, y: x and y,
         map(
             lambda p, q: (
                 p.model_dump(exclude=IGNORED_FIELDS)
-                == q.model_dump(exclude=IGNORED_FIELDS)
+                == q.model_dump(exclude=IGNORED_FIELDS)  # ty: ignore[unresolved-attribute]
             ),
             start_entries,
             expected_startlist_individual_sprint.start_entries,
