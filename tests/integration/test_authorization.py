@@ -24,6 +24,7 @@ async def test_no_token(client: TestClient) -> None:
     """Should return 401 Unauthorized."""
     resp = client.delete(PROTECTED_URL)
     assert resp.status_code == HTTPStatus.UNAUTHORIZED
+    assert resp.headers["WWW-Authenticate"] == "Bearer"
 
 
 @pytest.mark.integration
@@ -32,6 +33,7 @@ async def test_expired_token(client: TestClient) -> None:
     token = _token(os.environ["JWT_SECRET"], exp=1)
     resp = client.delete(PROTECTED_URL, headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == HTTPStatus.UNAUTHORIZED
+    assert resp.headers["WWW-Authenticate"] == "Bearer"
 
 
 @pytest.mark.integration
@@ -42,6 +44,7 @@ async def test_token_with_invalid_signature(client: TestClient) -> None:
     )
     resp = client.delete(PROTECTED_URL, headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == HTTPStatus.UNAUTHORIZED
+    assert resp.headers["WWW-Authenticate"] == "Bearer"
 
 
 @pytest.mark.integration
@@ -49,6 +52,17 @@ async def test_undecodable_token(client: TestClient) -> None:
     """Should return 401 Unauthorized."""
     resp = client.delete(PROTECTED_URL, headers={"Authorization": "Bearer not-a-jwt"})
     assert resp.status_code == HTTPStatus.UNAUTHORIZED
+    assert resp.headers["WWW-Authenticate"] == "Bearer"
+
+
+@pytest.mark.integration
+async def test_token_without_role_claim(client: TestClient) -> None:
+    """Should return 401 Unauthorized, not 403, for a token without a role."""
+    payload = {"username": os.getenv("ADMIN_USERNAME"), "exp": 9999999999}
+    token = jwt.encode(payload, os.environ["JWT_SECRET"], "HS256")
+    resp = client.delete(PROTECTED_URL, headers={"Authorization": f"Bearer {token}"})
+    assert resp.status_code == HTTPStatus.UNAUTHORIZED
+    assert resp.headers["WWW-Authenticate"] == "Bearer"
 
 
 @pytest.mark.integration
@@ -87,6 +101,7 @@ async def test_invalid_token_is_logged_without_traceback(
     finally:
         app_logger.removeHandler(caplog.handler)
     assert resp.status_code == HTTPStatus.UNAUTHORIZED
+    assert resp.headers["WWW-Authenticate"] == "Bearer"
 
     records = [r for r in caplog.records if r.name == "app.authorization.authorization"]
     assert [r.getMessage() for r in records] == ["Token has expired"]
