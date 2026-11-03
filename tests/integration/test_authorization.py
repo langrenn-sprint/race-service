@@ -1,5 +1,6 @@
 """Integration test cases for authentication and authorization."""
 
+import logging
 import os
 import uuid
 from http import HTTPStatus
@@ -56,3 +57,26 @@ async def test_valid_token_with_insufficient_role(client: TestClient) -> None:
     token = _token(os.environ["JWT_SECRET"], exp=9999999999, role="user")
     resp = client.delete(PROTECTED_URL, headers={"Authorization": f"Bearer {token}"})
     assert resp.status_code == HTTPStatus.FORBIDDEN
+
+
+@pytest.mark.integration
+async def test_invalid_token_is_logged_without_traceback(
+    client: TestClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Should log a warning without a stack trace for an invalid token."""
+    token = _token(os.environ["JWT_SECRET"], exp=1)
+    # The "app" logger does not propagate to the root logger, so attach caplog to it:
+    app_logger = logging.getLogger("app")
+    app_logger.addHandler(caplog.handler)
+    try:
+        resp = client.delete(
+            PROTECTED_URL, headers={"Authorization": f"Bearer {token}"}
+        )
+    finally:
+        app_logger.removeHandler(caplog.handler)
+    assert resp.status_code == HTTPStatus.UNAUTHORIZED
+
+    records = [r for r in caplog.records if r.name == "app.authorization.authorization"]
+    assert [r.getMessage() for r in records] == ["Token has expired"]
+    assert records[0].levelno == logging.WARNING
+    assert records[0].exc_info is None
