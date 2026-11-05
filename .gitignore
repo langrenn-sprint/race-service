@@ -128,3 +128,6 @@ dmypy.json
 
 # IDE stuff
 .vscode
+
+# Container logs from failed contract tests
+docker-compose-logs.txt
