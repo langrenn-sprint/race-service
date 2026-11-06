@@ -5,7 +5,7 @@ from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
 
 from app.adapters import (
@@ -14,7 +14,7 @@ from app.adapters import (
     RaceplansAdapter,
     RacesAdapter,
 )
-from app.authorization import Role, RoleChecker
+from app.authorization import Role, require_roles
 from app.models import (
     IndividualSprintRace,
     IntervalStartRace,
@@ -71,7 +71,7 @@ async def get_raceplan_by_id(raceplan_id: UUID) -> RaceplanWithRaces:
 
 @router.put(
     "/raceplans/{raceplan_id}",
-    dependencies=[Depends(RoleChecker([Role.ADMIN, Role.EVENT_ADMIN]))],
+    dependencies=[require_roles(Role.ADMIN, Role.EVENT_ADMIN)],
 )
 async def update_raceplan(raceplan_id: UUID, raceplan: Raceplan) -> Response:
     """Update raceplan."""
@@ -89,7 +89,7 @@ async def update_raceplan(raceplan_id: UUID, raceplan: Raceplan) -> Response:
 
 @router.delete(
     "/raceplans/{raceplan_id}",
-    dependencies=[Depends(RoleChecker([Role.ADMIN, Role.EVENT_ADMIN]))],
+    dependencies=[require_roles(Role.ADMIN, Role.EVENT_ADMIN)],
 )
 async def delete_raceplan(raceplan_id: UUID) -> Response:
     """Delete the raceplan and all the races in it."""

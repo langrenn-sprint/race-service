@@ -24,6 +24,7 @@ from app.authorization import (
     TokenError,
     TokenMissingError,
     TokenValidationError,
+    document_roles,
 )
 from app.routers import (
     ping,
@@ -238,3 +239,4 @@ api.include_router(start_entries.router)
 api.include_router(startlists_commands.router)
 api.include_router(startlists.router)
 api.include_router(time_events.router)
+document_roles(api)

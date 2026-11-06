@@ -5,7 +5,7 @@ import os
 from http import HTTPStatus
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
 
@@ -14,7 +14,7 @@ from app.adapters import (
     RaceplanNotFoundError,
     RaceplansAdapter,
 )
-from app.authorization import Role, RoleChecker
+from app.authorization import Role, require_roles
 from app.commands import (
     CompetitionFormatNotSupportedError,
     CouldNotCreateRaceError,
@@ -47,7 +47,7 @@ class GenerateRaceplanCommand(BaseModel):
 
 @router.post(
     "/raceplans/generate-raceplan-for-event",
-    dependencies=[Depends(RoleChecker([Role.ADMIN, Role.EVENT_ADMIN]))],
+    dependencies=[require_roles(Role.ADMIN, Role.EVENT_ADMIN)],
 )
 async def generate_raceplan_for_event(command: GenerateRaceplanCommand) -> Response:
     """Generate raceplan for the given event."""
@@ -76,7 +76,7 @@ async def generate_raceplan_for_event(command: GenerateRaceplanCommand) -> Respo
 
 @router.post(
     "/raceplans/{raceplan_id}/validate",
-    dependencies=[Depends(RoleChecker([Role.ADMIN, Role.EVENT_ADMIN]))],
+    dependencies=[require_roles(Role.ADMIN, Role.EVENT_ADMIN)],
 )
 async def validate_raceplan(raceplan_id: UUID) -> dict[int, list[str]]:
     """Validate the given raceplan."""
