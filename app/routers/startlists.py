@@ -5,7 +5,7 @@ from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
 
 from app.adapters import (
@@ -14,7 +14,7 @@ from app.adapters import (
     StartlistNotFoundError,
     StartlistsAdapter,
 )
-from app.authorization import Role, RoleChecker
+from app.authorization import Role, require_roles
 from app.models import Startlist, StartlistWithStartEntries
 from app.services import (
     RacesService,
@@ -94,7 +94,7 @@ async def get_startlist_by_id(startlist_id: UUID) -> StartlistWithStartEntries:
 
 @router.delete(
     "/startlists/{startlist_id}",
-    dependencies=[Depends(RoleChecker([Role.ADMIN, Role.EVENT_ADMIN]))],
+    dependencies=[require_roles(Role.ADMIN, Role.EVENT_ADMIN)],
 )
 async def delete_startlist(startlist_id: UUID) -> Response:
     """Delete startlist, and start-entries in it."""

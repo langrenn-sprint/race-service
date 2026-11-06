@@ -6,6 +6,8 @@ from .authorization import (
     TokenError,
     TokenMissingError,
     TokenValidationError,
+    document_roles,
+    require_roles,
 )
 
 __all__ = [
@@ -14,4 +16,6 @@ __all__ = [
     "TokenError",
     "TokenMissingError",
     "TokenValidationError",
+    "document_roles",
+    "require_roles",
 ]

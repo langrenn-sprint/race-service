@@ -6,7 +6,7 @@ from http import HTTPStatus
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
 
 from app.adapters import (
@@ -19,7 +19,7 @@ from app.adapters import (
     StartlistNotFoundError,
     StartlistsAdapter,
 )
-from app.authorization import Role, RoleChecker
+from app.authorization import Role, require_roles
 from app.models import (
     IndividualSprintRace,
     StartEntry,
@@ -41,7 +41,14 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["start-entries"])
 
-ALLOWED_ROLES = [Role.ADMIN, Role.EVENT_ADMIN, Role.RACE_RESULT, Role.RACE_OFFICE]
+# contestant-admin may add and change start entries (late entries), but not delete:
+ALLOWED_ROLES = [
+    Role.ADMIN,
+    Role.EVENT_ADMIN,
+    Role.RESULT_ADMIN,
+    Role.CONTESTANT_ADMIN,
+]
+DELETE_ROLES = [Role.ADMIN, Role.EVENT_ADMIN, Role.RESULT_ADMIN]
 
 
 @router.get("/races/{race_id}/start-entries")
@@ -65,7 +72,7 @@ async def get_start_entries(
 
 @router.post(
     "/races/{race_id}/start-entries",
-    dependencies=[Depends(RoleChecker(ALLOWED_ROLES))],
+    dependencies=[require_roles(*ALLOWED_ROLES)],
 )
 async def create_start_entry(race_id: UUID, new_start_entry: StartEntry) -> Response:
     """Create the start_entry and add it to the race and startlist."""
@@ -163,7 +170,7 @@ async def get_start_entry_by_id(race_id: UUID, start_entry_id: UUID) -> StartEnt
 
 @router.put(
     "/races/{race_id}/start-entries/{start_entry_id}",
-    dependencies=[Depends(RoleChecker(ALLOWED_ROLES))],
+    dependencies=[require_roles(*ALLOWED_ROLES)],
 )
 async def update_start_entry(
     race_id: UUID, start_entry_id: UUID, start_entry: StartEntry
@@ -184,7 +191,7 @@ async def update_start_entry(
 
 @router.delete(
     "/races/{race_id}/start-entries/{start_entry_id}",
-    dependencies=[Depends(RoleChecker(ALLOWED_ROLES))],
+    dependencies=[require_roles(*DELETE_ROLES)],
 )
 async def delete_start_entry(race_id: UUID, start_entry_id: UUID) -> Response:
     """Delete the start-entry, and remove it from the race and startlist."""

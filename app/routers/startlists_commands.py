@@ -5,7 +5,7 @@ import os
 from http import HTTPStatus
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
 from pydantic import BaseModel
 
@@ -14,7 +14,7 @@ from app.adapters import (
     EventNotFoundError,
     RaceclassesNotFoundError,
 )
-from app.authorization import Role, RoleChecker
+from app.authorization import Role, require_roles
 from app.commands import (
     CompetitionFormatNotSupportedError,
     DuplicateRaceplansInEventError,
@@ -45,7 +45,7 @@ class GenerateStartlistCommand(BaseModel):
 
 @router.post(
     "/startlists/generate-startlist-for-event",
-    dependencies=[Depends(RoleChecker([Role.ADMIN, Role.EVENT_ADMIN]))],
+    dependencies=[require_roles(Role.ADMIN, Role.EVENT_ADMIN)],
 )
 async def generate_startlist(command: GenerateStartlistCommand) -> Response:
     """Generate startlist for the given event."""

@@ -7,7 +7,7 @@ from typing import Annotated
 from uuid import UUID
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
 
 from app.adapters import (
@@ -17,7 +17,7 @@ from app.adapters import (
     TimeEventNotFoundError,
     TimeEventsAdapter,
 )
-from app.authorization import Role, RoleChecker
+from app.authorization import Role, require_roles
 from app.models import Changelog, TimeEvent
 from app.services import (
     ContestantNotInStartEntriesError,
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["time-events"])
 
-ALLOWED_ROLES = [Role.ADMIN, Role.EVENT_ADMIN, Role.RACE_RESULT]
+ALLOWED_ROLES = [Role.ADMIN, Role.EVENT_ADMIN, Role.RESULT_ADMIN]
 
 
 @router.get("/time-events")
@@ -79,7 +79,7 @@ async def get_time_events(
 
 @router.post(
     "/time-events",
-    dependencies=[Depends(RoleChecker(ALLOWED_ROLES))],
+    dependencies=[require_roles(*ALLOWED_ROLES)],
 )
 async def create_time_event(time_event: TimeEvent) -> TimeEvent:
     """Create time-event, and add it to the race-result of the race."""
@@ -135,7 +135,7 @@ async def get_time_event_by_id(time_event_id: UUID) -> TimeEvent:
 
 @router.put(
     "/time-events/{time_event_id}",
-    dependencies=[Depends(RoleChecker(ALLOWED_ROLES))],
+    dependencies=[require_roles(*ALLOWED_ROLES)],
 )
 async def update_time_event(time_event_id: UUID, time_event: TimeEvent) -> Response:
     """Update time-event."""
@@ -153,7 +153,7 @@ async def update_time_event(time_event_id: UUID, time_event: TimeEvent) -> Respo
 
 @router.delete(
     "/time-events/{time_event_id}",
-    dependencies=[Depends(RoleChecker(ALLOWED_ROLES))],
+    dependencies=[require_roles(*ALLOWED_ROLES)],
 )
 async def delete_time_event(time_event_id: UUID) -> Response:
     """Delete time-event and also remove it from race-result."""
