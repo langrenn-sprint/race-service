@@ -7,6 +7,7 @@ import uuid
 from collections.abc import AsyncGenerator
 from http import HTTPStatus
 from typing import Any
+from urllib.parse import urlsplit
 
 import motor.motor_asyncio
 import pytest
@@ -17,14 +18,6 @@ from app.utils import db_utils
 
 from .utils import _decide_group_order_and_ranking
 
-EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
-EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
-COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
-COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
-USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
-USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = int(os.getenv("DB_PORT", "27017"))
 DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -35,9 +28,9 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module", autouse=True)
-async def token(http_service: Any) -> str:
+async def token(http_service: Any, users_url: str) -> str:
     """Create a valid token."""
-    url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
+    url = f"{users_url}/login"
     headers = {"Content-Type": "application/json"}
     request_startlist = {
         "username": os.getenv("ADMIN_USERNAME"),
@@ -57,11 +50,11 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="module", autouse=True)
-async def clear_db() -> AsyncGenerator:
+async def clear_db(db_address: dict[str, Any]) -> AsyncGenerator:
     """Clear db before and after tests."""
     logger.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
-        host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
+        **db_address, username=DB_USER, password=DB_PASSWORD
     )
     try:
         await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
@@ -82,7 +75,11 @@ async def clear_db() -> AsyncGenerator:
 
 @pytest.fixture(scope="module", autouse=True)
 async def context(
-    http_service: Any, token: MockFixture, clear_db: Any
+    http_service: Any,
+    token: MockFixture,
+    clear_db: Any,
+    competition_format_url: str,
+    events_url: str,
 ) -> dict[str, str | list]:
     """Arrange and create startlist to do tests on."""
     event_id = ""
@@ -94,7 +91,7 @@ async def context(
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_startlist = competition_format
             response = await client.post(url, headers=headers, json=request_startlist)
             if response.status_code != HTTPStatus.CREATED:
@@ -110,7 +107,7 @@ async def context(
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_startlist = event
             response = await client.post(url, headers=headers, json=request_startlist)
             assert response.status_code == HTTPStatus.CREATED
@@ -121,7 +118,7 @@ async def context(
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_all.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -137,19 +134,13 @@ async def context(
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set group and order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -166,13 +157,13 @@ async def context(
             assert put_response.status_code == HTTPStatus.NO_CONTENT
 
         # Then we have to assign bibs to all contestants:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/assign-bibs"
+        url = f"{events_url}/events/{event_id}/contestants/assign-bibs"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/contestants" in response.headers["Location"]
 
         # Get the contestants for debugging purposes:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
+        url = f"{events_url}/events/{event_id}/contestants"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         contestants = response.json()
@@ -207,7 +198,8 @@ async def context(
                 f"Got unexpected status {response.status_code}, reason {startlist}."
             )
         assert response.status_code == HTTPStatus.CREATED
-        startlist_url = response.headers["Location"]
+        # Location uses the service's configured host, not Docker's port
+        startlist_url = f"{http_service}{urlsplit(response.headers['Location']).path}"
         assert "/startlists/" in startlist_url
 
         context: dict[str, str | list] = {
@@ -840,14 +832,16 @@ async def test_get_all_startlists_by_event_id_when_event_does_not_exist(
 # ---
 
 
-async def delete_competition_formats(token: MockFixture) -> None:
+async def delete_competition_formats(
+    competition_format_url: str, token: MockFixture
+) -> None:
     """Delete all competition_formats."""
     headers = {
         "Authorization": f"Bearer {token}",
     }
 
     async with AsyncClient() as client:
-        url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+        url = f"{competition_format_url}/competition-formats"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         competition_formats = response.json()
@@ -859,14 +853,14 @@ async def delete_competition_formats(token: MockFixture) -> None:
     logger.info("Clear_db: Deleted all competition_formats.")
 
 
-async def delete_events(token: MockFixture) -> None:
+async def delete_events(events_url: str, token: MockFixture) -> None:
     """Delete all events."""
     headers = {
         "Authorization": f"Bearer {token}",
     }
 
     async with AsyncClient() as client:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+        url = f"{events_url}/events"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         events = response.json()
@@ -878,14 +872,14 @@ async def delete_events(token: MockFixture) -> None:
     logger.info("Clear_db: Deleted all events.")
 
 
-async def delete_contestants(token: MockFixture) -> None:
+async def delete_contestants(events_url: str, token: MockFixture) -> None:
     """Delete all contestants."""
     headers = {
         "Authorization": f"Bearer {token}",
     }
 
     async with AsyncClient() as client:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+        url = f"{events_url}/events"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         events = response.json()
@@ -897,14 +891,14 @@ async def delete_contestants(token: MockFixture) -> None:
     logger.info("Clear_db: Deleted all contestants.")
 
 
-async def delete_raceclasses(token: MockFixture) -> None:
+async def delete_raceclasses(events_url: str, token: MockFixture) -> None:
     """Delete all raceclasses."""
     headers = {
         "Authorization": f"Bearer {token}",
     }
 
     async with AsyncClient() as client:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+        url = f"{events_url}/events"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         events = response.json()

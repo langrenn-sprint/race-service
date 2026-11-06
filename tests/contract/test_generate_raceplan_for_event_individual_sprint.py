@@ -6,6 +6,7 @@ import os
 from collections.abc import AsyncGenerator
 from http import HTTPStatus
 from typing import Any
+from urllib.parse import urlsplit
 
 import motor.motor_asyncio
 import pytest
@@ -16,14 +17,6 @@ from app.utils import db_utils
 
 from .utils import _decide_group_order_and_ranking
 
-EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
-EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
-COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
-COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
-USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
-USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = int(os.getenv("DB_PORT", "27017"))
 DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -32,9 +25,9 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(autouse=True)
-async def token(http_service: Any) -> str:
+async def token(http_service: Any, users_url: str) -> str:
     """Create a valid token."""
-    url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
+    url = f"{users_url}/login"
     headers = {"Content-Type": "application/json"}
     request_body = {
         "username": os.getenv("ADMIN_USERNAME"),
@@ -52,11 +45,11 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(autouse=True)
-async def clear_db() -> AsyncGenerator:
+async def clear_db(db_address: dict[str, Any]) -> AsyncGenerator:
     """Clear db before and after tests."""
     logger.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
-        host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
+        **db_address, username=DB_USER, password=DB_PASSWORD
     )
     try:
         await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
@@ -80,6 +73,8 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
     http_service: Any,
     token: MockFixture,
     clear_db: AsyncGenerator,
+    competition_format_url: str,
+    events_url: str,
 ) -> None:
     """Should return 201 created and a location header with url to the raceplan."""
     # ARRANGE
@@ -93,7 +88,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_body = competition_format
             response = await client.post(url, headers=headers, json=request_body)
             assert response.status_code == HTTPStatus.CREATED
@@ -106,7 +101,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_body = event
             response = await client.post(url, headers=headers, json=request_body)
             try:
@@ -122,7 +117,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_J10_17.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -138,19 +133,13 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -188,7 +177,8 @@ async def test_generate_raceplan_for_individual_sprint_event_J10(  # noqa: N802
         assert "/raceplans/" in response.headers["Location"]
 
         # We check that raceplan are actually created:
-        url = response.headers["Location"]
+        # Location uses the service's configured host, not Docker's port
+        url = f"{http_service}{urlsplit(response.headers['Location']).path}"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceplan = response.json()
@@ -251,6 +241,8 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
     http_service: Any,
     token: MockFixture,
     clear_db: AsyncGenerator,
+    competition_format_url: str,
+    events_url: str,
 ) -> None:
     """Should return 201 created and a location header with url to the raceplan."""
     # ARRANGE
@@ -264,7 +256,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_body = competition_format
             response = await client.post(url, headers=headers, json=request_body)
             assert response.status_code == HTTPStatus.CREATED
@@ -277,7 +269,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_body = event
             response = await client.post(url, headers=headers, json=request_body)
             if response.status_code != HTTPStatus.CREATED:
@@ -294,7 +286,7 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_J11_17.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -310,19 +302,13 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -359,7 +345,8 @@ async def test_generate_raceplan_for_individual_sprint_event_J11(  # noqa: N802
         assert "/raceplans/" in response.headers["Location"]
 
         # We check that raceplan are actually created:
-        url = response.headers["Location"]
+        # Location uses the service's configured host, not Docker's port
+        url = f"{http_service}{urlsplit(response.headers['Location']).path}"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceplan = response.json()
@@ -412,6 +399,8 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
     http_service: Any,
     token: MockFixture,
     clear_db: AsyncGenerator,
+    competition_format_url: str,
+    events_url: str,
 ) -> None:
     """Should return 201 created and a location header with url to the raceplan."""
     # ARRANGE
@@ -425,7 +414,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_body = competition_format
             response = await client.post(url, headers=headers, json=request_body)
             assert response.status_code == HTTPStatus.CREATED
@@ -438,7 +427,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_body = event
             response = await client.post(url, headers=headers, json=request_body)
             if response.status_code != HTTPStatus.CREATED:
@@ -455,7 +444,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_G11_10.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -471,19 +460,13 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -520,7 +503,8 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_10(  # noqa: N8
         assert "/raceplans/" in response.headers["Location"]
 
         # We check that raceplan are actually created:
-        url = response.headers["Location"]
+        # Location uses the service's configured host, not Docker's port
+        url = f"{http_service}{urlsplit(response.headers['Location']).path}"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceplan = response.json()
@@ -575,6 +559,8 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
     http_service: Any,
     token: MockFixture,
     clear_db: AsyncGenerator,
+    competition_format_url: str,
+    events_url: str,
 ) -> None:
     """Should return 201 created and a location header with url to the raceplan."""
     # ARRANGE
@@ -588,7 +574,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_body = competition_format
             response = await client.post(url, headers=headers, json=request_body)
             assert response.status_code == HTTPStatus.CREATED
@@ -601,7 +587,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_body = event
             response = await client.post(url, headers=headers, json=request_body)
             if response.status_code != HTTPStatus.CREATED:
@@ -619,7 +605,7 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_all.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -635,19 +621,13 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set group and order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -685,7 +665,8 @@ async def test_generate_raceplan_for_individual_sprint_event_all(
         assert "/raceplans/" in response.headers["Location"]
 
         # We check that raceplan are actually created:
-        url = response.headers["Location"]
+        # Location uses the service's configured host, not Docker's port
+        url = f"{http_service}{urlsplit(response.headers['Location']).path}"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceplan = response.json()
@@ -745,6 +726,8 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
     http_service: Any,
     token: MockFixture,
     clear_db: AsyncGenerator,
+    competition_format_url: str,
+    events_url: str,
 ) -> None:
     """Should return 201 created and a location header with url to the raceplan."""
     # ARRANGE
@@ -758,7 +741,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_body = competition_format
             response = await client.post(url, headers=headers, json=request_body)
             assert response.status_code == HTTPStatus.CREATED
@@ -771,7 +754,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_body = event
             response = await client.post(url, headers=headers, json=request_body)
             if response.status_code != HTTPStatus.CREATED:
@@ -788,7 +771,7 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_G11_7.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -804,19 +787,13 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -853,7 +830,8 @@ async def test_generate_raceplan_for_individual_sprint_event_G11_7(  # noqa: N80
         assert "/raceplans/" in response.headers["Location"]
 
         # We check that raceplan are actually created:
-        url = response.headers["Location"]
+        # Location uses the service's configured host, not Docker's port
+        url = f"{http_service}{urlsplit(response.headers['Location']).path}"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceplan = response.json()

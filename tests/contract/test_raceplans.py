@@ -18,14 +18,6 @@ from app.utils import db_utils
 
 from .utils import _decide_group_order_and_ranking
 
-EVENTS_HOST_SERVER = os.getenv("EVENTS_HOST_SERVER")
-EVENTS_HOST_PORT = os.getenv("EVENTS_HOST_PORT")
-COMPETITION_FORMAT_HOST_SERVER = os.getenv("COMPETITION_FORMAT_HOST_SERVER")
-COMPETITION_FORMAT_HOST_PORT = os.getenv("COMPETITION_FORMAT_HOST_PORT")
-USERS_HOST_SERVER = os.getenv("USERS_HOST_SERVER")
-USERS_HOST_PORT = os.getenv("USERS_HOST_PORT")
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = int(os.getenv("DB_PORT", "27017"))
 DB_NAME = os.getenv("DB_NAME", "races_test")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
@@ -34,9 +26,9 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="module", autouse=True)
-async def token(http_service: Any) -> str:
+async def token(http_service: Any, users_url: str) -> str:
     """Create a valid token."""
-    url = f"http://{USERS_HOST_SERVER}:{USERS_HOST_PORT}/login"
+    url = f"{users_url}/login"
     headers = {"Content-Type": "application/json"}
     request_body = {
         "username": os.getenv("ADMIN_USERNAME"),
@@ -54,11 +46,11 @@ async def token(http_service: Any) -> str:
 
 
 @pytest.fixture(scope="module", autouse=True)
-async def clear_db() -> AsyncGenerator:
+async def clear_db(db_address: dict[str, Any]) -> AsyncGenerator:
     """Clear db before and after tests."""
     logger.info(" --- Cleaning db at startup. ---")
     mongo = motor.motor_asyncio.AsyncIOMotorClient(
-        host=DB_HOST, port=DB_PORT, username=DB_USER, password=DB_PASSWORD
+        **db_address, username=DB_USER, password=DB_PASSWORD
     )
     try:
         await db_utils.drop_db_and_recreate_indexes(mongo, DB_NAME)
@@ -83,6 +75,8 @@ async def context(
     http_service: Any,
     token: MockFixture,
     clear_db: Any,
+    competition_format_url: str,
+    events_url: str,
 ) -> dict:
     """Create context and return event_id."""
     event_id = ""
@@ -94,7 +88,7 @@ async def context(
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{COMPETITION_FORMAT_HOST_SERVER}:{COMPETITION_FORMAT_HOST_PORT}/competition-formats"
+            url = f"{competition_format_url}/competition-formats"
             request_body = competition_format
             response = await client.post(url, headers=headers, json=request_body)
             if response.status_code != HTTPStatus.CREATED:
@@ -110,7 +104,7 @@ async def context(
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {token}",
             }
-            url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events"
+            url = f"{events_url}/events"
             request_body = event
             response = await client.post(url, headers=headers, json=request_body)
             assert response.status_code == HTTPStatus.CREATED
@@ -121,7 +115,7 @@ async def context(
         headers = {
             "Authorization": f"Bearer {token}",
         }
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/file"
+        url = f"{events_url}/events/{event_id}/contestants/file"
         with open("tests/files/contestants_all.csv", "rb") as file:
             logger.debug(f"Adding contestants from file at url {url}.")
             response = await client.post(
@@ -137,19 +131,13 @@ async def context(
             assert status == HTTPStatus.OK
 
         # Generate raceclasses based on contestants:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/generate-raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/generate-raceclasses"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/raceclasses" in response.headers["Location"]
 
         # Set group and order on all raceclasses:
-        url = (
-            f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}"
-            f"/events/{event_id}/raceclasses"
-        )
+        url = f"{events_url}/events/{event_id}/raceclasses"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
         raceclasses = response.json()
@@ -166,13 +154,13 @@ async def context(
             assert put_response.status_code == HTTPStatus.NO_CONTENT
 
         # Then we have to assign bibs to all contestants:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants/assign-bibs"
+        url = f"{events_url}/events/{event_id}/contestants/assign-bibs"
         response = await client.post(url, headers=headers)
         assert response.status_code == HTTPStatus.CREATED
         assert f"/events/{event_id}/contestants" in response.headers["Location"]
 
         # Get the contestants for debugging purposes:
-        url = f"http://{EVENTS_HOST_SERVER}:{EVENTS_HOST_PORT}/events/{event_id}/contestants"
+        url = f"{events_url}/events/{event_id}/contestants"
         response = await client.get(url)
         assert response.status_code == HTTPStatus.OK
 
